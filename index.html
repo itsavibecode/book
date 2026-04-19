@@ -100,17 +100,17 @@
   .btn.kick{ background: #53fc18; }
   .btn.twitch{ background: #9146ff; color: #ffffff; }
 
-  /* Audio controls panel (bottom-right) */
+  /* Audio controls panel (top-center, horizontal) */
   .audio-panel{
     position: fixed;
-    bottom: 24px;
-    right: 24px;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 10;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: stretch;
-    gap: 10px;
-    min-width: 180px;
+    gap: 12px;
   }
 
   /* Volume slider housing */
@@ -118,16 +118,11 @@
     background: #ffffff;
     border: 4px solid #0a0a0a;
     box-shadow: 5px 5px 0 #0a0a0a;
-    padding: 12px 14px;
+    padding: 12px 16px;
     display: flex;
     align-items: center;
     gap: 10px;
-    transition: opacity .25s ease, transform .25s ease;
-  }
-  .vol-wrap.hidden{
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(8px);
+    min-width: 180px;
   }
   .vol-wrap svg{
     width: 22px;
@@ -208,9 +203,9 @@
   @media (max-width: 480px){
     .btn{ font-size: 20px; padding: 14px 22px; }
     .btn svg{ width: 22px; height: 22px; }
-    .audio-panel{ bottom: 16px; right: 16px; min-width: 150px; }
-    .sound-btn{ font-size: 16px; padding: 10px 16px; }
-    .vol-wrap{ padding: 10px 12px; }
+    .audio-panel{ top: 16px; gap: 8px; flex-direction: row; max-width: calc(100% - 24px); }
+    .sound-btn{ font-size: 14px; padding: 10px 12px; }
+    .vol-wrap{ padding: 8px 12px; min-width: 120px; }
   }
 </style>
 </head>
@@ -244,7 +239,7 @@
 
   <!-- Audio controls -->
   <div class="audio-panel">
-    <div id="volWrap" class="vol-wrap hidden">
+    <div id="volWrap" class="vol-wrap">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
       </svg>
@@ -264,83 +259,42 @@
       const btn = document.getElementById('soundBtn');
       const label = document.getElementById('soundLabel');
       const icon = document.getElementById('soundIcon');
-      const volWrap = document.getElementById('volWrap');
       const volSlider = document.getElementById('vol');
 
-      // Icon paths
       const iconUnmuted = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
       const iconMuted = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.17v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
 
-      // Initialize volume from slider default
+      // Set initial volume from slider
       vid.volume = volSlider.value / 100;
 
-      function showUnmuted(){
-        vid.muted = false;
-        vid.play().catch(() => {});
+      function setUnmutedUI(){
         btn.classList.remove('muted');
         label.textContent = 'TAP TO MUTE';
         icon.innerHTML = iconUnmuted;
-        volWrap.classList.remove('hidden');
       }
 
-      function showMuted(){
-        vid.muted = true;
+      function setMutedUI(){
         btn.classList.add('muted');
         label.textContent = 'TAP FOR SOUND';
         icon.innerHTML = iconMuted;
-        volWrap.classList.add('hidden');
       }
 
-      // Try to autoplay with sound immediately (works if browser has granted permission
-      // for this origin, e.g. from a previous visit). Fallback: stays muted until interaction.
-      function tryAutoUnmute(){
-        vid.muted = false;
-        const p = vid.play();
-        if (p && typeof p.then === 'function'){
-          p.then(() => {
-            // success — sound is on
-            showUnmuted();
-          }).catch(() => {
-            // blocked by browser — keep muted, wait for user interaction
-            vid.muted = true;
-            vid.play().catch(() => {});
-          });
-        }
-      }
+      // Start muted (browsers require this for autoplay)
+      vid.muted = true;
+      setMutedUI();
 
-      // Attempt immediately and also shortly after (some browsers need a tick)
-      tryAutoUnmute();
-
-      // Auto-unmute on any first interaction anywhere on the page
-      function firstInteract(e){
-        // don't hijack clicks on links or on the audio controls themselves
-        if (e.target && e.target.closest){
-          if (e.target.closest('a.btn')) return;
-          if (e.target.closest('#soundBtn')) return;
-          if (e.target.closest('#volWrap')) return;
-        }
-        if (vid.muted){
-          showUnmuted();
-        }
-        // remove after first use
-        document.removeEventListener('click', firstInteract, true);
-        document.removeEventListener('touchstart', firstInteract, true);
-        document.removeEventListener('keydown', firstInteract, true);
-        document.removeEventListener('scroll', firstInteract, true);
-        document.removeEventListener('mousemove', firstInteract, true);
-      }
-      document.addEventListener('click', firstInteract, true);
-      document.addEventListener('touchstart', firstInteract, true);
-      document.addEventListener('keydown', firstInteract, true);
-      document.addEventListener('scroll', firstInteract, true);
-      document.addEventListener('mousemove', firstInteract, true);
-
-      // Mute/unmute toggle button
+      // Toggle sound on button click
       btn.addEventListener('click', function(){
         if (vid.muted){
-          showUnmuted();
+          vid.muted = false;
+          vid.volume = volSlider.value / 100;
+          // make sure it's playing (some browsers pause on unmute)
+          const p = vid.play();
+          if (p && p.catch) p.catch(() => {});
+          setUnmutedUI();
         } else {
-          showMuted();
+          vid.muted = true;
+          setMutedUI();
         }
       });
 
@@ -348,12 +302,10 @@
       volSlider.addEventListener('input', function(){
         const v = volSlider.value / 100;
         vid.volume = v;
-        // if user drags to 0, treat as mute; above 0, ensure unmuted
-        if (v === 0){
+        // if sound is currently on and user drags to 0, reflect muted state
+        if (!vid.muted && v === 0){
           vid.muted = true;
-        } else if (vid.muted){
-          vid.muted = false;
-          showUnmuted();
+          setMutedUI();
         }
       });
     })();
