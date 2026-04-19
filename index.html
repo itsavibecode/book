@@ -15,9 +15,44 @@
     background: #39ff14;
     font-family: 'Luckiest Guy', system-ui, sans-serif;
     letter-spacing: 1px;
+    overflow: hidden;
   }
 
-  body{
+  /* Background video */
+  .bg-video{
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+
+  /* Neon green tint overlay so the video "fits in" */
+  .tint{
+    position: fixed;
+    inset: 0;
+    background: #39ff14;
+    opacity: 0.55;
+    mix-blend-mode: multiply;
+    z-index: 1;
+    pointer-events: none;
+  }
+  /* second layer to brighten/unify the green */
+  .tint-2{
+    position: fixed;
+    inset: 0;
+    background: #39ff14;
+    opacity: 0.30;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Content container */
+  .content{
+    position: relative;
+    z-index: 3;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -30,7 +65,7 @@
     width: min(90vw, 560px);
     height: auto;
     display: block;
-    filter: drop-shadow(6px 8px 0 rgba(0,0,0,0.35));
+    filter: drop-shadow(6px 8px 0 rgba(0,0,0,0.5));
   }
 
   .links{
@@ -59,38 +94,119 @@
     box-shadow: 9px 9px 0 #0a0a0a;
   }
 
-  .btn svg{
-    width: 28px;
-    height: 28px;
-  }
+  .btn svg{ width: 28px; height: 28px; }
 
   .btn.kick{ background: #53fc18; }
   .btn.twitch{ background: #9146ff; color: #ffffff; }
 
+  /* Unmute prompt */
+  .unmute{
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    font-family: 'Luckiest Guy', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+    color: #0a0a0a;
+    background: #ffe82e;
+    border: 4px solid #0a0a0a;
+    box-shadow: 5px 5px 0 #0a0a0a;
+    cursor: pointer;
+    animation: pulse 1.4s ease-in-out infinite;
+    transition: transform .12s ease, box-shadow .12s ease, opacity .3s ease;
+  }
+  .unmute:hover{
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 #0a0a0a;
+  }
+  .unmute.hidden{
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+  }
+  .unmute svg{ width: 22px; height: 22px; }
+
+  @keyframes pulse{
+    0%,100%{ transform: scale(1); }
+    50%{ transform: scale(1.05); }
+  }
+
   @media (max-width: 480px){
     .btn{ font-size: 20px; padding: 14px 22px; }
     .btn svg{ width: 22px; height: 22px; }
+    .unmute{ font-size: 16px; padding: 10px 16px; bottom: 16px; right: 16px; }
   }
 </style>
 </head>
 <body>
 
-  <img class="logo" src="logo.png" alt="BookHockeys" />
+  <video id="bgvid" class="bg-video" autoplay muted loop playsinline preload="auto">
+    <source src="bookmentions.mp4" type="video/mp4">
+  </video>
 
-  <div class="links">
-    <a class="btn kick" href="https://kick.com/bookhockeys" target="_blank" rel="noopener">
-      <svg viewBox="0 0 933 300" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-        <path d="M0 0h100v100h100V0h100v100H300v100H200v100H100V200H0zM400 0h100v300H400zM533 0h100v100h100V0h100v100H833V200H733v100H633V200H533zM866 0h67v100h-67zm0 200h67v100h-67z"/>
-      </svg>
-      KICK
-    </a>
-    <a class="btn twitch" href="https://twitch.tv/bookhockeys" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
-      </svg>
-      TWITCH
-    </a>
+  <div class="tint"></div>
+  <div class="tint-2"></div>
+
+  <div class="content">
+    <img class="logo" src="logo.png" alt="BookHockeys" />
+
+    <div class="links">
+      <a class="btn kick" href="https://kick.com/bookhockeys" target="_blank" rel="noopener">
+        <svg viewBox="0 0 933 300" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+          <path d="M0 0h100v100h100V0h100v100H300v100H200v100H100V200H0zM400 0h100v300H400zM533 0h100v100h100V0h100v100H833V200H733v100H633V200H533zM866 0h67v100h-67zm0 200h67v100h-67z"/>
+        </svg>
+        KICK
+      </a>
+      <a class="btn twitch" href="https://twitch.tv/bookhockeys" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+        </svg>
+        TWITCH
+      </a>
+    </div>
   </div>
+
+  <button id="unmute" class="unmute" aria-label="Unmute video">
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+    </svg>
+    TAP FOR SOUND
+  </button>
+
+  <script>
+    (function(){
+      const vid = document.getElementById('bgvid');
+      const btn = document.getElementById('unmute');
+
+      function unmuteNow(){
+        vid.muted = false;
+        vid.volume = 1.0;
+        // make sure it's playing
+        vid.play().catch(() => {});
+        btn.classList.add('hidden');
+        // clean up listeners
+        document.removeEventListener('click', firstClick, true);
+        document.removeEventListener('touchstart', firstClick, true);
+        document.removeEventListener('keydown', firstClick, true);
+      }
+
+      function firstClick(e){
+        // don't hijack clicks on the actual link buttons
+        if (e.target && e.target.closest && e.target.closest('a.btn')) return;
+        unmuteNow();
+      }
+
+      btn.addEventListener('click', unmuteNow);
+      document.addEventListener('click', firstClick, true);
+      document.addEventListener('touchstart', firstClick, true);
+      document.addEventListener('keydown', firstClick, true);
+    })();
+  </script>
 
 </body>
 </html>
