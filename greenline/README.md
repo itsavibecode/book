@@ -45,18 +45,11 @@ face box height to size the bar.
 
 ## Configuration
 
-### Google Analytics (optional)
+### Google Analytics
 
-Replace the placeholder `G-XXXXXXXXXX` in `index.html` with your real GA4
-Measurement ID:
-
-```html
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-…
-gtag('config', 'G-XXXXXXXXXX');
-```
-
-The page already fires these events when a real ID is set:
+Wired to GA4 Measurement ID `G-DYME377V2S` in `index.html`. To swap it,
+update both occurrences (the `gtag.js` `src` and the `gtag('config', …)`
+call). Events fired:
 
 - `detect_complete` (with `faces` count)
 - `download`
@@ -81,6 +74,11 @@ the existing `CNAME` at the repo root, so the live URL is
 <https://bookhockeys.com/greenline/>.
 
 ## Changelog
+
+### v0.1.1 — 2026-04-24
+Watermark switched from a green text pill to a small, semi-transparent
+BookHockeys logo (`../logo.png`) in the lower-right — same brand, less
+clutter on the meme. Live GA4 Measurement ID wired in.
 
 ### v0.1.0 — 2026-04-24
 Initial release. Drop-or-pick upload, paste-from-clipboard, auto face

@@ -38,6 +38,14 @@
   var modelsLoading = null;
   var currentImage = null;
 
+  // Preload the BookHockeys logo for use as a watermark.
+  var watermarkImg = new Image();
+  var watermarkLoaded = new Promise(function (resolve) {
+    watermarkImg.onload = function () { resolve(true); };
+    watermarkImg.onerror = function () { resolve(false); };
+  });
+  watermarkImg.src = '../logo.png';
+
   function setStatus(msg, isError) {
     statusEl.textContent = msg;
     statusEl.classList.toggle('error', !!isError);
@@ -160,34 +168,19 @@
     });
   }
 
-  // Watermark: bottom-right "GREEN LINE v{version}" on a translucent green pill.
+  // Watermark: small semi-transparent BookHockeys logo, lower-right.
   function drawWatermark() {
-    var version = (document.querySelector('meta[name="version"]') || {}).content || '';
-    var label = 'GREEN LINE' + (version ? ' v' + version : '');
+    if (!watermarkImg.complete || !watermarkImg.naturalWidth) return;
     var w = canvasEl.width, h = canvasEl.height;
-    var pad = Math.max(10, Math.round(Math.min(w, h) * 0.012));
-    var fontPx = Math.max(14, Math.round(Math.min(w, h) * 0.028));
-
+    var pad = Math.max(10, Math.round(Math.min(w, h) * 0.018));
+    var maxDim = Math.min(w, h) * 0.18;
+    var iw = watermarkImg.naturalWidth;
+    var ih = watermarkImg.naturalHeight;
+    var scale = Math.min(maxDim / iw, maxDim / ih);
+    var dw = iw * scale, dh = ih * scale;
     ctx.save();
-    ctx.font = '700 ' + fontPx + 'px "Luckiest Guy", "Arial Black", sans-serif';
-    ctx.textBaseline = 'middle';
-    var textW = ctx.measureText(label).width;
-    var boxH = fontPx + pad;
-    var boxW = textW + pad * 2;
-    var x = w - boxW - pad;
-    var y = h - boxH - pad;
-
-    // Translucent green pill with thin black border
-    ctx.globalAlpha = 0.78;
-    ctx.fillStyle = '#39ff14';
-    ctx.fillRect(x, y, boxW, boxH);
-    ctx.globalAlpha = 1;
-    ctx.strokeStyle = 'rgba(10,10,10,0.85)';
-    ctx.lineWidth = Math.max(2, Math.round(fontPx * 0.08));
-    ctx.strokeRect(x, y, boxW, boxH);
-
-    ctx.fillStyle = '#0a0a0a';
-    ctx.fillText(label, x + pad, y + boxH / 2);
+    ctx.globalAlpha = 0.55;
+    ctx.drawImage(watermarkImg, w - dw - pad, h - dh - pad, dw, dh);
     ctx.restore();
   }
 
@@ -249,10 +242,12 @@
 
     return ensureModels().then(function () {
       var options = new window.faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.4 });
-      return window.faceapi
-        .detectAllFaces(canvasEl, options)
-        .withFaceLandmarks(true); // useTinyModel = true
-    }).then(function (detections) {
+      return Promise.all([
+        window.faceapi.detectAllFaces(canvasEl, options).withFaceLandmarks(true),
+        watermarkLoaded
+      ]);
+    }).then(function (results) {
+      var detections = results[0];
       var count = detections ? detections.length : 0;
       if (count === 0) {
         setStatus('No faces detected — try a clearer photo. Watermark added anyway.');
