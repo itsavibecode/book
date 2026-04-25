@@ -104,6 +104,14 @@ via the existing root `CNAME`, so the live URL is
 
 ## Changelog
 
+### v0.3.0 — 2026-04-25
+**Verdict labels.** After axes are drawn, the page now compares each
+person's lean angle and stamps a label on the canvas: the straightest
+subject is tagged `MOST CONFIDENT` (green), the most-leaning subject is
+tagged `LESS DOMINANT` (black/yellow). Footer cleaned up — the text
+"BookHockeys / source" links were replaced with a small transparent
+BookHockeys logo that links back to the parent site.
+
 ### v0.2.0 — 2026-04-25
 **Body axis, not eye bar.** Reworked to actually implement the Green
 Line Theory: replaced face-api.js eye-corner detection with TensorFlow.js

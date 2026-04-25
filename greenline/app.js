@@ -199,34 +199,108 @@
     return { top: top, bot: bot, shoulderWidth: shoulderWidth };
   }
 
+  // Lean angle from vertical, in degrees (0 = perfectly upright).
+  function leanAngle(endpoints) {
+    var dx = endpoints.bot.x - endpoints.top.x;
+    var dy = endpoints.bot.y - endpoints.top.y;
+    return Math.atan2(Math.abs(dx), Math.abs(dy)) * 180 / Math.PI;
+  }
+
+  function drawSingleAxis(endpoints) {
+    var thickness = Math.max(8, endpoints.shoulderWidth * 0.10);
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#0a0a0a';
+    ctx.lineWidth = thickness * 1.45;
+    ctx.beginPath();
+    ctx.moveTo(endpoints.top.x, endpoints.top.y);
+    ctx.lineTo(endpoints.bot.x, endpoints.bot.y);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#39ff14';
+    ctx.lineWidth = thickness;
+    ctx.beginPath();
+    ctx.moveTo(endpoints.top.x, endpoints.top.y);
+    ctx.lineTo(endpoints.bot.x, endpoints.bot.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Brutalist label pill anchored above a point. kind = 'confident' | 'insecure'.
+  function drawVerdictLabel(text, anchor, kind) {
+    var w = canvasEl.width, h = canvasEl.height;
+    var fontPx = Math.max(18, Math.round(Math.min(w, h) * 0.026));
+    var padX = Math.round(fontPx * 0.55);
+    var padY = Math.round(fontPx * 0.32);
+
+    ctx.save();
+    ctx.font = '700 ' + fontPx + 'px "Luckiest Guy", "Arial Black", sans-serif';
+    ctx.textBaseline = 'middle';
+    var textW = ctx.measureText(text).width;
+    var boxW = Math.round(textW + padX * 2);
+    var boxH = Math.round(fontPx + padY * 2);
+
+    // Center above the anchor (top of the body line), with breathing room.
+    var x = Math.round(anchor.x - boxW / 2);
+    var y = Math.round(anchor.y - boxH - fontPx * 0.4);
+
+    // Clamp into the canvas so labels stay readable when the line top
+    // is off-image.
+    var margin = 6;
+    if (x < margin) x = margin;
+    if (x + boxW > w - margin) x = w - margin - boxW;
+    if (y < margin) y = margin;
+
+    var bg, fg;
+    if (kind === 'confident') { bg = '#39ff14'; fg = '#0a0a0a'; }
+    else                      { bg = '#0a0a0a'; fg = '#ffe82e'; }
+
+    ctx.fillStyle = bg;
+    ctx.fillRect(x, y, boxW, boxH);
+    ctx.lineWidth = Math.max(2, Math.round(fontPx * 0.13));
+    ctx.strokeStyle = '#0a0a0a';
+    ctx.strokeRect(x, y, boxW, boxH);
+
+    ctx.fillStyle = fg;
+    ctx.fillText(text, x + padX, y + boxH / 2);
+    ctx.restore();
+  }
+
+  // Draw lines + verdict labels. Returns the analyzed list (so callers
+  // can build a status message about who got which label).
   function drawAxisLines(poses) {
-    var drawn = 0;
+    var analyzed = [];
     poses.forEach(function (pose) {
       var endpoints = bodyAxisEndpoints(pose);
       if (!endpoints) return;
-      drawn++;
-
-      var thickness = Math.max(8, endpoints.shoulderWidth * 0.10);
-
-      // Black outline first so the green line stays visible on busy backgrounds.
-      ctx.save();
-      ctx.lineCap = 'round';
-      ctx.strokeStyle = '#0a0a0a';
-      ctx.lineWidth = thickness * 1.45;
-      ctx.beginPath();
-      ctx.moveTo(endpoints.top.x, endpoints.top.y);
-      ctx.lineTo(endpoints.bot.x, endpoints.bot.y);
-      ctx.stroke();
-
-      ctx.strokeStyle = '#39ff14';
-      ctx.lineWidth = thickness;
-      ctx.beginPath();
-      ctx.moveTo(endpoints.top.x, endpoints.top.y);
-      ctx.lineTo(endpoints.bot.x, endpoints.bot.y);
-      ctx.stroke();
-      ctx.restore();
+      analyzed.push({ endpoints: endpoints, angle: leanAngle(endpoints) });
     });
-    return drawn;
+
+    // Draw all the lines first so labels render on top.
+    analyzed.forEach(function (a) { drawSingleAxis(a.endpoints); });
+
+    if (analyzed.length === 0) return analyzed;
+
+    // Tag straightest = MOST CONFIDENT, most-leaning = LESS DOMINANT.
+    // With a single subject, no comparison is meaningful so skip labels.
+    if (analyzed.length >= 2) {
+      var minIdx = 0, maxIdx = 0;
+      for (var i = 1; i < analyzed.length; i++) {
+        if (analyzed[i].angle < analyzed[minIdx].angle) minIdx = i;
+        if (analyzed[i].angle > analyzed[maxIdx].angle) maxIdx = i;
+      }
+      // Tie-break: if every subject has the exact same angle, both bail.
+      if (minIdx !== maxIdx) {
+        analyzed[minIdx].label = { text: 'MOST CONFIDENT', kind: 'confident' };
+        analyzed[maxIdx].label = { text: 'LESS DOMINANT', kind: 'insecure' };
+      }
+    }
+
+    analyzed.forEach(function (a) {
+      if (a.label) drawVerdictLabel(a.label.text, a.endpoints.top, a.label.kind);
+    });
+
+    return analyzed;
   }
 
   // Watermark: small semi-transparent BookHockeys logo, lower-right.
@@ -362,14 +436,22 @@
     }).then(function (poses) {
       return watermarkLoaded.then(function () { return poses; });
     }).then(function (poses) {
-      var drawn = drawAxisLines(poses);
+      var analyzed = drawAxisLines(poses);
       drawWatermark();
       downloadBtn.disabled = false;
       shareBtn.disabled = false;
+      var drawn = analyzed.length;
       if (drawn === 0) {
         setStatus('No body axes could be mapped — try a clearer, full-body staged photo. Watermark added anyway.');
+      } else if (drawn === 1) {
+        setStatus('1 axis drawn. Need at least two people for a verdict — try a couple photo.');
       } else {
-        setStatus('Drew green lines on ' + drawn + ' ' + (drawn === 1 ? 'person' : 'people') + '. Hit DOWNLOAD or SHARE.');
+        var labelled = analyzed.filter(function (a) { return a.label; }).length;
+        if (labelled >= 2) {
+          setStatus('Verdict labelled. ' + drawn + ' axes drawn — hit DOWNLOAD or SHARE.');
+        } else {
+          setStatus('Drew green lines on ' + drawn + ' people. Hit DOWNLOAD or SHARE.');
+        }
       }
       track('detect_complete', { people: drawn });
     });

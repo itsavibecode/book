@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.2.0" />
+<meta name="version" content="0.3.0" />
 <title>Green Line Theory — Auto Test Your Couple Photos | BookHockeys</title>
 
 <meta name="description" content="The Green Line Theory, automated. Upload a staged couple photo and the page draws a green line through each person's body axis — the lean tells you who's leaning in. Runs in your browser." />
@@ -189,8 +189,23 @@
     letter-spacing: 0;
     color: #0a0a0a;
     opacity: 0.85;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
   }
-  .footer a{ color: #0a0a0a; }
+  .footer-logo{
+    display: inline-block;
+    opacity: 0.35;
+    transition: opacity .2s ease;
+    line-height: 0;
+  }
+  .footer-logo:hover{ opacity: 0.65; }
+  .footer-logo img{
+    width: 70px;
+    height: auto;
+    display: block;
+  }
 
   @media (max-width: 480px){
     .btn{ font-size: 18px; padding: 12px 16px; }
@@ -243,7 +258,7 @@
 
   <header class="header">
     <img class="logo" src="logo.svg" alt="Green Line — Auto Meme Generator" />
-    <span class="version" id="version">v0.2.0</span>
+    <span class="version" id="version">v0.3.0</span>
   </header>
 
   <main class="card">
@@ -287,7 +302,9 @@
 
   <footer class="footer">
     <p>Runs 100% in your browser — your photo never leaves your device.</p>
-    <p>Part of <a href="../">BookHockeys</a> &middot; <a href="https://github.com/itsavibecode/book">source</a></p>
+    <a class="footer-logo" href="../" aria-label="BookHockeys">
+      <img src="../logo.png" alt="" />
+    </a>
   </footer>
 
   <script src="app.js"></script>
