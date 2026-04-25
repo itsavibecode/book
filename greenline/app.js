@@ -1,14 +1,21 @@
 /* Green Line — Auto Meme Generator
- * Loads face-api.js from a CDN, detects faces + landmarks, draws a green
- * censor bar across the eyes for every face, then stamps a watermark.
- * Runs entirely client-side. No upload, no analytics on the photo itself.
+ * Implements the Green Line Theory: for every detected person in a photo,
+ * draw a green line along their body axis (shoulder-midpoint through
+ * hip-midpoint, extended head-to-toe). The lean of the line vs. their
+ * partner is the meme. Pose detection via TensorFlow.js + MoveNet.
+ * Runs entirely client-side. No upload.
  */
 (function () {
   'use strict';
 
-  // CDN sources. jsdelivr mirrors the face-api.js repo, including model weights.
-  var FACEAPI_SRC = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js';
-  var MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+  // CDN scripts. All three Google ML libraries share the same TF.js 4.x
+  // runtime, so they cooperate cleanly. face-detection (BlazeFace) finds
+  // every person, then MoveNet SinglePose runs on a body-region crop
+  // around each face — more reliable than MoveNet MultiPose alone for
+  // overlapping or busy couple photos.
+  var TFJS_SRC = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js';
+  var POSEDET_SRC = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.3/dist/pose-detection.min.js';
+  var FACEDET_SRC = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection@1.0.3/dist/face-detection.min.js';
 
   var dropEl = document.getElementById('drop');
   var fileEl = document.getElementById('file');
@@ -25,7 +32,7 @@
   var copyLinkBtn = document.getElementById('copyLinkBtn');
 
   var SITE_URL = 'https://bookhockeys.com/greenline/';
-  var SHARE_TEXT = 'I just made a Green Line meme — auto-detect, auto-draw. Try it:';
+  var SHARE_TEXT = 'I just ran the Green Line Theory on a photo — auto-detect, auto-draw. Try it:';
 
   function track(eventName, params) {
     try {
@@ -34,8 +41,9 @@
   }
 
   var ctx = canvasEl.getContext('2d');
-  var modelsReady = false;
-  var modelsLoading = null;
+  var poseDetector = null;
+  var faceDetector = null;
+  var detectorLoading = null;
   var currentImage = null;
 
   // Preload the BookHockeys logo for use as a watermark.
@@ -62,25 +70,53 @@
     });
   }
 
-  function ensureModels() {
-    if (modelsReady) return Promise.resolve();
-    if (modelsLoading) return modelsLoading;
+  function ensureDetector() {
+    if (poseDetector && faceDetector) return Promise.resolve();
+    if (detectorLoading) return detectorLoading;
 
-    setStatus('Loading face-detection model… (first time only)');
-    modelsLoading = loadScript(FACEAPI_SRC).then(function () {
-      if (!window.faceapi) throw new Error('face-api.js failed to initialize.');
-      return Promise.all([
-        window.faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-        window.faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL)
-      ]);
-    }).then(function () {
-      modelsReady = true;
-    }).catch(function (err) {
-      modelsLoading = null;
-      throw err;
-    });
+    setStatus('Loading detection models… (~4 MB, first time only)');
+    detectorLoading = loadScript(TFJS_SRC)
+      .then(function () {
+        return Promise.all([loadScript(POSEDET_SRC), loadScript(FACEDET_SRC)]);
+      })
+      .then(function () {
+        if (!window.tf || !window.poseDetection || !window.faceDetection) {
+          throw new Error('A detection library failed to initialize.');
+        }
+        return window.tf.ready();
+      })
+      .then(function () {
+        return Promise.all([
+          window.poseDetection.createDetector(
+            window.poseDetection.SupportedModels.MoveNet,
+            {
+              modelType: window.poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+              enableSmoothing: false
+            }
+          ),
+          window.faceDetection.createDetector(
+            window.faceDetection.SupportedModels.MediaPipeFaceDetector,
+            {
+              runtime: 'tfjs',
+              // 'full' covers people further from camera (5m+), which is
+              // important for couple photos where both subjects can be
+              // mid-distance. 'short' was missing secondary subjects.
+              modelType: 'full',
+              maxFaces: 6
+            }
+          )
+        ]);
+      })
+      .then(function (detectors) {
+        poseDetector = detectors[0];
+        faceDetector = detectors[1];
+      })
+      .catch(function (err) {
+        detectorLoading = null;
+        throw err;
+      });
 
-    return modelsLoading;
+    return detectorLoading;
   }
 
   function readFileAsImage(file) {
@@ -108,64 +144,89 @@
     return { w: Math.round(w * scale), h: Math.round(h * scale) };
   }
 
-  // Compute oriented bar from two eye-corner points.
-  // Returns rectangle vertices, padded outward to fully cover the eyes.
-  function eyeBarPolygon(leftCorner, rightCorner, faceBox) {
-    var dx = rightCorner.x - leftCorner.x;
-    var dy = rightCorner.y - leftCorner.y;
-    var len = Math.sqrt(dx * dx + dy * dy);
-    if (len < 2) return null;
-
-    var ux = dx / len, uy = dy / len;     // along the eye line
-    var nx = -uy, ny = ux;                // perpendicular (downward in face)
-
-    // Extend beyond eye corners horizontally and pad vertically.
-    var faceW = Math.max(faceBox.width, len);
-    var extend = faceW * 0.18;            // how far past each outer eye corner
-    var thickness = Math.max(faceBox.height * 0.13, 14);
-
-    var x1 = leftCorner.x - ux * extend;
-    var y1 = leftCorner.y - uy * extend;
-    var x2 = rightCorner.x + ux * extend;
-    var y2 = rightCorner.y + uy * extend;
-
-    var halfT = thickness / 2;
-    return [
-      { x: x1 + nx * halfT, y: y1 + ny * halfT },
-      { x: x2 + nx * halfT, y: y2 + ny * halfT },
-      { x: x2 - nx * halfT, y: y2 - ny * halfT },
-      { x: x1 - nx * halfT, y: y1 - ny * halfT }
-    ];
+  function getKeypoint(pose, name) {
+    if (!pose || !pose.keypoints) return null;
+    for (var i = 0; i < pose.keypoints.length; i++) {
+      if (pose.keypoints[i].name === name) return pose.keypoints[i];
+    }
+    return null;
   }
 
-  function drawPolygon(c, pts, fill, stroke, strokeW) {
-    c.beginPath();
-    c.moveTo(pts[0].x, pts[0].y);
-    for (var i = 1; i < pts.length; i++) c.lineTo(pts[i].x, pts[i].y);
-    c.closePath();
-    if (fill) { c.fillStyle = fill; c.fill(); }
-    if (stroke) { c.strokeStyle = stroke; c.lineWidth = strokeW || 2; c.stroke(); }
+  // Compute the body axis line endpoints for one pose. Returns null if
+  // the four core keypoints aren't confident enough or the layout is
+  // implausible (e.g. MoveNet mixed two people into one pose).
+  // SinglePose Lightning often returns confident overall poses with one
+  // shoulder or hip occluded (raised arm, hand on partner's shoulder).
+  // We keep MIN_KEYPOINT_SCORE permissive and rely on the geometry
+  // sanity checks below (shoulder/hip ratio, body length) to filter
+  // out garbage.
+  var MIN_KEYPOINT_SCORE = 0.15;
+  var MIN_POSE_SCORE = 0.2;
+  function bodyAxisEndpoints(pose) {
+    if (typeof pose.score === 'number' && pose.score < MIN_POSE_SCORE) return null;
+
+    var ls = getKeypoint(pose, 'left_shoulder');
+    var rs = getKeypoint(pose, 'right_shoulder');
+    var lh = getKeypoint(pose, 'left_hip');
+    var rh = getKeypoint(pose, 'right_hip');
+    if (!ls || !rs || !lh || !rh) return null;
+    if (ls.score < MIN_KEYPOINT_SCORE || rs.score < MIN_KEYPOINT_SCORE ||
+        lh.score < MIN_KEYPOINT_SCORE || rh.score < MIN_KEYPOINT_SCORE) return null;
+
+    var shoulderWidth = Math.hypot(rs.x - ls.x, rs.y - ls.y);
+    var hipWidth = Math.hypot(rh.x - lh.x, rh.y - lh.y);
+    // Shoulders and hips should be roughly the same width on the same body.
+    // If one is wildly larger than the other, this is a mixed/garbage pose.
+    if (shoulderWidth < 8 || hipWidth < 8) return null;
+    var ratio = shoulderWidth / hipWidth;
+    if (ratio < 0.4 || ratio > 2.5) return null;
+
+    var sm = { x: (ls.x + rs.x) / 2, y: (ls.y + rs.y) / 2 };
+    var hm = { x: (lh.x + rh.x) / 2, y: (lh.y + rh.y) / 2 };
+
+    var dx = hm.x - sm.x;
+    var dy = hm.y - sm.y;
+    var len = Math.hypot(dx, dy);
+    if (len < 4) return null;
+    var ux = dx / len, uy = dy / len; // unit vector pointing from shoulders toward hips
+
+    // Extend up by ~0.85 body-lengths (head height) and down by ~1.7
+    // (legs). The canvas will clip if we go off-image, which mimics the
+    // manual style where lines often run off the top/bottom edges.
+    var top = { x: sm.x - ux * len * 0.85, y: sm.y - uy * len * 0.85 };
+    var bot = { x: hm.x + ux * len * 1.70, y: hm.y + uy * len * 1.70 };
+
+    return { top: top, bot: bot, shoulderWidth: shoulderWidth };
   }
 
-  // 68-point landmark indices: left eye 36..41, right eye 42..47.
-  // Outer corners are 36 (left) and 45 (right).
-  function drawGreenLines(detections) {
-    detections.forEach(function (det) {
-      var pts = det.landmarks.positions;
-      var left = pts[36];
-      var right = pts[45];
-      var poly = eyeBarPolygon(left, right, det.detection.box);
-      if (!poly) return;
+  function drawAxisLines(poses) {
+    var drawn = 0;
+    poses.forEach(function (pose) {
+      var endpoints = bodyAxisEndpoints(pose);
+      if (!endpoints) return;
+      drawn++;
 
-      // Drop shadow for punch
+      var thickness = Math.max(8, endpoints.shoulderWidth * 0.10);
+
+      // Black outline first so the green line stays visible on busy backgrounds.
       ctx.save();
-      ctx.shadowColor = 'rgba(0,0,0,0.55)';
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetX = Math.max(3, det.detection.box.width * 0.012);
-      ctx.shadowOffsetY = Math.max(3, det.detection.box.width * 0.012);
-      drawPolygon(ctx, poly, '#39ff14', '#0a0a0a', Math.max(3, det.detection.box.width * 0.012));
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#0a0a0a';
+      ctx.lineWidth = thickness * 1.45;
+      ctx.beginPath();
+      ctx.moveTo(endpoints.top.x, endpoints.top.y);
+      ctx.lineTo(endpoints.bot.x, endpoints.bot.y);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#39ff14';
+      ctx.lineWidth = thickness;
+      ctx.beginPath();
+      ctx.moveTo(endpoints.top.x, endpoints.top.y);
+      ctx.lineTo(endpoints.bot.x, endpoints.bot.y);
+      ctx.stroke();
       ctx.restore();
     });
+    return drawn;
   }
 
   // Watermark: small semi-transparent BookHockeys logo, lower-right.
@@ -220,8 +281,7 @@
   function nativeShare() {
     return canvasToBlob().then(function (blob) {
       var file = new File([blob], 'greenline-' + Date.now() + '.png', { type: 'image/png' });
-      var data = { title: 'Green Line Meme', text: SHARE_TEXT, url: SITE_URL };
-      // Only include files if the platform claims it can share them.
+      var data = { title: 'Green Line Theory', text: SHARE_TEXT, url: SITE_URL };
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         data.files = [file];
       }
@@ -232,43 +292,93 @@
     });
   }
 
+  // Normalize a face detection's box across face-detection API versions.
+  function faceBox(face) {
+    var b = face.box || face;
+    var x = (b.xMin != null) ? b.xMin : (b.x != null ? b.x : (b.left != null ? b.left : 0));
+    var y = (b.yMin != null) ? b.yMin : (b.y != null ? b.y : (b.top != null ? b.top : 0));
+    var w = (b.width != null) ? b.width
+      : (b.xMax != null ? b.xMax - x : 0);
+    var h = (b.height != null) ? b.height
+      : (b.yMax != null ? b.yMax - y : 0);
+    return { x: x, y: y, w: w, h: h };
+  }
+
+  // For one face bounding box, crop a body region around it and run
+  // pose detection. Returns a pose with keypoints translated back into
+  // the original canvas coordinate system, or null if nothing usable.
+  function detectPersonForFace(face) {
+    var fb = faceBox(face);
+    if (!fb.w || !fb.h) return Promise.resolve(null);
+    // Pad: head room above, ~7 face-heights below for the body, ~1.5
+    // face-widths to each side.
+    var x = Math.max(0, Math.round(fb.x - fb.w * 1.5));
+    var y = Math.max(0, Math.round(fb.y - fb.h * 0.4));
+    var x2 = Math.min(canvasEl.width, Math.round(fb.x + fb.w * 2.5));
+    var y2 = Math.min(canvasEl.height, Math.round(fb.y + fb.h * 7.5));
+    var cw = x2 - x;
+    var ch = y2 - y;
+    if (cw < 32 || ch < 32) return Promise.resolve(null);
+
+    var crop = document.createElement('canvas');
+    crop.width = cw;
+    crop.height = ch;
+    crop.getContext('2d').drawImage(canvasEl, x, y, cw, ch, 0, 0, cw, ch);
+
+    return poseDetector.estimatePoses(crop, { maxPoses: 1 }).then(function (poses) {
+      if (!poses || !poses.length) return null;
+      var p = poses[0];
+      p.keypoints = p.keypoints.map(function (k) {
+        return { name: k.name, score: k.score, x: k.x + x, y: k.y + y };
+      });
+      return p;
+    }).catch(function (err) {
+      console.warn('pose estimation failed for face', err);
+      return null;
+    });
+  }
+
   function processImage(img) {
     var dims = fitDimensions(img.naturalWidth || img.width, img.naturalHeight || img.height);
     canvasEl.width = dims.w;
     canvasEl.height = dims.h;
     ctx.drawImage(img, 0, 0, dims.w, dims.h);
     showCanvas();
-    setStatus('Detecting faces…');
+    setStatus('Detecting people…');
 
-    return ensureModels().then(function () {
-      var options = new window.faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.4 });
-      return Promise.all([
-        window.faceapi.detectAllFaces(canvasEl, options).withFaceLandmarks(true),
-        watermarkLoaded
-      ]);
-    }).then(function (results) {
-      var detections = results[0];
-      var count = detections ? detections.length : 0;
-      if (count === 0) {
-        setStatus('No faces detected — try a clearer photo. Watermark added anyway.');
-        drawWatermark();
-        downloadBtn.disabled = false;
-        shareBtn.disabled = false;
-        track('detect_complete', { faces: 0 });
-        return;
-      }
-      drawGreenLines(detections);
+    return ensureDetector().then(function () {
+      return faceDetector.estimateFaces(canvasEl);
+    }).then(function (faces) {
+      if (!faces || !faces.length) return [];
+      setStatus('Found ' + faces.length + ' face' + (faces.length === 1 ? '' : 's') + '. Mapping body axes…');
+      return faces.reduce(function (chain, face) {
+        return chain.then(function (acc) {
+          return detectPersonForFace(face).then(function (p) {
+            if (p) acc.push(p);
+            return acc;
+          });
+        });
+      }, Promise.resolve([]));
+    }).then(function (poses) {
+      return watermarkLoaded.then(function () { return poses; });
+    }).then(function (poses) {
+      var drawn = drawAxisLines(poses);
       drawWatermark();
       downloadBtn.disabled = false;
       shareBtn.disabled = false;
-      setStatus('Drew green lines on ' + count + ' face' + (count === 1 ? '' : 's') + '. Hit DOWNLOAD or SHARE.');
-      track('detect_complete', { faces: count });
+      if (drawn === 0) {
+        setStatus('No body axes could be mapped — try a clearer, full-body staged photo. Watermark added anyway.');
+      } else {
+        setStatus('Drew green lines on ' + drawn + ' ' + (drawn === 1 ? 'person' : 'people') + '. Hit DOWNLOAD or SHARE.');
+      }
+      track('detect_complete', { people: drawn });
     });
   }
 
   function handleFile(file) {
     setStatus('Loading image…');
     downloadBtn.disabled = true;
+    shareBtn.disabled = true;
     readFileAsImage(file)
       .then(function (img) {
         currentImage = img;
@@ -286,8 +396,6 @@
     if (fileEl.files && fileEl.files[0]) handleFile(fileEl.files[0]);
   });
 
-  // Click on the drop label opens file picker (label[for] handles it via the
-  // nested input). Drag and drop:
   ['dragenter', 'dragover'].forEach(function (ev) {
     dropEl.addEventListener(ev, function (e) {
       e.preventDefault();
@@ -307,7 +415,6 @@
     if (files && files[0]) handleFile(files[0]);
   });
 
-  // Paste from clipboard
   window.addEventListener('paste', function (e) {
     var items = e.clipboardData && e.clipboardData.items;
     if (!items) return;
@@ -350,7 +457,6 @@
         }
       })
       .catch(function (err) {
-        // AbortError = user cancelled; treat silently.
         if (err && err.name === 'AbortError') return;
         console.error(err);
         shareFallback.hidden = false;

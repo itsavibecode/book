@@ -6,11 +6,25 @@
   </defs>
   <rect width="1200" height="630" fill="#39ff14"/>
   <rect x="40" y="40" width="1120" height="550" fill="#ffffff" stroke="#0a0a0a" stroke-width="10"/>
-  <text x="100" y="220" class="title" font-size="140" fill="#0a0a0a" letter-spacing="4">GREEN LINE</text>
-  <rect x="100" y="240" width="700" height="22" fill="#39ff14" stroke="#0a0a0a" stroke-width="6"/>
-  <text x="100" y="350" class="title" font-size="56" fill="#0a0a0a" letter-spacing="2">AUTO-MEME GENERATOR</text>
-  <text x="100" y="430" font-family="system-ui, sans-serif" font-size="32" fill="#0a0a0a">Drop a photo. Faces are auto-detected.</text>
-  <text x="100" y="475" font-family="system-ui, sans-serif" font-size="32" fill="#0a0a0a">Green line drawn. Watermark stamped. Done.</text>
-  <rect x="100" y="520" width="220" height="50" fill="#0a0a0a"/>
-  <text x="115" y="555" class="title" font-size="28" fill="#ffe82e" letter-spacing="2">BOOKHOCKEYS</text>
+
+  <!-- Two stylized people with axis lines on the right side -->
+  <g transform="translate(820, 130)">
+    <!-- Figure 1 -->
+    <circle cx="60" cy="60" r="34" fill="#0a0a0a"/>
+    <rect x="32" y="100" width="56" height="170" rx="14" fill="#0a0a0a"/>
+    <line x1="60" y1="0" x2="60" y2="370" stroke="#39ff14" stroke-width="14" stroke-linecap="round"/>
+    <!-- Figure 2 (slightly leaning toward figure 1) -->
+    <circle cx="180" cy="60" r="34" fill="#0a0a0a"/>
+    <rect x="152" y="100" width="56" height="170" rx="14" fill="#0a0a0a"/>
+    <line x1="200" y1="0" x2="170" y2="370" stroke="#39ff14" stroke-width="14" stroke-linecap="round"/>
+  </g>
+
+  <text x="100" y="220" class="title" font-size="120" fill="#0a0a0a" letter-spacing="4">GREEN LINE</text>
+  <text x="100" y="320" class="title" font-size="120" fill="#0a0a0a" letter-spacing="4">THEORY</text>
+  <rect x="100" y="340" width="500" height="20" fill="#39ff14" stroke="#0a0a0a" stroke-width="6"/>
+  <text x="100" y="430" font-family="system-ui, sans-serif" font-size="32" fill="#0a0a0a">Drop a staged couple photo.</text>
+  <text x="100" y="475" font-family="system-ui, sans-serif" font-size="32" fill="#0a0a0a">Every body axis gets a green line.</text>
+  <text x="100" y="520" font-family="system-ui, sans-serif" font-size="32" fill="#0a0a0a">The lean is the meme.</text>
+  <rect x="100" y="555" width="220" height="40" fill="#0a0a0a"/>
+  <text x="115" y="585" class="title" font-size="22" fill="#ffe82e" letter-spacing="2">BOOKHOCKEYS</text>
 </svg>

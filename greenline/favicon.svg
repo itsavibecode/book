@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" fill="#0a0a0a"/>
-  <circle cx="32" cy="30" r="18" fill="#ffe082"/>
-  <rect x="6" y="26" width="52" height="10" fill="#39ff14" stroke="#0a0a0a" stroke-width="2"/>
+  <!-- Two stylized figures (head + body) -->
+  <circle cx="22" cy="18" r="6" fill="#ffe082"/>
+  <rect x="16" y="26" width="12" height="22" rx="3" fill="#ffe082"/>
+  <circle cx="44" cy="18" r="6" fill="#ffe082"/>
+  <rect x="38" y="26" width="12" height="22" rx="3" fill="#ffe082"/>
+  <!-- Vertical green axis lines through each figure -->
+  <line x1="22" y1="6" x2="22" y2="58" stroke="#39ff14" stroke-width="4" stroke-linecap="round"/>
+  <line x1="44" y1="6" x2="44" y2="58" stroke="#39ff14" stroke-width="4" stroke-linecap="round"/>
 </svg>
