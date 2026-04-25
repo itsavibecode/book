@@ -1,0 +1,38 @@
+# BookHockeys
+
+> Personal site of streamer Book Hockeys (Kick / Twitch) plus a small collection of in-browser tools — currently the Green Line Theory auto-tester.
+
+BookHockeys (`bookhockeys.com`) is a static site hosted on GitHub Pages from
+[github.com/itsavibecode/book](https://github.com/itsavibecode/book). The
+home page is a streaming landing page; sub-paths host self-contained
+browser tools. Everything is client-side — no backend, no upload of
+user content.
+
+## Pages
+
+- [BookHockeys home](https://bookhockeys.com/): landing page with the brand video and links to Book Hockeys' Kick and Twitch streams.
+- [Green Line Theory — auto test](https://bookhockeys.com/greenline/): the meat. Drop a staged couple photo into the page and it (1) detects every person, (2) draws a vertical green line through each subject's body axis (shoulder midpoint → hip midpoint, extended head-to-toe), and (3) labels the straightest line `MOST CONFIDENT` and the most-leaning line `LESS DOMINANT`. The lean is the meme.
+
+## How the Green Line Theory tool works
+
+1. Image is loaded into a canvas client-side and downscaled so the long edge is at most 1600 px.
+2. Faces are detected with [MediaPipe Face Detection / BlazeFace](https://github.com/tensorflow/tfjs-models/tree/master/face-detection) via TensorFlow.js (model: `MediaPipeFaceDetector`, runtime: `tfjs`, modelType: `full`).
+3. For each detected face, a body-region crop is taken (≈ 4 face-widths × 8 face-heights, centred on the face).
+4. Each crop is run through [MoveNet SinglePose Lightning](https://github.com/tensorflow/tfjs-models/tree/master/pose-detection) to recover 17 COCO keypoints.
+5. The body axis is the line through `(left_shoulder + right_shoulder) / 2` and `(left_hip + right_hip) / 2`, extended ~0.85 body-lengths upward (head) and ~1.7 body-lengths downward (legs).
+6. Lean angle from vertical is computed per axis. Among all detected subjects, the smallest angle is tagged `MOST CONFIDENT` and the largest is tagged `LESS DOMINANT`.
+7. Output is exported as a PNG, with a small semi-transparent BookHockeys logo as a watermark in the lower-right.
+
+## Important caveat (per the meme's own rules)
+
+The Green Line Theory **only applies to staged photos** where both subjects knew the camera was there. Per [Newsweek](https://www.newsweek.com/what-green-line-test-relationship-video-tiktok-1699304): "the green lines just look at the axis' and centre of gravity of each person in a photo — but only in staged photos. The green line theory can't be applied to candids or photos taken without the couple's knowledge."
+
+## Privacy
+
+No image data leaves the browser. There is no upload, no server-side processing, no per-user storage. Google Analytics 4 records page views and a few anonymous events (`detect_complete` with a face count, `download`, `share_click`) but never any image content.
+
+## Source
+
+- Repo: [github.com/itsavibecode/book](https://github.com/itsavibecode/book)
+- Greenline subfolder: [github.com/itsavibecode/book/tree/main/greenline](https://github.com/itsavibecode/book/tree/main/greenline)
+- Project README with changelog: [github.com/itsavibecode/book/blob/main/greenline/README.md](https://github.com/itsavibecode/book/blob/main/greenline/README.md)

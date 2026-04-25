@@ -229,7 +229,7 @@
   // Brutalist label pill anchored above a point. kind = 'confident' | 'insecure'.
   function drawVerdictLabel(text, anchor, kind) {
     var w = canvasEl.width, h = canvasEl.height;
-    var fontPx = Math.max(18, Math.round(Math.min(w, h) * 0.026));
+    var fontPx = Math.max(24, Math.round(Math.min(w, h) * 0.036));
     var padX = Math.round(fontPx * 0.55);
     var padY = Math.round(fontPx * 0.32);
 

@@ -3,34 +3,118 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.3.0" />
-<title>Green Line Theory — Auto Test Your Couple Photos | BookHockeys</title>
+<meta name="version" content="0.4.0" />
+<title>Green Line Theory Test — Most Confident vs Less Dominant | BookHockeys</title>
 
-<meta name="description" content="The Green Line Theory, automated. Upload a staged couple photo and the page draws a green line through each person's body axis — the lean tells you who's leaning in. Runs in your browser." />
+<meta name="description" content="Run the Green Line Theory on any staged couple photo, free, in your browser. The page auto-detects each person, draws a green line through their body axis, and labels the straightest as MOST CONFIDENT and the most-leaning as LESS DOMINANT. No upload, no signup." />
 <meta name="theme-color" content="#39ff14" />
-<meta name="keywords" content="green line theory, green line test, green line meme, body axis test, couple photo test, TikTok green line, relationship test, BookHockeys, pose detection, meme maker, browser tool" />
+<meta name="keywords" content="green line theory, green line test, green line meme, green line theory test, green line couple test, green line tiktok, body axis test, body lean test, couple photo analyzer, relationship body language, posture analysis tool, who is more confident, who is more insecure, dominant partner test, less dominant partner, most confident partner, leaning in relationship, photo lean test, meme generator, photo meme tool, free meme maker, browser meme tool, in-browser face detection, in-browser pose detection, BookHockeys, BookHockeys greenline" />
 <meta name="author" content="BookHockeys" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
 <link rel="canonical" href="https://bookhockeys.com/greenline/" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="BookHockeys" />
-<meta property="og:title" content="Green Line Theory — Auto Test" />
-<meta property="og:description" content="Drop a staged couple photo. Each person's body axis gets a green line. The lean is the meme." />
+<meta property="og:title" content="Green Line Theory Test — Most Confident vs Less Dominant" />
+<meta property="og:description" content="Drop a staged couple photo. Each person's body axis gets a green line; the straightest is labelled MOST CONFIDENT, the most-leaning LESS DOMINANT. Runs in your browser." />
 <meta property="og:url" content="https://bookhockeys.com/greenline/" />
 <meta property="og:image" content="https://bookhockeys.com/greenline/og-card.svg" />
+<meta property="og:image:alt" content="Green Line Theory — most confident vs less dominant, the BookHockeys auto-tester" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
 
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Green Line Theory — Auto Test" />
-<meta name="twitter:description" content="Drop a staged couple photo. Each person's body axis gets a green line. The lean is the meme." />
+<meta name="twitter:title" content="Green Line Theory Test — Most Confident vs Less Dominant" />
+<meta name="twitter:description" content="Drop a staged couple photo. Each person's body axis gets a green line; the straightest is labelled MOST CONFIDENT, the most-leaning LESS DOMINANT." />
 <meta name="twitter:image" content="https://bookhockeys.com/greenline/og-card.svg" />
+<meta name="twitter:image:alt" content="Green Line Theory — most confident vs less dominant, the BookHockeys auto-tester" />
 
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="icon" type="image/x-icon" href="../favicon.ico" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+
+<link rel="alternate" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+
+<!-- Structured data for search + AI surface -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://bookhockeys.com/greenline/#app",
+      "name": "Green Line Theory — Auto Test",
+      "alternateName": ["Green Line Test", "Green Line Meme Generator"],
+      "url": "https://bookhockeys.com/greenline/",
+      "description": "An in-browser tool that automates the TikTok Green Line Theory: detect every person in a staged couple photo, draw a green line through each body axis, and label the straightest subject MOST CONFIDENT and the most-leaning LESS DOMINANT.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any (browser)",
+      "browserRequirements": "Requires WebGL and a modern evergreen browser",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "BookHockeys",
+        "url": "https://bookhockeys.com/"
+      },
+      "image": "https://bookhockeys.com/greenline/og-card.svg",
+      "softwareVersion": "0.4.0"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the Green Line Theory?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Green Line Theory is a TikTok-popularised relationship test where vertical green lines are drawn through each person's body axis in a staged couple photo. The straightest line indicates the more confident or dominant partner; the more-leaning line indicates the less dominant or more insecure partner."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the Green Line Theory work on any photo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Per the original TikTok creators and outlets like Newsweek, the test only applies to staged photos where both subjects knew the camera was there. It cannot be applied to candids."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my photo uploaded anywhere when I use this tool?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The page runs entirely in your browser using TensorFlow.js. The image is decoded and analysed locally; nothing is sent to a server."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the auto-detection work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Faces are detected with BlazeFace (Google MediaPipe Face Detection). For each face, the page crops a body region and runs MoveNet SinglePose to find shoulder and hip keypoints. The body axis is the line through the shoulder midpoint and hip midpoint, extended head-to-toe, and the lean angle from vertical determines who is most confident vs least dominant."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is one person not getting a green line?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "If a subject's shoulders or hips are heavily occluded (raised arm, hand on partner, hidden behind clothing or another person), pose detection may not return confident keypoints. Try a clearer, more head-to-toe photo."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DYME377V2S"></script>
@@ -79,16 +163,6 @@
     height: auto;
     filter: drop-shadow(5px 6px 0 rgba(0,0,0,0.45));
   }
-  .version{
-    display: inline-block;
-    background: #0a0a0a;
-    color: #ffe82e;
-    padding: 4px 12px;
-    font-size: 16px;
-    border: 3px solid #0a0a0a;
-    box-shadow: 4px 4px 0 #ffffff;
-  }
-
   /* Card */
   .card{
     background: #ffffff;
@@ -206,6 +280,56 @@
     height: auto;
     display: block;
   }
+  .version-tag{
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    opacity: 0.5;
+    margin: 0;
+  }
+
+  /* Visually hidden but accessible to screen readers + crawlers */
+  .visually-hidden{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* FAQ */
+  details.faq{
+    background: #ffffff;
+    border: 4px solid #0a0a0a;
+    box-shadow: 6px 6px 0 #0a0a0a;
+    width: 100%;
+    max-width: 760px;
+    padding: 14px 18px;
+    font-family: system-ui, sans-serif;
+    letter-spacing: 0;
+    color: #0a0a0a;
+  }
+  details.faq summary{
+    cursor: pointer;
+    font-family: 'Luckiest Guy', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1px;
+    list-style: none;
+  }
+  details.faq summary::-webkit-details-marker{ display: none; }
+  details.faq summary::after{ content: ' ▾'; }
+  details.faq[open] summary::after{ content: ' ▴'; }
+  details.faq h3{
+    font-family: 'Luckiest Guy', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    margin: 18px 0 4px;
+  }
+  details.faq p{ font-size: 14px; line-height: 1.5; }
 
   @media (max-width: 480px){
     .btn{ font-size: 18px; padding: 12px 16px; }
@@ -256,9 +380,10 @@
 </head>
 <body>
 
+  <h1 class="visually-hidden">Green Line Theory Test — Most Confident vs Less Dominant Auto-Detector</h1>
+
   <header class="header">
-    <img class="logo" src="logo.svg" alt="Green Line — Auto Meme Generator" />
-    <span class="version" id="version">v0.3.0</span>
+    <img class="logo" src="logo.svg" alt="Green Line Theory — most confident vs less dominant" />
   </header>
 
   <main class="card">
@@ -300,11 +425,26 @@
     </div>
   </main>
 
+  <details class="faq">
+    <summary>FAQ — How does the Green Line Theory work?</summary>
+    <h3>What is the Green Line Theory?</h3>
+    <p>A TikTok relationship test. You draw a vertical green line through each person's body axis in a staged couple photo — the line of the straighter posture marks the more confident or dominant partner; the line that leans most marks the less dominant or more insecure partner.</p>
+    <h3>Does it work on any photo?</h3>
+    <p>No. The theory only applies to staged photos where both subjects knew the camera was there. It cannot be applied to candids — there's no intentional posture to read.</p>
+    <h3>Is my photo uploaded anywhere?</h3>
+    <p>No. The page runs entirely in your browser using TensorFlow.js. The image is decoded and analysed locally; nothing is sent to a server.</p>
+    <h3>How does the auto-detection work?</h3>
+    <p>Faces are detected with BlazeFace. For each face, the page crops a body region around it and runs MoveNet SinglePose to find shoulder and hip keypoints. The body axis is the line through the shoulder midpoint and hip midpoint, extended head-to-toe. The lean angle from vertical determines who's most confident vs least dominant.</p>
+    <h3>Why is one person not getting a green line?</h3>
+    <p>If a subject's shoulders or hips are heavily occluded (raised arm, hand on partner, hidden behind clothing or another person), pose detection may not return confident keypoints. Try a clearer, head-to-toe photo.</p>
+  </details>
+
   <footer class="footer">
     <p>Runs 100% in your browser — your photo never leaves your device.</p>
-    <a class="footer-logo" href="../" aria-label="BookHockeys">
+    <a class="footer-logo" href="../" aria-label="BookHockeys home">
       <img src="../logo.png" alt="" />
     </a>
+    <p class="version-tag" id="version">v0.4.0</p>
   </footer>
 
   <script src="app.js"></script>

@@ -104,6 +104,30 @@ via the existing root `CNAME`, so the live URL is
 
 ## Changelog
 
+### v0.4.0 — 2026-04-25
+**SEO + AI discoverability + polish.**
+
+- Site-wide additions at the repo root: `robots.txt` (with explicit
+  allow lines for `GPTBot`, `ChatGPT-User`, `OAI-SearchBot`, `ClaudeBot`,
+  `Claude-Web`, `anthropic-ai`, `PerplexityBot`, `Google-Extended`,
+  `Applebot-Extended`, `Bytespider`), `sitemap.xml`, and `llms.txt`
+  (per the [llmstxt.org](https://llmstxt.org/) spec) so the site is
+  legible to both search engines and LLM crawlers.
+- New on-page SEO: visually-hidden `<h1>`, expanded `<meta name="keywords">`,
+  `<meta name="robots">` with `max-image-preview:large`, FAQ section
+  rendered with `FAQPage` schema, and a `WebApplication` JSON-LD block
+  for rich-result eligibility.
+- Open Graph and Twitter cards refreshed with the v0.4.0 framing
+  (`og:image:alt`, `twitter:image:alt`, `og:locale` added).
+- Verdict labels on the canvas got bumped from ~26 px to ~36 px on a
+  1600 px image — same brutalist pill style, more legible at thumbnail
+  size on social previews.
+- Header version badge moved to the footer as a small dim
+  `v0.4.0` tag — keeps the header clean.
+- `logo.svg` subtitle changed from "AUTO-MEME GENERATOR" to
+  "MOST CONFIDENT VS LESS DOMINANT" so the page's purpose reads at a
+  glance.
+
 ### v0.3.0 — 2026-04-25
 **Verdict labels.** After axes are drawn, the page now compares each
 person's lean angle and stamps a label on the canvas: the straightest
