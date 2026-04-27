@@ -29,7 +29,7 @@ The Green Line Theory **only applies to staged photos** where both subjects knew
 
 ## Privacy
 
-No image data leaves the browser. There is no upload, no server-side processing, no per-user storage. Google Analytics 4 records page views and a few anonymous events (`detect_complete` with a face count, `download`, `share_click`) but never any image content.
+No image data leaves the browser. There is no upload, no server-side processing, no per-user storage. Google Analytics 4 records page views and a few anonymous events (`detect_complete` with a face count, `download`, `share_click`) but never any image content. Visitors with a European (`Europe/*`) timezone — plus EEA outliers like Iceland, Cyprus, and the Atlantic island EU territories — see a Google Consent Mode v2 banner on first visit and analytics is denied by default until they choose; visitors elsewhere have analytics enabled by default with no banner. Choice is persisted in `localStorage` and can be revisited via a small "Cookies" link in the footer.
 
 ## Source
 

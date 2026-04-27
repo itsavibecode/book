@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.4.0" />
+<meta name="version" content="0.4.1" />
 <title>Green Line Theory Test — Most Confident vs Less Dominant | BookHockeys</title>
 
 <meta name="description" content="Run the Green Line Theory on any staged couple photo, free, in your browser. The page auto-detects each person, draws a green line through their body axis, and labels the straightest as MOST CONFIDENT and the most-leaning as LESS DOMINANT. No upload, no signup." />
@@ -65,7 +65,7 @@
         "url": "https://bookhockeys.com/"
       },
       "image": "https://bookhockeys.com/greenline/og-card.svg",
-      "softwareVersion": "0.4.0"
+      "softwareVersion": "0.4.1"
     },
     {
       "@type": "FAQPage",
@@ -116,11 +116,55 @@
 }
 </script>
 
-<!-- Google Analytics 4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DYME377V2S"></script>
+<!-- Google Consent Mode v2 — set defaults BEFORE the gtag.js script
+     loads so GA4 honours them from the very first page-view request.
+     EU/EEA/UK/CH visitors must opt in; everyone else defaults to
+     granted (no banner). -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
+
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+
+  (function () {
+    // Approximate EU/EEA/UK/CH detection by browser timezone. No
+    // external API call, no IP lookup. Covers all members plus a
+    // few outliers (Iceland, Cyprus, Atlantic island EU territories).
+    // Errs toward over-showing: any Europe/* timezone triggers the
+    // banner, so a Russian or Turkish visitor will also see it —
+    // small UX cost, safer for compliance.
+    var tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+    var euExtras = [
+      'Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+      'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'
+    ];
+    var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+
+    var saved = null;
+    try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+
+    if (saved === 'granted') {
+      gtag('consent', 'update', { 'analytics_storage': 'granted' });
+    } else if (saved === 'denied') {
+      // already denied by default
+    } else if (!likelyEU) {
+      gtag('consent', 'update', { 'analytics_storage': 'granted' });
+    } else {
+      window.__needsConsent = true;
+    }
+  })();
+</script>
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DYME377V2S"></script>
+<script>
   gtag('js', new Date());
   gtag('config', 'G-DYME377V2S');
 </script>
@@ -301,6 +345,66 @@
     border: 0;
   }
 
+  /* Consent banner */
+  .consent-banner{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: #ffffff;
+    border-top: 4px solid #0a0a0a;
+    box-shadow: 0 -6px 0 rgba(0,0,0,0.25);
+    padding: 16px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    font-family: system-ui, sans-serif;
+    letter-spacing: 0;
+    color: #0a0a0a;
+  }
+  .consent-banner[hidden]{ display: none; }
+  .consent-text{
+    max-width: 720px;
+    text-align: center;
+  }
+  .consent-text strong{
+    display: block;
+    font-family: 'Luckiest Guy', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .consent-text p{ font-size: 14px; line-height: 1.45; }
+  .consent-buttons{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .consent-buttons .btn{
+    font-size: 16px;
+    padding: 10px 18px;
+    box-shadow: 4px 4px 0 #0a0a0a;
+  }
+  .consent-buttons .btn:hover:not(:disabled){
+    box-shadow: 6px 6px 0 #0a0a0a;
+  }
+  .cookie-reset{
+    background: none;
+    border: none;
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #0a0a0a;
+    opacity: 0.5;
+    cursor: pointer;
+    padding: 2px 6px;
+    text-decoration: underline;
+  }
+  .cookie-reset:hover{ opacity: 0.85; }
+
   /* FAQ */
   details.faq{
     background: #ffffff;
@@ -444,8 +548,63 @@
     <a class="footer-logo" href="../" aria-label="BookHockeys home">
       <img src="../logo.png" alt="" />
     </a>
-    <p class="version-tag" id="version">v0.4.0</p>
+    <p class="version-tag" id="version">v0.4.1</p>
+    <button id="cookieReset" type="button" class="cookie-reset">Cookies</button>
   </footer>
+
+  <div id="consentBanner" class="consent-banner" hidden role="dialog" aria-labelledby="consentTitle" aria-describedby="consentDesc">
+    <div class="consent-text">
+      <strong id="consentTitle">Cookies for analytics</strong>
+      <p id="consentDesc">BookHockeys uses Google Analytics to count anonymous visits and basic events. No ads, no personal data sold, no image content tracked. The tool works either way.</p>
+    </div>
+    <div class="consent-buttons">
+      <button class="btn warn" id="consentReject" type="button">REJECT</button>
+      <button class="btn primary" id="consentAccept" type="button">ACCEPT</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var banner = document.getElementById('consentBanner');
+      var acceptBtn = document.getElementById('consentAccept');
+      var rejectBtn = document.getElementById('consentReject');
+      var resetLink = document.getElementById('cookieReset');
+      if (!banner || !acceptBtn || !rejectBtn) return;
+
+      function show() { banner.hidden = false; }
+      function hide() { banner.hidden = true; }
+
+      function record(state) {
+        try {
+          if (window.gtag) {
+            window.gtag('consent', 'update', {
+              'analytics_storage': state === 'granted' ? 'granted' : 'denied'
+            });
+          }
+        } catch (e) {}
+        try { localStorage.setItem('greenline-consent', state); } catch (e) {}
+        hide();
+      }
+
+      acceptBtn.addEventListener('click', function () { record('granted'); });
+      rejectBtn.addEventListener('click', function () { record('denied'); });
+
+      if (resetLink) {
+        resetLink.addEventListener('click', function () {
+          try { localStorage.removeItem('greenline-consent'); } catch (e) {}
+          // Revert consent so a fresh decision is required.
+          try {
+            if (window.gtag) {
+              window.gtag('consent', 'update', { 'analytics_storage': 'denied' });
+            }
+          } catch (e) {}
+          show();
+        });
+      }
+
+      if (window.__needsConsent) show();
+    })();
+  </script>
 
   <script src="app.js"></script>
 </body>

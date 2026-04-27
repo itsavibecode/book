@@ -104,6 +104,19 @@ via the existing root `CNAME`, so the live URL is
 
 ## Changelog
 
+### v0.4.1 — 2026-04-27
+**GA4 cookie consent for EU/EEA traffic.** The page now uses
+[Google Consent Mode v2](https://developers.google.com/tag-platform/security/guides/consent)
+with all four consent signals (`ad_storage`, `ad_user_data`,
+`ad_personalization`, `analytics_storage`) defaulted to `denied`
+before `gtag.js` loads. A small client-side timezone check decides
+whether to show a banner: any `Europe/*` timezone (plus EEA outliers
+like `Atlantic/Reykjavik` and `Asia/Nicosia`) gets the banner;
+everyone else has analytics auto-granted with no UI. Choices are
+persisted in `localStorage` under `greenline-consent`. A small
+"Cookies" link in the footer reopens the banner so visitors can
+revisit their decision.
+
 ### v0.4.0 — 2026-04-25
 **SEO + AI discoverability + polish.**
 
