@@ -104,6 +104,11 @@ via the existing root `CNAME`, so the live URL is
 
 ## Changelog
 
+### v0.4.2 — 2026-04-27
+Consent banner copy now reads "Green Line uses Google Analytics…"
+instead of "BookHockeys uses Google Analytics…" so the brand
+matches the page the visitor is actually on.
+
 ### v0.4.1 — 2026-04-27
 **GA4 cookie consent for EU/EEA traffic.** The page now uses
 [Google Consent Mode v2](https://developers.google.com/tag-platform/security/guides/consent)
