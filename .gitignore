@@ -1,0 +1,13 @@
+# Personal test assets that shouldn't ship to the live site
+greenline/testimage.jpg
+greenline/testimage.png
+greenline/testimage.jpeg
+greenline/testimage.webp
+
+# OS / editor crud
+Thumbs.db
+.DS_Store
+*~
+*.swp
+.vscode/
+.idea/
