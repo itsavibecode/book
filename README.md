@@ -20,6 +20,9 @@ Site-wide assets live at the repo root: `robots.txt`, `sitemap.xml`, `llms.txt`,
 
 ## Changelog — home page
 
+### v0.1.1 — 2026-04-28
+- Added a small `v0.1.1` tag in the bottom-left corner of the page (mirrors the "Cookies" link on the right). Same understated style — system font, 55% opacity — so it doesn't fight the brand.
+
 ### v0.1.0 — 2026-04-27
 First proper release of the landing page. Brings it up to the same baseline `/greenline/` already had:
 
