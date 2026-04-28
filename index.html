@@ -3,12 +3,118 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BookHockeys</title>
+<meta name="version" content="0.1.0" />
+<title>BookHockeys — Kick &amp; Twitch streamer</title>
+
+<meta name="description" content="Official site of streamer Book Hockeys. Catch the live streams on Kick and Twitch." />
+<meta name="theme-color" content="#39ff14" />
+<meta name="author" content="BookHockeys" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="https://bookhockeys.com/" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="BookHockeys — Kick &amp; Twitch streamer" />
+<meta property="og:description" content="Official site of streamer Book Hockeys. Catch the live streams on Kick and Twitch." />
+<meta property="og:url" content="https://bookhockeys.com/" />
+<meta property="og:image" content="https://bookhockeys.com/og-card.jpg" />
+<meta property="og:image:alt" content="BookHockeys logo splat on neon green" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="BookHockeys — Kick &amp; Twitch streamer" />
+<meta name="twitter:description" content="Official site of streamer Book Hockeys. Catch the live streams on Kick and Twitch." />
+<meta name="twitter:image" content="https://bookhockeys.com/og-card.jpg" />
+<meta name="twitter:image:alt" content="BookHockeys logo splat on neon green" />
+
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<link rel="alternate" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+
+<!-- Structured data for search + AI surface -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://bookhockeys.com/#website",
+      "url": "https://bookhockeys.com/",
+      "name": "BookHockeys",
+      "description": "Official site of streamer Book Hockeys.",
+      "publisher": { "@id": "https://bookhockeys.com/#person" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://bookhockeys.com/#person",
+      "name": "BookHockeys",
+      "alternateName": "Book Hockeys",
+      "url": "https://bookhockeys.com/",
+      "sameAs": [
+        "https://kick.com/bookhockeys",
+        "https://twitch.tv/bookhockeys"
+      ]
+    }
+  ]
+}
+</script>
+
+<!-- Google Consent Mode v2 — set defaults BEFORE the gtag.js script
+     loads so GA4 honours them from the very first page-view request.
+     EU/EEA/UK/CH visitors must opt in; everyone else defaults to
+     granted (no banner). The localStorage key is shared with
+     /greenline/ so a decision made on one page persists site-wide. -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+
+  (function () {
+    var tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+    var euExtras = [
+      'Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+      'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'
+    ];
+    var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+
+    var saved = null;
+    try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+
+    if (saved === 'granted') {
+      gtag('consent', 'update', { 'analytics_storage': 'granted' });
+    } else if (saved === 'denied') {
+      // already denied by default
+    } else if (!likelyEU) {
+      gtag('consent', 'update', { 'analytics_storage': 'granted' });
+    } else {
+      window.__needsConsent = true;
+    }
+  })();
+</script>
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DYME377V2S"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-DYME377V2S');
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
@@ -200,6 +306,83 @@
     50%{ transform: scale(1.05); }
   }
 
+  /* Honour reduced-motion preference */
+  @media (prefers-reduced-motion: reduce){
+    .sound-btn.muted{ animation: none; }
+    .btn, .sound-btn{ transition: none; }
+  }
+
+  /* Consent banner (matches /greenline/ pattern) */
+  .consent-banner{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: #ffffff;
+    border-top: 4px solid #0a0a0a;
+    box-shadow: 0 -6px 0 rgba(0,0,0,0.25);
+    padding: 16px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    font-family: system-ui, sans-serif;
+    letter-spacing: 0;
+    color: #0a0a0a;
+  }
+  .consent-banner[hidden]{ display: none; }
+  .consent-text{
+    max-width: 720px;
+    text-align: center;
+  }
+  .consent-text strong{
+    display: block;
+    font-family: 'Luckiest Guy', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .consent-text p{ font-size: 14px; line-height: 1.45; }
+  .consent-buttons{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .consent-buttons .consent-btn{
+    font-family: 'Luckiest Guy', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    padding: 10px 18px;
+    border: 4px solid #0a0a0a;
+    box-shadow: 4px 4px 0 #0a0a0a;
+    cursor: pointer;
+    color: #0a0a0a;
+  }
+  .consent-buttons .consent-btn:hover{
+    box-shadow: 6px 6px 0 #0a0a0a;
+  }
+  .consent-buttons .consent-btn.accept{ background: #53fc18; }
+  .consent-buttons .consent-btn.reject{ background: #ffffff; }
+  .cookie-reset{
+    position: fixed;
+    bottom: 8px;
+    right: 12px;
+    z-index: 11;
+    background: none;
+    border: none;
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #0a0a0a;
+    opacity: 0.55;
+    cursor: pointer;
+    padding: 2px 6px;
+    text-decoration: underline;
+  }
+  .cookie-reset:hover{ opacity: 0.9; }
+
   @media (max-width: 480px){
     .btn{ font-size: 20px; padding: 14px 22px; }
     .btn svg{ width: 22px; height: 22px; }
@@ -211,7 +394,7 @@
 </head>
 <body>
 
-  <video id="bgvid" class="bg-video" autoplay muted loop playsinline preload="auto">
+  <video id="bgvid" class="bg-video" autoplay muted loop playsinline preload="metadata" poster="poster.jpg">
     <source src="bookmentions.mp4" type="video/mp4">
   </video>
 
@@ -252,6 +435,19 @@
       <span id="soundLabel">TAP FOR SOUND</span>
     </button>
   </div>
+
+  <!-- Cookie consent banner -->
+  <div id="consentBanner" class="consent-banner" hidden role="dialog" aria-labelledby="consentTitle" aria-describedby="consentDesc">
+    <div class="consent-text">
+      <strong id="consentTitle">Cookies for analytics</strong>
+      <p id="consentDesc">BookHockeys uses Google Analytics to count anonymous visits. No ads, no personal data sold. The site works either way.</p>
+    </div>
+    <div class="consent-buttons">
+      <button class="consent-btn reject" id="consentReject" type="button">REJECT</button>
+      <button class="consent-btn accept" id="consentAccept" type="button">ACCEPT</button>
+    </div>
+  </div>
+  <button id="cookieReset" type="button" class="cookie-reset">Cookies</button>
 
   <script>
     (function(){
@@ -308,6 +504,49 @@
           setMutedUI();
         }
       });
+    })();
+  </script>
+
+  <!-- Consent banner wiring -->
+  <script>
+    (function () {
+      var banner = document.getElementById('consentBanner');
+      var acceptBtn = document.getElementById('consentAccept');
+      var rejectBtn = document.getElementById('consentReject');
+      var resetLink = document.getElementById('cookieReset');
+      if (!banner || !acceptBtn || !rejectBtn) return;
+
+      function show() { banner.hidden = false; }
+      function hide() { banner.hidden = true; }
+
+      function record(state) {
+        try {
+          if (window.gtag) {
+            window.gtag('consent', 'update', {
+              'analytics_storage': state === 'granted' ? 'granted' : 'denied'
+            });
+          }
+        } catch (e) {}
+        try { localStorage.setItem('greenline-consent', state); } catch (e) {}
+        hide();
+      }
+
+      acceptBtn.addEventListener('click', function () { record('granted'); });
+      rejectBtn.addEventListener('click', function () { record('denied'); });
+
+      if (resetLink) {
+        resetLink.addEventListener('click', function () {
+          try { localStorage.removeItem('greenline-consent'); } catch (e) {}
+          try {
+            if (window.gtag) {
+              window.gtag('consent', 'update', { 'analytics_storage': 'denied' });
+            }
+          } catch (e) {}
+          show();
+        });
+      }
+
+      if (window.__needsConsent) show();
     })();
   </script>
 
