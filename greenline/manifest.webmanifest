@@ -1,0 +1,30 @@
+{
+  "name": "Green Line Theory — Auto Test",
+  "short_name": "Green Line",
+  "description": "Drop a staged couple photo. The page detects each person, draws a green line through their body axis, and labels the straightest as MOST CONFIDENT and the most-leaning as LESS DOMINANT.",
+  "start_url": "/greenline/",
+  "scope": "/greenline/",
+  "display": "standalone",
+  "background_color": "#39ff14",
+  "theme_color": "#39ff14",
+  "icons": [
+    {
+      "src": "/greenline/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/greenline/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/greenline/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

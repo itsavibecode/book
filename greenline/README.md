@@ -104,6 +104,23 @@ via the existing root `CNAME`, so the live URL is
 
 ## Changelog
 
+### v0.4.4 — 2026-04-29
+**Greenline-specific favicons + PWA manifest.** Before this, the
+greenline page was using the parent BookHockeys favicons (its
+"splat" logo) for everything except the SVG, so iOS home-screen
+pins and Android installs showed the wrong brand. Generated a full
+icon set from `favicon.svg`:
+
+- `favicon-16.png`, `favicon-32.png`, `favicon-192.png`
+- `apple-touch-icon.png` (180×180, iOS)
+- `favicon-512.png` (Android splash + PWA install)
+- `favicon.ico` packed with 16/32/48
+- `manifest.webmanifest` with name/short_name/scope/icons for PWA install
+
+All wired in the HTML `<head>` with proper `sizes` attributes.
+Pinning to iOS or installing on Android now shows the
+two-figures-with-axis-lines design that matches the page.
+
 ### v0.4.3 — 2026-04-29
 **OG image now PNG, not SVG.** Facebook, LinkedIn, WhatsApp, and
 iMessage don't render SVG OG images and were dropping the share

@@ -3,7 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://bookhockeys.com/</loc>
-    <lastmod>2026-04-29</lastmod>
+    <lastmod>2026-04-29T22:00:00Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -13,7 +13,7 @@
   </url>
   <url>
     <loc>https://bookhockeys.com/greenline/</loc>
-    <lastmod>2026-04-29</lastmod>
+    <lastmod>2026-04-29T22:00:00Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
