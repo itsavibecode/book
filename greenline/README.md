@@ -104,6 +104,15 @@ via the existing root `CNAME`, so the live URL is
 
 ## Changelog
 
+### v0.4.3 — 2026-04-29
+**OG image now PNG, not SVG.** Facebook, LinkedIn, WhatsApp, and
+iMessage don't render SVG OG images and were dropping the share
+preview entirely. Rasterized `og-card.svg` to a 1200×630 PNG and
+updated `og:image`, `twitter:image`, the JSON-LD `image` field, and
+the sitemap `image:loc` to reference it. Added `og:image:type` and
+`og:image:secure_url` for completeness. The SVG is kept around for
+hand-editing the design.
+
 ### v0.4.2 — 2026-04-27
 Consent banner copy now reads "Green Line uses Google Analytics…"
 instead of "BookHockeys uses Google Analytics…" so the brand
