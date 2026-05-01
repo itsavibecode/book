@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="version" content="0.1.0" />
+<meta name="version" content="0.2.0" />
 <title>Cx Zombies — BookHockeys</title>
 
 <meta name="description" content="Cx Zombies — a side-scrolling zombie shooter. Walk South Lamar with Ice Poseidon, kill zombies, survive to the Alamo Drafthouse boss arena." />
@@ -63,7 +63,7 @@
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Luckiest+Guy&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=0.1.0">
+<link rel="stylesheet" href="css/style.css?v=0.2.0">
 </head>
 <body>
 
@@ -233,14 +233,21 @@
   </div>
 </div>
 
+<!-- Mobile touch controls (only visible during gameplay on touch devices) -->
+<div class="touch-controls" id="touch-controls" hidden>
+  <button class="touch-btn touch-left" id="touch-left" aria-label="Move left">◀</button>
+  <button class="touch-btn touch-jump" id="touch-jump" aria-label="Jump">▲</button>
+  <button class="touch-btn touch-right" id="touch-right" aria-label="Move right">▶</button>
+</div>
+
 <!-- Footer URL caption + version pill -->
 <div class="game-url">bookhockeys.com/zombies</div>
-<div class="game-version">Cx Zombies v0.1.0</div>
+<div class="game-version">Cx Zombies v0.2.0</div>
 
 <!-- Cookies link (clears localStorage consent + re-shows banner) -->
 <a href="#" class="cookies-link" id="cookies-link">Cookies</a>
 
-<script src="js/main.js?v=0.1.0"></script>
+<script src="js/main.js?v=0.2.0"></script>
 
 </body>
 </html>

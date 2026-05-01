@@ -382,6 +382,46 @@ canvas#game {
 .cookies-link:hover { color: #39ff14; }
 
 /* ============================================================
+ * Mobile touch controls — only shown on touch devices, only
+ * during gameplay (body.in-game adds the visible state)
+ * ============================================================ */
+.touch-controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30vh;
+  display: none;
+  z-index: 15;
+  pointer-events: none;
+}
+@media (pointer: coarse) {
+  body.in-game .touch-controls { display: flex; }
+}
+.touch-controls.force-show { display: flex; }
+.touch-btn {
+  flex: 1;
+  background: rgba(57, 255, 20, 0.08);
+  border: 2px solid rgba(57, 255, 20, 0.4);
+  color: rgba(57, 255, 20, 0.6);
+  font-size: 48px;
+  font-family: 'VT323', monospace;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.touch-btn:active, .touch-btn.pressed {
+  background: rgba(57, 255, 20, 0.25);
+  color: #39ff14;
+}
+.touch-jump { flex: 1.2; }
+
+/* ============================================================
  * Mobile tweaks
  * ============================================================ */
 @media (max-width: 720px) {

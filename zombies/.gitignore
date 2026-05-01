@@ -1,5 +1,17 @@
-# Ignore the art/ folder for v0.1.0 — Phase 0 doesn't load any assets yet.
-# Phase 1 will revisit and selectively un-ignore the bg-XX-final.png files
-# the game actually uses (vs the 30+MB of source photos and version backups
-# we don't want bloating the repo).
-art/
+# Default-ignore EVERY file in art/ at the top level. Using `art/*` (not
+# `art/`) so git can still un-ignore specific files via `!` rules below —
+# `art/` would ignore the directory wholesale and break the un-ignore.
+art/*
+
+# Explicitly UN-IGNORE the final game-loaded assets:
+!art/bg-00-final.png
+!art/bg-01-final.png
+!art/bg-02-final.png
+!art/bg-03-final.png
+!art/bg-04-final.png
+!art/bg-05-final.png
+!art/bg-06-final.png
+!art/ice-poseidon-walk.png
+!art/style-reference.png
+!art/zues-sidekick.png
+!art/abz_snorlax.jpg
