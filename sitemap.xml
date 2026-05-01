@@ -22,4 +22,10 @@
       <image:caption>Open Graph share card for the Green Line Theory auto-tester</image:caption>
     </image:image>
   </url>
+  <url>
+    <loc>https://bookhockeys.com/letterplex/</loc>
+    <lastmod>2026-05-01T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

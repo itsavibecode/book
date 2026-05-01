@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Letterplex — Letterboxd watchlist → Plex playlist</title>
+<meta name="description" content="Turn your Letterboxd watchlist export into a Plex playlist. All client-side." />
+<meta name="color-scheme" content="dark" />
+<meta property="og:title" content="Letterplex" />
+<meta property="og:description" content="Letterboxd watchlist → Plex playlist, in your browser." />
+<meta property="og:type" content="website" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23151820'/%3E%3Cpath d='M16 18h32v6H16zM16 30h32v6H16zM16 42h32v6H16z' fill='%23e5a00d'/%3E%3Ccircle cx='22' cy='21' r='3' fill='%2300c030'/%3E%3Ccircle cx='22' cy='33' r='3' fill='%2300c030'/%3E%3Ccircle cx='22' cy='45' r='3' fill='%2300c030'/%3E%3C/svg%3E" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+  :root{
+    --bg:#0e1117;
+    --panel:#151b25;
+    --panel-2:#1c2330;
+    --border:#252d3b;
+    --text:#e6e9ef;
+    --muted:#8a93a6;
+    --plex:#e5a00d;
+    --plex-hover:#f4b21d;
+    --letterboxd-green:#00c030;
+    --letterboxd-orange:#ff8000;
+    --letterboxd-blue:#40bcf4;
+    --danger:#e84855;
+    --ok:#3ddc97;
+    --warn:#f0b429;
+    --shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 8px 24px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--letterboxd-blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header{padding:32px 20px 16px;text-align:center;border-bottom:1px solid var(--border)}
+  header h1{margin:0 0 6px;font-size:28px;font-weight:700;letter-spacing:-.02em}
+  header h1 .lb{color:var(--letterboxd-green)}
+  header h1 .pl{color:var(--plex)}
+  header p{margin:0;color:var(--muted);font-size:14px}
+  header .ver{display:inline-block;margin-top:8px;font-size:11px;color:var(--muted);background:var(--panel);border:1px solid var(--border);padding:2px 8px;border-radius:999px}
+  main{max-width:920px;margin:0 auto;padding:24px 20px 80px}
+  .step{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin:0 0 16px;box-shadow:var(--shadow)}
+  .step h2{margin:0 0 4px;font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:10px}
+  .step h2 .num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;background:var(--panel-2);color:var(--text);font-size:12px;border:1px solid var(--border)}
+  .step.done h2 .num{background:var(--ok);color:#062;border-color:var(--ok)}
+  .step.active{border-color:var(--plex);box-shadow:0 0 0 1px var(--plex) inset, 0 8px 24px rgba(0,0,0,.4)}
+  .step .body{margin-top:12px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .grow{flex:1 1 auto;min-width:0}
+  button,.btn{appearance:none;border:1px solid var(--border);background:var(--panel-2);color:var(--text);padding:10px 16px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer;transition:transform .04s ease,background .15s,border-color .15s}
+  button:hover,.btn:hover{background:#222a39}
+  button:active,.btn:active{transform:translateY(1px)}
+  button.primary{background:var(--plex);border-color:var(--plex);color:#1a1300}
+  button.primary:hover{background:var(--plex-hover);border-color:var(--plex-hover)}
+  button.green{background:var(--letterboxd-green);border-color:var(--letterboxd-green);color:#001a06}
+  button.green:hover{background:#0aff42;border-color:#0aff42}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  input[type=text],input[type=password],select,textarea{appearance:none;background:#0a0d13;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;font:inherit;width:100%}
+  input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var(--plex)}
+  label.field{display:block;margin:0 0 10px}
+  label.field span{display:block;font-size:12px;color:var(--muted);margin:0 0 4px;letter-spacing:.04em;text-transform:uppercase}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);background:var(--panel-2);border:1px solid var(--border);padding:3px 10px;border-radius:999px}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+  .pill.ok .dot{background:var(--ok)}
+  .pill.warn .dot{background:var(--warn)}
+  .pill.err .dot{background:var(--danger)}
+  .drop{border:2px dashed var(--border);border-radius:12px;padding:24px;text-align:center;color:var(--muted);transition:.15s;cursor:pointer;background:#0a0d13}
+  .drop.drag{border-color:var(--letterboxd-green);color:var(--text);background:rgba(0,192,48,.06)}
+  .drop strong{display:block;margin-bottom:4px;color:var(--text)}
+  .drop input{display:none}
+  .info{font-size:13px;color:var(--muted);background:#0a0d13;border-left:3px solid var(--plex);padding:10px 14px;border-radius:6px;margin:10px 0}
+  .info code{background:#000;color:var(--plex);padding:1px 6px;border-radius:4px;font-size:12px}
+  details{background:#0a0d13;border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-top:10px}
+  details summary{cursor:pointer;color:var(--muted);font-size:13px}
+  details[open] summary{color:var(--text);margin-bottom:8px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;font-weight:600;color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--border)}
+  td{padding:8px 10px;border-bottom:1px solid var(--border)}
+  tr:last-child td{border-bottom:none}
+  .tab-bar{display:flex;gap:4px;margin:0 0 12px;border-bottom:1px solid var(--border)}
+  .tab-bar .tab{padding:8px 14px;border:none;background:transparent;color:var(--muted);border-bottom:2px solid transparent;border-radius:0;cursor:pointer;font-weight:600;font-size:13px}
+  .tab-bar .tab.active{color:var(--text);border-bottom-color:var(--plex)}
+  .tab-bar .tab .count{display:inline-block;margin-left:6px;background:var(--panel-2);color:var(--muted);font-size:11px;padding:1px 8px;border-radius:999px}
+  .tab-bar .tab.active .count{background:var(--plex);color:#1a1300}
+  .badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:6px;background:var(--panel-2);color:var(--muted);border:1px solid var(--border)}
+  .badge.ok{background:rgba(61,220,151,.12);color:var(--ok);border-color:rgba(61,220,151,.3)}
+  .badge.warn{background:rgba(240,180,41,.12);color:var(--warn);border-color:rgba(240,180,41,.3)}
+  .badge.err{background:rgba(232,72,85,.12);color:var(--danger);border-color:rgba(232,72,85,.3)}
+  .servers{display:grid;gap:8px;margin-top:8px}
+  .server{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--border);border-radius:10px;background:#0a0d13;cursor:pointer;transition:.15s}
+  .server:hover{border-color:var(--plex)}
+  .server.selected{border-color:var(--plex);background:rgba(229,160,13,.06)}
+  .server .name{font-weight:600}
+  .server .meta{font-size:12px;color:var(--muted);margin-top:2px}
+  .libs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .lib-chip{display:inline-flex;align-items:center;gap:8px;background:#0a0d13;border:1px solid var(--border);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;user-select:none}
+  .lib-chip input{accent-color:var(--plex);margin:0}
+  .lib-chip.checked{border-color:var(--plex);background:rgba(229,160,13,.06)}
+  .progress{height:6px;background:var(--panel-2);border-radius:999px;overflow:hidden;margin:10px 0}
+  .progress > div{height:100%;background:var(--plex);transition:width .2s}
+  .pin-box{display:flex;align-items:center;gap:14px;padding:14px;background:#0a0d13;border:1px solid var(--border);border-radius:10px;margin-top:10px}
+  .pin-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:24px;letter-spacing:.18em;color:var(--plex);font-weight:700}
+  .footer{text-align:center;color:var(--muted);font-size:12px;padding:24px 20px}
+  .footer a{color:var(--muted);border-bottom:1px dotted var(--muted)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);padding:10px 18px;border-radius:10px;box-shadow:var(--shadow);z-index:1000;font-size:14px;opacity:0;pointer-events:none;transition:.2s}
+  .toast.show{opacity:1;bottom:32px}
+  .toast.err{border-color:var(--danger);color:#ffd4d8}
+  .toast.ok{border-color:var(--ok);color:#cdf7e6}
+  .hidden{display:none !important}
+  .empty{padding:18px;text-align:center;color:var(--muted);font-size:13px}
+  .summary-row{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+  .summary-row .pill{font-size:13px;padding:5px 12px}
+  .alt-list{font-size:12px;color:var(--muted);margin-top:2px}
+  .alt-list a{color:var(--letterboxd-blue)}
+  @media (max-width:560px){
+    .step{padding:16px 14px}
+    header h1{font-size:22px}
+    .pin-code{font-size:20px}
+    th,td{padding:6px 6px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="lb">Letter</span><span class="pl">plex</span></h1>
+  <p>Build a Plex playlist from your Letterboxd watchlist. Runs entirely in your browser.</p>
+  <span class="ver" id="version">v0.1.0</span>
+</header>
+
+<main>
+
+  <!-- STEP 1: Plex auth -->
+  <section class="step active" id="step1">
+    <h2><span class="num">1</span> Connect to Plex</h2>
+    <div class="body" id="step1-body">
+      <div id="plex-disconnected">
+        <p style="margin:0 0 12px;color:var(--muted);font-size:14px">
+          Sign in with your Plex account. We use Plex's standard PIN flow — you'll get a 4-character code to enter at <code>plex.tv/link</code>.
+        </p>
+        <button class="primary" id="btn-plex-signin">Sign in with Plex</button>
+        <div id="pin-display" class="hidden">
+          <div class="pin-box">
+            <div>
+              <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Your PIN</div>
+              <div class="pin-code" id="pin-code">----</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:13px">Enter this at <a href="https://plex.tv/link" target="_blank" rel="noopener">plex.tv/link</a></div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Waiting for confirmation… <span id="pin-timer"></span></div>
+            </div>
+            <button id="btn-pin-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div id="plex-connected" class="hidden">
+        <div class="row">
+          <span class="pill ok"><span class="dot"></span> Signed in as <strong id="plex-user" style="color:var(--text);margin-left:4px">—</strong></span>
+          <button id="btn-plex-signout" style="margin-left:auto">Sign out</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2: Choose server + libraries -->
+  <section class="step" id="step2">
+    <h2><span class="num">2</span> Choose your Plex server &amp; movie libraries</h2>
+    <div class="body">
+      <div id="servers-loading" class="empty hidden">Loading servers…</div>
+      <div id="servers-list" class="servers"></div>
+      <div id="libraries-wrap" class="hidden" style="margin-top:14px">
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Movie libraries to search</div>
+        <div id="libraries-list" class="libs"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3: Watchlist -->
+  <section class="step" id="step3">
+    <h2><span class="num">3</span> Drop your Letterboxd watchlist</h2>
+    <div class="body">
+      <div class="info">
+        Letterboxd doesn't expose a public watchlist API. Export your data: open <a href="https://letterboxd.com/settings/data/" target="_blank" rel="noopener">Letterboxd Settings → Data</a>, click <strong>Export Your Data</strong>, and drop the resulting <code>letterboxd-…export.zip</code> below — or just the <code>watchlist.csv</code> from inside it.
+      </div>
+      <label class="drop" id="drop">
+        <input type="file" id="file-input" accept=".zip,.csv,text/csv,application/zip" />
+        <strong>Drop ZIP or watchlist.csv here</strong>
+        <span>or click to choose a file</span>
+      </label>
+      <div id="watchlist-summary" class="hidden" style="margin-top:14px">
+        <div class="row">
+          <span class="pill ok"><span class="dot"></span> <span id="watchlist-count">0</span> films loaded</span>
+          <button id="btn-clear-watchlist" style="margin-left:auto">Clear</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 4: Match -->
+  <section class="step" id="step4">
+    <h2><span class="num">4</span> Match against your library</h2>
+    <div class="body">
+      <div class="row" style="margin-bottom:8px">
+        <button class="primary" id="btn-match" disabled>Match watchlist</button>
+        <span class="pill" id="match-status" style="margin-left:auto"><span class="dot"></span> not run yet</span>
+      </div>
+      <div class="progress hidden" id="match-progress"><div style="width:0%"></div></div>
+      <div id="match-results" class="hidden">
+        <div class="summary-row">
+          <span class="pill ok" id="pill-matched"><span class="dot"></span> matched 0</span>
+          <span class="pill warn" id="pill-ambig"><span class="dot"></span> ambiguous 0</span>
+          <span class="pill err" id="pill-missing"><span class="dot"></span> missing 0</span>
+        </div>
+        <div class="tab-bar">
+          <button class="tab active" data-tab="matched">Matched <span class="count" id="count-matched">0</span></button>
+          <button class="tab" data-tab="ambiguous">Ambiguous <span class="count" id="count-ambiguous">0</span></button>
+          <button class="tab" data-tab="missing">Missing <span class="count" id="count-missing">0</span></button>
+        </div>
+        <div id="tab-matched">
+          <table>
+            <thead><tr><th style="width:36px"><input type="checkbox" id="check-all-matched" checked></th><th>Title</th><th>Year</th><th>Plex match</th></tr></thead>
+            <tbody id="tbody-matched"></tbody>
+          </table>
+          <div class="empty hidden" id="empty-matched">No matches yet.</div>
+        </div>
+        <div id="tab-ambiguous" class="hidden">
+          <table>
+            <thead><tr><th style="width:36px"></th><th>Letterboxd</th><th>Year</th><th>Plex candidates (pick one)</th></tr></thead>
+            <tbody id="tbody-ambiguous"></tbody>
+          </table>
+          <div class="empty hidden" id="empty-ambiguous">No ambiguous matches.</div>
+        </div>
+        <div id="tab-missing" class="hidden">
+          <table>
+            <thead><tr><th>Title</th><th>Year</th><th></th></tr></thead>
+            <tbody id="tbody-missing"></tbody>
+          </table>
+          <div class="empty hidden" id="empty-missing">Nothing missing — your library covers your whole watchlist.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 5: Create playlist -->
+  <section class="step" id="step5">
+    <h2><span class="num">5</span> Create the playlist</h2>
+    <div class="body">
+      <label class="field"><span>Playlist name</span>
+        <input type="text" id="playlist-name" value="Letterboxd Watchlist" />
+      </label>
+      <details>
+        <summary>Existing playlists with this name</summary>
+        <div id="existing-playlists" style="margin-top:8px;font-size:13px;color:var(--muted)">—</div>
+      </details>
+      <div class="row" style="margin-top:14px">
+        <button class="primary green" id="btn-create" disabled>Create Plex playlist</button>
+        <span class="pill" id="create-status" style="margin-left:auto"><span class="dot"></span> idle</span>
+      </div>
+      <div id="create-result" class="hidden" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+</main>
+
+<div class="footer">
+  Letterplex is open source · <a href="https://github.com/itsavibecode/letterplex" target="_blank" rel="noopener">github.com/itsavibecode/letterplex</a><br>
+  Not affiliated with Letterboxd or Plex. Your Plex token never leaves your browser.
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+'use strict';
+
+// --- Config ---
+const VERSION = '0.1.0';
+const CLIENT_ID_KEY = 'letterplex.clientId';
+const TOKEN_KEY = 'letterplex.plexToken';
+const USER_KEY = 'letterplex.plexUser';
+const HEADERS_BASE = () => ({
+  'X-Plex-Product': 'Letterplex',
+  'X-Plex-Version': VERSION,
+  'X-Plex-Client-Identifier': clientId(),
+  'X-Plex-Platform': 'Web',
+  'X-Plex-Device': 'Browser',
+  'X-Plex-Device-Name': 'Letterplex',
+  'Accept': 'application/json'
+});
+
+// --- State ---
+const state = {
+  token: localStorage.getItem(TOKEN_KEY) || null,
+  user: JSON.parse(localStorage.getItem(USER_KEY) || 'null'),
+  servers: [],          // {name, machineIdentifier, baseUri, owned, accessToken}
+  selectedServer: null,
+  libraries: [],        // {key, title, type, selected}
+  watchlist: [],        // {title, year, uri, dateAdded}
+  matched: [],          // {wl, plex:{ratingKey,title,year}, selected}
+  ambiguous: [],        // {wl, candidates:[{ratingKey,title,year}], chosen:ratingKey|null}
+  missing: [],          // {wl}
+  pin: null
+};
+
+// --- Utils ---
+function $(s){ return document.querySelector(s); }
+function $$(s){ return [...document.querySelectorAll(s)]; }
+function clientId(){
+  let id = localStorage.getItem(CLIENT_ID_KEY);
+  if(!id){
+    id = 'lpx-' + crypto.randomUUID();
+    localStorage.setItem(CLIENT_ID_KEY, id);
+  }
+  return id;
+}
+function toast(msg, kind=''){
+  const t = $('#toast');
+  t.className = 'toast show ' + kind;
+  t.textContent = msg;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>{ t.classList.remove('show'); }, 3200);
+}
+function setStep(n, cls){
+  for(let i=1;i<=5;i++){
+    const el = document.getElementById('step'+i);
+    el.classList.remove('active','done');
+  }
+  if(n) document.getElementById('step'+n).classList.add('active');
+  if(cls && cls.done){
+    cls.done.forEach(i => document.getElementById('step'+i).classList.add('done'));
+  }
+}
+function normalizeTitle(s){
+  return (s||'').toLowerCase()
+    .replace(/&/g,'and')
+    .replace(/[‘’‚‛]/g,"'")
+    .replace(/[“”„‟]/g,'"')
+    .replace(/[^a-z0-9 ]+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function basicTitleKey(s){
+  // Drop leading articles for matching robustness
+  return normalizeTitle(s).replace(/^(the|a|an) /,'');
+}
+
+// --- Plex API helpers ---
+async function plexTV(path, opts={}){
+  const url = new URL('https://plex.tv/api/v2' + path);
+  const headers = Object.assign({}, HEADERS_BASE(), opts.headers || {});
+  if(state.token) headers['X-Plex-Token'] = state.token;
+  const res = await fetch(url.toString(), {
+    method: opts.method || 'GET',
+    headers,
+    body: opts.body || null
+  });
+  if(!res.ok) throw new Error('plex.tv ' + res.status + ' ' + (await res.text().catch(()=>'')));
+  const ct = res.headers.get('content-type') || '';
+  if(ct.includes('json')) return await res.json();
+  return await res.text();
+}
+async function plexServer(server, path, opts={}){
+  const url = server.baseUri.replace(/\/$/,'') + path;
+  const headers = Object.assign({}, HEADERS_BASE(), opts.headers || {});
+  headers['X-Plex-Token'] = server.accessToken || state.token;
+  const res = await fetch(url, {
+    method: opts.method || 'GET',
+    headers,
+    body: opts.body || null
+  });
+  if(!res.ok) throw new Error(server.name + ' ' + res.status + ' ' + (await res.text().catch(()=>'')));
+  const ct = res.headers.get('content-type') || '';
+  if(ct.includes('json')) return await res.json();
+  return await res.text();
+}
+
+// --- Plex PIN sign-in ---
+async function startPinFlow(){
+  $('#btn-plex-signin').disabled = true;
+  try{
+    const pin = await plexTV('/pins?strong=true', { method:'POST' });
+    state.pin = pin;
+    $('#pin-code').textContent = pin.code;
+    $('#pin-display').classList.remove('hidden');
+
+    // Open Plex auth in popup
+    const authUrl = new URL('https://app.plex.tv/auth');
+    const params = {
+      clientID: clientId(),
+      code: pin.code,
+      'context[device][product]': 'Letterplex',
+      'context[device][version]': VERSION,
+      'context[device][platform]': 'Web',
+      'context[device][device]': 'Browser',
+      'context[device][deviceName]': 'Letterplex'
+    };
+    const hash = '?' + Object.entries(params).map(([k,v]) => encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+    window.open(authUrl.toString() + '#' + hash.slice(1), 'plex-auth', 'width=540,height=720');
+
+    // Poll
+    const start = Date.now();
+    const poll = async () => {
+      if(!state.pin || state.pin.id !== pin.id) return; // cancelled
+      const elapsed = Math.floor((Date.now()-start)/1000);
+      $('#pin-timer').textContent = '(' + Math.max(0, 900-elapsed) + 's left)';
+      if(elapsed > 900){ // 15 min
+        toast('PIN expired — please try again','err');
+        cancelPin();
+        return;
+      }
+      try{
+        const status = await plexTV('/pins/' + pin.id + '?code=' + encodeURIComponent(pin.code));
+        if(status.authToken){
+          state.token = status.authToken;
+          localStorage.setItem(TOKEN_KEY, state.token);
+          await fetchUser();
+          $('#pin-display').classList.add('hidden');
+          showSignedIn();
+          loadServers();
+          return;
+        }
+      }catch(e){ console.warn('pin poll err', e); }
+      setTimeout(poll, 1500);
+    };
+    poll();
+  }catch(e){
+    console.error(e);
+    toast('Could not start sign-in: ' + e.message, 'err');
+    $('#btn-plex-signin').disabled = false;
+  }
+}
+function cancelPin(){
+  state.pin = null;
+  $('#pin-display').classList.add('hidden');
+  $('#btn-plex-signin').disabled = false;
+}
+async function fetchUser(){
+  try{
+    const u = await plexTV('/user');
+    state.user = { username: u.username || u.title, email: u.email, id: u.id };
+    localStorage.setItem(USER_KEY, JSON.stringify(state.user));
+  }catch(e){ console.warn('user fetch failed', e); }
+}
+function showSignedIn(){
+  $('#plex-disconnected').classList.add('hidden');
+  $('#plex-connected').classList.remove('hidden');
+  $('#plex-user').textContent = (state.user && (state.user.username || state.user.email)) || 'Plex user';
+  document.getElementById('step1').classList.add('done');
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('step2').classList.add('active');
+}
+function signOut(){
+  state.token = null; state.user = null;
+  state.servers = []; state.selectedServer = null; state.libraries = [];
+  localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY);
+  $('#plex-disconnected').classList.remove('hidden');
+  $('#plex-connected').classList.add('hidden');
+  $('#btn-plex-signin').disabled = false;
+  $('#servers-list').innerHTML = '';
+  $('#libraries-wrap').classList.add('hidden');
+  setStep(1);
+}
+
+// --- Servers ---
+async function loadServers(){
+  $('#servers-loading').classList.remove('hidden');
+  $('#servers-list').innerHTML = '';
+  try{
+    const resources = await plexTV('/resources?includeHttps=1&includeRelay=1');
+    const servers = (resources || [])
+      .filter(r => (r.provides||'').split(',').includes('server'))
+      .map(r => {
+        const conns = (r.connections||[]).slice().sort((a,b) => {
+          // local first, then https public, then relay
+          const score = c => (c.local?0:10) + (c.relay?5:0) + (c.protocol==='https'?-1:0);
+          return score(a) - score(b);
+        });
+        return {
+          name: r.name,
+          machineIdentifier: r.clientIdentifier,
+          owned: !!r.owned,
+          product: r.product,
+          accessToken: r.accessToken,
+          connections: conns,
+          baseUri: conns[0] ? conns[0].uri : null
+        };
+      })
+      .filter(s => s.baseUri);
+    state.servers = servers;
+    renderServers();
+  }catch(e){
+    console.error(e);
+    toast('Failed to load Plex servers: ' + e.message, 'err');
+  }finally{
+    $('#servers-loading').classList.add('hidden');
+  }
+}
+function renderServers(){
+  const wrap = $('#servers-list');
+  wrap.innerHTML = '';
+  if(!state.servers.length){
+    wrap.innerHTML = '<div class="empty">No Plex servers found on this account.</div>';
+    return;
+  }
+  for(const s of state.servers){
+    const div = document.createElement('div');
+    div.className = 'server';
+    div.innerHTML = `
+      <div>
+        <div class="name">${escapeHtml(s.name)} ${s.owned ? '<span class="badge ok">owned</span>' : '<span class="badge">shared</span>'}</div>
+        <div class="meta">${escapeHtml(s.product||'Plex Media Server')} · ${s.connections.length} connection(s)</div>
+      </div>
+      <button class="btn">Use this</button>
+    `;
+    div.querySelector('button').addEventListener('click', () => selectServer(s));
+    wrap.appendChild(div);
+  }
+}
+async function selectServer(s){
+  state.selectedServer = s;
+  $$('#servers-list .server').forEach(el => el.classList.remove('selected'));
+  $$('#servers-list .server').forEach((el,i) => { if(state.servers[i]===s) el.classList.add('selected'); });
+  // Try connections in order until one responds
+  let ok = false;
+  for(const c of s.connections){
+    s.baseUri = c.uri;
+    try{
+      await plexServer(s, '/identity');
+      ok = true; break;
+    }catch(e){ /* try next */ }
+  }
+  if(!ok){
+    toast('Could not reach this server on any connection. Make sure Plex is running and you\'re on a network that can reach it.', 'err');
+    return;
+  }
+  toast('Connected to ' + s.name, 'ok');
+  await loadLibraries();
+}
+async function loadLibraries(){
+  try{
+    const data = await plexServer(state.selectedServer, '/library/sections');
+    const sections = (data && data.MediaContainer && data.MediaContainer.Directory) || [];
+    state.libraries = sections
+      .filter(s => s.type === 'movie')
+      .map(s => ({ key: s.key, title: s.title, type: s.type, selected: true }));
+    renderLibraries();
+    document.getElementById('step2').classList.add('done');
+    document.getElementById('step2').classList.remove('active');
+    document.getElementById('step3').classList.add('active');
+    refreshMatchEnabled();
+  }catch(e){
+    console.error(e);
+    toast('Failed to load libraries: ' + e.message, 'err');
+  }
+}
+function renderLibraries(){
+  $('#libraries-wrap').classList.remove('hidden');
+  const wrap = $('#libraries-list');
+  wrap.innerHTML = '';
+  if(!state.libraries.length){
+    wrap.innerHTML = '<div class="empty">No movie libraries on this server.</div>';
+    return;
+  }
+  for(const lib of state.libraries){
+    const id = 'lib-'+lib.key;
+    const label = document.createElement('label');
+    label.className = 'lib-chip checked';
+    label.innerHTML = `<input type="checkbox" id="${id}" checked> <span>${escapeHtml(lib.title)}</span>`;
+    label.querySelector('input').addEventListener('change', e => {
+      lib.selected = e.target.checked;
+      label.classList.toggle('checked', lib.selected);
+    });
+    wrap.appendChild(label);
+  }
+}
+
+// --- Watchlist ingest ---
+function bindDrop(){
+  const drop = $('#drop');
+  const input = $('#file-input');
+  drop.addEventListener('click', () => input.click());
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault();
+    drop.classList.remove('drag');
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if(f) handleFile(f);
+  });
+  input.addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if(f) handleFile(f);
+  });
+  $('#btn-clear-watchlist').addEventListener('click', () => {
+    state.watchlist = [];
+    $('#watchlist-summary').classList.add('hidden');
+    $('#file-input').value = '';
+    refreshMatchEnabled();
+  });
+}
+async function handleFile(f){
+  try{
+    let csvText = null;
+    if(/\.zip$/i.test(f.name) || f.type === 'application/zip'){
+      const zip = await JSZip.loadAsync(f);
+      const entry = Object.values(zip.files).find(e => /(^|\/)watchlist\.csv$/i.test(e.name));
+      if(!entry) throw new Error('watchlist.csv not found inside the ZIP');
+      csvText = await entry.async('string');
+    }else{
+      csvText = await f.text();
+    }
+    const rows = parseCSV(csvText);
+    if(!rows.length) throw new Error('Empty CSV');
+    const header = rows[0].map(c => c.trim().toLowerCase());
+    const ix = {
+      name: header.indexOf('name'),
+      year: header.indexOf('year'),
+      uri: header.indexOf('letterboxd uri'),
+      date: header.indexOf('date')
+    };
+    if(ix.name === -1) throw new Error('CSV does not have a Name column — is this really watchlist.csv?');
+    const items = [];
+    for(let i=1;i<rows.length;i++){
+      const r = rows[i];
+      if(!r || !r[ix.name]) continue;
+      items.push({
+        title: r[ix.name].trim(),
+        year: ix.year>=0 ? parseInt(r[ix.year],10) || null : null,
+        uri: ix.uri>=0 ? (r[ix.uri]||'').trim() : '',
+        dateAdded: ix.date>=0 ? (r[ix.date]||'').trim() : ''
+      });
+    }
+    state.watchlist = items;
+    $('#watchlist-count').textContent = items.length;
+    $('#watchlist-summary').classList.remove('hidden');
+    document.getElementById('step3').classList.add('done');
+    document.getElementById('step3').classList.remove('active');
+    document.getElementById('step4').classList.add('active');
+    refreshMatchEnabled();
+    toast('Loaded ' + items.length + ' films', 'ok');
+  }catch(e){
+    console.error(e);
+    toast('Could not read file: ' + e.message, 'err');
+  }
+}
+function parseCSV(text){
+  // Minimal RFC4180-ish parser handling quoted fields with commas, quotes, newlines
+  const rows = [];
+  let cur = [], field = '', inQ = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(inQ){
+      if(c === '"'){
+        if(text[i+1] === '"'){ field += '"'; i++; }
+        else inQ = false;
+      }else field += c;
+    }else{
+      if(c === '"') inQ = true;
+      else if(c === ','){ cur.push(field); field=''; }
+      else if(c === '\n'){ cur.push(field); rows.push(cur); cur=[]; field=''; }
+      else if(c === '\r'){ /* skip */ }
+      else field += c;
+    }
+  }
+  if(field.length || cur.length){ cur.push(field); rows.push(cur); }
+  return rows.filter(r => r.length && !(r.length===1 && r[0]===''));
+}
+
+// --- Matching ---
+function refreshMatchEnabled(){
+  const can = state.token && state.selectedServer && state.libraries.some(l=>l.selected) && state.watchlist.length;
+  $('#btn-match').disabled = !can;
+}
+
+async function runMatch(){
+  $('#btn-match').disabled = true;
+  $('#match-progress').classList.remove('hidden');
+  $('#match-results').classList.add('hidden');
+  const bar = $('#match-progress > div');
+  bar.style.width = '0%';
+  setMatchStatus('searching', 'warn');
+
+  const selectedLibs = state.libraries.filter(l => l.selected);
+  state.matched = [];
+  state.ambiguous = [];
+  state.missing = [];
+
+  const total = state.watchlist.length;
+  for(let i=0;i<state.watchlist.length;i++){
+    const wl = state.watchlist[i];
+    let candidates = [];
+    for(const lib of selectedLibs){
+      try{
+        const data = await plexServer(state.selectedServer,
+          '/library/sections/'+lib.key+'/all?type=1&title='+encodeURIComponent(wl.title));
+        const items = (data && data.MediaContainer && data.MediaContainer.Metadata) || [];
+        for(const m of items){
+          candidates.push({
+            ratingKey: m.ratingKey,
+            title: m.title,
+            year: m.year || null,
+            librarySectionTitle: lib.title
+          });
+        }
+      }catch(e){ console.warn('search failed', e); }
+    }
+    // Deduplicate by ratingKey
+    const seen = new Set();
+    candidates = candidates.filter(c => seen.has(c.ratingKey) ? false : (seen.add(c.ratingKey), true));
+
+    const result = pickBest(wl, candidates);
+    if(result.kind === 'match') state.matched.push({ wl, plex: result.plex, selected: true });
+    else if(result.kind === 'ambiguous') state.ambiguous.push({ wl, candidates, chosen: null });
+    else state.missing.push({ wl });
+
+    bar.style.width = Math.round(((i+1)/total)*100) + '%';
+  }
+  renderMatchResults();
+  setMatchStatus(`${state.matched.length}/${total} matched`, state.missing.length || state.ambiguous.length ? 'warn' : 'ok');
+  $('#btn-match').disabled = false;
+  $('#match-progress').classList.add('hidden');
+  document.getElementById('step4').classList.add('done');
+  document.getElementById('step4').classList.remove('active');
+  document.getElementById('step5').classList.add('active');
+  refreshCreateEnabled();
+  loadExistingPlaylists();
+}
+
+function pickBest(wl, candidates){
+  if(!candidates.length) return { kind:'missing' };
+  const wlKey = basicTitleKey(wl.title);
+  const wlNorm = normalizeTitle(wl.title);
+
+  // 1. Exact normalized title + same year
+  let exact = candidates.filter(c => normalizeTitle(c.title) === wlNorm && wl.year && c.year === wl.year);
+  if(exact.length === 1) return { kind:'match', plex:exact[0] };
+  if(exact.length > 1) return { kind:'ambiguous' };
+
+  // 2. Exact normalized title (any year) — only one candidate
+  exact = candidates.filter(c => normalizeTitle(c.title) === wlNorm);
+  if(exact.length === 1) return { kind:'match', plex:exact[0] };
+
+  // 3. Article-stripped title + same year
+  let articleHit = candidates.filter(c => basicTitleKey(c.title) === wlKey && wl.year && c.year === wl.year);
+  if(articleHit.length === 1) return { kind:'match', plex:articleHit[0] };
+  if(articleHit.length > 1) return { kind:'ambiguous' };
+
+  // 4. Article-stripped title, no year requirement — single candidate
+  articleHit = candidates.filter(c => basicTitleKey(c.title) === wlKey);
+  if(articleHit.length === 1) return { kind:'match', plex:articleHit[0] };
+
+  // 5. Any candidates exist → ambiguous
+  return { kind:'ambiguous' };
+}
+
+function setMatchStatus(text, kind){
+  const el = $('#match-status');
+  el.className = 'pill ' + (kind||'');
+  el.innerHTML = '<span class="dot"></span> ' + text;
+}
+
+function renderMatchResults(){
+  $('#match-results').classList.remove('hidden');
+  $('#count-matched').textContent = state.matched.length;
+  $('#count-ambiguous').textContent = state.ambiguous.length;
+  $('#count-missing').textContent = state.missing.length;
+  const m = state.matched.length, a = state.ambiguous.length, g = state.missing.length;
+  $('#pill-matched').innerHTML = '<span class="dot"></span> matched ' + m;
+  $('#pill-ambig').innerHTML = '<span class="dot"></span> ambiguous ' + a;
+  $('#pill-missing').innerHTML = '<span class="dot"></span> missing ' + g;
+
+  // Matched
+  const tbm = $('#tbody-matched');
+  tbm.innerHTML = '';
+  if(!state.matched.length){
+    $('#empty-matched').classList.remove('hidden');
+  }else{
+    $('#empty-matched').classList.add('hidden');
+    state.matched.forEach((row, idx) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="checkbox" data-idx="${idx}" ${row.selected?'checked':''}></td>
+        <td>${escapeHtml(row.wl.title)}</td>
+        <td>${row.wl.year||''}</td>
+        <td>${escapeHtml(row.plex.title)}${row.plex.year?' <span class="badge">'+row.plex.year+'</span>':''}</td>
+      `;
+      tr.querySelector('input').addEventListener('change', e => {
+        row.selected = e.target.checked;
+        refreshCreateEnabled();
+      });
+      tbm.appendChild(tr);
+    });
+  }
+  $('#check-all-matched').onchange = e => {
+    state.matched.forEach(r => r.selected = e.target.checked);
+    $$('#tbody-matched input[type=checkbox]').forEach(cb => cb.checked = e.target.checked);
+    refreshCreateEnabled();
+  };
+
+  // Ambiguous
+  const tba = $('#tbody-ambiguous');
+  tba.innerHTML = '';
+  if(!state.ambiguous.length){
+    $('#empty-ambiguous').classList.remove('hidden');
+  }else{
+    $('#empty-ambiguous').classList.add('hidden');
+    state.ambiguous.forEach((row, idx) => {
+      const tr = document.createElement('tr');
+      const opts = ['<option value="">— skip —</option>'].concat(
+        row.candidates.map(c => `<option value="${c.ratingKey}">${escapeHtml(c.title)}${c.year?' ('+c.year+')':''}</option>`)
+      ).join('');
+      tr.innerHTML = `
+        <td></td>
+        <td>${escapeHtml(row.wl.title)}</td>
+        <td>${row.wl.year||''}</td>
+        <td><select data-idx="${idx}">${opts}</select></td>
+      `;
+      tr.querySelector('select').addEventListener('change', e => {
+        row.chosen = e.target.value || null;
+        refreshCreateEnabled();
+      });
+      tba.appendChild(tr);
+    });
+  }
+
+  // Missing
+  const tbg = $('#tbody-missing');
+  tbg.innerHTML = '';
+  if(!state.missing.length){
+    $('#empty-missing').classList.remove('hidden');
+  }else{
+    $('#empty-missing').classList.add('hidden');
+    state.missing.forEach(row => {
+      const tr = document.createElement('tr');
+      const lbUri = row.wl.uri || ('https://letterboxd.com/search/films/' + encodeURIComponent(row.wl.title) + '/');
+      tr.innerHTML = `
+        <td>${escapeHtml(row.wl.title)}</td>
+        <td>${row.wl.year||''}</td>
+        <td><a href="${escapeHtml(lbUri)}" target="_blank" rel="noopener">View on Letterboxd ↗</a></td>
+      `;
+      tbg.appendChild(tr);
+    });
+  }
+
+  // Tabs
+  $$('.tab-bar .tab').forEach(btn => {
+    btn.onclick = () => {
+      $$('.tab-bar .tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const t = btn.dataset.tab;
+      ['matched','ambiguous','missing'].forEach(name => {
+        document.getElementById('tab-'+name).classList.toggle('hidden', name!==t);
+      });
+    };
+  });
+}
+
+// --- Existing playlists ---
+async function loadExistingPlaylists(){
+  try{
+    const name = $('#playlist-name').value.trim().toLowerCase();
+    const data = await plexServer(state.selectedServer, '/playlists?playlistType=video');
+    const lists = (data && data.MediaContainer && data.MediaContainer.Metadata) || [];
+    const matches = lists.filter(p => (p.title||'').toLowerCase() === name);
+    if(!matches.length){
+      $('#existing-playlists').innerHTML = '<em>None — a new one will be created.</em>';
+    }else{
+      $('#existing-playlists').innerHTML = matches.map(p =>
+        `${escapeHtml(p.title)} (${p.leafCount||0} items, updated ${p.updatedAt? new Date(p.updatedAt*1000).toLocaleDateString():'?'})`
+      ).join('<br>') + '<div style="margin-top:6px"><em>A new playlist with the same name will be created — Plex allows duplicates. Delete old ones manually if you want.</em></div>';
+    }
+  }catch(e){ console.warn(e); }
+}
+
+// --- Create playlist ---
+function refreshCreateEnabled(){
+  const ratingKeys = collectRatingKeys();
+  $('#btn-create').disabled = !ratingKeys.length;
+}
+function collectRatingKeys(){
+  const keys = [];
+  for(const r of state.matched){ if(r.selected && r.plex) keys.push(r.plex.ratingKey); }
+  for(const r of state.ambiguous){ if(r.chosen) keys.push(r.chosen); }
+  return keys;
+}
+async function createPlaylist(){
+  const name = $('#playlist-name').value.trim();
+  if(!name){ toast('Give your playlist a name','err'); return; }
+  const ratingKeys = collectRatingKeys();
+  if(!ratingKeys.length){ toast('Nothing selected','err'); return; }
+
+  const s = state.selectedServer;
+  const setStatus = (txt, kind='') => {
+    const el = $('#create-status');
+    el.className = 'pill ' + kind;
+    el.innerHTML = '<span class="dot"></span> ' + txt;
+  };
+  $('#btn-create').disabled = true;
+  setStatus('creating…','warn');
+  try{
+    // Plex limits how many ratingKeys you can pass in a single URI; chunk to be safe.
+    const chunkSize = 100;
+    const first = ratingKeys.slice(0, chunkSize);
+    const rest = ratingKeys.slice(chunkSize);
+    const baseItems = first.join(',');
+    const uri = `server://${s.machineIdentifier}/com.plexapp.plugins.library/library/metadata/${baseItems}`;
+    const params = new URLSearchParams({
+      type: 'video',
+      title: name,
+      smart: '0',
+      uri
+    });
+    const created = await plexServer(s, '/playlists?' + params.toString(), { method:'POST' });
+    const playlist = created && created.MediaContainer && created.MediaContainer.Metadata && created.MediaContainer.Metadata[0];
+    if(!playlist) throw new Error('Plex did not return playlist metadata');
+    let added = first.length;
+
+    // Add remaining items in batches
+    for(let i=0;i<rest.length;i+=chunkSize){
+      const batch = rest.slice(i, i+chunkSize);
+      const addUri = `server://${s.machineIdentifier}/com.plexapp.plugins.library/library/metadata/${batch.join(',')}`;
+      const p = new URLSearchParams({ uri: addUri });
+      await plexServer(s, '/playlists/'+playlist.ratingKey+'/items?' + p.toString(), { method:'PUT' });
+      added += batch.length;
+      setStatus('adding… ' + added + '/' + ratingKeys.length, 'warn');
+    }
+
+    setStatus('done — ' + added + ' items', 'ok');
+    const result = $('#create-result');
+    result.classList.remove('hidden');
+    result.innerHTML = `
+      <div class="pill ok"><span class="dot"></span> Created “${escapeHtml(name)}” with ${added} films</div>
+      <div style="margin-top:8px;font-size:13px;color:var(--muted)">Open Plex (web/app) and you'll find it under Playlists. <strong>${state.missing.length}</strong> films from your watchlist weren't in your library — see the Missing tab above.</div>
+    `;
+    toast('Playlist created!','ok');
+  }catch(e){
+    console.error(e);
+    setStatus('failed','err');
+    toast('Failed to create playlist: ' + e.message, 'err');
+  }finally{
+    $('#btn-create').disabled = false;
+  }
+}
+
+// --- Helpers ---
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// --- Init ---
+function init(){
+  $('#version').textContent = 'v' + VERSION;
+  $('#btn-plex-signin').addEventListener('click', startPinFlow);
+  $('#btn-pin-cancel').addEventListener('click', cancelPin);
+  $('#btn-plex-signout').addEventListener('click', signOut);
+  $('#btn-match').addEventListener('click', runMatch);
+  $('#btn-create').addEventListener('click', createPlaylist);
+  $('#playlist-name').addEventListener('input', () => {
+    clearTimeout(init._t);
+    init._t = setTimeout(loadExistingPlaylists, 400);
+  });
+  bindDrop();
+
+  if(state.token){
+    showSignedIn();
+    loadServers();
+  }
+}
+init();
+
+})();
+</script>
+</body>
+</html>
