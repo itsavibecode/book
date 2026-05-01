@@ -148,6 +148,64 @@ Add later (v0.2+):
 - **Crawler** — low-profile, easy to miss with high-aimed shots.
 - **Boss** at every Nth wave.
 
+### 5c-bis. Mini-bosses — Xena the Siren — LOCKED
+
+**Xena** carries over from the EmpireX `/run/` universe (where she was
+the player's cellmate in the jail mechanic). In Cx Zombies she's
+re-cast as a **Siren** — she **leads the zombies**.
+
+**Behavior — mini-boss pattern (Option A):**
+
+- **Spawn:** at the start of selected waves (likely waves 3, 5, 7).
+  Walks in from the right edge of the screen.
+- **Combat:** stands at a distance and **summons additional zombies**
+  on a timer (e.g., 3 zombies every 4 seconds while she's alive).
+  Doesn't approach the player directly — she's a backline support.
+- **HP:** ~50 HP (5x a Shambler). Player can shoot her down.
+- **Death:** when killed, the wave's zombie spawn rate drops to zero
+  for the rest of that wave (the wave ends faster). Visual flair on
+  death — collapse + dissipating glow particle effect.
+- **Sprite size:** 120×168 (taller than wide — slim figure in a
+  dress). Bigger than zombies (96×96 / 144×144) but not bulky.
+- **Reference art:** `art/xena-run-reference.png` (copy of Run's
+  `xena-pose-01.png` — front-facing standing portrait for character
+  recognizability). Will be re-styled into the locked Cx Zombies
+  pixel-art style via ChatGPT (see prompt block below).
+
+**Sprite atlas needed (~24 frames):**
+
+| State | Frames | Notes |
+|---|---|---|
+| Idle | 4 | gentle sway, hair drifting |
+| Walk | 8 | enters from right, walks toward summon position |
+| Summon | 4 | arms raise, glow build, zombies "erupt" from ground |
+| Hurt | 2 | red flash on bullet impact |
+| Die | 6 | collapse + dissipating glow |
+
+**ChatGPT prompt for the atlas (paste into the Cx Zombies Art project):**
+
+> CRITICAL STYLE: Match the chunky 16-bit pixel-art style of the
+> FIRST attached image (sprite sheet — soldier + zombie + UI items).
+> Hard 1px outlines, NO anti-aliasing, ~32-color limited palette,
+> visible pixel grid. NOT painterly. The SECOND attached image is a
+> reference of the character Xena from a sister game — long dark
+> hair, black off-shoulder dress, gold necklace, tattoos visible at
+> the shoulder. Re-render her as a sprite atlas in the locked Cx
+> Zombies pixel-art style above, but keep her recognizably Xena
+> (same hair, same dress, same body type, same vibe). She is a
+> SIREN-style mini-boss that leads zombies. Output a single sprite
+> atlas PNG with transparent background, 24 frames total, each frame
+> 120 pixels wide by 168 pixels tall. Layout: 8 frames per row, 3
+> rows. Row 1: 4 IDLE frames (gentle sway, hair drifting), then 4
+> WALK frames part 1 (facing left, entering scene). Row 2: 4 WALK
+> frames part 2, then 4 SUMMON frames (arms raised, building energy
+> glow around her hands, zombies erupting from ground at her feet
+> on the last frame). Row 3: 2 HURT frames (red flash, recoiling),
+> then 6 DIE frames (collapse to knees, fall sideways, dissipating
+> green-glow particle effect on final frame). All frames face left
+> (toward the player who is on the right side of screen). Total
+> output dimension: 960 wide by 504 tall.
+
 ### 5d. Wave / difficulty system + level architecture — LOCKED
 
 **The level is ONE CONTINUOUS SEAMLESS WALK** through 7 zones, not
