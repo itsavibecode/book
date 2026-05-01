@@ -1,0 +1,393 @@
+/*
+ * Cx Zombies — base styles for HUD, overlays, controls.
+ *
+ * Palette philosophy: the GAME world (canvas) uses the locked pixel-art
+ * palette (military olive, dusk purple, sunset orange). The UI CHROME
+ * (HUD, overlays, buttons) uses BookHockeys neon green #39ff14 as the
+ * accent color so it reads as part of the BookHockeys brand without
+ * polluting the in-world art.
+ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: #0a0a0a;
+  color: #e8e8e8;
+  font-family: 'VT323', system-ui, monospace;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+canvas#game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ============================================================
+ * HUD — top-left, always visible, pointer-events none
+ * ============================================================ */
+.hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+}
+.hud-left {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #39ff14;
+  text-shadow: 2px 2px 0 #000;
+}
+.hp-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hp-bar {
+  width: 220px;
+  height: 18px;
+  background: #1a1a1a;
+  border: 2px solid #39ff14;
+  position: relative;
+}
+.hp-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #39ff14 0%, #b3ff39 100%);
+  transition: width 200ms ease-out;
+}
+.hp-fill.low { background: linear-gradient(90deg, #ff3939 0%, #ff8d39 100%); }
+.hp-label { font-size: 18px; }
+.kills, .wave, .coins { font-size: 22px; }
+.special-badge {
+  background: rgba(57, 255, 20, 0.15);
+  border: 2px solid #39ff14;
+  padding: 4px 8px;
+  font-size: 20px;
+  width: fit-content;
+}
+.special-badge.hidden { display: none; }
+
+/* ============================================================
+ * Pause + audio gear (top-right)
+ * ============================================================ */
+.btn-pause, .audio-toggle {
+  position: fixed;
+  top: 14px;
+  width: 38px;
+  height: 38px;
+  background: rgba(10, 10, 10, 0.7);
+  border: 2px solid #39ff14;
+  color: #39ff14;
+  cursor: pointer;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-pause { right: 64px; }
+.audio-toggle { right: 14px; }
+.btn-pause svg, .audio-toggle svg { width: 22px; height: 22px; }
+.btn-pause .icon-play { display: none; }
+.btn-pause.paused .icon-pause { display: none; }
+.btn-pause.paused .icon-play { display: block; }
+
+.audio-controls { position: relative; }
+.audio-panel {
+  position: fixed;
+  top: 60px;
+  right: 14px;
+  width: 280px;
+  background: rgba(10, 10, 10, 0.95);
+  border: 2px solid #39ff14;
+  padding: 14px;
+  z-index: 25;
+  display: none;
+  font-size: 18px;
+}
+.audio-panel.open { display: block; }
+.audio-panel-title {
+  font-family: 'Luckiest Guy', sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: #39ff14;
+  margin-bottom: 8px;
+}
+.audio-panel-title.controls-title { margin-top: 14px; }
+.audio-panel-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+.audio-panel-row label { width: 50px; font-size: 16px; }
+.audio-panel-row input[type="range"] { flex: 1; accent-color: #39ff14; }
+.audio-channel-mute {
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: 1px solid #39ff14;
+  color: #39ff14;
+  cursor: pointer;
+  font-size: 14px;
+}
+.audio-channel-mute.muted { background: #39ff14; color: #0a0a0a; }
+.audio-master-mute {
+  margin-top: 10px;
+  width: 100%;
+  background: transparent;
+  border: 2px solid #39ff14;
+  color: #39ff14;
+  font-family: 'Luckiest Guy', sans-serif;
+  letter-spacing: 2px;
+  padding: 6px;
+  cursor: pointer;
+}
+.audio-master-mute.muted { background: #ff3939; border-color: #ff3939; color: #fff; }
+.audio-panel-controls { font-size: 15px; line-height: 1.6; }
+.audio-panel-controls kbd {
+  display: inline-block;
+  background: #1a1a1a;
+  border: 1px solid #39ff14;
+  padding: 1px 5px;
+  font-family: 'VT323', monospace;
+  font-size: 13px;
+  color: #39ff14;
+}
+.audio-panel-version { margin-top: 10px; font-size: 12px; opacity: 0.5; text-align: right; }
+
+/* ============================================================
+ * Overlays — full-screen dim backdrop with centered content
+ * ============================================================ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  z-index: 100;
+  text-align: center;
+  padding: 24px;
+}
+.overlay.hidden { display: none; }
+.overlay h1 {
+  font-family: 'Luckiest Guy', sans-serif;
+  font-size: clamp(48px, 8vw, 96px);
+  letter-spacing: 4px;
+  color: #39ff14;
+  text-shadow: 4px 4px 0 #000;
+}
+.overlay h1.title-cx { font-size: clamp(56px, 10vw, 120px); }
+.overlay h1 .title-z { color: #ff3939; }
+.overlay p { font-size: 20px; }
+.overlay p.hint { font-size: 16px; opacity: 0.7; }
+.overlay button {
+  background: transparent;
+  border: 2px solid #39ff14;
+  color: #39ff14;
+  font-family: 'Luckiest Guy', sans-serif;
+  font-size: 22px;
+  letter-spacing: 2px;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.overlay button:hover:not(:disabled) {
+  background: #39ff14;
+  color: #0a0a0a;
+}
+.overlay button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.title-buttons, .gameover-buttons, .loadout-buttons {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.title-stats {
+  display: flex;
+  gap: 32px;
+  margin-top: 14px;
+}
+.ts-label { font-size: 14px; opacity: 0.6; }
+.ts-value { font-size: 28px; color: #39ff14; }
+
+/* ============================================================
+ * Loadout / character select
+ * ============================================================ */
+.loadout-cards {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 960px;
+}
+.char-card {
+  background: rgba(20, 20, 20, 0.8);
+  border: 2px solid #444;
+  width: 240px;
+  padding: 14px;
+  cursor: pointer;
+  transition: border-color 120ms ease, transform 120ms ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.char-card:hover { border-color: #39ff14; transform: translateY(-2px); }
+.char-card.selected { border-color: #39ff14; background: rgba(57, 255, 20, 0.1); }
+.char-portrait {
+  width: 100%;
+  height: 200px;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Luckiest Guy', sans-serif;
+  font-size: 14px;
+  color: #555;
+}
+.char-portrait::after { content: 'PORTRAIT'; }
+.char-portrait-ice::after { content: 'ICE'; color: #39ff14; }
+.char-portrait-scout::after { content: 'SCOUT'; }
+.char-portrait-heavy::after { content: 'HEAVY'; }
+.char-name {
+  font-family: 'Luckiest Guy', sans-serif;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: #39ff14;
+}
+.char-bio { font-size: 16px; opacity: 0.8; line-height: 1.3; }
+.char-stats { display: flex; flex-direction: column; gap: 3px; font-size: 14px; }
+.stat-row { display: flex; align-items: center; gap: 8px; }
+.stat-row > span:first-child { width: 36px; opacity: 0.7; }
+.stat-bar {
+  flex: 1;
+  height: 6px;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  position: relative;
+}
+.stat-bar > span {
+  display: block;
+  height: 100%;
+  background: #39ff14;
+}
+
+/* ============================================================
+ * Cutscene overlay
+ * ============================================================ */
+.cutscene-canvas {
+  width: min(900px, 90vw);
+  aspect-ratio: 3/2;
+  background: #1a1a1a;
+  border: 2px solid #39ff14;
+  position: relative;
+}
+.cutscene-bg { width: 100%; height: 100%; object-fit: cover; }
+.cutscene-dialogue {
+  width: min(900px, 90vw);
+  background: rgba(10, 10, 10, 0.95);
+  border: 2px solid #39ff14;
+  padding: 16px;
+  text-align: left;
+}
+.cutscene-name {
+  font-family: 'Luckiest Guy', sans-serif;
+  color: #39ff14;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.cutscene-text { font-size: 22px; line-height: 1.4; }
+.cutscene-choices {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+ * Consent banner (EU only)
+ * ============================================================ */
+.consent-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #0a0a0a;
+  border-top: 2px solid #39ff14;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  z-index: 200;
+}
+.consent-banner.hidden { display: none; }
+.consent-text { flex: 1; min-width: 220px; font-size: 16px; }
+.consent-buttons { display: flex; gap: 8px; }
+.consent-buttons button {
+  background: transparent;
+  border: 2px solid #39ff14;
+  color: #39ff14;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+/* ============================================================
+ * Footer caption + version pill
+ * ============================================================ */
+.game-url, .game-version {
+  position: fixed;
+  bottom: 8px;
+  font-family: 'VT323', monospace;
+  font-size: 13px;
+  letter-spacing: 1px;
+  opacity: 0.4;
+  z-index: 30;
+  pointer-events: none;
+}
+.game-url { right: 14px; }
+.game-version { left: 14px; }
+.cookies-link {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'VT323', monospace;
+  font-size: 12px;
+  color: #888;
+  text-decoration: none;
+  z-index: 30;
+}
+.cookies-link:hover { color: #39ff14; }
+
+/* ============================================================
+ * Mobile tweaks
+ * ============================================================ */
+@media (max-width: 720px) {
+  .hp-bar { width: 140px; height: 14px; }
+  .hud-left { font-size: 18px; }
+  .char-card { width: 100%; max-width: 320px; }
+  .overlay h1 { font-size: 48px; }
+  .overlay h1.title-cx { font-size: 64px; }
+}

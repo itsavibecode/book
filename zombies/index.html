@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="version" content="0.1.0" />
+<title>Cx Zombies — BookHockeys</title>
+
+<meta name="description" content="Cx Zombies — a side-scrolling zombie shooter. Walk South Lamar with Ice Poseidon, kill zombies, survive to the Alamo Drafthouse boss arena." />
+<meta name="theme-color" content="#0a0a0a" />
+<meta name="author" content="BookHockeys" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="canonical" href="https://bookhockeys.com/zombies/" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="Cx Zombies — BookHockeys" />
+<meta property="og:description" content="Side-scrolling zombie shooter. South Lamar, Austin. Kill zombies, survive to the Alamo Drafthouse." />
+<meta property="og:url" content="https://bookhockeys.com/zombies/" />
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Cx Zombies" />
+<meta name="twitter:description" content="Side-scrolling zombie shooter. South Lamar, Austin." />
+
+<link rel="icon" href="/logo.png" />
+
+<!-- Consent default-deny + EU detection (mirrors /greenline/ pattern,
+     shares the 'greenline-consent' localStorage key site-wide) -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    'analytics_storage': 'denied',
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'wait_for_update': 500
+  });
+  (function(){
+    var tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch(e){}
+    var euExtras = ['Atlantic/Azores','Atlantic/Madeira','Atlantic/Canary','Atlantic/Reykjavik','Asia/Nicosia','Asia/Famagusta'];
+    var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+    var saved = null;
+    try { saved = localStorage.getItem('greenline-consent'); } catch(e){}
+    if (saved === 'granted') {
+      gtag('consent', 'update', { 'analytics_storage': 'granted' });
+    } else if (saved === 'denied') {
+      // already denied
+    } else if (!likelyEU) {
+      gtag('consent', 'update', { 'analytics_storage': 'granted' });
+    } else {
+      window.__needsConsent = true;
+    }
+  })();
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DYME377V2S"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-DYME377V2S');
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Luckiest+Guy&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=0.1.0">
+</head>
+<body>
+
+<!-- Game canvas. Resized to viewport via JS on load + resize. -->
+<canvas id="game"></canvas>
+
+<!-- HUD overlay (always-on, pointer-events: none so taps pass through to canvas).
+     HP bar (Doom-style), kill counter, wave indicator, Cx coin counter. -->
+<div class="hud">
+  <div class="hud-left">
+    <div class="hp-bar-wrap">
+      <div class="hp-bar"><div class="hp-fill" id="hp-fill"></div></div>
+      <div class="hp-label" id="hp-label">100 / 100</div>
+    </div>
+    <div class="kills">Kills: <span id="kill-count">0</span></div>
+    <div class="wave">Wave <span id="wave-num">1</span></div>
+    <div class="coins">Cx <span id="coin-count">0</span></div>
+    <!-- Active special-weapon badge (rocket / shotgun / flame / minigun countdown) -->
+    <div class="special-badge hidden" id="special-badge"></div>
+  </div>
+</div>
+
+<!-- Pause button. P / ESC / right-click also toggles. -->
+<button type="button" id="btn-pause" class="btn-pause" aria-label="Pause">
+  <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+  <svg class="icon-play"  viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+</button>
+
+<!-- Settings panel (audio sliders + mute) -->
+<div class="audio-controls">
+  <button type="button" id="audio-toggle" class="audio-toggle" aria-label="Settings">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65c-.04-.24-.24-.42-.49-.42h-4c-.25 0-.45.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98L2.46 14.63c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.24.42.49.42h4c.25 0 .45-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+  </button>
+  <div id="audio-panel" class="audio-panel">
+    <div class="audio-panel-title">AUDIO</div>
+    <div class="audio-panel-row">
+      <button type="button" class="audio-channel-mute" data-mute-channel="music" aria-label="Mute music">♪</button>
+      <label>Music</label>
+      <input type="range" min="0" max="100" value="50" data-channel="music" aria-label="Music volume">
+    </div>
+    <div class="audio-panel-row">
+      <button type="button" class="audio-channel-mute" data-mute-channel="sfx" aria-label="Mute SFX">★</button>
+      <label>SFX</label>
+      <input type="range" min="0" max="100" value="70" data-channel="sfx" aria-label="SFX volume">
+    </div>
+    <div class="audio-panel-row">
+      <button type="button" class="audio-channel-mute" data-mute-channel="voice" aria-label="Mute voice">●</button>
+      <label>Voice</label>
+      <input type="range" min="0" max="100" value="100" data-channel="voice" aria-label="Voice volume">
+    </div>
+    <button type="button" id="audio-master-mute" class="audio-master-mute">MUTE ALL</button>
+    <div class="audio-panel-title controls-title">CONTROLS</div>
+    <div class="audio-panel-controls">
+      <div><kbd>A</kbd> <kbd>D</kbd> or <kbd>⬅</kbd> <kbd>➡</kbd> move</div>
+      <div><kbd>SPACE</kbd> jump</div>
+      <div><kbd>Z</kbd> or <kbd>click</kbd> shoot (hold for auto-fire on specials)</div>
+      <div><kbd>P</kbd> <kbd>ESC</kbd> right-click pause</div>
+    </div>
+    <div class="audio-panel-version" id="audio-panel-version"></div>
+  </div>
+</div>
+
+<!-- Start / title overlay. Click START → loadout. -->
+<div class="overlay overlay-start" id="overlay-start">
+  <h1 class="title-cx">CX <span class="title-z">ZOMBIES</span></h1>
+  <p class="tagline">Side-scrolling zombie shooter — South Lamar, Austin</p>
+  <p class="hint">A / D move · SPACE jump · Z shoot · P / ESC pause</p>
+  <div class="title-buttons">
+    <button type="button" id="btn-start">START</button>
+    <button type="button" id="btn-title-leaderboard" disabled title="Coming in v0.5">LEADERBOARD</button>
+  </div>
+  <div class="title-stats" id="title-stats" hidden>
+    <div class="ts-block">
+      <div class="ts-label">Total Runs</div>
+      <div class="ts-value" id="ts-attempts">—</div>
+    </div>
+    <div class="ts-block">
+      <div class="ts-label">Top Score</div>
+      <div class="ts-value" id="ts-top-score">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- Loadout / character-select overlay (3 placeholder cards) -->
+<div class="overlay overlay-loadout hidden" id="overlay-loadout">
+  <h1>CHOOSE</h1>
+  <p class="hint">Pick your character</p>
+  <div class="loadout-cards">
+    <div class="char-card" data-char="ice">
+      <div class="char-portrait char-portrait-ice"></div>
+      <div class="char-name">ICE POSEIDON</div>
+      <div class="char-bio">Balanced default. 100 HP. With Zeus tank-sidekick.</div>
+      <div class="char-stats">
+        <div class="stat-row"><span>HP</span><span class="stat-bar"><span style="width:67%"></span></span></div>
+        <div class="stat-row"><span>SPD</span><span class="stat-bar"><span style="width:50%"></span></span></div>
+        <div class="stat-row"><span>FIRE</span><span class="stat-bar"><span style="width:50%"></span></span></div>
+        <div class="stat-row"><span>DMG</span><span class="stat-bar"><span style="width:33%"></span></span></div>
+      </div>
+    </div>
+    <div class="char-card" data-char="scout">
+      <div class="char-portrait char-portrait-scout"></div>
+      <div class="char-name">SCOUT</div>
+      <div class="char-bio">Glass cannon. 75 HP. Fast and dodgy.</div>
+      <div class="char-stats">
+        <div class="stat-row"><span>HP</span><span class="stat-bar"><span style="width:50%"></span></span></div>
+        <div class="stat-row"><span>SPD</span><span class="stat-bar"><span style="width:80%"></span></span></div>
+        <div class="stat-row"><span>FIRE</span><span class="stat-bar"><span style="width:90%"></span></span></div>
+        <div class="stat-row"><span>DMG</span><span class="stat-bar"><span style="width:33%"></span></span></div>
+      </div>
+    </div>
+    <div class="char-card" data-char="heavy">
+      <div class="char-portrait char-portrait-heavy"></div>
+      <div class="char-name">HEAVY</div>
+      <div class="char-bio">Tank. 150 HP. Slow but punchy.</div>
+      <div class="char-stats">
+        <div class="stat-row"><span>HP</span><span class="stat-bar"><span style="width:100%"></span></span></div>
+        <div class="stat-row"><span>SPD</span><span class="stat-bar"><span style="width:33%"></span></span></div>
+        <div class="stat-row"><span>FIRE</span><span class="stat-bar"><span style="width:30%"></span></span></div>
+        <div class="stat-row"><span>DMG</span><span class="stat-bar"><span style="width:90%"></span></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="loadout-buttons">
+    <button type="button" id="btn-loadout-back">BACK</button>
+    <button type="button" id="btn-loadout-play" disabled>PLAY</button>
+  </div>
+</div>
+
+<!-- Pause overlay -->
+<div class="overlay overlay-pause hidden" id="overlay-pause">
+  <h1>PAUSED</h1>
+  <p class="hint">P / ESC / right-click or tap PAUSED to resume</p>
+  <button type="button" id="btn-pause-quit">QUIT TO TITLE</button>
+</div>
+
+<!-- Cutscene overlay (Snorlax dialogue, etc) -->
+<div class="overlay overlay-cutscene hidden" id="overlay-cutscene">
+  <div class="cutscene-canvas">
+    <img class="cutscene-bg" id="cutscene-bg" src="" alt="">
+  </div>
+  <div class="cutscene-dialogue">
+    <div class="cutscene-name" id="cutscene-name">SNORLAX</div>
+    <p class="cutscene-text" id="cutscene-text"></p>
+    <div class="cutscene-choices hidden" id="cutscene-choices"></div>
+  </div>
+</div>
+
+<!-- Game-over overlay -->
+<div class="overlay overlay-gameover hidden" id="overlay-gameover">
+  <h1>BUSTED</h1>
+  <p class="final-score">0 kills · Wave 0</p>
+  <div class="gameover-buttons">
+    <button type="button" id="btn-submit-score" disabled title="Coming in v0.5">SUBMIT SCORE</button>
+    <button type="button" id="btn-restart">PLAY AGAIN</button>
+    <button type="button" id="btn-gameover-quit">QUIT TO TITLE</button>
+  </div>
+</div>
+
+<!-- EU consent banner (shown only when window.__needsConsent is true) -->
+<div class="consent-banner hidden" id="consent-banner">
+  <div class="consent-text">
+    We use cookies for anonymous analytics. Decline if you'd prefer not to be counted.
+  </div>
+  <div class="consent-buttons">
+    <button type="button" id="consent-deny">Decline</button>
+    <button type="button" id="consent-accept">Accept</button>
+  </div>
+</div>
+
+<!-- Footer URL caption + version pill -->
+<div class="game-url">bookhockeys.com/zombies</div>
+<div class="game-version">Cx Zombies v0.1.0</div>
+
+<!-- Cookies link (clears localStorage consent + re-shows banner) -->
+<a href="#" class="cookies-link" id="cookies-link">Cookies</a>
+
+<script src="js/main.js?v=0.1.0"></script>
+
+</body>
+</html>

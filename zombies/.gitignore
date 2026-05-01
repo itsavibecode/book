@@ -1,0 +1,5 @@
+# Ignore the art/ folder for v0.1.0 — Phase 0 doesn't load any assets yet.
+# Phase 1 will revisit and selectively un-ignore the bg-XX-final.png files
+# the game actually uses (vs the 30+MB of source photos and version backups
+# we don't want bloating the repo).
+art/
