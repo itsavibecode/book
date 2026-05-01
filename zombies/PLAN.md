@@ -945,6 +945,73 @@ not stretch-best-case.
   (even if all 3 share the same placeholder sprite for now)
 - **Ship:** v0.2.0 — playable empty world with character-select shell
 
+### Phase 1.5 — v0.2.1 + v0.2.2 polish (1-2 sessions)
+
+**v0.2.1 (shipped):** feedback patch — bigger Ice sprite, color-key
+transparency on walk atlas, per-scene ground-line interpolation,
+soft shadow band at scene seams, animated FX overlay system (bg-06
+neon flicker + ambulance lights).
+
+**v0.2.2 — bridge images for true seamless transitions:**
+
+The locked approach (Option B from the design discussion):
+
+- Keep all 7 `bg-XX-final.png` anchor scenes untouched.
+- Generate **6 NEW transition bridge images** that explicitly
+  match adjacent edges:
+  - `bridge-00-01.png` — connects bg-00 right edge → bg-01 left edge
+  - `bridge-01-02.png` — connects bg-01 → bg-02
+  - ... through `bridge-05-06.png`
+- Each bridge: **512×768 px** (a quarter of a hero scene's width).
+  Left half visually continues bg-N's right edge; right half
+  transitions into bg-(N+1)'s left edge; center is a smooth
+  gradient — stretching ground texture, fading building heights,
+  no new major architectural elements (it's a transitional
+  alley/passage, not a new scene).
+
+**ChatGPT prompt template per bridge** (paste into Cx Zombies Art
+project, attach `style-reference.png` + `bg-N-final.png` +
+`bg-(N+1)-final.png`):
+
+> Generate a 512×768 pixel transition strip in chunky 16-bit
+> pixel-art style matching the FIRST attached image (style
+> reference). The SECOND attached image is the LEFT-side anchor
+> scene; the THIRD is the RIGHT-side anchor scene. Your output
+> must serve as a SEAMLESS BRIDGE between them: the LEFT edge of
+> your output (first ~80 pixels) must visually continue from the
+> RIGHT edge of the second attached image (same ground level,
+> same sky color, same atmospheric lighting, same tree silhouette
+> heights, same architectural style). The RIGHT edge of your
+> output (last ~80 pixels) must transition into the LEFT edge of
+> the third attached image. The middle should be a smooth gradient
+> — a transitional alley, walkway, or passage with no new major
+> architectural elements. Same time-of-day lighting as the two
+> anchors. Apocalyptic touches OK (debris, distant zombie
+> silhouette) but understated. Output dimensions: 512 wide × 768
+> tall. Transparent background NOT needed — fill the full
+> dimensions.
+
+**Code changes in `main.js`:**
+
+- World layout becomes interleaved: scene[0] → bridge[0] →
+  scene[1] → bridge[1] → ... → scene[6]. 7 anchors + 6 bridges = 13
+  segments.
+- New `WORLD_LAYOUT` array: `[{type:'scene',idx:0,w:2048},
+  {type:'bridge',idx:0,w:512}, ...]`.
+- Camera/render iterates this layout instead of pure scene math.
+- World width: 7×2048 + 6×512 = **17408 px** (was 14336).
+- `SCENE_GROUND_LINES` becomes `SEGMENT_GROUND_LINES` with 13
+  entries; bridge ground lines tuned to interpolate cleanly between
+  their two neighbors.
+- The seam shadow-band hack from v0.2.1 gets removed — bridges
+  replace it.
+
+**Effort:** ~6 ChatGPT chats (one per bridge), ~1-2 refinement
+messages each, plus the code change. ~1 session.
+
+**Ship:** v0.2.2 — true seamless transitions through the entire
+level. Then we move to Phase 2.
+
 ### Phase 2 — shooting + first zombie (2 sessions)
 - Bullet pool + collision system
 - Shambler entity: spawn, walk, contact damage, death
