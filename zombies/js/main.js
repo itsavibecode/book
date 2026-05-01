@@ -1,5 +1,19 @@
 /*
- * Cx Zombies — boot + game loop (v0.2.0).
+ * Cx Zombies — boot + game loop (v0.2.1).
+ *
+ * v0.2.1 patch — feedback fixes from live test:
+ *   - Player sprite scaled up ~2.3x (was way too small)
+ *   - Color-key transparency on ice walk atlas (white halo removed)
+ *   - Per-scene ground line array with smooth interpolation between
+ *     scenes (player no longer walks through fences / floats above
+ *     sidewalks)
+ *   - Soft alpha crossfade in ~150-px overlap zone at scene seams
+ *     (won't fully hide content mismatch but softens hard cuts)
+ *   - Animated FX overlay system. v0.2.1 ships with: bg-06 Alamo
+ *     boss arena gets flickering ALAMO marquee + HighBall neon
+ *     signs + ambulance roof lights pulsing red/blue.
+ *
+ * v0.2.0 baseline (still here):
  *
  * v0.2.0 (Phase 1) adds the actual game loop, asset preloader, player
  * walk/jump, scrolling camera through bg-00 → bg-06, mobile touch
@@ -36,11 +50,40 @@
   var SCENE_HEIGHT = 768;        // each bg image is 768 tall
   var SCENE_COUNT = 7;           // bg-00 through bg-06
   var WORLD_WIDTH = SCENE_WIDTH * SCENE_COUNT;
-  var GROUND_RATIO = 0.78;       // ground line at 78% down the bg image
   var GRAVITY = 0.6;             // px/frame^2 (in scene-coord px)
   var JUMP_VELOCITY = -13;       // px/frame
   var BASE_MOVE_SPEED = 4;       // px/frame multiplied by char.speedMul
   var CAMERA_LEAD = 0.35;        // 0 = camera centered on player, 1 = far right
+  var PLAYER_HEIGHT = 220;       // sprite display height in scene-coord px
+  var SEAM_FADE = 150;           // px of crossfade overlap on each side of a scene boundary
+
+  // Per-scene ground line as a fraction of SCENE_HEIGHT (0..1, 1=bottom).
+  // Eyeballed from each bg-XX-final.png; tweak if Ice's feet float or sink.
+  var SCENE_GROUND_LINES = [
+    0.80,  // bg-00 garage flagstone driveway
+    0.82,  // bg-01 craftsman walkway
+    0.85,  // bg-02 in front of wood fence (sidewalk near bottom)
+    0.78,  // bg-03 treadwell street level
+    0.80,  // bg-04 lamar plaza
+    0.78,  // bg-05 lamar corridor asphalt
+    0.82   // bg-06 alamo planter level
+  ];
+
+  // Animated FX overlays. Each entry is (sceneIndex, x, y, w, h in
+  // scene-coords) plus a `type` and per-type params. Drawn AFTER the
+  // bg, BEFORE the player. Phase 2 will add zombie/bullet entities
+  // between these and the player.
+  var SCENE_FX = {
+    6: [
+      // ALAMO marquee (sits above the entrance) — slow neon flicker
+      { type: 'flicker', x: 1080, y: 280, w: 380, h: 70, color: '#ff5a3d', period: 280, jitter: 0.45 },
+      // HighBall vertical sign — faster flicker, warmer hue
+      { type: 'flicker', x: 1500, y: 240, w: 70,  h: 230, color: '#ffaa3d', period: 180, jitter: 0.55 },
+      // Ambulance roof light bar — alternating red/blue blink
+      { type: 'pulseRed',  x: 1730, y: 540, w: 60, h: 22, period: 700, duty: 0.35 },
+      { type: 'pulseBlue', x: 1730, y: 540, w: 60, h: 22, period: 700, duty: 0.35, offset: 350 }
+    ]
+  };
 
   // Per-character stats. Keys match the loadout-card data-char values.
   var CHARACTERS = {
@@ -66,8 +109,19 @@
   // Scene draw scale — backgrounds are 768 tall; we scale to fit viewport
   // height so the ground line lands consistently regardless of window size.
   var sceneScale = 1;
-  // Ground y in scene-coord px (where the player's feet rest)
-  var groundY = SCENE_HEIGHT * GROUND_RATIO;
+
+  // Ground-y for the current world position. Calculated each frame by
+  // interpolating between adjacent SCENE_GROUND_LINES so the player
+  // smoothly steps up/down at scene boundaries instead of teleporting.
+  function groundYAt(worldX) {
+    var sceneFloat = Math.max(0, Math.min(SCENE_COUNT - 1, worldX / SCENE_WIDTH));
+    var sceneA = Math.floor(sceneFloat);
+    var sceneB = Math.min(SCENE_COUNT - 1, sceneA + 1);
+    var t = sceneFloat - sceneA;
+    var a = SCENE_GROUND_LINES[sceneA];
+    var b = SCENE_GROUND_LINES[sceneB];
+    return SCENE_HEIGHT * (a + (b - a) * t);
+  }
 
   function resize() {
     viewportW = canvas.width = Math.floor(window.innerWidth);
@@ -114,7 +168,33 @@
       assets.bgs = bgs;
       return loadImage('art/ice-poseidon-walk.png');
     }).then(function (img) {
-      assets.iceWalk = img;
+      // Color-key any near-white pixels to transparent. The AI-generated
+      // atlas has an opaque white-ish background which shows up as a halo
+      // around the player. We do this once at load (not per-frame) and
+      // cache the result on an offscreen canvas that drawImage can use.
+      var off = document.createElement('canvas');
+      off.width = img.naturalWidth;
+      off.height = img.naturalHeight;
+      var octx = off.getContext('2d');
+      octx.drawImage(img, 0, 0);
+      try {
+        var data = octx.getImageData(0, 0, off.width, off.height);
+        var px = data.data;
+        for (var i = 0; i < px.length; i += 4) {
+          var r = px[i], g = px[i+1], b = px[i+2];
+          // Threshold: if pixel is near-white (sum > 700, i.e., each channel > ~230 avg)
+          // OR if it's exactly the corner color of the atlas, treat as background.
+          if (r + g + b > 700 && Math.abs(r - g) < 25 && Math.abs(g - b) < 25) {
+            px[i+3] = 0; // alpha = 0
+          }
+        }
+        octx.putImageData(data, 0, 0);
+        assets.iceWalk = off;
+      } catch (e) {
+        // CORS / canvas tainted — fall back to original image (with halo)
+        console.warn('[Cx Zombies] alpha-key failed, using raw atlas:', e);
+        assets.iceWalk = img;
+      }
     });
   }
 
@@ -124,13 +204,15 @@
   var gameStarted = false;
   var lastTime = 0;
   var rafId = null;
+  // Wall-clock-style accumulator (ms since game start) used for FX timing.
+  var gameTime = 0;
 
   var state = 'title';
   var selectedChar = 'ice';
 
   var player = {
     x: 100,         // world x (scene-coord px)
-    y: groundY,     // world y (scene-coord px, top-left of sprite)
+    y: SCENE_HEIGHT * 0.80,  // initial world y (set properly in startGame)
     vx: 0,
     vy: 0,
     onGround: true,
@@ -180,7 +262,7 @@
   function startGame() {
     var char = CHARACTERS[selectedChar] || CHARACTERS.ice;
     player.x = 100;
-    player.y = groundY;
+    player.y = groundYAt(player.x);
     player.vx = 0;
     player.vy = 0;
     player.onGround = true;
@@ -190,6 +272,7 @@
     player.speedMul = char.speedMul;
     player.jumpMul = char.jumpMul;
     camera.x = 0;
+    gameTime = 0;
     updateHUD();
     gameStarted = true;
     setState('playing');
@@ -228,11 +311,12 @@
       input.jump = false; // single-fire; player must release+repress
     }
 
-    // Gravity
+    // Gravity (per-scene ground line, smoothly interpolated)
+    var currentGroundY = groundYAt(player.x);
     player.vy += GRAVITY;
     player.y += player.vy;
-    if (player.y >= groundY) {
-      player.y = groundY;
+    if (player.y >= currentGroundY) {
+      player.y = currentGroundY;
       player.vy = 0;
       player.onGround = true;
     }
@@ -265,7 +349,13 @@
     ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(0, 0, viewportW, viewportH);
 
-    // Draw backgrounds — only the scenes whose world range intersects the camera viewport
+    // ============ Backgrounds + seam shadow bands ============
+    // Draw each visible scene at full opacity, then overlay a soft dark
+    // vertical gradient at each seam. The shadow band reads as a passage-
+    // way / alley shadow between buildings and hides the hard cut better
+    // than an alpha crossfade does (since adjacent bg content is often
+    // very different and crossfading them just makes mush).
+    // True pixel-perfect bridge images = v0.2.2+ work.
     var leftEdge = camera.x;
     var rightEdge = camera.x + viewportW / sceneScale;
     var firstScene = Math.max(0, Math.floor(leftEdge / SCENE_WIDTH));
@@ -277,22 +367,61 @@
       var screenX = (sceneWorldX - camera.x) * sceneScale;
       ctx.drawImage(bg, screenX, 0, SCENE_WIDTH * sceneScale, SCENE_HEIGHT * sceneScale);
     }
+    // Soft dark vertical gradient band at each seam to occlude hard cuts.
+    for (var s = 1; s < SCENE_COUNT; s++) {
+      var seamWorldX = s * SCENE_WIDTH;
+      if (seamWorldX < leftEdge - SEAM_FADE || seamWorldX > rightEdge + SEAM_FADE) continue;
+      var seamScreenX = (seamWorldX - camera.x) * sceneScale;
+      var bandW = SEAM_FADE * sceneScale;
+      var grad = ctx.createLinearGradient(seamScreenX - bandW, 0, seamScreenX + bandW, 0);
+      grad.addColorStop(0,    'rgba(8,6,12,0)');
+      grad.addColorStop(0.5,  'rgba(8,6,12,0.55)');
+      grad.addColorStop(1,    'rgba(8,6,12,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(seamScreenX - bandW, 0, bandW * 2, viewportH);
+    }
 
-    // Draw player sprite (Ice walk-cycle frame)
+    // ============ Animated FX overlays (per-scene) ============
+    for (var sceneIdx = firstScene; sceneIdx <= lastScene; sceneIdx++) {
+      var fxList = SCENE_FX[sceneIdx];
+      if (!fxList) continue;
+      for (var f = 0; f < fxList.length; f++) {
+        var fx = fxList[f];
+        var fxWorldX = sceneIdx * SCENE_WIDTH + fx.x;
+        var sx = (fxWorldX - camera.x) * sceneScale;
+        var sy = fx.y * sceneScale;
+        var sw = fx.w * sceneScale;
+        var sh = fx.h * sceneScale;
+        var alpha = computeFxAlpha(fx);
+        if (alpha <= 0.01) continue;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = fx.color || (fx.type === 'pulseRed' ? '#ff2222' : '#22aaff');
+        // Soft glow: draw a slightly larger filled rect with low alpha + the core
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.shadowBlur = sh * 0.8;
+        ctx.fillRect(sx, sy, sw, sh);
+        ctx.shadowBlur = 0;
+      }
+    }
+    ctx.globalAlpha = 1.0;
+
+    // ============ Player sprite ============
     var playerScreenX = (player.x - camera.x) * sceneScale;
     var playerScreenY = player.y * sceneScale;
     if (assets.iceWalk) {
       var spriteSheet = assets.iceWalk;
-      var frameW = spriteSheet.naturalWidth / 8;
-      var frameH = spriteSheet.naturalHeight;
+      // The atlas is either an HTMLImageElement or an offscreen canvas after
+      // alpha-keying. Both expose width/height (canvas) or naturalWidth/Height
+      // (image), so normalize.
+      var sw = spriteSheet.naturalWidth || spriteSheet.width;
+      var sh = spriteSheet.naturalHeight || spriteSheet.height;
+      var frameW = sw / 8;
+      var frameH = sh;
       var frame = player.walkFrame;
-      // Display the sprite at a height of ~12% of viewport (matching scene scale)
-      var drawH = 96 * sceneScale;
+      var drawH = PLAYER_HEIGHT * sceneScale;
       var drawW = (frameW / frameH) * drawH;
-      // Draw centered horizontally at player.x; feet at player.y
       var dx = playerScreenX - drawW / 2;
       var dy = playerScreenY - drawH;
-      // Mirror horizontally if facing left
       if (player.facing === -1) {
         ctx.save();
         ctx.translate(dx + drawW, dy);
@@ -303,10 +432,28 @@
         ctx.drawImage(spriteSheet, frame * frameW, 0, frameW, frameH, dx, dy, drawW, drawH);
       }
     } else {
-      // Placeholder rect if sprite hasn't loaded
       ctx.fillStyle = '#39ff14';
-      ctx.fillRect(playerScreenX - 24, playerScreenY - 96 * sceneScale, 48, 96 * sceneScale);
+      ctx.fillRect(playerScreenX - 24, playerScreenY - PLAYER_HEIGHT * sceneScale, 48, PLAYER_HEIGHT * sceneScale);
     }
+  }
+
+  // Compute the current alpha of an animated FX based on its type + gameTime.
+  // - flicker: random-ish modulation between 0.4 and 1.0 driven by jitter
+  // - pulseRed/pulseBlue: square-wave on/off based on period + duty + offset
+  function computeFxAlpha(fx) {
+    if (fx.type === 'flicker') {
+      // Pseudo-random based on gameTime / period; smoothed to avoid pure noise
+      var t = (gameTime + (fx.offset || 0)) / fx.period;
+      var s = Math.sin(t) * 0.5 + Math.cos(t * 2.7) * 0.3 + Math.sin(t * 0.4) * 0.2;
+      var jitter = fx.jitter || 0.3;
+      var base = 0.7;
+      return Math.max(0.2, Math.min(1, base + s * jitter));
+    }
+    if (fx.type === 'pulseRed' || fx.type === 'pulseBlue') {
+      var phase = ((gameTime + (fx.offset || 0)) % fx.period) / fx.period;
+      return phase < (fx.duty || 0.5) ? 1.0 : 0.05;
+    }
+    return 0;
   }
 
   // ============================================================
@@ -315,6 +462,7 @@
   function tick(now) {
     var dt = Math.min(50, now - lastTime);
     lastTime = now;
+    if (state === 'playing') gameTime += dt;
     update(dt);
     render();
     rafId = requestAnimationFrame(tick);
