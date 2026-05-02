@@ -38,37 +38,10 @@ def font(weight, size):
     return ImageFont.load_default()
 
 
-def square_crop_mascot(mascot):
-    """Tight-crop to the non-transparent bounding box, then pad to a square."""
-    bbox = mascot.getbbox()
-    cropped = mascot.crop(bbox)
-    w, h = cropped.size
-    side = max(w, h)
-    sq = Image.new("RGBA", (side, side), (0, 0, 0, 0))
-    sq.paste(cropped, ((side - w) // 2, (side - h) // 2), cropped)
-    return sq
-
-
-def make_favicon(size, mascot_sq):
-    """Gold disc + Shoovy mascot inside, scaled to `size`x`size`."""
-    # Build at 4x then downsample for crisp edges
-    s = size * 4
-    canvas = Image.new("RGBA", (s, s), (0, 0, 0, 0))
-    d = ImageDraw.Draw(canvas)
-    d.ellipse((0, 0, s - 1, s - 1), fill=GOLD + (255,))
-
-    # Mascot fills 78% of the disc, centered
-    target = int(s * 0.78)
-    mascot = mascot_sq.resize((target, target), Image.LANCZOS)
-    canvas.paste(mascot, ((s - target) // 2, (s - target) // 2), mascot)
-
-    return canvas.resize((size, size), Image.LANCZOS)
-
-
 def cover_fit_disc(diameter, mascot_full, y_pos=0.30):
-    """Replicates the page header logo: object-fit:cover, object-position:center 30%,
-    background:#ffd166, border-radius:50%. Head fills the circle; gold only shows
-    through the mascot's transparent regions, not as a ring around it."""
+    """Replicates the page header logo: object-fit:cover, object-position:center y_pos,
+    background:#ffd166, border-radius:50%. Head fills the circle edge-to-edge; gold only
+    shows through the mascot's transparent regions, not as a ring around it."""
     s = diameter * 4
 
     # Cover-fit the original mascot to s x s
@@ -95,7 +68,7 @@ def cover_fit_disc(diameter, mascot_full, y_pos=0.30):
     return final.resize((diameter, diameter), Image.LANCZOS)
 
 
-def make_og(mascot_sq, mascot_full, squeeze):
+def make_og(mascot_full, squeeze):
     """1200x630 share card. Squeeze frame as background, gold mascot disc + wordmark left."""
     W, H = 1200, 630
 
@@ -118,8 +91,6 @@ def make_og(mascot_sq, mascot_full, squeeze):
     canvas = Image.alpha_composite(canvas, overlay)
 
     # Gold mascot disc — bottom-right corner accent.
-    # Uses cover-fit (matching .brand .mascot CSS on the page) so the head
-    # fills the disc instead of floating inside a gold ring.
     disc_size = 280
     disc = cover_fit_disc(disc_size, mascot_full, y_pos=0.30)
     canvas.paste(disc, (W - disc_size - 50, H - disc_size - 50), disc)
@@ -135,7 +106,7 @@ def make_og(mascot_sq, mascot_full, squeeze):
     bbox_shoov = draw.textbbox((pad, title_y), "Shoov", font=f_title)
     draw.text((bbox_shoov[2], title_y), "lator", fill=GOLD + (255,), font=f_title)
 
-    # Tagline (gold accent, broken across two lines for readability)
+    # Tagline
     f_tag = font("semibold", 36)
     tag = "Type English. Get it back just\nmuch more enough confused than usually."
     draw.multiline_text((pad, 340), tag, fill=(228, 228, 228, 255), font=f_tag, spacing=12)
@@ -153,11 +124,11 @@ def make_og(mascot_sq, mascot_full, squeeze):
 
 
 def main():
-    mascot   = Image.open(MASCOT).convert("RGBA")
-    squeeze  = Image.open(OG_SRC).convert("RGB")
-    mascot_sq = square_crop_mascot(mascot)
+    mascot  = Image.open(MASCOT).convert("RGBA")
+    squeeze = Image.open(OG_SRC).convert("RGB")
 
-    # Favicons
+    # All discs (favicons + OG accent) use cover_fit_disc, matching the page
+    # header's .brand .mascot CSS — head fills the circle edge-to-edge.
     sizes = {
         "favicon-16.png":         16,
         "favicon-32.png":         32,
@@ -165,20 +136,19 @@ def main():
         "favicon-192.png":       192,
     }
     for name, size in sizes.items():
-        out = make_favicon(size, mascot_sq)
+        out = cover_fit_disc(size, mascot)
         out.save(os.path.join(HERE, name), optimize=True)
         print(f"  wrote {name} ({size}x{size})")
 
     # Multi-resolution .ico
-    ico_src = make_favicon(64, mascot_sq)
+    ico_src = cover_fit_disc(64, mascot)
     ico_path = os.path.join(HERE, "favicon.ico")
     ico_src.save(ico_path, sizes=[(16, 16), (32, 32), (48, 48)])
     print(f"  wrote favicon.ico (16/32/48)")
 
     # OG card
-    og = make_og(mascot_sq, mascot, squeeze)
-    og_path = os.path.join(HERE, "og-card.png")
-    og.save(og_path, optimize=True)
+    og = make_og(mascot, squeeze)
+    og.save(os.path.join(HERE, "og-card.png"), optimize=True)
     print(f"  wrote og-card.png (1200x630)")
 
 
