@@ -1,5 +1,19 @@
 /*
- * Cx Zombies — boot + game loop (v0.2.4).
+ * Cx Zombies — boot + game loop (v0.2.5).
+ *
+ * v0.2.5 — bridge images REGENERATED with explicit y-coord prompts.
+ *   The v0.2.2 bridges had mismatched ground lines (sidewalks/curbs
+ *   at different y positions than the adjacent scenes), creating
+ *   visible "step up/down" effects when the player walked across
+ *   bridges. New bridges painted with EXPLICIT y-coord constraints:
+ *   - Sky: 0% to 55% of canvas
+ *   - Mid-elements: 35% to 78%
+ *   - Sidewalk: 78% to 88% (continuous flat strip)
+ *   - Curb line: exactly 88%
+ *   - Asphalt: 88% to 100% (bottom)
+ *   This matches SCENE_GROUND_LINES (~88-92% across all scenes), so
+ *   the player walks at a consistent y across the entire level.
+ *   No code changes — only art replacement.
  *
  * v0.2.4 — second feedback patch:
  *   - SCENE_GROUND_LINES bumped from 0.78-0.85 → 0.88-0.93 so Ice's
