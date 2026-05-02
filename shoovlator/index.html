@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.2.0" />
+<meta name="version" content="0.2.1" />
 <title>Shoovlator — talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
 
 <meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy — stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
@@ -291,12 +291,14 @@
       <li><button type="button" data-ex="People want better information about new products.">People want better information about new products.</button></li>
       <li><button type="button" data-ex="This is the best advice I have ever received.">This is the best advice I have ever received.</button></li>
       <li><button type="button" data-ex="They are very smart and very fast at solving hard problems.">They are very smart and very fast at solving hard problems.</button></li>
+      <li><button type="button" data-ex="Do not run faster than the others — they don't want to be left behind.">Do not run faster than the others — they don't want to be left behind.</button></li>
+      <li><button type="button" data-ex="Move quickly and don't make it harder than it needs to be.">Move quickly and don't make it harder than it needs to be.</button></li>
     </ul>
   </div>
 </main>
 
 <footer>
-  <a href="/">BookHockeys</a> &middot; v0.2.0 &middot; runs entirely in your browser
+  <a href="/">BookHockeys</a> &middot; v0.2.1 &middot; runs entirely in your browser
 </footer>
 
 <script>
@@ -399,6 +401,16 @@ const VERB_SWAPS = {
 
 const SUBJ_VERB_SWAP = { have: 'has', do: 'does', are: 'is' };
 
+// Shoovy uses the superlative where the comparative belongs.
+const WRONG_SUPERLATIVE = {
+  faster: 'fastest'
+};
+
+// Shoovy sometimes prefers "swiftly" over "quickly".
+const ADV_SWAPS = {
+  quickly: 'swiftly'
+};
+
 const maybe = (p) => Math.random() < p;
 const pick  = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -418,6 +430,30 @@ function shoovlate(text, intensity) {
 }
 
 function shoovlateSentence(s, i) {
+  // 0a) Shoovy-ism: "faster" -> "fastest" (superlative for comparative).
+  // Run before the "fast" -> "more faster than most" boost so this only
+  // triggers on the user's literal "faster", not on inserted text.
+  for (const [k, v] of Object.entries(WRONG_SUPERLATIVE)) {
+    const re = new RegExp(`\\b${k}\\b`, 'gi');
+    s = s.replace(re, m => maybe(0.80 + i * 0.20) ? caseMatch(v, m) : m);
+  }
+
+  // 0b) Shoovy-ism: "quickly" -> "swiftly" (sometimes).
+  for (const [k, v] of Object.entries(ADV_SWAPS)) {
+    const re = new RegExp(`\\b${k}\\b`, 'gi');
+    s = s.replace(re, m => maybe(0.45 + i * 0.30) ? caseMatch(v, m) : m);
+  }
+
+  // 0c) Shoovy-ism: "don't" -> "donut", "do not" -> "dough knot".
+  // Must run BEFORE the subject-verb swap (pass 7) — otherwise
+  // "you do not" gets eaten by "you do" -> "you does" first.
+  s = s.replace(/\bdon['’]t\b/gi, m =>
+    maybe(0.85 + i * 0.15) ? caseMatch('donut', m) : m
+  );
+  s = s.replace(/\bdo not\b/gi, m =>
+    maybe(0.85 + i * 0.15) ? caseMatch('dough knot', m) : m
+  );
+
   // 1) stack "more"
   s = s.replace(/\bmore\b/gi, m =>
     maybe(0.55 + i * 0.40) ? caseMatch(pick(COMPARATIVE_STACKS), m) : m
