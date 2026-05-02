@@ -1,5 +1,18 @@
 /*
- * Cx Zombies — boot + game loop (v0.2.5).
+ * Cx Zombies — boot + game loop (v0.2.6).
+ *
+ * v0.2.6 — bridge perspective mismatch mitigation:
+ *   - BRIDGE_WIDTH halved from 512 → 256 so bridges occupy less screen
+ *     real estate. Their face-on perspective (no vanishing point) doesn't
+ *     match the scenes' angled road perspectives, but a smaller surface
+ *     area is less perceptible.
+ *   - Shadow bands re-added at bridge↔scene seams (60px wide, ~0.4 alpha).
+ *     They don't help with mismatched ground lines (which v0.2.5 fixed
+ *     with explicit y-coord prompts) but they DO help mask perspective
+ *     differences. Different problem, different fix.
+ *   World width: 7*2048 + 6*256 = 15872 (was 17408 in v0.2.5).
+ *   Bridges become "quick alleys" — present, transitional, but not
+ *   visually dominant.
  *
  * v0.2.5 — bridge images REGENERATED with explicit y-coord prompts.
  *   The v0.2.2 bridges had mismatched ground lines (sidewalks/curbs
@@ -109,7 +122,12 @@
   var SCENE_WIDTH = 2048;        // each bg image is 2048 wide
   var SCENE_HEIGHT = 768;        // each bg image is 768 tall (also bridge height)
   var SCENE_COUNT = 7;           // bg-00 through bg-06
-  var BRIDGE_WIDTH = 512;        // each bridge image's world-coord width
+  var BRIDGE_WIDTH = 256;        // each bridge image's world-coord width
+                                 // (v0.2.6: reduced from 512 → 256 so bridges
+                                 //  are less visually dominant; perspective
+                                 //  mismatches with scenes have less surface
+                                 //  area to be noticeable. Player zips
+                                 //  through transitional zones quickly.)
   var BRIDGE_COUNT = SCENE_COUNT - 1;  // 6 bridges between 7 scenes
   // World width: 7 scenes + 6 bridges = 7*2048 + 6*512 = 17408
   var WORLD_WIDTH = SCENE_WIDTH * SCENE_COUNT + BRIDGE_WIDTH * BRIDGE_COUNT;
@@ -118,7 +136,7 @@
   var BASE_MOVE_SPEED = 4;       // px/frame multiplied by char.speedMul
   var CAMERA_LEAD = 0.35;        // 0 = camera centered on player, 1 = far right
   var PLAYER_HEIGHT = 300;       // sprite display height in scene-coord px (v0.2.3 bumped from 220)
-  var SEAM_FADE = 80;            // px-wide soft shadow band at each bridge↔scene boundary
+  var SEAM_FADE = 60;            // px-wide soft shadow band at each bridge↔scene boundary (v0.2.6)
 
   // Per-scene ground line as a fraction of SCENE_HEIGHT (0..1, 1=bottom).
   // v0.2.4: bumped much closer to bottom — the painted asphalt/sidewalk
@@ -478,11 +496,29 @@
       ctx.drawImage(img, screenX, 0, seg.w * sceneScale, SCENE_HEIGHT * sceneScale);
     }
 
-    // ============ Bridge↔scene seam treatment (v0.2.4: removed) ============
-    // v0.2.3 added soft shadow bands here. User feedback: they made the seams
-    // MORE obvious, not less. Removed for v0.2.4. Real fix is regenerating
-    // bridges with explicit y-coordinates for curbs/sidewalks/fences (deferred
-    // to a separate ChatGPT pass).
+    // ============ Bridge↔scene seam shadow bands (v0.2.6) ============
+    // v0.2.5 regenerated bridges with explicit y-coords so ground elements
+    // (sidewalk, curb) align with scenes. But the SCENES have angled road
+    // perspectives (because their source photos were angled), while bridges
+    // are face-on (no vanishing point). AI can't match perspective across
+    // separate generations. Soft shadow bands at each bridge↔scene boundary
+    // help mask the perspective mismatch even though they don't help with
+    // line-up issues. Each band is SEAM_FADE px wide, ~0.4 alpha at center.
+    for (var b = 0; b < WORLD_LAYOUT.length - 1; b++) {
+      var seg1 = WORLD_LAYOUT[b];
+      var seg2 = WORLD_LAYOUT[b + 1];
+      if (seg1.type !== 'bridge' && seg2.type !== 'bridge') continue;
+      var seamWorldX = seg1.worldX + seg1.w;
+      if (seamWorldX < leftEdge - SEAM_FADE || seamWorldX > rightEdge + SEAM_FADE) continue;
+      var seamScreenX = (seamWorldX - camera.x) * sceneScale;
+      var bandW = SEAM_FADE * sceneScale;
+      var grad = ctx.createLinearGradient(seamScreenX - bandW, 0, seamScreenX + bandW, 0);
+      grad.addColorStop(0,   'rgba(8,6,12,0)');
+      grad.addColorStop(0.5, 'rgba(8,6,12,0.40)');
+      grad.addColorStop(1,   'rgba(8,6,12,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(seamScreenX - bandW, 0, bandW * 2, viewportH);
+    }
 
     // ============ Animated FX overlays — radial glow + additive blend (v0.2.3) ============
     // v0.2.2 used solid fillRect which painted huge ugly colored rectangles
