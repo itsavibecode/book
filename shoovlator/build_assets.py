@@ -65,7 +65,37 @@ def make_favicon(size, mascot_sq):
     return canvas.resize((size, size), Image.LANCZOS)
 
 
-def make_og(mascot_sq, squeeze):
+def cover_fit_disc(diameter, mascot_full, y_pos=0.30):
+    """Replicates the page header logo: object-fit:cover, object-position:center 30%,
+    background:#ffd166, border-radius:50%. Head fills the circle; gold only shows
+    through the mascot's transparent regions, not as a ring around it."""
+    s = diameter * 4
+
+    # Cover-fit the original mascot to s x s
+    w, h = mascot_full.size
+    scale = s / min(w, h)
+    nw, nh = int(w * scale), int(h * scale)
+    scaled = mascot_full.resize((nw, nh), Image.LANCZOS)
+
+    # Crop to s x s with vertical bias (object-position: center y_pos)
+    left = max(0, (nw - s) // 2)
+    top = max(0, int((nh - s) * y_pos))
+    cropped = scaled.crop((left, top, left + s, top + s))
+
+    # Composite on a gold square so transparent regions of the mascot show gold
+    bg = Image.new("RGBA", (s, s), GOLD + (255,))
+    composited = Image.alpha_composite(bg, cropped)
+
+    # Circular clip
+    mask = Image.new("L", (s, s), 0)
+    ImageDraw.Draw(mask).ellipse((0, 0, s - 1, s - 1), fill=255)
+    final = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    final.paste(composited, (0, 0), mask)
+
+    return final.resize((diameter, diameter), Image.LANCZOS)
+
+
+def make_og(mascot_sq, mascot_full, squeeze):
     """1200x630 share card. Squeeze frame as background, gold mascot disc + wordmark left."""
     W, H = 1200, 630
 
@@ -87,9 +117,11 @@ def make_og(mascot_sq, squeeze):
     overlay.putalpha(grad)
     canvas = Image.alpha_composite(canvas, overlay)
 
-    # Gold mascot disc — bottom-right corner accent
+    # Gold mascot disc — bottom-right corner accent.
+    # Uses cover-fit (matching .brand .mascot CSS on the page) so the head
+    # fills the disc instead of floating inside a gold ring.
     disc_size = 280
-    disc = make_favicon(disc_size, mascot_sq)
+    disc = cover_fit_disc(disc_size, mascot_full, y_pos=0.30)
     canvas.paste(disc, (W - disc_size - 50, H - disc_size - 50), disc)
 
     draw = ImageDraw.Draw(canvas)
@@ -144,7 +176,7 @@ def main():
     print(f"  wrote favicon.ico (16/32/48)")
 
     # OG card
-    og = make_og(mascot_sq, squeeze)
+    og = make_og(mascot_sq, mascot, squeeze)
     og_path = os.path.join(HERE, "og-card.png")
     og.save(og_path, optimize=True)
     print(f"  wrote og-card.png (1200x630)")
