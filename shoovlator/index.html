@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="version" content="0.1.0" />
+<title>Shoovlator — make English sound just much more enough confused | BookHockeys</title>
+
+<meta name="description" content="Type any English. Shoovlator rewrites it with stacked comparatives, redundant fillers, and confidently wrong grammar — so it sounds just much more enough funny than usually. Runs entirely in your browser." />
+<meta name="theme-color" content="#1a1a1a" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="https://bookhockeys.com/shoovlator/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="Shoovlator — make English sound just much more enough confused" />
+<meta property="og:description" content="Rewrites your sentence with stacked comparatives and redundant fillers. Much more enough funny than usually." />
+<meta property="og:url" content="https://bookhockeys.com/shoovlator/" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Shoovlator" />
+<meta name="twitter:description" content="Make English sound just much more enough funny than usually." />
+
+<link rel="icon" href="/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="alternate" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #1a1a1a;
+    color: #e6e6e6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.5;
+  }
+
+  header {
+    padding: 36px 24px 12px;
+    text-align: center;
+  }
+  h1 {
+    margin: 0 0 6px;
+    font-size: clamp(30px, 5vw, 46px);
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  h1 .accent { color: #ffd166; }
+  .tagline {
+    margin: 0;
+    color: #a8a8a8;
+    font-size: 15px;
+    max-width: 580px;
+    margin-inline: auto;
+  }
+
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 20px 32px;
+  }
+
+  .panes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 760px) {
+    .panes { grid-template-columns: 1fr; }
+  }
+
+  .pane {
+    background: #232323;
+    border: 1px solid #333;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .pane-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #333;
+    background: #1f1f1f;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    color: #999;
+  }
+  .pane-head button {
+    background: transparent;
+    color: #ccc;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: inherit;
+  }
+  .pane-head button:hover { background: #2a2a2a; color: #fff; }
+
+  textarea, .output {
+    width: 100%;
+    min-height: 280px;
+    padding: 14px 16px;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font-size: 16px;
+    line-height: 1.55;
+    outline: none;
+    font-family: inherit;
+  }
+  textarea { resize: vertical; }
+  .output {
+    white-space: pre-wrap;
+    overflow-y: auto;
+    font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Chalkboard", cursive;
+    color: #ffd166;
+  }
+  .output:empty::before {
+    content: 'Type something on the left and watch it get just much more enough confused than usually.';
+    color: #777;
+    font-style: italic;
+  }
+
+  .controls {
+    margin-top: 18px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .intensity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #aaa;
+    font-size: 13px;
+  }
+  .intensity input[type="range"] {
+    accent-color: #ffd166;
+    width: 160px;
+  }
+  .intensity .label-text { min-width: 70px; }
+  .intensity .pct { min-width: 38px; color: #ffd166; font-variant-numeric: tabular-nums; }
+
+  button.action {
+    background: #ffd166;
+    color: #1a1a1a;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  button.action:hover { background: #ffdf94; }
+
+  .examples {
+    margin-top: 28px;
+    padding: 14px 18px;
+    background: #1f1f1f;
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: #aaa;
+    font-size: 14px;
+  }
+  .examples h3 {
+    margin: 0 0 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    color: #888;
+    font-weight: 600;
+  }
+  .examples ul { margin: 0; padding-left: 18px; }
+  .examples li { margin: 5px 0; }
+  .examples li button {
+    background: transparent;
+    border: 0;
+    color: #ffd166;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    padding: 0;
+    text-align: left;
+  }
+  .examples li button:hover { color: #ffe8a8; }
+
+  footer {
+    padding: 16px 24px 24px;
+    text-align: center;
+    color: #666;
+    font-size: 12px;
+  }
+  footer a { color: #888; text-decoration: none; }
+  footer a:hover { color: #ccc; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Shoov<span class="accent">lator</span></h1>
+  <p class="tagline">Type English. Get it back just much more enough confused than usually.</p>
+</header>
+
+<main>
+  <div class="panes">
+    <div class="pane">
+      <div class="pane-head">
+        <span>English</span>
+        <button id="clearBtn" type="button">Clear</button>
+      </div>
+      <textarea id="input" placeholder="He has done it more times than others." spellcheck="false"></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-head">
+        <span>Shoovlated</span>
+        <button id="copyBtn" type="button">Copy</button>
+      </div>
+      <div class="output" id="output" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label class="intensity">
+      <span class="label-text">Intensity</span>
+      <input type="range" id="intensity" min="0" max="100" value="65" />
+      <span class="pct" id="intensityLabel">65%</span>
+    </label>
+    <button class="action" id="rerollBtn" type="button">Re-roll</button>
+  </div>
+
+  <div class="examples">
+    <h3>Try one</h3>
+    <ul>
+      <li><button type="button" data-ex="He has done it more times than others.">He has done it more times than others.</button></li>
+      <li><button type="button" data-ex="The company is making a lot of money this year.">The company is making a lot of money this year.</button></li>
+      <li><button type="button" data-ex="People want better information about new products.">People want better information about new products.</button></li>
+      <li><button type="button" data-ex="This is the best advice I have ever received.">This is the best advice I have ever received.</button></li>
+      <li><button type="button" data-ex="They are very smart and very fast at solving hard problems.">They are very smart and very fast at solving hard problems.</button></li>
+    </ul>
+  </div>
+</main>
+
+<footer>
+  <a href="/">BookHockeys</a> &middot; v0.1.0 &middot; runs entirely in your browser
+</footer>
+
+<script>
+// ===========================================================================
+// Shoovlator transformation engine
+// All rule-based; no network calls.
+// ===========================================================================
+
+const COMPARATIVE_STACKS = [
+  'many more enough',
+  'much more',
+  'more many',
+  'way most more',
+  'more enough than',
+  'much more better',
+  'more many enough'
+];
+
+const VERY_STACKS = [
+  'much most very',
+  'very most absolute',
+  'most very enough',
+  'so very much most',
+  'very absolutely most'
+];
+
+const FILLERS = [
+  'just',
+  'really just',
+  'basically just',
+  'kind of just',
+  'for sure just',
+  'actually just'
+];
+
+const TAILS = [
+  'than others',
+  'than usually',
+  'than most',
+  'and stuff',
+  'and the things',
+  'or whatever else',
+  'more or less',
+  'and such things',
+  'than usual ones'
+];
+
+const ADJ_BOOST = {
+  good:   'more good of quality',
+  bad:    'much worser than usual',
+  big:    'much bigger of size',
+  small:  'more smaller of size',
+  fast:   'more faster than most',
+  slow:   'much slower of speed',
+  smart:  'much more cleverer enough',
+  dumb:   'more dumber than others',
+  tall:   'more taller of height',
+  short:  'much shorter enough',
+  happy:  'more happier than usually',
+  sad:    'much sadder of mood',
+  easy:   'more easier than most',
+  hard:   'much harder enough',
+  old:    'more older of age',
+  new:    'much newer enough',
+  rich:   'more richer of moneys',
+  poor:   'much poorer of moneys',
+  strong: 'more stronger of strength',
+  weak:   'much weaker enough',
+  cool:   'more cooler than most',
+  nice:   'much nicer of feeling',
+  funny:  'more funnier than usual',
+  great:  'much most greater enough',
+  best:   'much most best of all',
+  worst:  'more worsest than others',
+  hot:    'much hotter of temperature',
+  cold:   'more colder of temperature'
+};
+
+const PLURAL_WEIRD = {
+  people:      'the peoples',
+  money:       'the moneys',
+  information: 'the informations',
+  advice:      'many advices',
+  feedback:    'feedbacks of opinion',
+  research:    'many researches',
+  knowledge:   'many knowledges',
+  music:       'the musics',
+  homework:    'the homeworks',
+  furniture:   'the furnitures',
+  software:    'the softwares',
+  evidence:    'many evidences'
+};
+
+const VERB_SWAPS = {
+  is:   'be',
+  are:  'is',
+  was:  'has been',
+  were: 'has was'
+};
+
+const SUBJ_VERB_SWAP = { have: 'has', do: 'does', are: 'is' };
+
+const maybe = (p) => Math.random() < p;
+const pick  = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+function caseMatch(replacement, original) {
+  if (!original.length) return replacement;
+  const c = original[0];
+  if (c === c.toUpperCase() && c !== c.toLowerCase()) {
+    return replacement[0].toUpperCase() + replacement.slice(1);
+  }
+  return replacement;
+}
+
+function shoovlate(text, intensity) {
+  if (!text || !text.trim()) return '';
+  const parts = text.split(/(?<=[.!?])\s+/);
+  return parts.map(p => shoovlateSentence(p, intensity)).join(' ');
+}
+
+function shoovlateSentence(s, i) {
+  // 1) stack "more"
+  s = s.replace(/\bmore\b/gi, m =>
+    maybe(0.55 + i * 0.40) ? caseMatch(pick(COMPARATIVE_STACKS), m) : m
+  );
+
+  // 2) stack "very"
+  s = s.replace(/\bvery\b/gi, m =>
+    maybe(0.45 + i * 0.45) ? caseMatch(pick(VERY_STACKS), m) : m
+  );
+
+  // 3) adjective boost
+  for (const [k, v] of Object.entries(ADJ_BOOST)) {
+    const re = new RegExp(`\\b${k}\\b`, 'gi');
+    s = s.replace(re, m => maybe(0.30 + i * 0.50) ? caseMatch(v, m) : m);
+  }
+
+  // 4) noun plural weirdness
+  for (const [k, v] of Object.entries(PLURAL_WEIRD)) {
+    const re = new RegExp(`\\b${k}\\b`, 'gi');
+    s = s.replace(re, m => maybe(0.35 + i * 0.45) ? caseMatch(v, m) : m);
+  }
+
+  // 5) "has/have/had X" -> insert filler before X
+  s = s.replace(/\b(has|have|had)\s+([A-Za-z]+)\b/g, (m, aux, verb) => {
+    if (/^(been|just|really|kind|basically|for|actually)$/i.test(verb)) return m;
+    if (!maybe(0.45 + i * 0.40)) return m;
+    return `${aux} ${pick(FILLERS)} ${verb}`;
+  });
+
+  // 6) is/are/was/were swaps (low rate)
+  s = s.replace(/\b(is|are|was|were)\b/gi, m => {
+    if (!maybe(0.08 + i * 0.22)) return m;
+    return caseMatch(VERB_SWAPS[m.toLowerCase()] || m, m);
+  });
+
+  // 7) subject-verb mismatch on plural pronouns
+  s = s.replace(/\b(they|we|you)\s+(have|do|are)\b/gi, (m, pron, verb) => {
+    if (!maybe(0.12 + i * 0.30)) return m;
+    const swap = SUBJ_VERB_SWAP[verb.toLowerCase()];
+    return swap ? `${pron} ${caseMatch(swap, verb)}` : m;
+  });
+
+  // 8) clause tail before terminal punctuation
+  s = s.replace(/([.!?])\s*$/, (m, punct) => {
+    if (!maybe(0.35 + i * 0.40)) return m;
+    return ` ${pick(TAILS)}${punct}`;
+  });
+  // ...or append a tail to a sentence with no terminator
+  if (!/[.!?]\s*$/.test(s) && s.trim() && maybe(0.25 + i * 0.35)) {
+    s = `${s.replace(/\s+$/, '')} ${pick(TAILS)}`;
+  }
+
+  return s;
+}
+
+// ===========================================================================
+// UI wiring
+// ===========================================================================
+
+const input         = document.getElementById('input');
+const output        = document.getElementById('output');
+const intensityEl   = document.getElementById('intensity');
+const intensityLbl  = document.getElementById('intensityLabel');
+const clearBtn      = document.getElementById('clearBtn');
+const copyBtn       = document.getElementById('copyBtn');
+const rerollBtn     = document.getElementById('rerollBtn');
+
+let debounceTimer = null;
+
+function render() {
+  const i = +intensityEl.value / 100;
+  output.textContent = shoovlate(input.value, i);
+}
+
+function debouncedRender() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(render, 160);
+}
+
+input.addEventListener('input', debouncedRender);
+intensityEl.addEventListener('input', () => {
+  intensityLbl.textContent = `${intensityEl.value}%`;
+  render();
+});
+
+clearBtn.addEventListener('click', () => {
+  input.value = '';
+  render();
+  input.focus();
+});
+
+copyBtn.addEventListener('click', async () => {
+  const txt = output.textContent || '';
+  if (!txt.trim()) return;
+  try {
+    await navigator.clipboard.writeText(txt);
+    const orig = copyBtn.textContent;
+    copyBtn.textContent = 'Copied';
+    setTimeout(() => { copyBtn.textContent = orig; }, 1200);
+  } catch (e) {
+    // clipboard unavailable; ignore silently
+  }
+});
+
+rerollBtn.addEventListener('click', render);
+
+document.querySelectorAll('.examples button[data-ex]').forEach(b => {
+  b.addEventListener('click', () => {
+    input.value = b.dataset.ex;
+    render();
+    input.focus();
+  });
+});
+
+intensityLbl.textContent = `${intensityEl.value}%`;
+render();
+</script>
+</body>
+</html>

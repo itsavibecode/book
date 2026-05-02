@@ -8,6 +8,7 @@ Personal site of streamer Book Hockeys. Live at **[bookhockeys.com](https://book
 | --- | --- | --- |
 | `/` | Landing page — Kick + Twitch links over the brand video | this README |
 | `/greenline/` | Green Line Theory auto-tester (in-browser, BlazeFace + MoveNet) | [`greenline/README.md`](greenline/README.md) |
+| `/shoovlator/` | Toy translator that re-writes English with stacked comparatives and redundant fillers | inline `<meta name="version">` on the page |
 
 Site-wide assets live at the repo root: `robots.txt`, `sitemap.xml`, `llms.txt`, `CNAME`, favicon set, `og-card.jpg`, `poster.jpg`, `bookmentions.mp4`, `logo.png`.
 
