@@ -1,5 +1,20 @@
 /*
- * Cx Zombies — boot + game loop (v0.2.3).
+ * Cx Zombies — boot + game loop (v0.2.4).
+ *
+ * v0.2.4 — second feedback patch:
+ *   - SCENE_GROUND_LINES bumped from 0.78-0.85 → 0.88-0.93 so Ice's
+ *     feet actually land on the painted asphalt/sidewalk at the
+ *     bottom of each scene instead of floating mid-bg.
+ *   - Walk-cycle frame extraction fixed: 1774-wide atlas / 8 frames
+ *     = 221.75 px/frame (not clean). Subpixel source rects let
+ *     adjacent frames bleed in (visible as "ghost leg" flicker).
+ *     Now Math.floor + 6-px inset on each side of every frame's
+ *     crop window. Clean integer pixels, no bleed.
+ *   - Shadow bands at bridge↔scene seams REMOVED. User feedback:
+ *     they made seams more obvious, not less. Real fix is
+ *     regenerating bridges with explicit y-coords for shared
+ *     architectural elements (curbs, sidewalks, fences) — that's
+ *     a separate ChatGPT pass, queued.
  *
  * v0.2.3 — feedback patch from live test:
  *   - Ice sprite bumped 220 → 300 scene-px tall (more visible)
@@ -92,15 +107,18 @@
   var SEAM_FADE = 80;            // px-wide soft shadow band at each bridge↔scene boundary
 
   // Per-scene ground line as a fraction of SCENE_HEIGHT (0..1, 1=bottom).
-  // Eyeballed from each bg-XX-final.png; tweak if Ice's feet float or sink.
+  // v0.2.4: bumped much closer to bottom — the painted asphalt/sidewalk
+  // in each bg actually extends deep into the bottom 10-15% of each
+  // scene image, so Ice's feet should sit at ~88-92% down to land on
+  // the visible street, not float in the middle of the scene.
   var SCENE_GROUND_LINES = [
-    0.80,  // bg-00 garage flagstone driveway
-    0.82,  // bg-01 craftsman walkway
-    0.85,  // bg-02 in front of wood fence (sidewalk near bottom)
-    0.78,  // bg-03 treadwell street level
-    0.80,  // bg-04 lamar plaza
-    0.78,  // bg-05 lamar corridor asphalt
-    0.82   // bg-06 alamo planter level
+    0.92,  // bg-00 garage flagstone driveway (deep at bottom)
+    0.92,  // bg-01 craftsman walkway
+    0.93,  // bg-02 in front of wood fence (sidewalk hugs bottom)
+    0.88,  // bg-03 treadwell street level
+    0.90,  // bg-04 lamar plaza
+    0.88,  // bg-05 lamar corridor asphalt
+    0.90   // bg-06 alamo planter level
   ];
 
   // World layout: alternating scenes and bridges.
@@ -446,27 +464,11 @@
       ctx.drawImage(img, screenX, 0, seg.w * sceneScale, SCENE_HEIGHT * sceneScale);
     }
 
-    // ============ Soft shadow bands at bridge↔scene seams (v0.2.3) ============
-    // The bridges aren't pixel-perfect against the adjacent scenes (ChatGPT
-    // approximates rather than truly matches edges). This thin dark gradient
-    // at each bridge boundary softens the visible cut. 12 bands total
-    // (one on each side of each of the 6 bridges).
-    for (var b = 0; b < WORLD_LAYOUT.length - 1; b++) {
-      var seg1 = WORLD_LAYOUT[b];
-      var seg2 = WORLD_LAYOUT[b + 1];
-      // Only at boundaries that involve a bridge (skip non-existent bridge-bridge boundaries)
-      if (seg1.type !== 'bridge' && seg2.type !== 'bridge') continue;
-      var seamWorldX = seg1.worldX + seg1.w;
-      if (seamWorldX < leftEdge - SEAM_FADE || seamWorldX > rightEdge + SEAM_FADE) continue;
-      var seamScreenX = (seamWorldX - camera.x) * sceneScale;
-      var bandW = SEAM_FADE * sceneScale;
-      var grad = ctx.createLinearGradient(seamScreenX - bandW, 0, seamScreenX + bandW, 0);
-      grad.addColorStop(0,    'rgba(8,6,12,0)');
-      grad.addColorStop(0.5,  'rgba(8,6,12,0.42)');
-      grad.addColorStop(1,    'rgba(8,6,12,0)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(seamScreenX - bandW, 0, bandW * 2, viewportH);
-    }
+    // ============ Bridge↔scene seam treatment (v0.2.4: removed) ============
+    // v0.2.3 added soft shadow bands here. User feedback: they made the seams
+    // MORE obvious, not less. Removed for v0.2.4. Real fix is regenerating
+    // bridges with explicit y-coordinates for curbs/sidewalks/fences (deferred
+    // to a separate ChatGPT pass).
 
     // ============ Animated FX overlays — radial glow + additive blend (v0.2.3) ============
     // v0.2.2 used solid fillRect which painted huge ugly colored rectangles
@@ -516,26 +518,32 @@
     var playerScreenY = player.y * sceneScale;
     if (assets.iceWalk) {
       var spriteSheet = assets.iceWalk;
-      // The atlas is either an HTMLImageElement or an offscreen canvas after
-      // alpha-keying. Both expose width/height (canvas) or naturalWidth/Height
-      // (image), so normalize.
       var sw = spriteSheet.naturalWidth || spriteSheet.width;
       var sh = spriteSheet.naturalHeight || spriteSheet.height;
-      var frameW = sw / 8;
-      var frameH = sh;
+      // v0.2.4: floor the frame width so source-rect math is integer-pixel.
+      // The atlas is 1774 wide / 8 frames = 221.75 px per frame (not clean).
+      // Subpixel source rects cause adjacent frames' content to bleed in
+      // (visible as a "ghost leg" flicker behind Ice). Floor + inset 6px on
+      // each side of every crop to keep adjacent frames' kicked-out legs
+      // from poking in.
       var frame = player.walkFrame;
+      var frameW = Math.floor(sw / 8);
+      var frameInset = 6;
+      var srcX = frame * frameW + frameInset;
+      var srcW = frameW - frameInset * 2;
+      var frameH = sh;
       var drawH = PLAYER_HEIGHT * sceneScale;
-      var drawW = (frameW / frameH) * drawH;
+      var drawW = (srcW / frameH) * drawH;
       var dx = playerScreenX - drawW / 2;
       var dy = playerScreenY - drawH;
       if (player.facing === -1) {
         ctx.save();
         ctx.translate(dx + drawW, dy);
         ctx.scale(-1, 1);
-        ctx.drawImage(spriteSheet, frame * frameW, 0, frameW, frameH, 0, 0, drawW, drawH);
+        ctx.drawImage(spriteSheet, srcX, 0, srcW, frameH, 0, 0, drawW, drawH);
         ctx.restore();
       } else {
-        ctx.drawImage(spriteSheet, frame * frameW, 0, frameW, frameH, dx, dy, drawW, drawH);
+        ctx.drawImage(spriteSheet, srcX, 0, srcW, frameH, dx, dy, drawW, drawH);
       }
     } else {
       ctx.fillStyle = '#39ff14';
