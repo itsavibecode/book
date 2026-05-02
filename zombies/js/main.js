@@ -1,5 +1,18 @@
 /*
- * Cx Zombies — boot + game loop (v0.2.1).
+ * Cx Zombies — boot + game loop (v0.2.2).
+ *
+ * v0.2.2 — true seamless transitions via bridge images:
+ *   - 6 new bridge PNGs (bridge-00-01 through bridge-05-06) explicitly
+ *     painted to transition between adjacent anchor scenes
+ *   - WORLD_LAYOUT array interleaves scenes + bridges (13 segments
+ *     instead of 7). Each segment has its own ground line; bridges'
+ *     ground lines are the average of their two adjacent scenes
+ *   - World width grows from 14336 to 17408 (7*2048 + 6*512)
+ *   - groundYAt() and the bg render loop now walk WORLD_LAYOUT
+ *     instead of doing pure scene-index math
+ *   - Soft shadow band hack from v0.2.1 removed (bridges replace it)
+ *   - SCENE_FX positions now look up the scene's worldX via
+ *     WORLD_LAYOUT (since scene index no longer equals worldX/2048)
  *
  * v0.2.1 patch — feedback fixes from live test:
  *   - Player sprite scaled up ~2.3x (was way too small)
@@ -47,15 +60,17 @@
   // Constants
   // ============================================================
   var SCENE_WIDTH = 2048;        // each bg image is 2048 wide
-  var SCENE_HEIGHT = 768;        // each bg image is 768 tall
+  var SCENE_HEIGHT = 768;        // each bg image is 768 tall (also bridge height)
   var SCENE_COUNT = 7;           // bg-00 through bg-06
-  var WORLD_WIDTH = SCENE_WIDTH * SCENE_COUNT;
+  var BRIDGE_WIDTH = 512;        // each bridge image's world-coord width
+  var BRIDGE_COUNT = SCENE_COUNT - 1;  // 6 bridges between 7 scenes
+  // World width: 7 scenes + 6 bridges = 7*2048 + 6*512 = 17408
+  var WORLD_WIDTH = SCENE_WIDTH * SCENE_COUNT + BRIDGE_WIDTH * BRIDGE_COUNT;
   var GRAVITY = 0.6;             // px/frame^2 (in scene-coord px)
   var JUMP_VELOCITY = -13;       // px/frame
   var BASE_MOVE_SPEED = 4;       // px/frame multiplied by char.speedMul
   var CAMERA_LEAD = 0.35;        // 0 = camera centered on player, 1 = far right
   var PLAYER_HEIGHT = 220;       // sprite display height in scene-coord px
-  var SEAM_FADE = 150;           // px of crossfade overlap on each side of a scene boundary
 
   // Per-scene ground line as a fraction of SCENE_HEIGHT (0..1, 1=bottom).
   // Eyeballed from each bg-XX-final.png; tweak if Ice's feet float or sink.
@@ -68,6 +83,31 @@
     0.78,  // bg-05 lamar corridor asphalt
     0.82   // bg-06 alamo planter level
   ];
+
+  // World layout: alternating scenes and bridges.
+  //   [scene-0] [bridge-0-1] [scene-1] [bridge-1-2] ... [scene-6]
+  // 13 segments total. Each entry: { type, idx, worldX, w, groundLine }.
+  // Built once at boot. The render loop and groundYAt() walk this array
+  // instead of doing pure scene-index math.
+  var WORLD_LAYOUT = [];
+  (function buildWorldLayout() {
+    var x = 0;
+    for (var i = 0; i < SCENE_COUNT; i++) {
+      WORLD_LAYOUT.push({
+        type: 'scene', idx: i, worldX: x, w: SCENE_WIDTH,
+        groundLine: SCENE_GROUND_LINES[i]
+      });
+      x += SCENE_WIDTH;
+      if (i < BRIDGE_COUNT) {
+        WORLD_LAYOUT.push({
+          type: 'bridge', idx: i, worldX: x, w: BRIDGE_WIDTH,
+          // Bridge ground line = average of adjacent scenes (close enough)
+          groundLine: (SCENE_GROUND_LINES[i] + SCENE_GROUND_LINES[i+1]) / 2
+        });
+        x += BRIDGE_WIDTH;
+      }
+    }
+  })();
 
   // Animated FX overlays. Each entry is (sceneIndex, x, y, w, h in
   // scene-coords) plus a `type` and per-type params. Drawn AFTER the
@@ -110,17 +150,29 @@
   // height so the ground line lands consistently regardless of window size.
   var sceneScale = 1;
 
-  // Ground-y for the current world position. Calculated each frame by
-  // interpolating between adjacent SCENE_GROUND_LINES so the player
-  // smoothly steps up/down at scene boundaries instead of teleporting.
+  // Find the WORLD_LAYOUT segment containing the given world x. Returns
+  // null if past the world end. O(n) walk; n=13 so it's fine.
+  function findSegment(worldX) {
+    for (var i = 0; i < WORLD_LAYOUT.length; i++) {
+      var seg = WORLD_LAYOUT[i];
+      if (worldX >= seg.worldX && worldX < seg.worldX + seg.w) {
+        return { idx: i, seg: seg, t: (worldX - seg.worldX) / seg.w };
+      }
+    }
+    var last = WORLD_LAYOUT[WORLD_LAYOUT.length - 1];
+    return { idx: WORLD_LAYOUT.length - 1, seg: last, t: 1 };
+  }
+
+  // Ground-y for the current world position. Walks WORLD_LAYOUT to find
+  // the current segment, then linearly interpolates the ground line
+  // toward the next segment's ground line so the player rises/falls
+  // smoothly across segment boundaries instead of teleporting.
   function groundYAt(worldX) {
-    var sceneFloat = Math.max(0, Math.min(SCENE_COUNT - 1, worldX / SCENE_WIDTH));
-    var sceneA = Math.floor(sceneFloat);
-    var sceneB = Math.min(SCENE_COUNT - 1, sceneA + 1);
-    var t = sceneFloat - sceneA;
-    var a = SCENE_GROUND_LINES[sceneA];
-    var b = SCENE_GROUND_LINES[sceneB];
-    return SCENE_HEIGHT * (a + (b - a) * t);
+    var info = findSegment(worldX);
+    var nextIdx = Math.min(WORLD_LAYOUT.length - 1, info.idx + 1);
+    var a = info.seg.groundLine;
+    var b = WORLD_LAYOUT[nextIdx].groundLine;
+    return SCENE_HEIGHT * (a + (b - a) * info.t);
   }
 
   function resize() {
@@ -147,7 +199,7 @@
   // ============================================================
   // Asset loader
   // ============================================================
-  var assets = { bgs: [], iceWalk: null };
+  var assets = { bgs: [], bridges: [], iceWalk: null };
 
   function loadImage(src) {
     return new Promise(function (resolve, reject) {
@@ -164,8 +216,17 @@
       var idx = i.toString().padStart(2, '0');
       bgPromises.push(loadImage('art/bg-' + idx + '-final.png'));
     }
+    var bridgePromises = [];
+    for (var j = 0; j < BRIDGE_COUNT; j++) {
+      var idxA = j.toString().padStart(2, '0');
+      var idxB = (j + 1).toString().padStart(2, '0');
+      bridgePromises.push(loadImage('art/bridge-' + idxA + '-' + idxB + '.png'));
+    }
     return Promise.all(bgPromises).then(function (bgs) {
       assets.bgs = bgs;
+      return Promise.all(bridgePromises);
+    }).then(function (bridges) {
+      assets.bridges = bridges;
       return loadImage('art/ice-poseidon-walk.png');
     }).then(function (img) {
       // Color-key any near-white pixels to transparent. The AI-generated
@@ -349,45 +410,39 @@
     ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(0, 0, viewportW, viewportH);
 
-    // ============ Backgrounds + seam shadow bands ============
-    // Draw each visible scene at full opacity, then overlay a soft dark
-    // vertical gradient at each seam. The shadow band reads as a passage-
-    // way / alley shadow between buildings and hides the hard cut better
-    // than an alpha crossfade does (since adjacent bg content is often
-    // very different and crossfading them just makes mush).
-    // True pixel-perfect bridge images = v0.2.2+ work.
+    // ============ Backgrounds via WORLD_LAYOUT ============
+    // Walk the layout (alternating scenes + bridges), draw any segment that
+    // intersects the camera viewport. Bridges replace the v0.2.1 seam-
+    // shadow-band hack — scenes now flow seamlessly into each other through
+    // explicitly painted transitions.
     var leftEdge = camera.x;
     var rightEdge = camera.x + viewportW / sceneScale;
-    var firstScene = Math.max(0, Math.floor(leftEdge / SCENE_WIDTH));
-    var lastScene = Math.min(SCENE_COUNT - 1, Math.floor(rightEdge / SCENE_WIDTH));
-    for (var i = firstScene; i <= lastScene; i++) {
-      var bg = assets.bgs[i];
-      if (!bg) continue;
-      var sceneWorldX = i * SCENE_WIDTH;
-      var screenX = (sceneWorldX - camera.x) * sceneScale;
-      ctx.drawImage(bg, screenX, 0, SCENE_WIDTH * sceneScale, SCENE_HEIGHT * sceneScale);
-    }
-    // Soft dark vertical gradient band at each seam to occlude hard cuts.
-    for (var s = 1; s < SCENE_COUNT; s++) {
-      var seamWorldX = s * SCENE_WIDTH;
-      if (seamWorldX < leftEdge - SEAM_FADE || seamWorldX > rightEdge + SEAM_FADE) continue;
-      var seamScreenX = (seamWorldX - camera.x) * sceneScale;
-      var bandW = SEAM_FADE * sceneScale;
-      var grad = ctx.createLinearGradient(seamScreenX - bandW, 0, seamScreenX + bandW, 0);
-      grad.addColorStop(0,    'rgba(8,6,12,0)');
-      grad.addColorStop(0.5,  'rgba(8,6,12,0.55)');
-      grad.addColorStop(1,    'rgba(8,6,12,0)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(seamScreenX - bandW, 0, bandW * 2, viewportH);
+    for (var i = 0; i < WORLD_LAYOUT.length; i++) {
+      var seg = WORLD_LAYOUT[i];
+      if (seg.worldX + seg.w < leftEdge) continue;   // off-screen left
+      if (seg.worldX > rightEdge) break;             // off-screen right (and rest are too)
+      var img = (seg.type === 'scene') ? assets.bgs[seg.idx] : assets.bridges[seg.idx];
+      if (!img) continue;
+      var screenX = (seg.worldX - camera.x) * sceneScale;
+      ctx.drawImage(img, screenX, 0, seg.w * sceneScale, SCENE_HEIGHT * sceneScale);
     }
 
     // ============ Animated FX overlays (per-scene) ============
-    for (var sceneIdx = firstScene; sceneIdx <= lastScene; sceneIdx++) {
+    // FX positions are stored in scene-local coords (x relative to scene's
+    // left edge). Translate to world coords using the scene's worldX from
+    // WORLD_LAYOUT, then to screen.
+    for (var sceneIdx = 0; sceneIdx < SCENE_COUNT; sceneIdx++) {
       var fxList = SCENE_FX[sceneIdx];
       if (!fxList) continue;
+      // Find this scene's segment in the layout (scenes are at even positions: 0,2,4,...)
+      var sceneSeg = WORLD_LAYOUT[sceneIdx * 2];
+      if (!sceneSeg) continue;
+      // Skip if the entire scene is off-screen
+      if (sceneSeg.worldX + sceneSeg.w < leftEdge) continue;
+      if (sceneSeg.worldX > rightEdge) continue;
       for (var f = 0; f < fxList.length; f++) {
         var fx = fxList[f];
-        var fxWorldX = sceneIdx * SCENE_WIDTH + fx.x;
+        var fxWorldX = sceneSeg.worldX + fx.x;
         var sx = (fxWorldX - camera.x) * sceneScale;
         var sy = fx.y * sceneScale;
         var sw = fx.w * sceneScale;
@@ -396,7 +451,6 @@
         if (alpha <= 0.01) continue;
         ctx.globalAlpha = alpha;
         ctx.fillStyle = fx.color || (fx.type === 'pulseRed' ? '#ff2222' : '#22aaff');
-        // Soft glow: draw a slightly larger filled rect with low alpha + the core
         ctx.shadowColor = ctx.fillStyle;
         ctx.shadowBlur = sh * 0.8;
         ctx.fillRect(sx, sy, sw, sh);
