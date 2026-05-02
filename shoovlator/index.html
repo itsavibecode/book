@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.2.1" />
+<meta name="version" content="0.3.0" />
 <title>Shoovlator — talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
 
 <meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy — stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
@@ -163,7 +163,7 @@
     color: #ffd166;
   }
   .output:empty::before {
-    content: 'Type something on the left and watch it get just much more enough confused than usually.';
+    content: attr(data-placeholder);
     color: #777;
     font-style: italic;
   }
@@ -202,6 +202,14 @@
     font-family: inherit;
   }
   button.action:hover { background: #ffdf94; }
+  button.action.secondary {
+    background: transparent;
+    color: #ffd166;
+    border: 1px solid #ffd166;
+  }
+  button.action.secondary:hover { background: rgba(255, 209, 102, 0.10); color: #ffe8a8; }
+  body.reverse .forward-only { display: none !important; }
+  body.forward .reverse-only { display: none !important; }
 
   .examples {
     margin-top: 28px;
@@ -245,7 +253,7 @@
   footer a:hover { color: #ccc; }
 </style>
 </head>
-<body>
+<body class="forward">
 
 <header>
   <div class="brand">
@@ -260,14 +268,14 @@
   <div class="panes">
     <div class="pane">
       <div class="pane-head">
-        <span>English</span>
+        <span id="leftLabel">English</span>
         <button id="clearBtn" type="button">Clear</button>
       </div>
-      <textarea id="input" placeholder="He has done it more times than others." spellcheck="false"></textarea>
+      <textarea id="input" spellcheck="false"></textarea>
     </div>
     <div class="pane">
       <div class="pane-head">
-        <span>Shoovlated</span>
+        <span id="rightLabel">Shoovlated</span>
         <button id="copyBtn" type="button">Copy</button>
       </div>
       <div class="output" id="output" aria-live="polite"></div>
@@ -275,16 +283,17 @@
   </div>
 
   <div class="controls">
-    <label class="intensity">
+    <label class="intensity forward-only">
       <span class="label-text">Intensity</span>
       <input type="range" id="intensity" min="0" max="100" value="65" />
       <span class="pct" id="intensityLabel">65%</span>
     </label>
-    <button class="action" id="rerollBtn" type="button">Re-roll</button>
+    <button class="action forward-only" id="rerollBtn" type="button">Re-roll</button>
+    <button class="action secondary" id="swapBtn" type="button" title="Swap direction — translate Shoovy back to English">&harr; Swap direction</button>
   </div>
 
-  <div class="examples">
-    <h3>Try one</h3>
+  <div class="examples forward-only">
+    <h3>Try one (English &rarr; Shoovy)</h3>
     <ul>
       <li><button type="button" data-ex="He has done it more times than others.">He has done it more times than others.</button></li>
       <li><button type="button" data-ex="The company is making a lot of money this year.">The company is making a lot of money this year.</button></li>
@@ -295,10 +304,21 @@
       <li><button type="button" data-ex="Move quickly and don't make it harder than it needs to be.">Move quickly and don't make it harder than it needs to be.</button></li>
     </ul>
   </div>
+
+  <div class="examples reverse-only">
+    <h3>Try one (Shoovy &rarr; English, best guess)</h3>
+    <ul>
+      <li><button type="button" data-ex="He has just done it many more enough times than others.">He has just done it many more enough times than others.</button></li>
+      <li><button type="button" data-ex="Donut go fastest than that and stuff.">Donut go fastest than that and stuff.</button></li>
+      <li><button type="button" data-ex="Move swiftly and donut be late than usually.">Move swiftly and donut be late than usually.</button></li>
+      <li><button type="button" data-ex="He has just given many advices to the peoples and stuff.">He has just given many advices to the peoples and stuff.</button></li>
+      <li><button type="button" data-ex="Dough knot, I repeat, dough knot press that button and such things.">Dough knot, I repeat, dough knot press that button and such things.</button></li>
+    </ul>
+  </div>
 </main>
 
 <footer>
-  <a href="/">BookHockeys</a> &middot; v0.2.1 &middot; runs entirely in your browser
+  <a href="/">BookHockeys</a> &middot; v0.3.0 &middot; runs entirely in your browser
 </footer>
 
 <script>
@@ -423,6 +443,10 @@ function caseMatch(replacement, original) {
   return replacement;
 }
 
+function escapeRe(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function shoovlate(text, intensity) {
   if (!text || !text.trim()) return '';
   const parts = text.split(/(?<=[.!?])\s+/);
@@ -510,6 +534,76 @@ function shoovlateSentence(s, i) {
 }
 
 // ===========================================================================
+// Reverse pass: best-effort Shoovy -> English.
+// Lossy by nature (forward is probabilistic + many-to-one) — undoes the
+// distinctive deterministic patterns and accepts that some real English
+// like "donut" or "than others" may also get reversed.
+// ===========================================================================
+
+function deshoovlate(text) {
+  if (!text || !text.trim()) return '';
+  const parts = text.split(/(?<=[.!?])\s+/);
+  return parts.map(deshoovlateSentence).join(' ');
+}
+
+function deshoovlateSentence(s) {
+  // 1) Shoovy-isms — distinct enough to reverse confidently.
+  s = s.replace(/\bdough knot\b/gi, m => caseMatch('do not', m));
+  s = s.replace(/\bdonut\b/gi,      m => caseMatch("don't",  m));
+  s = s.replace(/\bfastest\b/gi,    m => caseMatch('faster', m));
+  s = s.replace(/\bswiftly\b/gi,    m => caseMatch('quickly', m));
+
+  // 2) Adjective boost reverse — these are long, distinctive phrases. They
+  // overlap with comparative-stack fragments ("much more cleverer enough"
+  // starts with "much more"), so they MUST run before stack reversal.
+  for (const [k, v] of Object.entries(ADJ_BOOST)) {
+    const re = new RegExp('\\b' + escapeRe(v) + '\\b', 'gi');
+    s = s.replace(re, m => caseMatch(k, m));
+  }
+
+  // 3) Plural weirdness reverse.
+  for (const [k, v] of Object.entries(PLURAL_WEIRD)) {
+    const re = new RegExp('\\b' + escapeRe(v) + '\\b', 'gi');
+    s = s.replace(re, m => caseMatch(k, m));
+  }
+
+  // 4) Comparative stacks -> "more".
+  for (const stack of COMPARATIVE_STACKS) {
+    const re = new RegExp('\\b' + escapeRe(stack) + '\\b', 'gi');
+    s = s.replace(re, m => caseMatch('more', m));
+  }
+
+  // 5) Very stacks -> "very".
+  for (const stack of VERY_STACKS) {
+    const re = new RegExp('\\b' + escapeRe(stack) + '\\b', 'gi');
+    s = s.replace(re, m => caseMatch('very', m));
+  }
+
+  // 6) Filler removal: "has/have/had FILLER X" -> "has/have/had X".
+  for (const filler of FILLERS) {
+    const re = new RegExp('\\b(has|have|had)\\s+' + escapeRe(filler) + '\\s+', 'gi');
+    s = s.replace(re, '$1 ');
+  }
+
+  // 7) Distinctive verb swap reverse — only "has was" is unambiguous.
+  // ("be" -> "is" and "has been" -> "was" would mangle legitimate English.)
+  s = s.replace(/\bhas was\b/gi, m => caseMatch('were', m));
+
+  // 8) Subject-verb mismatch reverse on plural pronouns.
+  s = s.replace(/\b(they|we|you)\s+(has|does|is)\b/gi, (m, pron, verb) => {
+    const swap = { has: 'have', does: 'do', is: 'are' }[verb.toLowerCase()];
+    return swap ? `${pron} ${caseMatch(swap, verb)}` : m;
+  });
+
+  // 9) Tail removal — strip one or more trailing tails before terminal punct.
+  const tailAlt = TAILS.map(escapeRe).join('|');
+  s = s.replace(new RegExp('(?:\\s+(?:' + tailAlt + '))+\\s*([.!?])', 'gi'), '$1');
+  s = s.replace(new RegExp('(?:\\s+(?:' + tailAlt + '))+\\s*$', 'gi'), '');
+
+  return s;
+}
+
+// ===========================================================================
 // UI wiring
 // ===========================================================================
 
@@ -520,12 +614,45 @@ const intensityLbl  = document.getElementById('intensityLabel');
 const clearBtn      = document.getElementById('clearBtn');
 const copyBtn       = document.getElementById('copyBtn');
 const rerollBtn     = document.getElementById('rerollBtn');
+const swapBtn       = document.getElementById('swapBtn');
+const leftLabel     = document.getElementById('leftLabel');
+const rightLabel    = document.getElementById('rightLabel');
 
+let direction = 'forward'; // 'forward' = English -> Shoovy, 'reverse' = Shoovy -> English
 let debounceTimer = null;
 
+const PLACEHOLDERS = {
+  forward: {
+    input:  'He has done it more times than others.',
+    output: 'Type something on the left and watch it get just much more enough confused than usually.',
+    leftLabel:  'English',
+    rightLabel: 'Shoovlated',
+  },
+  reverse: {
+    input:  'He has just done it many more enough times than others.',
+    output: 'Paste shoovlated text on the left to translate it back to English (best guess).',
+    leftLabel:  'Shoovlated',
+    rightLabel: 'English (best guess)',
+  },
+};
+
+function applyDirection() {
+  document.body.classList.toggle('forward', direction === 'forward');
+  document.body.classList.toggle('reverse', direction === 'reverse');
+  const p = PLACEHOLDERS[direction];
+  input.placeholder = p.input;
+  output.dataset.placeholder = p.output;
+  leftLabel.textContent  = p.leftLabel;
+  rightLabel.textContent = p.rightLabel;
+}
+
 function render() {
-  const i = +intensityEl.value / 100;
-  output.textContent = shoovlate(input.value, i);
+  if (direction === 'forward') {
+    const i = +intensityEl.value / 100;
+    output.textContent = shoovlate(input.value, i);
+  } else {
+    output.textContent = deshoovlate(input.value);
+  }
 }
 
 function debouncedRender() {
@@ -560,6 +687,16 @@ copyBtn.addEventListener('click', async () => {
 
 rerollBtn.addEventListener('click', render);
 
+swapBtn.addEventListener('click', () => {
+  // Move current output to input so the round-trip is visible. If output is
+  // empty (e.g. user hasn't typed yet), leave the input alone.
+  const outText = (output.textContent || '').trim();
+  if (outText) input.value = output.textContent;
+  direction = direction === 'forward' ? 'reverse' : 'forward';
+  applyDirection();
+  render();
+});
+
 document.querySelectorAll('.examples button[data-ex]').forEach(b => {
   b.addEventListener('click', () => {
     input.value = b.dataset.ex;
@@ -569,6 +706,7 @@ document.querySelectorAll('.examples button[data-ex]').forEach(b => {
 });
 
 intensityLbl.textContent = `${intensityEl.value}%`;
+applyDirection();
 render();
 </script>
 </body>
