@@ -1,5 +1,22 @@
 /*
- * Cx Zombies — boot + game loop (v0.2.6).
+ * Cx Zombies — boot + game loop (v0.2.7).
+ *
+ * v0.2.7 — Option A: foreground occluder silhouettes at bridge↔scene seams.
+ *   The bridges still don't perfectly match adjacent scenes (different
+ *   perspective: bridges face-on, scenes angled — AI can't reconcile them
+ *   across separate generations). v0.2.6 narrowed bridges + added shadow
+ *   bands, but seams still visible.
+ *   This patch covers each of the 12 bridge↔scene boundaries with a tall
+ *   vertical silhouette object (lamppost / tree / brick column) drawn in
+ *   shadow tones BETWEEN bg+FX and the player. Each silhouette is wide
+ *   enough to hide ~40-60 px of scene on each side of the seam, which is
+ *   exactly where the perspective mismatch is most visible. Player walks
+ *   in FRONT of them so they don't block the action.
+ *   All silhouettes are pure canvas drawn (no new art assets needed) so
+ *   this ships without another ChatGPT iteration loop. Type rotation:
+ *   tree → lamppost → column → lamppost → tree → lamppost (organic feel).
+ *   Lamppost variant adds a small additive warm-glow halo around the bulb
+ *   (matches the existing FX overlay system).
  *
  * v0.2.6 — bridge perspective mismatch mitigation:
  *   - BRIDGE_WIDTH halved from 512 → 256 so bridges occupy less screen
@@ -175,6 +192,33 @@
         });
         x += BRIDGE_WIDTH;
       }
+    }
+  })();
+
+  // Foreground occluders (v0.2.7). One silhouette per bridge↔scene seam
+  // (12 total — 6 bridges × 2 seams each). Drawn AFTER bg+FX but BEFORE
+  // the player so the player walks in front of them naturally. They're
+  // the visual fix for the perspective-mismatch problem at bridge edges:
+  // each silhouette is wide enough at the base to hide 40-60 px of scene
+  // on either side of the seam (which is where the mismatch is worst).
+  // Three shapes rotated for organic variety: tree, lamppost, brick
+  // column. Built once at boot, walked in render() each frame.
+  var OCCLUDER_TYPE_CYCLE = ['tree', 'lamppost', 'column', 'lamppost', 'tree', 'column', 'lamppost', 'tree', 'column', 'lamppost', 'tree', 'lamppost'];
+  var OCCLUDER_HEIGHT_CYCLE = [430, 380, 410, 360, 440, 390, 400, 370, 450, 380, 420, 360];
+  var OCCLUDER_LAYOUT = [];
+  (function buildOccluders() {
+    var hi = 0;
+    for (var i = 0; i < WORLD_LAYOUT.length - 1; i++) {
+      var seg1 = WORLD_LAYOUT[i];
+      var seg2 = WORLD_LAYOUT[i + 1];
+      // Only place an occluder where one side of the seam is a bridge
+      if (seg1.type !== 'bridge' && seg2.type !== 'bridge') continue;
+      OCCLUDER_LAYOUT.push({
+        worldX: seg1.worldX + seg1.w,   // exact seam position
+        type: OCCLUDER_TYPE_CYCLE[hi % OCCLUDER_TYPE_CYCLE.length],
+        height: OCCLUDER_HEIGHT_CYCLE[hi % OCCLUDER_HEIGHT_CYCLE.length]
+      });
+      hi++;
     }
   })();
 
@@ -563,6 +607,22 @@
     }
     ctx.restore();
 
+    // ============ Foreground occluders at every bridge↔scene seam (v0.2.7) ============
+    // Drawn ON TOP of bg+FX, BEFORE the player. Each tall silhouette physically
+    // covers ~40-60 px of scene on each side of the seam — exactly the zone
+    // where the bridge↔scene perspective mismatch is most visible. The player
+    // walks in FRONT of these so they don't block the action. See OCCLUDER_LAYOUT
+    // for placement; drawOccluder() implements the 3 silhouette shapes.
+    for (var oi = 0; oi < OCCLUDER_LAYOUT.length; oi++) {
+      var occ = OCCLUDER_LAYOUT[oi];
+      // Cull off-screen occluders (treat each as ~80 px wide for cull margin)
+      if (occ.worldX + 80 < leftEdge) continue;
+      if (occ.worldX - 80 > rightEdge) continue;
+      var occScreenX = (occ.worldX - camera.x) * sceneScale;
+      var occBaseY = groundYAt(occ.worldX) * sceneScale;
+      drawOccluder(occ, occScreenX, occBaseY);
+    }
+
     // ============ Player sprite ============
     var playerScreenX = (player.x - camera.x) * sceneScale;
     var playerScreenY = player.y * sceneScale;
@@ -598,6 +658,72 @@
     } else {
       ctx.fillStyle = '#39ff14';
       ctx.fillRect(playerScreenX - 24, playerScreenY - PLAYER_HEIGHT * sceneScale, 48, PLAYER_HEIGHT * sceneScale);
+    }
+  }
+
+  // Draw one foreground occluder silhouette at (screenX, baseY).
+  // Three shapes — tree, lamppost, column — drawn in deep shadow tones to
+  // read as in-foreground silhouettes against the painted pixel-art world.
+  // The lamppost variant adds a soft warm-glow halo around the bulb (additive
+  // blend, matches the existing FX overlay style).
+  function drawOccluder(occ, screenX, baseY) {
+    var s = sceneScale;
+    var h = occ.height * s;
+    if (occ.type === 'lamppost') {
+      // Dark steel pole + cross-arm + round lamp head
+      ctx.fillStyle = 'rgba(12, 10, 16, 0.95)';
+      var poleW = 10 * s;
+      ctx.fillRect(screenX - poleW / 2, baseY - h, poleW, h);
+      // Cross-arm bracket
+      ctx.fillRect(screenX - 28 * s, baseY - h + 12 * s, 56 * s, 6 * s);
+      // Lamp head
+      ctx.beginPath();
+      ctx.ellipse(screenX, baseY - h + 8 * s, 16 * s, 12 * s, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Subtle warm-glow halo (additive blend, brightens the bg behind)
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      var grad = ctx.createRadialGradient(
+        screenX, baseY - h + 8 * s, 0,
+        screenX, baseY - h + 8 * s, 80 * s
+      );
+      grad.addColorStop(0,   'rgba(255, 200, 90, 0.35)');
+      grad.addColorStop(0.5, 'rgba(255, 200, 90, 0.12)');
+      grad.addColorStop(1,   'rgba(255, 200, 90, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(screenX - 80 * s, baseY - h - 60 * s, 160 * s, 140 * s);
+      ctx.restore();
+    } else if (occ.type === 'tree') {
+      // Dark trunk
+      ctx.fillStyle = 'rgba(20, 14, 10, 0.96)';
+      var trunkW = 20 * s;
+      var trunkH = h * 0.55;
+      ctx.fillRect(screenX - trunkW / 2, baseY - trunkH, trunkW, trunkH);
+      // Foliage as overlapping organic dark-green blobs
+      ctx.fillStyle = 'rgba(14, 24, 12, 0.95)';
+      var fy = baseY - h + 60 * s;
+      ctx.beginPath(); ctx.ellipse(screenX - 32 * s, fy + 30 * s, 50 * s, 60 * s, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(screenX + 28 * s, fy + 36 * s, 55 * s, 62 * s, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(screenX, fy, 60 * s, 70 * s, 0, 0, Math.PI * 2); ctx.fill();
+      // Tiny lighter highlight blob to break up the silhouette
+      ctx.fillStyle = 'rgba(40, 56, 28, 0.55)';
+      ctx.beginPath(); ctx.ellipse(screenX - 14 * s, fy - 10 * s, 24 * s, 18 * s, 0, 0, Math.PI * 2); ctx.fill();
+    } else if (occ.type === 'column') {
+      // Brick column / building corner — thick rectangle + cap
+      ctx.fillStyle = 'rgba(28, 18, 18, 0.97)';
+      var colW = 38 * s;
+      ctx.fillRect(screenX - colW / 2, baseY - h, colW, h);
+      // Cap at top (slightly wider lip)
+      ctx.fillRect(screenX - colW / 2 - 6 * s, baseY - h, colW + 12 * s, 14 * s);
+      // Subtle vertical highlight on left edge so it reads as 3D
+      ctx.fillStyle = 'rgba(54, 34, 30, 0.55)';
+      ctx.fillRect(screenX - colW / 2, baseY - h, 4 * s, h);
+      // Faint horizontal mortar lines (every ~50 scene-px)
+      ctx.fillStyle = 'rgba(8, 4, 4, 0.5)';
+      var mortarStep = 50 * s;
+      for (var my = baseY - h + mortarStep; my < baseY; my += mortarStep) {
+        ctx.fillRect(screenX - colW / 2, my, colW, 1.5 * s);
+      }
     }
   }
 
