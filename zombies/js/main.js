@@ -1,5 +1,23 @@
 /*
- * Cx Zombies — boot + game loop (v0.2.2).
+ * Cx Zombies — boot + game loop (v0.2.3).
+ *
+ * v0.2.3 — feedback patch from live test:
+ *   - Ice sprite bumped 220 → 300 scene-px tall (more visible)
+ *   - Alpha-key threshold lowered 700 → 540 + dropped grayscale check
+ *     (kills the soft anti-aliased white halo around Ice, not just
+ *     pure-white pixels). Skin tones survive (sum ≈ 510 < 540).
+ *   - Soft shadow bands added back at all 12 bridge↔scene seams.
+ *     The bridges aren't pixel-perfect against adjacent scenes (AI
+ *     can't truly match edges across separate generations), so a
+ *     thin (80-px wide) dark gradient column at each boundary
+ *     softens the visible cut. True pixel-perfect = manual stitch
+ *     in Photoshop, deferred to v0.2.4 if needed.
+ *   - Animated FX overlays REWRITTEN — was painting flat solid
+ *     colored rectangles over the bg neon (looked terrible per
+ *     user feedback). Now uses soft radial gradients with
+ *     globalCompositeOperation 'lighter' so the FX BRIGHTEN the
+ *     existing painted neon rather than covering it. Reads as
+ *     actual flickering lights instead of flat overlays.
  *
  * v0.2.2 — true seamless transitions via bridge images:
  *   - 6 new bridge PNGs (bridge-00-01 through bridge-05-06) explicitly
@@ -70,7 +88,8 @@
   var JUMP_VELOCITY = -13;       // px/frame
   var BASE_MOVE_SPEED = 4;       // px/frame multiplied by char.speedMul
   var CAMERA_LEAD = 0.35;        // 0 = camera centered on player, 1 = far right
-  var PLAYER_HEIGHT = 220;       // sprite display height in scene-coord px
+  var PLAYER_HEIGHT = 300;       // sprite display height in scene-coord px (v0.2.3 bumped from 220)
+  var SEAM_FADE = 80;            // px-wide soft shadow band at each bridge↔scene boundary
 
   // Per-scene ground line as a fraction of SCENE_HEIGHT (0..1, 1=bottom).
   // Eyeballed from each bg-XX-final.png; tweak if Ice's feet float or sink.
@@ -241,13 +260,13 @@
       try {
         var data = octx.getImageData(0, 0, off.width, off.height);
         var px = data.data;
+        // v0.2.3: Lowered threshold from 700 → 540 (catches the soft anti-aliased
+        // halo around Ice, not just pure-white pixels). Also dropped the
+        // grayscale-similarity check (Ice's actual figure has no near-white-tinted
+        // pixels — his shirt is blue, jeans dark, hair dark, skin tan ≈ sum 510).
+        // Skin tones survive because they sum below 540.
         for (var i = 0; i < px.length; i += 4) {
-          var r = px[i], g = px[i+1], b = px[i+2];
-          // Threshold: if pixel is near-white (sum > 700, i.e., each channel > ~230 avg)
-          // OR if it's exactly the corner color of the atlas, treat as background.
-          if (r + g + b > 700 && Math.abs(r - g) < 25 && Math.abs(g - b) < 25) {
-            px[i+3] = 0; // alpha = 0
-          }
+          if (px[i] + px[i+1] + px[i+2] > 540) px[i+3] = 0;
         }
         octx.putImageData(data, 0, 0);
         assets.iceWalk = off;
@@ -427,37 +446,70 @@
       ctx.drawImage(img, screenX, 0, seg.w * sceneScale, SCENE_HEIGHT * sceneScale);
     }
 
-    // ============ Animated FX overlays (per-scene) ============
-    // FX positions are stored in scene-local coords (x relative to scene's
-    // left edge). Translate to world coords using the scene's worldX from
-    // WORLD_LAYOUT, then to screen.
+    // ============ Soft shadow bands at bridge↔scene seams (v0.2.3) ============
+    // The bridges aren't pixel-perfect against the adjacent scenes (ChatGPT
+    // approximates rather than truly matches edges). This thin dark gradient
+    // at each bridge boundary softens the visible cut. 12 bands total
+    // (one on each side of each of the 6 bridges).
+    for (var b = 0; b < WORLD_LAYOUT.length - 1; b++) {
+      var seg1 = WORLD_LAYOUT[b];
+      var seg2 = WORLD_LAYOUT[b + 1];
+      // Only at boundaries that involve a bridge (skip non-existent bridge-bridge boundaries)
+      if (seg1.type !== 'bridge' && seg2.type !== 'bridge') continue;
+      var seamWorldX = seg1.worldX + seg1.w;
+      if (seamWorldX < leftEdge - SEAM_FADE || seamWorldX > rightEdge + SEAM_FADE) continue;
+      var seamScreenX = (seamWorldX - camera.x) * sceneScale;
+      var bandW = SEAM_FADE * sceneScale;
+      var grad = ctx.createLinearGradient(seamScreenX - bandW, 0, seamScreenX + bandW, 0);
+      grad.addColorStop(0,    'rgba(8,6,12,0)');
+      grad.addColorStop(0.5,  'rgba(8,6,12,0.42)');
+      grad.addColorStop(1,    'rgba(8,6,12,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(seamScreenX - bandW, 0, bandW * 2, viewportH);
+    }
+
+    // ============ Animated FX overlays — radial glow + additive blend (v0.2.3) ============
+    // v0.2.2 used solid fillRect which painted huge ugly colored rectangles
+    // over the bg. v0.2.3 switches to soft radial gradients with
+    // globalCompositeOperation 'lighter' so the FX BRIGHTEN the existing
+    // painted neon in the bg art rather than covering it. The result reads
+    // as actual flickering lights instead of flat overlays.
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
     for (var sceneIdx = 0; sceneIdx < SCENE_COUNT; sceneIdx++) {
       var fxList = SCENE_FX[sceneIdx];
       if (!fxList) continue;
-      // Find this scene's segment in the layout (scenes are at even positions: 0,2,4,...)
       var sceneSeg = WORLD_LAYOUT[sceneIdx * 2];
       if (!sceneSeg) continue;
-      // Skip if the entire scene is off-screen
       if (sceneSeg.worldX + sceneSeg.w < leftEdge) continue;
       if (sceneSeg.worldX > rightEdge) continue;
       for (var f = 0; f < fxList.length; f++) {
         var fx = fxList[f];
+        var alpha = computeFxAlpha(fx);
+        if (alpha <= 0.01) continue;
         var fxWorldX = sceneSeg.worldX + fx.x;
         var sx = (fxWorldX - camera.x) * sceneScale;
         var sy = fx.y * sceneScale;
         var sw = fx.w * sceneScale;
         var sh = fx.h * sceneScale;
-        var alpha = computeFxAlpha(fx);
-        if (alpha <= 0.01) continue;
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = fx.color || (fx.type === 'pulseRed' ? '#ff2222' : '#22aaff');
-        ctx.shadowColor = ctx.fillStyle;
-        ctx.shadowBlur = sh * 0.8;
-        ctx.fillRect(sx, sy, sw, sh);
-        ctx.shadowBlur = 0;
+        var cx = sx + sw / 2;
+        var cy = sy + sh / 2;
+        // Glow radius scaled to FX size — bigger emitters glow further
+        var radius = Math.max(sw, sh) * 1.6;
+        // Color: convert hex to rgba
+        var hex = fx.color || (fx.type === 'pulseRed' ? '#ff2222' : '#22aaff');
+        var r = parseInt(hex.slice(1,3), 16);
+        var g = parseInt(hex.slice(3,5), 16);
+        var bl = parseInt(hex.slice(5,7), 16);
+        var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+        grad.addColorStop(0,   'rgba(' + r + ',' + g + ',' + bl + ',' + (alpha * 0.9).toFixed(3) + ')');
+        grad.addColorStop(0.4, 'rgba(' + r + ',' + g + ',' + bl + ',' + (alpha * 0.4).toFixed(3) + ')');
+        grad.addColorStop(1,   'rgba(' + r + ',' + g + ',' + bl + ',0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
       }
     }
-    ctx.globalAlpha = 1.0;
+    ctx.restore();
 
     // ============ Player sprite ============
     var playerScreenX = (player.x - camera.x) * sceneScale;
