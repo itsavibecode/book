@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.3.0" />
+<meta name="version" content="0.4.0" />
 <title>Shoovlator — talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
 
 <meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy — stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
@@ -167,6 +167,41 @@
     color: #777;
     font-style: italic;
   }
+  /* Highlighted transformations — body.forward only, since reverse uses plain text. */
+  .output .changed {
+    background: rgba(255, 209, 102, 0.16);
+    border-radius: 3px;
+    padding: 0 2px;
+    cursor: help;
+    position: relative;
+    transition: background 120ms ease-out;
+  }
+  .output .changed:hover { background: rgba(255, 209, 102, 0.34); }
+  .output .changed:hover::after {
+    content: 'was: ' attr(data-orig);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-6px);
+    background: #1a1a1a;
+    color: #ffd166;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    white-space: nowrap;
+    border: 1px solid #ffd166;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+  .output .changed[data-orig="\2205"]:hover::after { content: '(inserted)'; }
+  .output.refreshing { animation: refresh 280ms ease-out; }
+  @keyframes refresh {
+    0%   { opacity: 0; transform: translateY(-3px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
 
   .controls {
     margin-top: 18px;
@@ -318,7 +353,7 @@
 </main>
 
 <footer>
-  <a href="/">BookHockeys</a> &middot; v0.3.0 &middot; runs entirely in your browser
+  <a href="/">BookHockeys</a> &middot; v0.4.0 &middot; runs entirely in your browser
 </footer>
 
 <script>
@@ -447,6 +482,47 @@ function escapeRe(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// ---------------------------------------------------------------------------
+// Change tracking. Each forward pass wraps its replacements with sentinel
+// chars (SOH, STX, ETX) that survive subsequent regex passes. After all passes
+// run, renderMarked() converts these wrapper sentinels into <span> elements
+// for the highlight-on-hover UI.
+//
+// "INSERTED" marks transformations where the original text was nothing —
+// inserted fillers and tails. The CSS shows a different tooltip ("(inserted)")
+// for those. Using ∅ (empty set) since it can't appear in user input.
+// ---------------------------------------------------------------------------
+const M_OPEN = '', M_SEP = '', M_CLOSE = '';
+const INSERTED_MARK = '∅';
+
+function wrap(orig, repl) {
+  return M_OPEN + (orig || INSERTED_MARK) + M_SEP + repl + M_CLOSE;
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+}
+function escapeAttr(s) {
+  return s.replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+function renderMarked(s) {
+  // Non-greedy because sentinels can't nest (the [^...] excludes them).
+  const re = /([^]*)([^]*)/g;
+  let out = '';
+  let last = 0;
+  let m;
+  while ((m = re.exec(s)) !== null) {
+    out += escapeHtml(s.slice(last, m.index));
+    out += `<span class="changed" data-orig="${escapeAttr(m[1])}">${escapeHtml(m[2])}</span>`;
+    last = re.lastIndex;
+  }
+  out += escapeHtml(s.slice(last));
+  return out;
+}
+
 function shoovlate(text, intensity) {
   if (!text || !text.trim()) return '';
   const parts = text.split(/(?<=[.!?])\s+/);
@@ -454,80 +530,80 @@ function shoovlate(text, intensity) {
 }
 
 function shoovlateSentence(s, i) {
+  // Each pass wraps its replacement with sentinels so renderMarked can
+  // highlight what changed. Order is preserved from the pre-tracking engine
+  // (homophones before subject-verb swap, "faster" before "fast" boost).
+
   // 0a) Shoovy-ism: "faster" -> "fastest" (superlative for comparative).
-  // Run before the "fast" -> "more faster than most" boost so this only
-  // triggers on the user's literal "faster", not on inserted text.
   for (const [k, v] of Object.entries(WRONG_SUPERLATIVE)) {
     const re = new RegExp(`\\b${k}\\b`, 'gi');
-    s = s.replace(re, m => maybe(0.80 + i * 0.20) ? caseMatch(v, m) : m);
+    s = s.replace(re, m => maybe(0.80 + i * 0.20) ? wrap(m, caseMatch(v, m)) : m);
   }
 
   // 0b) Shoovy-ism: "quickly" -> "swiftly" (sometimes).
   for (const [k, v] of Object.entries(ADV_SWAPS)) {
     const re = new RegExp(`\\b${k}\\b`, 'gi');
-    s = s.replace(re, m => maybe(0.45 + i * 0.30) ? caseMatch(v, m) : m);
+    s = s.replace(re, m => maybe(0.45 + i * 0.30) ? wrap(m, caseMatch(v, m)) : m);
   }
 
   // 0c) Shoovy-ism: "don't" -> "donut", "do not" -> "dough knot".
-  // Must run BEFORE the subject-verb swap (pass 7) — otherwise
-  // "you do not" gets eaten by "you do" -> "you does" first.
   s = s.replace(/\bdon['’]t\b/gi, m =>
-    maybe(0.85 + i * 0.15) ? caseMatch('donut', m) : m
+    maybe(0.85 + i * 0.15) ? wrap(m, caseMatch('donut', m)) : m
   );
   s = s.replace(/\bdo not\b/gi, m =>
-    maybe(0.85 + i * 0.15) ? caseMatch('dough knot', m) : m
+    maybe(0.85 + i * 0.15) ? wrap(m, caseMatch('dough knot', m)) : m
   );
 
   // 1) stack "more"
   s = s.replace(/\bmore\b/gi, m =>
-    maybe(0.55 + i * 0.40) ? caseMatch(pick(COMPARATIVE_STACKS), m) : m
+    maybe(0.55 + i * 0.40) ? wrap(m, caseMatch(pick(COMPARATIVE_STACKS), m)) : m
   );
 
   // 2) stack "very"
   s = s.replace(/\bvery\b/gi, m =>
-    maybe(0.45 + i * 0.45) ? caseMatch(pick(VERY_STACKS), m) : m
+    maybe(0.45 + i * 0.45) ? wrap(m, caseMatch(pick(VERY_STACKS), m)) : m
   );
 
   // 3) adjective boost
   for (const [k, v] of Object.entries(ADJ_BOOST)) {
     const re = new RegExp(`\\b${k}\\b`, 'gi');
-    s = s.replace(re, m => maybe(0.30 + i * 0.50) ? caseMatch(v, m) : m);
+    s = s.replace(re, m => maybe(0.30 + i * 0.50) ? wrap(m, caseMatch(v, m)) : m);
   }
 
   // 4) noun plural weirdness
   for (const [k, v] of Object.entries(PLURAL_WEIRD)) {
     const re = new RegExp(`\\b${k}\\b`, 'gi');
-    s = s.replace(re, m => maybe(0.35 + i * 0.45) ? caseMatch(v, m) : m);
+    s = s.replace(re, m => maybe(0.35 + i * 0.45) ? wrap(m, caseMatch(v, m)) : m);
   }
 
-  // 5) "has/have/had X" -> insert filler before X
+  // 5) "has/have/had X" -> insert filler before X (filler is the inserted text)
   s = s.replace(/\b(has|have|had)\s+([A-Za-z]+)\b/g, (m, aux, verb) => {
     if (/^(been|just|really|kind|basically|for|actually)$/i.test(verb)) return m;
     if (!maybe(0.45 + i * 0.40)) return m;
-    return `${aux} ${pick(FILLERS)} ${verb}`;
+    return `${aux} ${wrap('', pick(FILLERS))} ${verb}`;
   });
 
   // 6) is/are/was/were swaps (low rate)
   s = s.replace(/\b(is|are|was|were)\b/gi, m => {
     if (!maybe(0.08 + i * 0.22)) return m;
-    return caseMatch(VERB_SWAPS[m.toLowerCase()] || m, m);
+    const repl = VERB_SWAPS[m.toLowerCase()];
+    return repl ? wrap(m, caseMatch(repl, m)) : m;
   });
 
   // 7) subject-verb mismatch on plural pronouns
   s = s.replace(/\b(they|we|you)\s+(have|do|are)\b/gi, (m, pron, verb) => {
     if (!maybe(0.12 + i * 0.30)) return m;
     const swap = SUBJ_VERB_SWAP[verb.toLowerCase()];
-    return swap ? `${pron} ${caseMatch(swap, verb)}` : m;
+    return swap ? `${pron} ${wrap(verb, caseMatch(swap, verb))}` : m;
   });
 
-  // 8) clause tail before terminal punctuation
+  // 8) clause tail before terminal punctuation (tail is inserted from nothing)
   s = s.replace(/([.!?])\s*$/, (m, punct) => {
     if (!maybe(0.35 + i * 0.40)) return m;
-    return ` ${pick(TAILS)}${punct}`;
+    return ` ${wrap('', pick(TAILS))}${punct}`;
   });
-  // ...or append a tail to a sentence with no terminator
   if (!/[.!?]\s*$/.test(s) && s.trim() && maybe(0.25 + i * 0.35)) {
-    s = `${s.replace(/\s+$/, '')} ${pick(TAILS)}`;
+    s = `${s.replace(/\s+$/, '')} ${wrap('', pick(TAILS))}`;
   }
 
   return s;
@@ -646,18 +722,75 @@ function applyDirection() {
   rightLabel.textContent = p.rightLabel;
 }
 
-function render() {
+// Typewriter: progressively reveals the rendered HTML respecting tag
+// boundaries (so <span class="changed"> is opened/closed correctly mid-stream).
+let typewriterTimer = null;
+function typewriter(targetEl, html, charsPerTick = 4, tickMs = 14) {
+  if (typewriterTimer) { clearTimeout(typewriterTimer); typewriterTimer = null; }
+  // Tokenise into a stream of either visible text-units or invisible HTML tags.
+  const tokens = [];
+  let p = 0;
+  while (p < html.length) {
+    const c = html[p];
+    if (c === '<') {
+      const end = html.indexOf('>', p);
+      if (end === -1) { tokens.push({ vis: false, s: html.slice(p) }); break; }
+      tokens.push({ vis: false, s: html.slice(p, end + 1) });
+      p = end + 1;
+    } else if (c === '&') {
+      const semi = html.indexOf(';', p);
+      if (semi !== -1 && semi - p <= 8) {
+        tokens.push({ vis: true, s: html.slice(p, semi + 1) });
+        p = semi + 1;
+      } else {
+        tokens.push({ vis: true, s: c });
+        p++;
+      }
+    } else {
+      tokens.push({ vis: true, s: c });
+      p++;
+    }
+  }
+  let pos = 0;
+  function tick() {
+    let revealed = 0;
+    while (pos < tokens.length && revealed < charsPerTick) {
+      if (tokens[pos].vis) revealed++;
+      pos++;
+    }
+    // Also advance past trailing tags so we never end with a half-open span.
+    while (pos < tokens.length && !tokens[pos].vis) pos++;
+    let buf = '';
+    for (let k = 0; k < pos; k++) buf += tokens[k].s;
+    targetEl.innerHTML = buf;
+    if (pos < tokens.length) {
+      typewriterTimer = setTimeout(tick, tickMs);
+    } else {
+      typewriterTimer = null;
+    }
+  }
+  tick();
+}
+
+function render(animate = false) {
+  let html;
   if (direction === 'forward') {
     const i = +intensityEl.value / 100;
-    output.textContent = shoovlate(input.value, i);
+    html = renderMarked(shoovlate(input.value, i));
   } else {
-    output.textContent = deshoovlate(input.value);
+    html = escapeHtml(deshoovlate(input.value));
+  }
+  if (animate && html.length > 0) {
+    typewriter(output, html);
+  } else {
+    if (typewriterTimer) { clearTimeout(typewriterTimer); typewriterTimer = null; }
+    output.innerHTML = html;
   }
 }
 
 function debouncedRender() {
   clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(render, 160);
+  debounceTimer = setTimeout(() => render(false), 160);
 }
 
 input.addEventListener('input', debouncedRender);
@@ -685,7 +818,7 @@ copyBtn.addEventListener('click', async () => {
   }
 });
 
-rerollBtn.addEventListener('click', render);
+rerollBtn.addEventListener('click', () => render(true));
 
 swapBtn.addEventListener('click', () => {
   // Move current output to input so the round-trip is visible. If output is
@@ -694,13 +827,13 @@ swapBtn.addEventListener('click', () => {
   if (outText) input.value = output.textContent;
   direction = direction === 'forward' ? 'reverse' : 'forward';
   applyDirection();
-  render();
+  render(true);
 });
 
 document.querySelectorAll('.examples button[data-ex]').forEach(b => {
   b.addEventListener('click', () => {
     input.value = b.dataset.ex;
-    render();
+    render(true);
     input.focus();
   });
 });
