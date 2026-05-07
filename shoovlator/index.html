@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.5.1" />
+<meta name="version" content="0.5.2" />
 <title>Shoovlator — talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
 
 <meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy — stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
@@ -361,7 +361,7 @@
 </main>
 
 <footer>
-  <a href="/">BookHockeys</a> &middot; v0.5.1 &middot; runs entirely in your browser
+  <a href="/">BookHockeys</a> &middot; v0.5.2 &middot; runs entirely in your browser
 </footer>
 
 <script>
@@ -455,9 +455,11 @@ const PLURAL_WEIRD = {
   evidence:    'many evidences'
 };
 
+// Pass 6's bare "are" -> "is" was redundant with pass 7's pronoun-driven
+// "they/we/you are" -> "... is" swap, AND it broke the "are we not" Shoovy-ism
+// by mangling the "are" before pass 7b could see the full phrase. Dropped.
 const VERB_SWAPS = {
   is:   'be',
-  are:  'is',
   was:  'has been',
   were: 'has was'
 };
@@ -646,6 +648,14 @@ function shoovlateSentence(s, i) {
     return swap ? `${pron} ${wrap(verb, caseMatch(swap, verb))}` : m;
   });
 
+  // 7b) Shoovy-ism: "are we not" -> "is we are not". Runs AFTER pass 6 and
+  // pass 7 so the inserted "is" / "we are" inside the replacement isn't
+  // re-processed by them (the ID-based wrap keeps the ORIGINAL out of band,
+  // but the REPLACEMENT is still visible to later passes).
+  s = s.replace(/\bare we not\b/gi, m =>
+    maybe(0.80 + i * 0.20) ? wrap(m, caseMatch('is we are not', m)) : m
+  );
+
   // 8) clause tail before terminal punctuation (tail is inserted from nothing)
   s = s.replace(/([.!?])\s*$/, (m, punct) => {
     if (!maybe(0.35 + i * 0.40)) return m;
@@ -728,6 +738,9 @@ function deshoovlateSentence(s) {
   s = s.replace(/\b(am|is|are|be|been|being|was|were)\s+thank\s+you\b/gi,
     (m, cop) => `${cop} thankful`
   );
+
+  // 0d) "is we are not" -> "are we not"
+  s = s.replace(/\bis we are not\b/gi, m => caseMatch('are we not', m));
 
   // 1) Shoovy-isms — distinct enough to reverse confidently.
   s = s.replace(/\bdough knot\b/gi, m => caseMatch('do not', m));
