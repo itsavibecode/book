@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.5.2" />
+<meta name="version" content="0.5.3" />
 <title>Shoovlator — talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
 
 <meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy — stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
@@ -361,7 +361,7 @@
 </main>
 
 <footer>
-  <a href="/">BookHockeys</a> &middot; v0.5.2 &middot; runs entirely in your browser
+  <a href="/">BookHockeys</a> &middot; v0.5.3 &middot; runs entirely in your browser
 </footer>
 
 <script>
@@ -671,6 +671,10 @@ function shoovlateSentence(s, i) {
   // pass), the [A-Za-z]-anchored regex won't match and we silently skip.
   s = maybeStutter(s, i);
 
+  // 9b) Mid-sentence emphasis stutter on a 4+ letter content word. Skips
+  // anything that's already inside a wrap block (so we never nest sentinels).
+  s = maybeEmphasisStutter(s, i);
+
   // 10) Sentence prefix injection ("On God,", "My bad,", "Ay fucking yo bro,").
   // Runs LAST so the prefix isn't fed back into any earlier pass.
   s = maybeInjectPrefix(s, i);
@@ -678,14 +682,57 @@ function shoovlateSentence(s, i) {
   return s;
 }
 
+// Stutter forms: single-letter prefix, double-letter prefix, double word
+// repeat, triple word repeat — all observed in actual Shoovy speech.
+function pickStutterForm(word) {
+  const c = word[0];
+  const r = Math.random();
+  if (r < 0.35) return `${c}-${word}`;
+  if (r < 0.60) return `${c}-${c}-${word}`;
+  if (r < 0.85) return `${word} ${word}`;
+  return `${word} ${word} ${word}`;
+}
+
 function maybeStutter(s, i) {
   if (!maybe(0.10 + i * 0.20)) return s;
   const m = s.match(/^(\s*)([A-Za-z][A-Za-z']*)\b/);
   if (!m) return s;
   const lead = m[1], word = m[2];
-  const c = word[0];
-  const stuttered = maybe(0.40) ? `${c}-${c}-${word}` : `${c}-${word}`;
-  return lead + wrap(word, stuttered) + s.slice(m[0].length);
+  return lead + wrap(word, pickStutterForm(word)) + s.slice(m[0].length);
+}
+
+// Mid-sentence emphasis stutter — picks a 4+ letter word outside of any
+// existing wrap block (so we never nest sentinels) and stutters it.
+function maybeEmphasisStutter(s, i) {
+  if (!maybe(0.08 + i * 0.18)) return s;
+
+  // Find every wrap block's character range so we can avoid stuttering text
+  // that an earlier pass already wrapped.
+  const wrapRanges = [];
+  const wrapRe = /\d+[^]*/g;
+  let wm;
+  while ((wm = wrapRe.exec(s)) !== null) {
+    wrapRanges.push([wm.index, wm.index + wm[0].length]);
+  }
+
+  // Candidate content words: 4+ letters, not already at sentence start
+  // (that's covered by maybeStutter), not inside a wrap block.
+  const candidates = [];
+  const wordRe = /\b[A-Za-z][A-Za-z']{3,}\b/g;
+  let mm;
+  while ((mm = wordRe.exec(s)) !== null) {
+    const word = mm[0];
+    const start = mm.index, end = start + word.length;
+    if (start === 0) continue;
+    if (wrapRanges.some(([a, b]) => start >= a && end <= b)) continue;
+    candidates.push({ start, end, word });
+  }
+  if (candidates.length === 0) return s;
+
+  const choice = candidates[Math.floor(Math.random() * candidates.length)];
+  return s.slice(0, choice.start)
+    + wrap(choice.word, pickStutterForm(choice.word))
+    + s.slice(choice.end);
 }
 
 function maybeInjectPrefix(s, i) {
@@ -722,13 +769,21 @@ function deshoovlateSentence(s) {
   // 0) Strip Shoovy sentence prefixes ("On God,", "My bad,", "Ay fucking yo bro,").
   s = s.replace(/^\s*(On God|My bad|Ay fucking yo bro|Ay yo bro|Ay bro|Yo bro)\s*,\s*/i, '');
 
-  // 0a) Undo single-letter stutter at sentence start. Only treat it as a stutter
-  // if the prefix letter matches the first letter of the following word — that
-  // way "X-ray" or "co-op" at the start of a sentence aren't mangled.
-  s = s.replace(/^(\s*)([A-Za-z])-\2-([A-Za-z]+)\b/, '$1$3');
-  s = s.replace(/^(\s*)([A-Za-z])-([A-Za-z]+)\b/, (m, lead, c, word) =>
-    word[0].toLowerCase() === c.toLowerCase() ? lead + word : m
+  // 0a) Undo single-letter stutter at sentence start AND mid-sentence. Only
+  // treat as a stutter if the prefix letter matches the first letter of the
+  // following word — so "X-ray" or "co-op" survive untouched.
+  s = s.replace(/\b([A-Za-z])-\1-([A-Za-z]+)\b/g, (m, c, word) =>
+    word[0].toLowerCase() === c.toLowerCase() ? word : m
   );
+  s = s.replace(/\b([A-Za-z])-([A-Za-z]+)\b/g, (m, c, word) =>
+    word[0].toLowerCase() === c.toLowerCase() ? word : m
+  );
+
+  // 0a-2) Undo whole-word repetition stutters. Triple is rare in English so
+  // always safe to collapse; double we restrict to 4+ letter words to leave
+  // legitimate "had had" / "is is" / "the the" alone.
+  s = s.replace(/\b(\w+)\s+\1\s+\1\b/gi, '$1');
+  s = s.replace(/\b(\w{4,})\s+\1\b/gi, '$1');
 
   // 0b) "I dunno" -> "I don't know"
   s = s.replace(/\bi\s+dunno\b/gi, m => caseMatch("I don't know", m));
