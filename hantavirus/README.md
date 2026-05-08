@@ -70,6 +70,11 @@ See [`privacy.html`](privacy.html). No personal data, no uploads, no tracking be
 
 ## Changelog
 
+### v0.2.1 &mdash; 2026-05-08
+- **Stat strip expanded** to 6 cells with secondary date subtitles: TODAY (with today's date), THIS WEEK (with the week-of date), LAST CASE (with `Nd ago` and the date), CASES 90D, DEATHS 18MO, DOMINANT STRAIN (with most-active-region subtitle).
+- **Timeline tooltips fixed** — now position-fixed and z-indexed above the map's tile and marker panes; previously they were getting clipped behind the map when extending above the timeline strip.
+- **SOCIAL skeleton placeholders hidden** &mdash; only entries with a real tweet ID render. The placeholder slots remain in the source so curated tweets can be dropped in cleanly, but they no longer show in the UI.
+
 ### v0.2.0 — 2026-05-08
 First production-ready release. SEO + brand pass:
 

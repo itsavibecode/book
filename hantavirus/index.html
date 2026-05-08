@@ -194,13 +194,13 @@
   /* ---------- TOP BAR ---------- */
   .topbar {
     display: grid;
-    grid-template-columns: 320px 1fr auto;
+    grid-template-columns: 300px 1fr auto;
     align-items: center;
-    height: 64px;
+    height: 72px;
     border-bottom: 1px solid var(--border);
     background: var(--panel);
     padding: 0 18px;
-    gap: 24px;
+    gap: 20px;
   }
   .brand {
     display: flex;
@@ -232,24 +232,42 @@
   }
   .stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 28px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
     justify-content: center;
   }
+  .stat { min-width: 0; }
   .stat-label {
-    font-size: 9.5px;
-    letter-spacing: 1.5px;
+    font-size: 9px;
+    letter-spacing: 1.3px;
     color: var(--muted);
-    margin-bottom: 4px;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .stat-value {
     font-family: "SF Mono", Menlo, Consolas, monospace;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 600;
     color: var(--text);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .stat-value.warn { color: var(--s3); }
   .stat-value.accent { color: var(--accent); }
+  .stat-sub {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 9.5px;
+    color: var(--dim);
+    margin-top: 2px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .version {
     font-family: "SF Mono", Menlo, Consolas, monospace;
     font-size: 10px;
@@ -359,7 +377,7 @@
     grid-template-areas:
       "rail map"
       "rail timeline";
-    height: calc(100vh - 64px - 28px - 28px);
+    height: calc(100vh - 72px - 28px - 28px);
   }
   .rail { grid-area: rail; }
   .map-wrap { grid-area: map; }
@@ -621,17 +639,17 @@
     box-shadow: 0 0 0 2px var(--accent), 0 0 12px var(--accent);
   }
   .tl-tooltip {
-    position: absolute;
+    position: fixed;
     pointer-events: none;
     background: var(--panel);
     border: 1px solid var(--border-strong);
     border-radius: 3px;
     padding: 6px 10px;
     font-size: 11px;
-    z-index: 50;
+    z-index: 9999;
     display: none;
-    transform: translateX(-50%);
-    bottom: 64px;
+    transform: translate(-50%, -100%);
+    margin-top: -10px;
     max-width: 280px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.6);
   }
@@ -921,23 +939,37 @@
   </a>
   <div class="stats">
     <div class="stat">
+      <div class="stat-label">TODAY</div>
+      <div class="stat-value accent" id="stat-today">—</div>
+      <div class="stat-sub" id="stat-today-sub">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">THIS WEEK</div>
+      <div class="stat-value accent" id="stat-week">—</div>
+      <div class="stat-sub" id="stat-week-sub">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">LAST CASE</div>
+      <div class="stat-value" id="stat-last">—</div>
+      <div class="stat-sub" id="stat-last-sub">—</div>
+    </div>
+    <div class="stat">
       <div class="stat-label">CASES 90D</div>
       <div class="stat-value accent" id="stat-cases">—</div>
+      <div class="stat-sub">trailing 90&nbsp;days</div>
     </div>
     <div class="stat">
       <div class="stat-label">DEATHS 18MO</div>
       <div class="stat-value warn" id="stat-deaths">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">MOST ACTIVE REGION</div>
-      <div class="stat-value" id="stat-region">—</div>
+      <div class="stat-sub">trailing 18&nbsp;months</div>
     </div>
     <div class="stat">
       <div class="stat-label">DOMINANT STRAIN</div>
       <div class="stat-value" id="stat-strain">—</div>
+      <div class="stat-sub" id="stat-strain-sub">most active region</div>
     </div>
   </div>
-  <div class="version">v0.2.0</div>
+  <div class="version">v0.2.1</div>
 </header>
 
 <div class="ticker">
@@ -995,7 +1027,7 @@
   <div class="bottom-left">
     <span>HANTAVIRUS MONITOR</span>
     <span>&middot;</span>
-    <span>v0.2.0</span>
+    <span>v0.2.1</span>
     <span>&middot;</span>
     <a href="privacy.html">PRIVACY</a>
     <a href="#" id="cookies-link">COOKIES</a>
@@ -1023,7 +1055,7 @@
 'use strict';
 
 // ---------- SEEDED EVENTS ----------
-// Representative dataset for v0.2.0. Mix of well-documented public events
+// Representative dataset for v0.2.1. Mix of well-documented public events
 // (Mono County 2025, Santa Fe 2025) and generic patterns matching ongoing
 // endemic surveillance. Real live ingest pipeline is the v0.2 goal.
 const NOW = new Date('2026-05-08T12:00:00Z');
@@ -1285,30 +1317,18 @@ function renderRail() {
 }
 
 function renderSocial() {
-  railCountEl.textContent = SOCIAL.length + ' source' + (SOCIAL.length === 1 ? '' : 's');
+  const live = SOCIAL.filter(s => s.tweetId);
+  railCountEl.textContent = live.length + ' tweet' + (live.length === 1 ? '' : 's');
   let html = '';
-  html += '<div class="demo-banner"><b>Social feed</b> &middot; Curated tweets from authoritative public-health accounts render here as official X embeds. v0.1.x: provide tweet IDs to populate. v0.2 plan: Worker auto-ingests fresh hantavirus posts from these handles nightly.</div>';
-  for (const s of SOCIAL) {
-    if (s.tweetId) {
-      html += '<div class="tweet-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-conversation="none" data-cards="hidden" data-dnt="true"><p>Loading tweet from @' + escapeHtml(s.handle) + '...</p>&mdash; <a href="https://x.com/' + encodeURIComponent(s.handle) + '/status/' + encodeURIComponent(s.tweetId) + '">View on X</a></blockquote></div>';
-    } else {
-      html += '<div class="tweet-card placeholder">' +
-        '<div class="tweet-head">' +
-          '<div class="tweet-avatar"></div>' +
-          '<div class="tweet-id">' +
-            '<div class="tweet-name">' + escapeHtml(s.name) + '</div>' +
-            '<div class="tweet-handle">@' + escapeHtml(s.handle) + '</div>' +
-          '</div>' +
-          '<div class="tweet-time">awaiting</div>' +
-        '</div>' +
-        '<div class="tweet-body">' + escapeHtml(s.note) + '</div>' +
-        '<div class="tweet-foot">SKELETON &middot; provide tweet ID to populate</div>' +
-      '</div>';
-    }
+  html += '<div class="demo-banner"><b>Social feed</b> &middot; Curated tweets from authoritative public-health accounts (CDC, WHO, the WHO Director-General, and the Outbreak Updates aggregator). Rendered as official X embeds.</div>';
+  if (live.length === 0) {
+    html += '<div class="demo-banner" style="text-align:center;color:var(--muted);">No tweets curated yet.</div>';
+  }
+  for (const s of live) {
+    html += '<div class="tweet-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-conversation="none" data-cards="hidden" data-dnt="true"><p>Loading tweet from @' + escapeHtml(s.handle) + '...</p>&mdash; <a href="https://x.com/' + encodeURIComponent(s.handle) + '/status/' + encodeURIComponent(s.tweetId) + '">View on X</a></blockquote></div>';
   }
   feedEl.innerHTML = html;
-  const hasRealTweets = SOCIAL.some(s => s.tweetId);
-  if (hasRealTweets) loadTwitterWidgets();
+  if (live.length) loadTwitterWidgets();
 }
 
 let twttrLoading = false;
@@ -1330,7 +1350,7 @@ function renderFeed() {
   const events = filteredEvents();
   railCountEl.textContent = events.length + ' event' + (events.length === 1 ? '' : 's');
   let html = '';
-  html += '<div class="demo-banner"><b>v0.2.0 demo</b> &middot; Seeded with documented 2025 cases plus representative endemic-surveillance entries. Real-time ingest from state DOH press releases, news aggregators, and curated X handles is planned for v0.3.</div>';
+  html += '<div class="demo-banner"><b>v0.2.1 demo</b> &middot; Seeded with documented 2025 cases plus representative endemic-surveillance entries. Real-time ingest from state DOH press releases, news aggregators, and curated X handles is planned for v0.3.</div>';
   if (events.length === 0) {
     html += '<div class="demo-banner" style="text-align:center;color:var(--muted);">No matching events.</div>';
   }
@@ -1361,31 +1381,64 @@ function escapeHtml(s) {
 }
 
 // ---------- STATS ----------
-function renderStats() {
-  const since90 = new Date(NOW.getTime() - 90 * 86400000);
-  const recent = EVENTS.filter(e => new Date(e.date + 'T12:00:00Z') >= since90);
-  const cases90 = recent.filter(e => e.cats.includes('CASE') || e.cats.includes('CLUSTER') || e.cats.includes('DEATH')).length;
-  const since18mo = new Date(NOW.getTime() - 547 * 86400000);
-  const deathsYtd = EVENTS.filter(e => e.cats.includes('DEATH') && new Date(e.date + 'T12:00:00Z') >= since18mo).length;
+function isCase(e) {
+  return e.cats.includes('CASE') || e.cats.includes('CLUSTER') || e.cats.includes('DEATH');
+}
 
+function fmtShortDate(d) {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+}
+
+function startOfWeekMonday(d) {
+  const day = d.getUTCDay();
+  const diff = (day + 6) % 7;
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - diff));
+}
+
+function renderStats() {
+  const todayStr = NOW.toISOString().slice(0, 10);
+  const weekStart = startOfWeekMonday(NOW);
+  const since90 = new Date(NOW.getTime() - 90 * 86400000);
+  const since18mo = new Date(NOW.getTime() - 547 * 86400000);
+
+  const cases = EVENTS.filter(isCase);
+  const today = cases.filter(e => e.date === todayStr).length;
+  const week = cases.filter(e => new Date(e.date + 'T12:00:00Z') >= weekStart).length;
+  const recent = EVENTS.filter(e => new Date(e.date + 'T12:00:00Z') >= since90);
+  const cases90 = recent.filter(isCase).length;
+  const deaths18 = EVENTS.filter(e => e.cats.includes('DEATH') && new Date(e.date + 'T12:00:00Z') >= since18mo).length;
+
+  // Last reported case
+  const sortedCases = [...cases].sort((a, b) => b.date.localeCompare(a.date));
+  let lastValue = '—', lastSub = '—';
+  if (sortedCases.length) {
+    const last = sortedCases[0];
+    const lastDate = new Date(last.date + 'T12:00:00Z');
+    const days = Math.floor((NOW - lastDate) / 86400000);
+    lastValue = days <= 0 ? 'today' : (days === 1 ? '1d ago' : days + 'd ago');
+    lastSub = fmtShortDate(lastDate);
+  }
+
+  // Strain + region (use most active region as the strain subtitle)
+  const strainCount = {};
   const regionCount = {};
   for (const e of recent) {
+    strainCount[e.strain] = (strainCount[e.strain] || 0) + 1;
     regionCount[e.region] = (regionCount[e.region] || 0) + 1;
   }
-  const topRegion = Object.entries(regionCount).sort((a,b)=>b[1]-a[1])[0];
-  const regionLabel = topRegion ? topRegion[0].toUpperCase() : '—';
+  const topStrain = Object.entries(strainCount).sort((a, b) => b[1] - a[1])[0];
+  const topRegion = Object.entries(regionCount).sort((a, b) => b[1] - a[1])[0];
 
-  const strainCount = {};
-  for (const e of recent) {
-    strainCount[e.strain] = (strainCount[e.strain] || 0) + 1;
-  }
-  const topStrain = Object.entries(strainCount).sort((a,b)=>b[1]-a[1])[0];
-  const strainLabel = topStrain ? topStrain[0] : '—';
-
+  document.getElementById('stat-today').textContent = today;
+  document.getElementById('stat-today-sub').textContent = fmtShortDate(NOW);
+  document.getElementById('stat-week').textContent = week;
+  document.getElementById('stat-week-sub').textContent = 'wk of ' + fmtShortDate(weekStart);
+  document.getElementById('stat-last').textContent = lastValue;
+  document.getElementById('stat-last-sub').textContent = lastSub;
   document.getElementById('stat-cases').textContent = cases90;
-  document.getElementById('stat-deaths').textContent = deathsYtd;
-  document.getElementById('stat-region').textContent = regionLabel;
-  document.getElementById('stat-strain').textContent = strainLabel;
+  document.getElementById('stat-deaths').textContent = deaths18;
+  document.getElementById('stat-strain').textContent = topStrain ? topStrain[0] : '—';
+  document.getElementById('stat-strain-sub').textContent = topRegion ? topRegion[0] + ' region' : 'no recent activity';
 }
 
 // ---------- TICKER ----------
@@ -1471,7 +1524,9 @@ function renderTimeline() {
       if (!e) return;
       tooltip.innerHTML = '<div class="tl-tooltip-title">' + escapeHtml(e.title) + '</div>' +
         '<div class="tl-tooltip-meta">' + escapeHtml(e.location) + ' &middot; ' + e.date + ' &middot; S' + e.sev + ' &middot; ' + escapeHtml(e.strain) + '</div>';
-      tooltip.style.left = dot.style.left;
+      const r = dot.getBoundingClientRect();
+      tooltip.style.left = (r.left + r.width / 2) + 'px';
+      tooltip.style.top = r.top + 'px';
       tooltip.classList.add('visible');
     });
     dot.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
