@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.5.3" />
+<meta name="version" content="0.5.4" />
 <title>Shoovlator — talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
 
 <meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy — stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
@@ -361,7 +361,7 @@
 </main>
 
 <footer>
-  <a href="/">BookHockeys</a> &middot; v0.5.3 &middot; runs entirely in your browser
+  <a href="/">BookHockeys</a> &middot; v0.5.4 &middot; runs entirely in your browser
 </footer>
 
 <script>
@@ -665,10 +665,10 @@ function shoovlateSentence(s, i) {
     s = `${s.replace(/\s+$/, '')} ${wrap('', pick(TAILS))}`;
   }
 
-  // 9) Stutter the first word of the sentence. Runs after word-level passes
-  // so we don't risk re-wrapping a stuttered word. If the sentence already
-  // starts with a sentinel block (first word was wrapped by an earlier
-  // pass), the [A-Za-z]-anchored regex won't match and we silently skip.
+  // 9) Stutter passes (mutually exclusive — at most one per sentence).
+  // First-word stutter has priority; the mid-sentence emphasis stutter only
+  // fires if the first-word one didn't, keeping the output less repetitive.
+  stutterFiredThisSentence = false;
   s = maybeStutter(s, i);
 
   // 9b) Mid-sentence emphasis stutter on a 4+ letter content word. Skips
@@ -682,29 +682,36 @@ function shoovlateSentence(s, i) {
   return s;
 }
 
-// Stutter forms: single-letter prefix, double-letter prefix, double word
-// repeat, triple word repeat — all observed in actual Shoovy speech.
+// Stutter forms: weighted toward simple letter-stutters over word repetition
+// (whole-word repeats are visually heavier and quickly feel repetitive when
+// stacked on top of fillers, tails, and prefixes).
 function pickStutterForm(word) {
   const c = word[0];
   const r = Math.random();
-  if (r < 0.35) return `${c}-${word}`;
-  if (r < 0.60) return `${c}-${c}-${word}`;
-  if (r < 0.85) return `${word} ${word}`;
-  return `${word} ${word} ${word}`;
+  if (r < 0.55) return `${c}-${word}`;          // 55% F-Faster
+  if (r < 0.80) return `${c}-${c}-${word}`;     // 25% F-F-Faster
+  if (r < 0.94) return `${word} ${word}`;       // 14% Faster Faster
+  return `${word} ${word} ${word}`;             //  6% Faster Faster Faster
 }
 
+// `stutterFiredThisSentence` lets the two stutter passes be mutually exclusive
+// — at most one stutter per sentence so output doesn't pile up.
+let stutterFiredThisSentence = false;
+
 function maybeStutter(s, i) {
-  if (!maybe(0.10 + i * 0.20)) return s;
+  if (!maybe(0.10 + i * 0.18)) return s;
   const m = s.match(/^(\s*)([A-Za-z][A-Za-z']*)\b/);
   if (!m) return s;
   const lead = m[1], word = m[2];
+  stutterFiredThisSentence = true;
   return lead + wrap(word, pickStutterForm(word)) + s.slice(m[0].length);
 }
 
 // Mid-sentence emphasis stutter — picks a 4+ letter word outside of any
 // existing wrap block (so we never nest sentinels) and stutters it.
 function maybeEmphasisStutter(s, i) {
-  if (!maybe(0.08 + i * 0.18)) return s;
+  if (stutterFiredThisSentence) return s;
+  if (!maybe(0.05 + i * 0.10)) return s;
 
   // Find every wrap block's character range so we can avoid stuttering text
   // that an earlier pass already wrapped.
@@ -739,11 +746,12 @@ function maybeInjectPrefix(s, i) {
   if (!s.trim()) return s;
   const stripLead = (str) => str.replace(/^\s+/, '');
 
-  // Apology beats surprise beats point — first match wins.
-  if (APOLOGY_TEST(s) && maybe(0.55 + i * 0.30)) {
+  // Apology beats surprise beats point — first match wins. Rates dialled
+  // back from earlier so prefixes don't pile up on top of the other passes.
+  if (APOLOGY_TEST(s) && maybe(0.40 + i * 0.30)) {
     return wrap('', APOLOGY_PREFIX + ',') + ' ' + stripLead(s);
   }
-  if (SURPRISE_TEST(s) && maybe(0.45 + i * 0.30)) {
+  if (SURPRISE_TEST(s) && maybe(0.35 + i * 0.30)) {
     return wrap('', SURPRISE_PREFIX + ',') + ' ' + stripLead(s);
   }
   if (POINT_TEST(s) && maybe(0.10 + i * 0.20)) {
