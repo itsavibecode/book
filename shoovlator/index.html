@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.5.4" />
+<meta name="version" content="0.5.5" />
 <title>Shoovlator — talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
 
 <meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy — stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
@@ -36,6 +36,29 @@
 <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
 <link rel="alternate" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://bookhockeys.com/shoovlator/#app",
+      "name": "Shoovlator",
+      "alternateName": ["Talk Like Shoovy", "Shoovy Translator"],
+      "url": "https://bookhockeys.com/shoovlator/",
+      "description": "An in-browser toy translator that rewrites English in the voice of streamer Shoovy — stacked comparatives, redundant fillers, homophone swaps, and confidently wrong grammar. Reverses too.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (browser)",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "BookHockeys", "url": "https://bookhockeys.com/" },
+      "image": "https://bookhockeys.com/shoovlator/og-card.png",
+      "softwareVersion": "0.5.5"
+    }
+  ]
+}
+</script>
 
 <style>
   *, *::before, *::after { box-sizing: border-box; }
@@ -198,11 +221,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   }
   .output .changed[data-orig="\2205"]:hover::after { content: '(inserted)'; }
-  .output.refreshing { animation: refresh 280ms ease-out; }
-  @keyframes refresh {
-    0%   { opacity: 0; transform: translateY(-3px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
 
   .controls {
     margin-top: 18px;
@@ -293,7 +311,11 @@
 
 <header>
   <div class="brand">
-    <img class="mascot" src="mascot-shoovy.png" alt="Shoovy mascot" width="56" height="56" />
+    <picture>
+      <source srcset="mascot-header.webp" type="image/webp" />
+      <img class="mascot" src="mascot-header.png" alt="Shoovy mascot"
+           width="56" height="56" decoding="async" fetchpriority="high" />
+    </picture>
     <h1>Shoov<span class="accent">lator</span></h1>
   </div>
   <p class="tagline">Type English. Get it back just much more enough confused than usually.</p>
@@ -361,7 +383,7 @@
 </main>
 
 <footer>
-  <a href="/">BookHockeys</a> &middot; v0.5.4 &middot; runs entirely in your browser
+  <a href="/">BookHockeys</a> &middot; v0.5.5 &middot; runs entirely in your browser
 </footer>
 
 <script>

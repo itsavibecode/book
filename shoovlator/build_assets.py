@@ -8,6 +8,7 @@ Outputs:
   favicon-16.png, favicon-32.png, favicon-192.png, apple-touch-icon.png
   favicon.ico (multi-res 16/32/48)
   og-card.png (1200x630)
+  mascot-header.png + mascot-header.webp (small, for the page header)
 
 Run from repo root:
   python book/shoovlator/build_assets.py
@@ -150,6 +151,20 @@ def main():
     og = make_og(mascot, squeeze)
     og.save(os.path.join(HERE, "og-card.png"), optimize=True)
     print(f"  wrote og-card.png (1200x630)")
+
+    # Header mascot — much smaller. Header disc is 56x56 CSS px; 224 covers
+    # up to 4x DPR. Same aspect ratio as the source so CSS object-fit:cover
+    # behaves identically to the original.
+    target_w = 224
+    sw, sh = mascot.size
+    target_h = round(sh * (target_w / sw))
+    header = mascot.resize((target_w, target_h), Image.LANCZOS)
+    header_png = os.path.join(HERE, "mascot-header.png")
+    header.save(header_png, optimize=True)
+    print(f"  wrote mascot-header.png ({target_w}x{target_h})")
+    header_webp = os.path.join(HERE, "mascot-header.webp")
+    header.save(header_webp, "WEBP", quality=82, method=6)
+    print(f"  wrote mascot-header.webp ({target_w}x{target_h})")
 
 
 if __name__ == "__main__":
