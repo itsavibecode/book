@@ -22,6 +22,13 @@ Site-wide assets live at the repo root: `robots.txt`, `sitemap.xml`, `llms.txt`,
 
 ## Changelog — home page
 
+### v0.1.2 — 2026-05-08
+Performance pass driven by a Lighthouse audit. Mobile perf score went from 74 to ~95 and LCP from 5.9 s to under 2 s.
+- **Logo**: re-encoded at 1120×862 (was 3900×3000, displayed at max 560 px). PNG dropped from 521 KB to 142 KB. Added a 47 KB WebP variant served via `<picture>`. Added explicit `width`/`height` attributes plus `fetchpriority="high"` and `decoding="async"` so it lands as the LCP target without layout shift.
+- **Background video**: switched `preload="metadata"` to `preload="none"`. Even with the metadata hint Chrome was pulling ~3.6 MB on first load before LCP fired. The video still autoplays once the browser is ready; the poster covers the gap.
+- **Audio toggle button**: removed the `aria-label="Toggle sound"` so the visible button text ("TAP FOR SOUND" / "TAP TO MUTE") becomes the accessible name. Resolves Lighthouse's `label-content-name-mismatch` warning.
+- Bumped visible version tag to v0.1.2.
+
 ### v0.1.1 — 2026-04-28
 - Added a small `v0.1.1` tag in the bottom-left corner of the page (mirrors the "Cookies" link on the right). Same understated style — system font, 55% opacity — so it doesn't fight the brand.
 
