@@ -928,9 +928,99 @@
   }
   .tweet-embed-wrap iframe { max-width: 100% !important; }
 
-  /* hide map filters when SOCIAL tab is active */
+  /* hide map filters when SOCIAL or PRIMER tab is active */
   .rail.social-mode .filters,
-  .rail.social-mode .search { display: none; }
+  .rail.social-mode .search,
+  .rail.primer-mode .filters,
+  .rail.primer-mode .search { display: none; }
+
+  /* ---------- PRIMER ---------- */
+  .primer-meta {
+    margin: 8px 12px 8px;
+    padding: 6px 10px;
+    border: 1px dashed var(--border-strong);
+    border-radius: 3px;
+    font-size: 10.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .primer-meta b { color: var(--accent); font-weight: 600; }
+  .primer-section {
+    margin: 0 12px 12px;
+    padding: 12px 14px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+  .primer-section.warn {
+    border-left: 3px solid var(--s3);
+  }
+  .primer-section h3 {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+  .primer-section.warn h3 { color: var(--s3); }
+  .primer-section .lede {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.5;
+    margin: 0 0 8px;
+  }
+  .primer-section h4 {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--text);
+    margin: 8px 0 4px;
+    font-weight: 600;
+  }
+  .primer-section ul {
+    margin: 4px 0 0;
+    padding-left: 18px;
+  }
+  .primer-section li {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 2px;
+  }
+  .primer-section li .muted { color: var(--muted); }
+  .primer-kv {
+    display: grid;
+    grid-template-columns: minmax(120px, max-content) 1fr;
+    gap: 4px 14px;
+    font-size: 12px;
+    line-height: 1.45;
+    margin-top: 4px;
+  }
+  .primer-kv dt {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    align-self: center;
+  }
+  .primer-kv dd {
+    margin: 0;
+    color: var(--text);
+  }
+  .primer-sources {
+    margin: 0 12px 12px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .primer-sources a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-right: 12px;
+  }
+  .primer-sources a:hover { text-decoration: underline; }
 
   /* ---------- reduced motion ---------- */
   @media (prefers-reduced-motion: reduce) {
@@ -1001,7 +1091,7 @@
       <div class="stat-sub" id="stat-strain-sub">most active region</div>
     </div>
   </div>
-  <div class="version">v0.2.2</div>
+  <div class="version">v0.2.3</div>
 </header>
 
 <div class="ticker">
@@ -1025,6 +1115,7 @@
       <button class="tab" data-tab="case">CASES</button>
       <button class="tab" data-tab="advisory">ADVISORIES</button>
       <button class="tab" data-tab="social">SOCIAL</button>
+      <button class="tab" data-tab="primer">PRIMER</button>
     </div>
     <input class="search" id="search" placeholder="Search events, regions, strains..." />
     <div class="filters">
@@ -1059,7 +1150,7 @@
   <div class="bottom-left">
     <span>HANTAVIRUS MONITOR</span>
     <span>&middot;</span>
-    <span>v0.2.2</span>
+    <span>v0.2.3</span>
     <span>&middot;</span>
     <a href="privacy.html">PRIVACY</a>
     <a href="#" id="cookies-link">COOKIES</a>
@@ -1087,7 +1178,7 @@
 'use strict';
 
 // ---------- SEEDED EVENTS ----------
-// Representative dataset for v0.2.2. Mix of well-documented public events
+// Representative dataset for v0.2.3. Mix of well-documented public events
 // (Mono County 2025, Santa Fe 2025) and generic patterns matching ongoing
 // endemic surveillance. Real live ingest pipeline is the v0.2 goal.
 const NOW = new Date('2026-05-08T12:00:00Z');
@@ -1294,6 +1385,125 @@ const SOCIAL = [
   { handle: 'CDPHE', name: 'Colorado Public Health & Environment', tweetId: null, note: 'Colorado hantavirus advisories and rural exposure guidance.' }
 ];
 
+// ---------- CLINICAL PRIMER ----------
+// Update PRIMER.lastUpdated whenever clinical content changes; the date
+// surfaces at the top of the PRIMER tab so users know how fresh it is.
+// Sources: CDC Hantavirus Technical Information; WHO disease information.
+const PRIMER = {
+  lastUpdated: '2026-05-08',
+  sources: [
+    { label: 'CDC — Hantavirus', url: 'https://www.cdc.gov/hantavirus/' },
+    { label: 'CDC — HPS Clinical Care', url: 'https://www.cdc.gov/hantavirus/hcp/clinical-care/' },
+    { label: 'WHO — Disease Information', url: 'https://www.who.int/health-topics/hantavirus' },
+    { label: 'PAHO — Hantavirus', url: 'https://www.paho.org/en/topics/hantavirus' }
+  ]
+};
+
+function renderPrimer() {
+  railCountEl.textContent = 'clinical reference';
+  let html = '';
+  html += '<div class="primer-meta"><b>Clinical primer.</b> Curated from CDC and WHO references. Last updated <b>' + PRIMER.lastUpdated + '</b>. This is for situational awareness only &mdash; not medical advice. If you suspect exposure, contact your health authority.</div>';
+
+  // Overview
+  html += '<div class="primer-section">' +
+    '<h3>OVERVIEW</h3>' +
+    '<p class="lede">Hantaviruses are rodent-borne viruses transmitted to humans primarily by inhalation of aerosolised excreta (urine, droppings, saliva). Two main human syndromes:</p>' +
+    '<dl class="primer-kv">' +
+      '<dt>HPS</dt><dd>Hantavirus Pulmonary Syndrome &mdash; Americas. Strains: Sin Nombre, Andes, Choclo. Fast progression, high mortality.</dd>' +
+      '<dt>HFRS</dt><dd>Hemorrhagic Fever with Renal Syndrome &mdash; Eurasia. Strains: Hantaan, Puumala, Seoul. Slower, multi-phase, lower mortality.</dd>' +
+    '</dl>' +
+  '</div>';
+
+  // Symptoms — HPS
+  html += '<div class="primer-section">' +
+    '<h3>SYMPTOMS &mdash; HPS (Americas)</h3>' +
+    '<p class="lede">Two-phase progression. Onset is typically 1&ndash;8 weeks after exposure (median 2&ndash;4 weeks).</p>' +
+    '<h4>Phase 1 &mdash; prodromal (3&ndash;5 days)</h4>' +
+    '<ul>' +
+      '<li>Fever, often abrupt onset</li>' +
+      '<li><b>Severe muscle aches</b> in large groups (thighs, hips, back, shoulders)</li>' +
+      '<li>Headache, fatigue, chills</li>' +
+      '<li>Gastrointestinal in ~50%: nausea, vomiting, diarrhoea, abdominal pain</li>' +
+      '<li>Dizziness</li>' +
+    '</ul>' +
+    '<h4>Phase 2 &mdash; cardiopulmonary (~4&ndash;10 days from onset)</h4>' +
+    '<ul>' +
+      '<li>Dry cough; rapidly worsening shortness of breath</li>' +
+      '<li>Tachycardia, hypotension</li>' +
+      '<li>Pulmonary edema can appear within 24 hours</li>' +
+      '<li>Cardiogenic shock in severe cases &mdash; most deaths occur in this phase</li>' +
+    '</ul>' +
+  '</div>';
+
+  // Symptoms — HFRS
+  html += '<div class="primer-section">' +
+    '<h3>SYMPTOMS &mdash; HFRS (Eurasia)</h3>' +
+    '<p class="lede">Five-phase progression. Incubation 1&ndash;6 weeks (median 2&ndash;4).</p>' +
+    '<dl class="primer-kv">' +
+      '<dt>1. Febrile</dt><dd>3&ndash;7 days &mdash; fever, headache, abdominal/back pain, conjunctival injection, sometimes a fine rash on the trunk and face.</dd>' +
+      '<dt>2. Hypotensive</dt><dd>Hours to 2 days &mdash; sharp blood-pressure drop, can progress to shock.</dd>' +
+      '<dt>3. Oliguric</dt><dd>3&ndash;7 days &mdash; sharply reduced urine output and acute kidney injury. The most lethal phase.</dd>' +
+      '<dt>4. Diuretic</dt><dd>Days to weeks &mdash; very high urine output, electrolyte imbalances.</dd>' +
+      '<dt>5. Convalescent</dt><dd>Weeks to months &mdash; gradual recovery.</dd>' +
+    '</dl>' +
+  '</div>';
+
+  // Duration
+  html += '<div class="primer-section">' +
+    '<h3>AVERAGE DURATION</h3>' +
+    '<dl class="primer-kv">' +
+      '<dt>HPS &mdash; acute</dt><dd>1&ndash;3 weeks of acute illness; ICU stays of 5&ndash;15 days are common in survivors.</dd>' +
+      '<dt>HPS &mdash; full recovery</dt><dd>Weeks to months. Pulmonary function typically normalises but fatigue can linger.</dd>' +
+      '<dt>HFRS &mdash; acute</dt><dd>3&ndash;6 weeks total across all phases.</dd>' +
+      '<dt>HFRS &mdash; full recovery</dt><dd>Several months for renal function to fully normalise; long-term hypertension reported in some survivors.</dd>' +
+    '</dl>' +
+  '</div>';
+
+  // Contagiousness
+  html += '<div class="primer-section warn">' +
+    '<h3>CONTAGIOUSNESS &amp; ISOLATION</h3>' +
+    '<p class="lede"><b>Most hantaviruses are not transmissible person-to-person.</b> Cases acquire the virus from rodent excreta, not from other people. <b>No isolation of cases or contacts is required</b> for Sin Nombre, Hantaan, Puumala, Seoul, or Choclo.</p>' +
+    '<h4>Andes virus &mdash; the documented exception</h4>' +
+    '<ul>' +
+      '<li>Person-to-person transmission well documented in Argentina and Chile.</li>' +
+      '<li>Acute symptomatic patients warrant isolation. Standard + droplet precautions; some authorities advise contact precautions.</li>' +
+      '<li>Period of communicability is incompletely characterised. Reported clusters suggest the highest risk is during the prodromal and cardiopulmonary phases &mdash; roughly the first 1&ndash;3 weeks of symptoms.</li>' +
+      '<li>Close contacts: monitor for symptoms through the full incubation period (up to ~6 weeks from last exposure).</li>' +
+    '</ul>' +
+  '</div>';
+
+  // Case fatality
+  html += '<div class="primer-section">' +
+    '<h3>CASE FATALITY (typical ranges)</h3>' +
+    '<dl class="primer-kv">' +
+      '<dt>HPS &mdash; Sin Nombre</dt><dd>~30&ndash;38% (lower with early ICU + ECMO).</dd>' +
+      '<dt>HPS &mdash; Andes</dt><dd>~25&ndash;40%.</dd>' +
+      '<dt>HFRS &mdash; Hantaan</dt><dd>5&ndash;15%.</dd>' +
+      '<dt>HFRS &mdash; Seoul</dt><dd>1&ndash;2%.</dd>' +
+      '<dt>HFRS &mdash; Puumala</dt><dd>&lt;0.4% (mildest form, "nephropathia epidemica").</dd>' +
+    '</dl>' +
+  '</div>';
+
+  // Exposure prevention
+  html += '<div class="primer-section">' +
+    '<h3>EXPOSURE PREVENTION</h3>' +
+    '<ul>' +
+      '<li>Air out enclosed spaces (cabins, sheds, outbuildings) for at least 30 minutes before entering.</li>' +
+      '<li>Wet-clean rodent droppings/nests with diluted bleach (1:10) &mdash; never sweep or vacuum dry.</li>' +
+      '<li>Wear gloves and an N95 or better respirator when cleaning rodent-contaminated areas.</li>' +
+      '<li>Seal entry points; remove food and water sources that attract rodents.</li>' +
+      '<li>Set traps if rodent activity is detected; dispose in sealed bags.</li>' +
+    '</ul>' +
+  '</div>';
+
+  // Sources
+  html += '<div class="primer-sources">SOURCES: ';
+  html += PRIMER.sources.map(s => '<a href="' + s.url + '" rel="noopener" target="_blank">' + escapeHtml(s.label) + '</a>').join('');
+  html += '</div>';
+
+  feedEl.innerHTML = html;
+}
+
 // ---------- STATE ----------
 const state = {
   tab: 'all',
@@ -1339,11 +1549,14 @@ const railEl = document.querySelector('.rail');
 const railCountEl = document.getElementById('rail-count');
 
 function renderRail() {
+  railEl.classList.remove('social-mode', 'primer-mode');
   if (state.tab === 'social') {
     railEl.classList.add('social-mode');
     renderSocial();
+  } else if (state.tab === 'primer') {
+    railEl.classList.add('primer-mode');
+    renderPrimer();
   } else {
-    railEl.classList.remove('social-mode');
     renderFeed();
   }
 }
@@ -1382,7 +1595,7 @@ function renderFeed() {
   const events = filteredEvents();
   railCountEl.textContent = events.length + ' event' + (events.length === 1 ? '' : 's');
   let html = '';
-  html += '<div class="demo-banner"><b>v0.2.2 demo</b> &middot; Seeded with documented 2025 cases plus representative endemic-surveillance entries. Real-time ingest from state DOH press releases, news aggregators, and curated X handles is planned for v0.3.</div>';
+  html += '<div class="demo-banner"><b>v0.2.3 demo</b> &middot; Seeded with documented 2025 cases plus representative endemic-surveillance entries. Real-time ingest from state DOH press releases, news aggregators, and curated X handles is planned for v0.3.</div>';
   if (events.length === 0) {
     html += '<div class="demo-banner" style="text-align:center;color:var(--muted);">No matching events.</div>';
   }

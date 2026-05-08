@@ -70,6 +70,9 @@ See [`privacy.html`](privacy.html). No personal data, no uploads, no tracking be
 
 ## Changelog
 
+### v0.2.3 &mdash; 2026-05-08
+- **New PRIMER tab** &mdash; clinical reference panel covering: HPS vs HFRS overview; phase-by-phase symptoms for both syndromes; average duration of illness and recovery; case-fatality ranges per strain; person-to-person contagiousness (only Andes virus, with isolation guidance); and exposure-prevention guidance. Sourced from CDC and WHO references; "last updated" date displayed at the top of the panel for transparency. Content lives in a JS constant so updates are a one-line content edit.
+
 ### v0.2.2 &mdash; 2026-05-08
 - **Accessibility pass.** Added a skip-to-content link, semantic `<h2>` markup on the LIVE WIRE and TIMELINE labels, `role="banner"` on the topbar, and `aria-label`s on the rail, map, and timeline regions. The map element gets a descriptive `role="img"` so screen readers announce it correctly.
 - **`prefers-reduced-motion` honoured.** Users with the OS-level reduce-motion preference no longer see the ticker scroll, the S3 marker pulse, or any other CSS transitions. The data still updates; only the animation stops.
