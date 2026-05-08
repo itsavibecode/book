@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hantavirus Monitor // OPS — Global Hantavirus Surveillance</title>
+<meta name="description" content="Live global monitoring of hantavirus cases, clusters, deaths, and environmental advisories. HPS / HFRS / Andes virus surveillance.">
+<meta name="version" content="0.1.1">
+<link rel="canonical" href="https://bookhockeys.com/hantavirus/">
+<meta property="og:title" content="Hantavirus Monitor — Global Hantavirus Surveillance">
+<meta property="og:description" content="Live global monitoring of hantavirus cases, clusters, deaths, and environmental advisories.">
+<meta property="og:url" content="https://bookhockeys.com/hantavirus/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<style>
+  :root {
+    --bg: #07090e;
+    --panel: #0d1219;
+    --panel-2: #11171f;
+    --border: #1a2331;
+    --border-strong: #2a3a52;
+    --text: #d8dde6;
+    --muted: #6a7587;
+    --dim: #4a5364;
+    --accent: #5ad9ff;
+    --accent-dim: #2b6f86;
+    --s1: #5ad9ff;
+    --s2: #f5c518;
+    --s3: #ff4d4d;
+    --s3-bg: rgba(255, 77, 77, 0.12);
+    --warn: #ff8a3d;
+    --good: #6cd96c;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    overflow: hidden;
+  }
+  .mono { font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+
+  /* ---------- TOP BAR ---------- */
+  .topbar {
+    display: grid;
+    grid-template-columns: 280px 1fr auto;
+    align-items: center;
+    height: 64px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    padding: 0 18px;
+    gap: 24px;
+  }
+  .brand-name {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+  .brand-name .dim { color: var(--dim); font-weight: 400; }
+  .brand-tagline {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px;
+    justify-content: center;
+  }
+  .stat-label {
+    font-size: 9.5px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .stat-value {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .stat-value.warn { color: var(--s3); }
+  .stat-value.accent { color: var(--accent); }
+  .version {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10px;
+    color: var(--dim);
+    border: 1px solid var(--border-strong);
+    padding: 4px 8px;
+    border-radius: 3px;
+  }
+
+  /* ---------- TICKER ---------- */
+  .ticker {
+    height: 28px;
+    border-bottom: 1px solid var(--border);
+    background: #0a0f17;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .ticker-track {
+    display: flex;
+    gap: 36px;
+    white-space: nowrap;
+    padding-left: 100%;
+    animation: tickerRoll 90s linear infinite;
+    align-items: center;
+  }
+  .ticker:hover .ticker-track { animation-play-state: paused; }
+  @keyframes tickerRoll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+  .ticker-item {
+    font-size: 11px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ticker-tag {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    background: rgba(255, 77, 77, 0.18);
+    color: var(--s3);
+  }
+  .ticker-tag.live {
+    background: var(--s3);
+    color: #0a0f17;
+    font-weight: 700;
+  }
+  .ticker-tag.live::before {
+    content: "";
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: #0a0f17;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+    animation: pulse 1.2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .ticker-loc { color: var(--muted); font-size: 10.5px; }
+
+  /* ---------- DASH ---------- */
+  .dash {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    height: calc(100vh - 64px - 28px - 28px);
+  }
+
+  /* ---------- LEFT RAIL ---------- */
+  .rail {
+    border-right: 1px solid var(--border);
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .rail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 8px;
+  }
+  .rail-title {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+  }
+  .rail-count {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+  }
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+  }
+  .tab {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    letter-spacing: 1.5px;
+    padding: 8px 12px 10px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .search {
+    margin: 12px 16px 0;
+    background: #0a0e14;
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 7px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+  }
+  .search:focus { border-color: var(--accent-dim); }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .chip {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--muted);
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 4px 9px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .chip:hover { color: var(--text); border-color: var(--accent-dim); }
+  .chip.active { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+  .chip.sev.s1.active { background: var(--s1); border-color: var(--s1); color: var(--bg); }
+  .chip.sev.s2.active { background: var(--s2); border-color: var(--s2); color: var(--bg); }
+  .chip.sev.s3.active { background: var(--s3); border-color: var(--s3); color: #fff; }
+
+  .feed {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+  .feed::-webkit-scrollbar { width: 8px; }
+  .feed::-webkit-scrollbar-track { background: transparent; }
+  .feed::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+  .demo-banner {
+    margin: 8px 16px 12px;
+    padding: 8px 10px;
+    border: 1px dashed var(--border-strong);
+    border-radius: 3px;
+    font-size: 10.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .demo-banner b { color: var(--warn); font-weight: 600; }
+
+  .card {
+    margin: 0 12px 8px;
+    padding: 10px 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border-strong);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .card:hover { background: #141b25; border-color: var(--border-strong); }
+  .card.s1 { border-left-color: var(--s1); }
+  .card.s2 { border-left-color: var(--s2); }
+  .card.s3 { border-left-color: var(--s3); background: linear-gradient(90deg, var(--s3-bg) 0%, var(--panel-2) 60%); }
+  .card.active { background: #1a2331; border-color: var(--accent-dim); }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    gap: 8px;
+  }
+  .cats {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .cat {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 2px 5px;
+    border-radius: 2px;
+    background: rgba(90, 217, 255, 0.1);
+    color: var(--accent);
+  }
+  .cat.death { background: rgba(255, 77, 77, 0.15); color: var(--s3); }
+  .cat.cluster { background: rgba(255, 138, 61, 0.15); color: var(--warn); }
+  .cat.case { background: rgba(245, 197, 24, 0.12); color: var(--s2); }
+  .cat.advisory { background: rgba(108, 217, 108, 0.12); color: var(--good); }
+  .cat.env { background: rgba(108, 217, 108, 0.12); color: var(--good); }
+  .cat.hps, .cat.hfrs, .cat.andes, .cat.puumala, .cat.hantaan, .cat.choclo, .cat.seoul {
+    background: rgba(170, 170, 200, 0.08); color: #aaa;
+  }
+
+  .sev-badge {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .sev-badge.s1 { background: rgba(90, 217, 255, 0.15); color: var(--s1); border: 1px solid var(--s1); }
+  .sev-badge.s2 { background: rgba(245, 197, 24, 0.15); color: var(--s2); border: 1px solid var(--s2); }
+  .sev-badge.s3 { background: var(--s3); color: #fff; border: 1px solid var(--s3); }
+
+  .card-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.35;
+    margin-bottom: 4px;
+  }
+  .card-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 10.5px;
+    color: var(--muted);
+  }
+  .card-meta .pin::before { content: "● "; color: var(--accent-dim); }
+  .card-meta .ago::before { content: "○ "; color: var(--dim); }
+
+  .briefing {
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    background: var(--panel-2);
+  }
+  .brief-label {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .brief-form {
+    display: flex;
+    gap: 0;
+  }
+  .brief-form input {
+    flex: 1;
+    background: #0a0e14;
+    border: 1px solid var(--border-strong);
+    border-right: none;
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 3px 0 0 3px;
+    font-size: 11.5px;
+    font-family: inherit;
+    outline: none;
+  }
+  .brief-form input::placeholder { color: var(--dim); }
+  .brief-form button {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--muted);
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    padding: 6px 12px;
+    border-radius: 0 3px 3px 0;
+    cursor: not-allowed;
+  }
+  .brief-foot {
+    margin-top: 6px;
+    font-size: 10px;
+    color: var(--dim);
+  }
+
+  /* ---------- MAP ---------- */
+  .map-wrap {
+    position: relative;
+    background: #050709;
+  }
+  #map {
+    width: 100%;
+    height: 100%;
+    background: #050709;
+  }
+  .leaflet-container { background: #050709 !important; }
+  .leaflet-control-attribution {
+    background: rgba(10, 14, 20, 0.7) !important;
+    color: var(--muted) !important;
+    font-size: 10px !important;
+  }
+  .leaflet-control-attribution a { color: var(--accent-dim) !important; }
+  .leaflet-control-zoom a {
+    background: var(--panel) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border-strong) !important;
+  }
+  .leaflet-control-zoom a:hover {
+    background: var(--panel-2) !important;
+    color: var(--accent) !important;
+  }
+
+  .map-legend {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(13, 18, 25, 0.92);
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    padding: 10px 12px;
+    z-index: 600;
+    font-size: 11px;
+    color: var(--muted);
+    backdrop-filter: blur(4px);
+  }
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .legend-row:last-child { margin-bottom: 0; }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    box-shadow: 0 0 6px currentColor;
+  }
+  .dot.s1 { background: var(--s1); color: var(--s1); }
+  .dot.s2 { background: var(--s2); color: var(--s2); }
+  .dot.s3 { background: var(--s3); color: var(--s3); }
+
+  /* Map markers */
+  .marker {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.6), 0 0 12px currentColor;
+  }
+  .marker.s1 { background: var(--s1); color: var(--s1); }
+  .marker.s2 { background: var(--s2); color: var(--s2); }
+  .marker.s3 { background: var(--s3); color: var(--s3); animation: markerPulse 2s infinite; }
+  @keyframes markerPulse {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(0,0,0,0.6), 0 0 12px var(--s3); }
+    50% { box-shadow: 0 0 0 2px rgba(0,0,0,0.6), 0 0 22px var(--s3), 0 0 28px var(--s3); }
+  }
+
+  .leaflet-popup-content-wrapper {
+    background: var(--panel) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border-strong) !important;
+    border-radius: 3px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6) !important;
+  }
+  .leaflet-popup-tip { background: var(--panel) !important; }
+  .leaflet-popup-content { margin: 10px 12px !important; font-size: 12px !important; }
+  .popup-title { font-weight: 600; margin-bottom: 4px; }
+  .popup-meta { font-size: 10.5px; color: var(--muted); }
+
+  /* ---------- BOTTOM ---------- */
+  .bottom {
+    height: 28px;
+    border-top: 1px solid var(--border);
+    background: #0a0f17;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 10.5px;
+    color: var(--dim);
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    letter-spacing: 0.5px;
+  }
+
+  /* ---------- tweet cards (SOCIAL tab) ---------- */
+  .tweet-card {
+    margin: 0 12px 8px;
+    padding: 10px 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .tweet-card.placeholder { opacity: 0.78; }
+  .tweet-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .tweet-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1d9bf0 0%, #0a4d7a 100%);
+    flex-shrink: 0;
+    border: 1px solid var(--border-strong);
+  }
+  .tweet-id {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.2;
+  }
+  .tweet-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tweet-handle {
+    font-size: 10.5px;
+    color: var(--muted);
+  }
+  .tweet-time {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    color: var(--dim);
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .tweet-body {
+    font-size: 12.5px;
+    color: var(--text);
+    line-height: 1.45;
+    margin-bottom: 8px;
+  }
+  .tweet-card.placeholder .tweet-body {
+    font-style: italic;
+    color: var(--muted);
+  }
+  .tweet-foot {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    color: var(--dim);
+    border-top: 1px dashed var(--border);
+    padding-top: 6px;
+  }
+  .tweet-embed-wrap {
+    margin: 0 12px 8px;
+  }
+  .tweet-embed-wrap iframe { max-width: 100% !important; }
+
+  /* hide map filters when SOCIAL tab is active */
+  .rail.social-mode .filters,
+  .rail.social-mode .search { display: none; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 900px) {
+    .topbar { grid-template-columns: 1fr auto; height: auto; padding: 10px 14px; gap: 10px; }
+    .topbar .stats { display: none; }
+    .dash { grid-template-columns: 1fr; height: auto; }
+    .rail { height: 50vh; }
+    #map { height: 50vh; }
+    body { overflow: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-name">Hantavirus Monitor <span class="dim">// OPS</span></div>
+    <div class="brand-tagline">GLOBAL HANTAVIRUS SURVEILLANCE</div>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">CASES 90D</div>
+      <div class="stat-value accent" id="stat-cases">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">DEATHS 18MO</div>
+      <div class="stat-value warn" id="stat-deaths">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">MOST ACTIVE REGION</div>
+      <div class="stat-value" id="stat-region">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">DOMINANT STRAIN</div>
+      <div class="stat-value" id="stat-strain">—</div>
+    </div>
+  </div>
+  <div class="version">v0.1.1</div>
+</header>
+
+<div class="ticker"><div class="ticker-track" id="ticker"></div></div>
+
+<main class="dash">
+  <aside class="rail">
+    <div class="rail-header">
+      <div class="rail-title">LIVE WIRE</div>
+      <div class="rail-count" id="rail-count">0 events</div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="all">FEED</button>
+      <button class="tab" data-tab="case">CASES</button>
+      <button class="tab" data-tab="advisory">ADVISORIES</button>
+      <button class="tab" data-tab="social">SOCIAL</button>
+    </div>
+    <input class="search" id="search" placeholder="Search events, regions, strains..." />
+    <div class="filters">
+      <button class="chip sev active" data-sev="all">ALL</button>
+      <button class="chip sev s1" data-sev="1">S1</button>
+      <button class="chip sev s2" data-sev="2">S2</button>
+      <button class="chip sev s3" data-sev="3">S3</button>
+      <button class="chip" data-region="americas">AMERICAS</button>
+      <button class="chip" data-region="eurasia">EURASIA</button>
+    </div>
+    <div class="feed" id="feed"></div>
+    <div class="briefing">
+      <div class="brief-label">DAILY BRIEFING</div>
+      <form class="brief-form" onsubmit="return false;">
+        <input type="email" placeholder="your@email.com" disabled />
+        <button type="button" disabled>SOON</button>
+      </form>
+      <div class="brief-foot">Email digest planned for v0.2</div>
+    </div>
+  </aside>
+  <section class="map-wrap">
+    <div id="map"></div>
+    <div class="map-legend">
+      <div class="legend-row"><span class="dot s1"></span> S1 — Confirmed, recovered</div>
+      <div class="legend-row"><span class="dot s2"></span> S2 — Hospitalized / active</div>
+      <div class="legend-row"><span class="dot s3"></span> S3 — Death or cluster &ge;3</div>
+    </div>
+  </section>
+</main>
+
+<footer class="bottom">
+  <div>HANTAVIRUS MONITOR &middot; v0.1.1 &middot; SEEDED REPRESENTATIVE DATA &middot; LIVE INGEST PLANNED v0.2</div>
+  <div>Always verify with state / national health authorities before action.</div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+'use strict';
+
+// ---------- SEEDED EVENTS ----------
+// Representative dataset for v0.1.1. Mix of well-documented public events
+// (Mono County 2025, Santa Fe 2025) and generic patterns matching ongoing
+// endemic surveillance. Real live ingest pipeline is the v0.2 goal.
+const NOW = new Date('2026-05-08T12:00:00Z');
+
+const EVENTS = [
+  {
+    id: 'mono-2025',
+    date: '2025-04-24',
+    title: 'Three Hantavirus Pulmonary Syndrome deaths confirmed in Mono County',
+    summary: 'Mono County Public Health confirmed a third HPS death in early 2025, marking an unusual cluster in the Eastern Sierra. Sin Nombre virus, deer mouse vector.',
+    cats: ['CLUSTER', 'DEATH', 'HPS'],
+    sev: 3,
+    lat: 37.6485, lng: -118.9721,
+    location: 'Mammoth Lakes, CA, USA',
+    region: 'americas',
+    strain: 'Sin Nombre'
+  },
+  {
+    id: 'santafe-2025',
+    date: '2025-02-12',
+    title: 'HPS-related fatality reported in Santa Fe County',
+    summary: 'New Mexico Department of Health confirmed an HPS death in Santa Fe County. Sin Nombre virus.',
+    cats: ['DEATH', 'HPS'],
+    sev: 3,
+    lat: 35.6870, lng: -105.9378,
+    location: 'Santa Fe County, NM, USA',
+    region: 'americas',
+    strain: 'Sin Nombre'
+  },
+  {
+    id: 'ev-yose',
+    date: '2026-04-12',
+    title: 'NPS rodent-presence advisory issued for Sierra backcountry cabins',
+    summary: 'Routine spring rodent surveillance prompted an environmental advisory for shared cabins. No human cases reported.',
+    cats: ['ADVISORY', 'ENV'],
+    sev: 1,
+    lat: 37.8651, lng: -119.5383,
+    location: 'Yosemite NP, CA, USA',
+    region: 'americas',
+    strain: 'Sin Nombre'
+  },
+  {
+    id: 'nm-spring',
+    date: '2026-04-02',
+    title: 'Confirmed HPS case, hospitalized — Northern New Mexico',
+    summary: 'Adult patient hospitalized in stable condition. Suspected exposure during spring cleaning of a rural outbuilding.',
+    cats: ['CASE', 'HPS'],
+    sev: 2,
+    lat: 35.0844, lng: -106.6504,
+    location: 'Bernalillo County, NM, USA',
+    region: 'americas',
+    strain: 'Sin Nombre'
+  },
+  {
+    id: 'az-feb',
+    date: '2026-03-08',
+    title: 'Confirmed HPS case in Pima County',
+    summary: 'Single confirmed case, hospitalized then recovered. State DOH recommends standard rodent-droppings precautions.',
+    cats: ['CASE', 'HPS'],
+    sev: 2,
+    lat: 32.2226, lng: -110.9747,
+    location: 'Pima County, AZ, USA',
+    region: 'americas',
+    strain: 'Sin Nombre'
+  },
+  {
+    id: 'tx-april',
+    date: '2026-04-19',
+    title: 'Recovered HPS case reported, West Texas',
+    summary: 'Patient recovered following hospitalization. Exposure linked to grain-storage outbuilding.',
+    cats: ['CASE', 'HPS'],
+    sev: 1,
+    lat: 31.7619, lng: -106.4850,
+    location: 'El Paso County, TX, USA',
+    region: 'americas',
+    strain: 'Sin Nombre'
+  },
+  {
+    id: 'co-april',
+    date: '2026-04-21',
+    title: 'Confirmed HPS case, Western Colorado',
+    summary: 'Patient hospitalized in stable condition. CDPHE issued seasonal rodent-control reminder for rural property owners.',
+    cats: ['CASE', 'HPS'],
+    sev: 2,
+    lat: 39.0639, lng: -108.5506,
+    location: 'Mesa County, CO, USA',
+    region: 'americas',
+    strain: 'Sin Nombre'
+  },
+  {
+    id: 'ar-andes',
+    date: '2026-04-26',
+    title: 'Andes virus case cluster under investigation',
+    summary: 'Argentine Ministry of Health investigating a probable two-person cluster in the Patagonian endemic zone. Andes virus is one of the few hantaviruses with documented person-to-person transmission.',
+    cats: ['CLUSTER', 'ANDES'],
+    sev: 3,
+    lat: -41.1335, lng: -71.3103,
+    location: 'Bariloche, Río Negro, Argentina',
+    region: 'americas',
+    strain: 'Andes'
+  },
+  {
+    id: 'cl-andes',
+    date: '2026-04-04',
+    title: 'Andes virus case confirmed, Aysén Region',
+    summary: 'Chilean MINSAL confirmed a single Andes virus case. Patient hospitalized.',
+    cats: ['CASE', 'ANDES'],
+    sev: 2,
+    lat: -45.5752, lng: -72.0662,
+    location: 'Coyhaique, Aysén, Chile',
+    region: 'americas',
+    strain: 'Andes'
+  },
+  {
+    id: 'cn-shaanxi',
+    date: '2026-04-30',
+    title: 'HFRS surveillance — elevated case counts, Shaanxi Province',
+    summary: 'Spring epidemic season for Hantaan virus continues; provincial CDC reports cases above the five-year mean. Striped field mouse reservoir.',
+    cats: ['CLUSTER', 'HFRS', 'HANTAAN'],
+    sev: 3,
+    lat: 34.3416, lng: 108.9398,
+    location: 'Xi’an, Shaanxi, China',
+    region: 'eurasia',
+    strain: 'Hantaan'
+  },
+  {
+    id: 'cn-heilongjiang',
+    date: '2026-04-15',
+    title: 'HFRS cases reported, Northeast China',
+    summary: 'Routine HFRS surveillance, multiple confirmed cases, no fatalities reported. Hantaan virus.',
+    cats: ['CASE', 'HFRS', 'HANTAAN'],
+    sev: 2,
+    lat: 45.8038, lng: 126.5340,
+    location: 'Harbin, Heilongjiang, China',
+    region: 'eurasia',
+    strain: 'Hantaan'
+  },
+  {
+    id: 'kr-seoul',
+    date: '2026-03-22',
+    title: 'Seoul-virus and Hantaan-virus surveillance update',
+    summary: 'KDCA monthly update: hantaviral cases tracking near baseline. Bank vole and Norway rat hosts.',
+    cats: ['CASE', 'SEOUL', 'HANTAAN'],
+    sev: 1,
+    lat: 37.5665, lng: 126.9780,
+    location: 'Seoul, South Korea',
+    region: 'eurasia',
+    strain: 'Seoul / Hantaan'
+  },
+  {
+    id: 'ru-bashk',
+    date: '2026-04-09',
+    title: 'Puumala virus cases climb in Volga federal district',
+    summary: 'Rospotrebnadzor reports a seasonal uptick in Puumala virus HFRS cases. Bank vole reservoir; mild renal HFRS form.',
+    cats: ['CASE', 'HFRS', 'PUUMALA'],
+    sev: 2,
+    lat: 54.7388, lng: 55.9721,
+    location: 'Bashkortostan, Russia',
+    region: 'eurasia',
+    strain: 'Puumala'
+  },
+  {
+    id: 'fi-puumala',
+    date: '2026-03-28',
+    title: 'Puumala virus surveillance — Finnish endemic baseline',
+    summary: 'THL reports Puumala-virus cases consistent with seasonal expectation. Most cases mild and self-limiting.',
+    cats: ['CASE', 'HFRS', 'PUUMALA'],
+    sev: 1,
+    lat: 62.2426, lng: 25.7473,
+    location: 'Central Finland',
+    region: 'eurasia',
+    strain: 'Puumala'
+  },
+  {
+    id: 'pa-choclo',
+    date: '2026-03-14',
+    title: 'Choclo virus case confirmed in Los Santos Province',
+    summary: 'Panama MINSA confirmed a Choclo virus HCPS case; pygmy rice rat reservoir. Patient hospitalized.',
+    cats: ['CASE', 'CHOCLO'],
+    sev: 2,
+    lat: 7.6361, lng: -80.4014,
+    location: 'Los Santos, Panama',
+    region: 'americas',
+    strain: 'Choclo'
+  }
+];
+
+// ---------- CURATED SOCIAL FEED ----------
+// Each entry renders as either:
+//   - an official X/Twitter embed if `tweetId` is set, OR
+//   - a skeleton placeholder card otherwise
+// v0.1.x: manually curated tweet IDs.
+// v0.2 plan: Worker scrapes these public-health handles for fresh hantavirus
+// posts and writes IDs to a Firestore collection the SPA reads.
+const SOCIAL = [
+  { handle: 'CDCgov', name: 'CDC', tweetId: null, note: 'Authoritative US hantavirus surveillance updates and case alerts.' },
+  { handle: 'WHO', name: 'World Health Organization', tweetId: null, note: 'Global outbreak alerts; HFRS / HPS situation reports.' },
+  { handle: 'PAHO', name: 'Pan American Health Organization', tweetId: null, note: 'Andes virus and Americas-region surveillance.' },
+  { handle: 'ECDC_EU', name: 'European CDC', tweetId: null, note: 'Puumala virus and European HFRS reporting.' },
+  { handle: 'NMHealth', name: 'New Mexico Department of Health', tweetId: null, note: 'New Mexico case alerts and seasonal advisories.' },
+  { handle: 'CDPHE', name: 'Colorado Public Health & Environment', tweetId: null, note: 'Colorado hantavirus advisories and rural exposure guidance.' }
+];
+
+// ---------- STATE ----------
+const state = {
+  tab: 'all',
+  sev: 'all',
+  region: 'all',
+  search: '',
+  selectedId: null
+};
+
+// ---------- HELPERS ----------
+function timeAgo(dateStr) {
+  const then = new Date(dateStr + 'T12:00:00Z');
+  const diff = NOW - then;
+  const days = Math.floor(diff / 86400000);
+  if (days < 1) return 'today';
+  if (days === 1) return '1d ago';
+  if (days < 30) return days + 'd ago';
+  if (days < 365) return Math.floor(days / 30) + 'mo ago';
+  return Math.floor(days / 365) + 'y ago';
+}
+
+function severityClass(sev) { return 's' + sev; }
+
+// ---------- FILTERING ----------
+function filteredEvents() {
+  return EVENTS.filter(e => {
+    if (state.sev !== 'all' && e.sev !== Number(state.sev)) return false;
+    if (state.region !== 'all' && e.region !== state.region) return false;
+    if (state.tab === 'case' && !e.cats.includes('CASE') && !e.cats.includes('CLUSTER') && !e.cats.includes('DEATH')) return false;
+    if (state.tab === 'advisory' && !e.cats.includes('ADVISORY') && !e.cats.includes('ENV')) return false;
+    if (state.search) {
+      const q = state.search.toLowerCase();
+      const hay = (e.title + ' ' + e.summary + ' ' + e.location + ' ' + e.strain + ' ' + e.cats.join(' ')).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort((a, b) => b.date.localeCompare(a.date));
+}
+
+// ---------- RENDER FEED ----------
+const feedEl = document.getElementById('feed');
+const railEl = document.querySelector('.rail');
+const railCountEl = document.getElementById('rail-count');
+
+function renderRail() {
+  if (state.tab === 'social') {
+    railEl.classList.add('social-mode');
+    renderSocial();
+  } else {
+    railEl.classList.remove('social-mode');
+    renderFeed();
+  }
+}
+
+function renderSocial() {
+  railCountEl.textContent = SOCIAL.length + ' source' + (SOCIAL.length === 1 ? '' : 's');
+  let html = '';
+  html += '<div class="demo-banner"><b>Social feed</b> &middot; Curated tweets from authoritative public-health accounts render here as official X embeds. v0.1.x: provide tweet IDs to populate. v0.2 plan: Worker auto-ingests fresh hantavirus posts from these handles nightly.</div>';
+  for (const s of SOCIAL) {
+    if (s.tweetId) {
+      html += '<div class="tweet-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-conversation="none" data-cards="hidden" data-dnt="true"><a href="https://twitter.com/' + encodeURIComponent(s.handle) + '/status/' + encodeURIComponent(s.tweetId) + '"></a></blockquote></div>';
+    } else {
+      html += '<div class="tweet-card placeholder">' +
+        '<div class="tweet-head">' +
+          '<div class="tweet-avatar"></div>' +
+          '<div class="tweet-id">' +
+            '<div class="tweet-name">' + escapeHtml(s.name) + '</div>' +
+            '<div class="tweet-handle">@' + escapeHtml(s.handle) + '</div>' +
+          '</div>' +
+          '<div class="tweet-time">awaiting</div>' +
+        '</div>' +
+        '<div class="tweet-body">' + escapeHtml(s.note) + '</div>' +
+        '<div class="tweet-foot">SKELETON &middot; provide tweet ID to populate</div>' +
+      '</div>';
+    }
+  }
+  feedEl.innerHTML = html;
+  const hasRealTweets = SOCIAL.some(s => s.tweetId);
+  if (hasRealTweets) loadTwitterWidgets();
+}
+
+let twttrLoading = false;
+function loadTwitterWidgets() {
+  if (window.twttr && window.twttr.widgets) {
+    window.twttr.widgets.load(feedEl);
+    return;
+  }
+  if (twttrLoading) return;
+  twttrLoading = true;
+  const s = document.createElement('script');
+  s.src = 'https://platform.twitter.com/widgets.js';
+  s.async = true;
+  s.charset = 'utf-8';
+  document.body.appendChild(s);
+}
+
+function renderFeed() {
+  const events = filteredEvents();
+  railCountEl.textContent = events.length + ' event' + (events.length === 1 ? '' : 's');
+  let html = '';
+  html += '<div class="demo-banner"><b>v0.1.1 demo</b> &middot; Seeded with documented 2025 cases plus representative endemic-surveillance entries. Real-time ingest from state DOH press releases, news aggregators, and curated X handles is planned for v0.2.</div>';
+  if (events.length === 0) {
+    html += '<div class="demo-banner" style="text-align:center;color:var(--muted);">No matching events.</div>';
+  }
+  for (const e of events) {
+    const sevCls = severityClass(e.sev);
+    const activeCls = state.selectedId === e.id ? ' active' : '';
+    html += '<div class="card ' + sevCls + activeCls + '" data-id="' + e.id + '">';
+    html += '<div class="card-top">';
+    html += '<div class="cats">';
+    for (const c of e.cats) {
+      html += '<span class="cat ' + c.toLowerCase() + '">' + c + '</span>';
+    }
+    html += '</div>';
+    html += '<span class="sev-badge ' + sevCls + '">S' + e.sev + '</span>';
+    html += '</div>';
+    html += '<div class="card-title">' + escapeHtml(e.title) + '</div>';
+    html += '<div class="card-meta"><span class="pin">' + escapeHtml(e.location) + '</span><span class="ago">' + timeAgo(e.date) + '</span></div>';
+    html += '</div>';
+  }
+  feedEl.innerHTML = html;
+  for (const card of feedEl.querySelectorAll('.card')) {
+    card.addEventListener('click', () => selectEvent(card.dataset.id));
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ---------- STATS ----------
+function renderStats() {
+  const since90 = new Date(NOW.getTime() - 90 * 86400000);
+  const recent = EVENTS.filter(e => new Date(e.date + 'T12:00:00Z') >= since90);
+  const cases90 = recent.filter(e => e.cats.includes('CASE') || e.cats.includes('CLUSTER') || e.cats.includes('DEATH')).length;
+  const since18mo = new Date(NOW.getTime() - 547 * 86400000);
+  const deathsYtd = EVENTS.filter(e => e.cats.includes('DEATH') && new Date(e.date + 'T12:00:00Z') >= since18mo).length;
+
+  const regionCount = {};
+  for (const e of recent) {
+    regionCount[e.region] = (regionCount[e.region] || 0) + 1;
+  }
+  const topRegion = Object.entries(regionCount).sort((a,b)=>b[1]-a[1])[0];
+  const regionLabel = topRegion ? topRegion[0].toUpperCase() : '—';
+
+  const strainCount = {};
+  for (const e of recent) {
+    strainCount[e.strain] = (strainCount[e.strain] || 0) + 1;
+  }
+  const topStrain = Object.entries(strainCount).sort((a,b)=>b[1]-a[1])[0];
+  const strainLabel = topStrain ? topStrain[0] : '—';
+
+  document.getElementById('stat-cases').textContent = cases90;
+  document.getElementById('stat-deaths').textContent = deathsYtd;
+  document.getElementById('stat-region').textContent = regionLabel;
+  document.getElementById('stat-strain').textContent = strainLabel;
+}
+
+// ---------- TICKER ----------
+function renderTicker() {
+  const recent = [...EVENTS].sort((a,b)=>b.date.localeCompare(a.date)).slice(0, 8);
+  const items = recent.map((e, i) => {
+    const tagCls = i === 0 ? 'live' : '';
+    const tagText = i === 0 ? 'LIVE' : 'S' + e.sev;
+    return '<span class="ticker-item">' +
+      '<span class="ticker-tag ' + tagCls + '">' + tagText + '</span>' +
+      '<span>' + escapeHtml(e.title) + '</span>' +
+      '<span class="ticker-loc">' + escapeHtml(e.location) + '</span>' +
+    '</span>';
+  });
+  // duplicate so loop is seamless
+  document.getElementById('ticker').innerHTML = items.concat(items).join('');
+}
+
+// ---------- MAP ----------
+let map, markerLayer;
+const markerById = {};
+
+function initMap() {
+  map = L.map('map', {
+    center: [25, 10],
+    zoom: 2,
+    minZoom: 2,
+    maxZoom: 8,
+    worldCopyJump: true,
+    zoomControl: true,
+    attributionControl: true
+  });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap, &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 19,
+    pane: 'shadowPane'
+  }).addTo(map);
+  markerLayer = L.layerGroup().addTo(map);
+  renderMarkers();
+}
+
+function renderMarkers() {
+  markerLayer.clearLayers();
+  for (const k of Object.keys(markerById)) delete markerById[k];
+  const events = filteredEvents();
+  for (const e of events) {
+    const sevCls = severityClass(e.sev);
+    const icon = L.divIcon({
+      className: '',
+      html: '<div class="marker ' + sevCls + '"></div>',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
+    const marker = L.marker([e.lat, e.lng], { icon }).addTo(markerLayer);
+    const popupHtml = '<div class="popup-title">' + escapeHtml(e.title) + '</div>' +
+      '<div class="popup-meta">' + escapeHtml(e.location) + ' &middot; ' + timeAgo(e.date) + ' &middot; S' + e.sev + ' &middot; ' + escapeHtml(e.strain) + '</div>';
+    marker.bindPopup(popupHtml, { closeButton: false });
+    marker.on('click', () => selectEvent(e.id));
+    markerById[e.id] = marker;
+  }
+}
+
+function selectEvent(id) {
+  state.selectedId = id;
+  const e = EVENTS.find(x => x.id === id);
+  if (!e) return;
+  renderFeed();
+  const card = feedEl.querySelector('[data-id="' + id + '"]');
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  if (markerById[id]) {
+    map.flyTo([e.lat, e.lng], Math.max(map.getZoom(), 5), { duration: 0.6 });
+    markerById[id].openPopup();
+  }
+}
+
+// ---------- WIRE UP CONTROLS ----------
+document.getElementById('search').addEventListener('input', (ev) => {
+  state.search = ev.target.value;
+  renderRail();
+  renderMarkers();
+});
+
+for (const tab of document.querySelectorAll('.tab')) {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.tab = tab.dataset.tab;
+    renderRail();
+    renderMarkers();
+  });
+}
+
+for (const chip of document.querySelectorAll('.chip')) {
+  chip.addEventListener('click', () => {
+    if (chip.dataset.sev !== undefined) {
+      document.querySelectorAll('.chip[data-sev]').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      state.sev = chip.dataset.sev;
+    } else if (chip.dataset.region !== undefined) {
+      const same = state.region === chip.dataset.region;
+      document.querySelectorAll('.chip[data-region]').forEach(c => c.classList.remove('active'));
+      if (same) {
+        state.region = 'all';
+      } else {
+        chip.classList.add('active');
+        state.region = chip.dataset.region;
+      }
+    }
+    renderRail();
+    renderMarkers();
+  });
+}
+
+// ---------- BOOT ----------
+renderStats();
+renderTicker();
+renderRail();
+initMap();
+</script>
+</body>
+</html>
