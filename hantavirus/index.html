@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hantavirus Monitor — Live Global Hantavirus Surveillance Dashboard | HPS, HFRS, Andes Virus</title>
-<meta name="description" content="Live global hantavirus surveillance dashboard tracking confirmed cases, clusters, deaths, and environmental advisories worldwide. Covers HPS (Sin Nombre), HFRS (Hantaan, Puumala, Seoul), Andes virus, and Choclo virus, with map, timeline, and curated public-health social feed.">
+<meta name="description" content="Live global hantavirus surveillance dashboard. Cases, clusters, deaths, and advisories for HPS, HFRS, Andes, Hantaan, Puumala, and Sin Nombre on a world map and timeline.">
 <meta name="keywords" content="hantavirus, hantavirus outbreak, hantavirus monitor, hantavirus surveillance, hantavirus tracker, HPS, hantavirus pulmonary syndrome, HFRS, hemorrhagic fever with renal syndrome, sin nombre virus, andes virus, hantaan virus, puumala virus, seoul virus, choclo virus, deer mouse, rodent-borne disease, zoonotic disease, public health dashboard, disease outbreak map, mammoth lakes hantavirus, mono county hantavirus, santa fe hantavirus, hantavirus cluster, hantavirus death, hantavirus case, hantavirus today, hantavirus 2026">
 <meta name="theme-color" content="#5ad9ff">
 <meta name="author" content="BookHockeys">
@@ -181,6 +181,23 @@
     white-space: nowrap;
     border: 0;
   }
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 8px;
+    background: var(--accent);
+    color: var(--bg);
+    padding: 8px 14px;
+    border-radius: 3px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-decoration: none;
+    z-index: 10000;
+    transition: top 0.15s;
+  }
+  .skip-link:focus { top: 8px; outline: 2px solid var(--text); }
   body {
     background: var(--bg);
     color: var(--text);
@@ -402,6 +419,8 @@
     font-size: 11px;
     letter-spacing: 1.5px;
     color: var(--accent);
+    margin: 0;
+    font-weight: 600;
   }
   .rail-count {
     font-family: "SF Mono", Menlo, Consolas, monospace;
@@ -583,6 +602,8 @@
     font-size: 10px;
     letter-spacing: 1.5px;
     color: var(--accent);
+    margin: 0;
+    font-weight: 600;
   }
   .tl-hint {
     font-family: "SF Mono", Menlo, Consolas, monospace;
@@ -911,6 +932,16 @@
   .rail.social-mode .filters,
   .rail.social-mode .search { display: none; }
 
+  /* ---------- reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-track { animation: none !important; }
+    .marker.s3 { animation: none !important; }
+    .tl-dot, .skip-link, .card, .chip, .tab, .ticker-speed button,
+    .map-wrap, .rail, .feed, .leaflet-fade-anim .leaflet-tile,
+    .leaflet-zoom-anim .leaflet-zoom-animated,
+    .ticker-tag.live::before { transition: none !important; animation: none !important; }
+  }
+
   /* ---------- responsive ---------- */
   @media (max-width: 900px) {
     .topbar { grid-template-columns: 1fr auto; height: auto; padding: 10px 14px; gap: 10px; }
@@ -928,8 +959,9 @@
 </head>
 <body>
 
+<a href="#main" class="skip-link">Skip to dashboard</a>
 <h1 class="sr-only">Hantavirus Monitor — Live Global Hantavirus Surveillance</h1>
-<header class="topbar">
+<header class="topbar" role="banner">
   <a class="brand" href="/hantavirus/" aria-label="Hantavirus Monitor home">
     <img class="brand-logo" src="logo.svg" alt="" width="34" height="34" aria-hidden="true">
     <div class="brand-text">
@@ -969,7 +1001,7 @@
       <div class="stat-sub" id="stat-strain-sub">most active region</div>
     </div>
   </div>
-  <div class="version">v0.2.1</div>
+  <div class="version">v0.2.2</div>
 </header>
 
 <div class="ticker">
@@ -982,10 +1014,10 @@
   </div>
 </div>
 
-<main class="dash">
-  <aside class="rail">
+<main class="dash" id="main">
+  <aside class="rail" aria-label="Event feed">
     <div class="rail-header">
-      <div class="rail-title">LIVE WIRE</div>
+      <h2 class="rail-title">LIVE WIRE</h2>
       <div class="rail-count" id="rail-count">0 events</div>
     </div>
     <div class="tabs">
@@ -1005,17 +1037,17 @@
     </div>
     <div class="feed" id="feed"></div>
   </aside>
-  <section class="map-wrap">
-    <div id="map"></div>
+  <section class="map-wrap" aria-label="World map of hantavirus events">
+    <div id="map" role="img" aria-label="Interactive world map showing hantavirus events as severity-coloured pins"></div>
     <div class="map-legend">
       <div class="legend-row"><span class="dot s1"></span> S1 — Confirmed, recovered</div>
       <div class="legend-row"><span class="dot s2"></span> S2 — Hospitalized / active</div>
       <div class="legend-row"><span class="dot s3"></span> S3 — Death or cluster &ge;3</div>
     </div>
   </section>
-  <section class="timeline">
+  <section class="timeline" aria-label="Event timeline">
     <div class="tl-header">
-      <span class="tl-label">TIMELINE</span>
+      <h2 class="tl-label">TIMELINE</h2>
       <span class="tl-hint" id="tl-hint">hover dots for details &middot; click to focus</span>
     </div>
     <div class="tl-track" id="tl-track"></div>
@@ -1027,7 +1059,7 @@
   <div class="bottom-left">
     <span>HANTAVIRUS MONITOR</span>
     <span>&middot;</span>
-    <span>v0.2.1</span>
+    <span>v0.2.2</span>
     <span>&middot;</span>
     <a href="privacy.html">PRIVACY</a>
     <a href="#" id="cookies-link">COOKIES</a>
@@ -1055,7 +1087,7 @@
 'use strict';
 
 // ---------- SEEDED EVENTS ----------
-// Representative dataset for v0.2.1. Mix of well-documented public events
+// Representative dataset for v0.2.2. Mix of well-documented public events
 // (Mono County 2025, Santa Fe 2025) and generic patterns matching ongoing
 // endemic surveillance. Real live ingest pipeline is the v0.2 goal.
 const NOW = new Date('2026-05-08T12:00:00Z');
@@ -1350,7 +1382,7 @@ function renderFeed() {
   const events = filteredEvents();
   railCountEl.textContent = events.length + ' event' + (events.length === 1 ? '' : 's');
   let html = '';
-  html += '<div class="demo-banner"><b>v0.2.1 demo</b> &middot; Seeded with documented 2025 cases plus representative endemic-surveillance entries. Real-time ingest from state DOH press releases, news aggregators, and curated X handles is planned for v0.3.</div>';
+  html += '<div class="demo-banner"><b>v0.2.2 demo</b> &middot; Seeded with documented 2025 cases plus representative endemic-surveillance entries. Real-time ingest from state DOH press releases, news aggregators, and curated X handles is planned for v0.3.</div>';
   if (events.length === 0) {
     html += '<div class="demo-banner" style="text-align:center;color:var(--muted);">No matching events.</div>';
   }

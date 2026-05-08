@@ -70,6 +70,11 @@ See [`privacy.html`](privacy.html). No personal data, no uploads, no tracking be
 
 ## Changelog
 
+### v0.2.2 &mdash; 2026-05-08
+- **Accessibility pass.** Added a skip-to-content link, semantic `<h2>` markup on the LIVE WIRE and TIMELINE labels, `role="banner"` on the topbar, and `aria-label`s on the rail, map, and timeline regions. The map element gets a descriptive `role="img"` so screen readers announce it correctly.
+- **`prefers-reduced-motion` honoured.** Users with the OS-level reduce-motion preference no longer see the ticker scroll, the S3 marker pulse, or any other CSS transitions. The data still updates; only the animation stops.
+- **Meta description trimmed** from ~280 chars to ~155 chars for a cleaner SERP snippet.
+
 ### v0.2.1 &mdash; 2026-05-08
 - **Stat strip expanded** to 6 cells with secondary date subtitles: TODAY (with today's date), THIS WEEK (with the week-of date), LAST CASE (with `Nd ago` and the date), CASES 90D, DEATHS 18MO, DOMINANT STRAIN (with most-active-region subtitle).
 - **Timeline tooltips fixed** — now position-fixed and z-indexed above the map's tile and marker panes; previously they were getting clipped behind the map when extending above the timeline strip.
