@@ -104,6 +104,32 @@ via the existing root `CNAME`, so the live URL is
 
 ## Changelog
 
+### v0.4.5 — 2026-05-08
+**PageSpeed perf tuning.** Three real wins on initial-load:
+
+- **520 KB watermark fetch deferred until needed.** The parent
+  BookHockeys logo (`../logo.png`, 3900×3000) was being fetched
+  eagerly at script-eval time as the watermark source, even if the
+  visitor never uploaded a photo. Moved the fetch behind an
+  `ensureWatermark()` helper that only kicks off inside
+  `processImage()`.
+- **Footer logo lazy-loaded.** The same `../logo.png` was the only
+  other thing referencing it, used as a 70 px footer icon. Added
+  `loading="lazy" decoding="async" fetchpriority="low"` plus
+  explicit `width`/`height` so it doesn't fetch above-the-fold and
+  doesn't shift layout when it does.
+- **Google Fonts CSS made non-render-blocking.** Switched from a
+  blocking `<link rel="stylesheet">` to the standard
+  `rel="preload" as="style" onload=…` pattern (with a `<noscript>`
+  fallback). System fallback paints first; Luckiest Guy swaps in
+  via `font-display: swap`.
+
+Plus: `<link rel="preconnect">` to `cdn.jsdelivr.net` (model CDN)
+and `<link rel="dns-prefetch">` to `storage.googleapis.com`
+(MoveNet weights bucket) so the connections are warm by the time
+the user uploads. Header logo now has explicit `width`/`height` +
+`fetchpriority="high"`.
+
 ### v0.4.4 — 2026-04-29
 **Greenline-specific favicons + PWA manifest.** Before this, the
 greenline page was using the parent BookHockeys favicons (its

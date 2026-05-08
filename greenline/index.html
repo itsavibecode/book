@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.4.4" />
+<meta name="version" content="0.4.5" />
 <title>Green Line Theory Test — Most Confident vs Less Dominant | BookHockeys</title>
 
 <meta name="description" content="Run the Green Line Theory on any staged couple photo, free, in your browser. The page auto-detects each person, draws a green line through their body axis, and labels the straightest as MOST CONFIDENT and the most-leaning as LESS DOMINANT. No upload, no signup." />
@@ -72,7 +72,7 @@
         "url": "https://bookhockeys.com/"
       },
       "image": "https://bookhockeys.com/greenline/og-card.png",
-      "softwareVersion": "0.4.4"
+      "softwareVersion": "0.4.5"
     },
     {
       "@type": "FAQPage",
@@ -176,9 +176,15 @@
   gtag('config', 'G-DYME377V2S');
 </script>
 
+<!-- Warm DNS / TCP for the resources we'll need later -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="dns-prefetch" href="https://storage.googleapis.com">
+
+<!-- Async-load Google Fonts CSS so it stops blocking first paint -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap"></noscript>
 
 <style>
   *{ box-sizing: border-box; margin: 0; padding: 0; }
@@ -494,7 +500,7 @@
   <h1 class="visually-hidden">Green Line Theory Test — Most Confident vs Less Dominant Auto-Detector</h1>
 
   <header class="header">
-    <img class="logo" src="logo.svg" alt="Green Line Theory — most confident vs less dominant" />
+    <img class="logo" src="logo.svg" alt="Green Line Theory — most confident vs less dominant" width="480" height="120" decoding="async" fetchpriority="high" />
   </header>
 
   <main class="card">
@@ -553,9 +559,9 @@
   <footer class="footer">
     <p>Runs 100% in your browser — your photo never leaves your device.</p>
     <a class="footer-logo" href="../" aria-label="BookHockeys home">
-      <img src="../logo.png" alt="" />
+      <img src="../logo.png" alt="" width="70" height="54" loading="lazy" decoding="async" fetchpriority="low" />
     </a>
-    <p class="version-tag" id="version">v0.4.4</p>
+    <p class="version-tag" id="version">v0.4.5</p>
     <button id="cookieReset" type="button" class="cookie-reset">Cookies</button>
   </footer>
 

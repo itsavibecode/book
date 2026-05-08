@@ -46,13 +46,23 @@
   var detectorLoading = null;
   var currentImage = null;
 
-  // Preload the BookHockeys logo for use as a watermark.
-  var watermarkImg = new Image();
-  var watermarkLoaded = new Promise(function (resolve) {
-    watermarkImg.onload = function () { resolve(true); };
-    watermarkImg.onerror = function () { resolve(false); };
-  });
-  watermarkImg.src = '../logo.png';
+  // Watermark logo. The fetch is deferred until the user actually
+  // processes a photo — saves ~520 KB on initial page load for
+  // visitors who never upload anything. The footer's <img> may
+  // fetch it earlier (lazy-loaded when scrolled into view), and
+  // the browser will dedupe via HTTP cache.
+  var watermarkImg = null;
+  var watermarkLoaded = null;
+  function ensureWatermark() {
+    if (watermarkLoaded) return watermarkLoaded;
+    watermarkImg = new Image();
+    watermarkLoaded = new Promise(function (resolve) {
+      watermarkImg.onload = function () { resolve(true); };
+      watermarkImg.onerror = function () { resolve(false); };
+    });
+    watermarkImg.src = '../logo.png';
+    return watermarkLoaded;
+  }
 
   function setStatus(msg, isError) {
     statusEl.textContent = msg;
@@ -305,7 +315,7 @@
 
   // Watermark: small semi-transparent BookHockeys logo, lower-right.
   function drawWatermark() {
-    if (!watermarkImg.complete || !watermarkImg.naturalWidth) return;
+    if (!watermarkImg || !watermarkImg.complete || !watermarkImg.naturalWidth) return;
     var w = canvasEl.width, h = canvasEl.height;
     var pad = Math.max(10, Math.round(Math.min(w, h) * 0.018));
     var maxDim = Math.min(w, h) * 0.18;
@@ -434,7 +444,7 @@
         });
       }, Promise.resolve([]));
     }).then(function (poses) {
-      return watermarkLoaded.then(function () { return poses; });
+      return ensureWatermark().then(function () { return poses; });
     }).then(function (poses) {
       var analyzed = drawAxisLines(poses);
       drawWatermark();
