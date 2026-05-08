@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hantavirus Monitor // OPS — Global Hantavirus Surveillance</title>
 <meta name="description" content="Live global monitoring of hantavirus cases, clusters, deaths, and environmental advisories. HPS / HFRS / Andes virus surveillance.">
-<meta name="version" content="0.1.1">
+<meta name="version" content="0.1.2">
 <link rel="canonical" href="https://bookhockeys.com/hantavirus/">
 <meta property="og:title" content="Hantavirus Monitor — Global Hantavirus Surveillance">
 <meta property="og:description" content="Live global monitoring of hantavirus cases, clusters, deaths, and environmental advisories.">
@@ -158,12 +158,51 @@
   }
   .ticker-loc { color: var(--muted); font-size: 10.5px; }
 
+  .ticker-speed {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 10px 0 28px;
+    background: linear-gradient(to right, transparent 0, var(--panel) 60%, var(--panel) 100%);
+    border-left: 1px solid var(--border);
+    z-index: 5;
+  }
+  .ticker-speed button {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--muted);
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+  }
+  .ticker-speed button:hover { color: var(--text); border-color: var(--border-strong); }
+  .ticker-speed button.active {
+    color: var(--accent);
+    background: rgba(90, 217, 255, 0.1);
+    border-color: var(--accent-dim);
+  }
+
   /* ---------- DASH ---------- */
   .dash {
     display: grid;
     grid-template-columns: 360px 1fr;
+    grid-template-rows: 1fr 76px;
+    grid-template-areas:
+      "rail map"
+      "rail timeline";
     height: calc(100vh - 64px - 28px - 28px);
   }
+  .rail { grid-area: rail; }
+  .map-wrap { grid-area: map; }
+  .timeline { grid-area: timeline; }
 
   /* ---------- LEFT RAIL ---------- */
   .rail {
@@ -346,51 +385,98 @@
   .card-meta .pin::before { content: "● "; color: var(--accent-dim); }
   .card-meta .ago::before { content: "○ "; color: var(--dim); }
 
-  .briefing {
-    border-top: 1px solid var(--border);
-    padding: 12px 16px;
+  /* ---------- TIMELINE PANEL ---------- */
+  .timeline {
     background: var(--panel-2);
+    border-top: 1px solid var(--border);
+    position: relative;
+    padding: 6px 16px 4px;
+    overflow: visible;
   }
-  .brief-label {
-    font-family: "SF Mono", Menlo, Consolas, monospace;
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-  .brief-form {
+  .tl-header {
     display: flex;
-    gap: 0;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
   }
-  .brief-form input {
-    flex: 1;
-    background: #0a0e14;
-    border: 1px solid var(--border-strong);
-    border-right: none;
-    color: var(--text);
-    padding: 6px 10px;
-    border-radius: 3px 0 0 3px;
-    font-size: 11.5px;
-    font-family: inherit;
-    outline: none;
-  }
-  .brief-form input::placeholder { color: var(--dim); }
-  .brief-form button {
-    background: transparent;
-    border: 1px solid var(--border-strong);
-    color: var(--muted);
+  .tl-label {
     font-family: "SF Mono", Menlo, Consolas, monospace;
     font-size: 10px;
     letter-spacing: 1.5px;
-    padding: 6px 12px;
-    border-radius: 0 3px 3px 0;
-    cursor: not-allowed;
+    color: var(--accent);
   }
-  .brief-foot {
-    margin-top: 6px;
-    font-size: 10px;
+  .tl-hint {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.5px;
     color: var(--dim);
   }
+  .tl-track {
+    position: relative;
+    height: 50px;
+  }
+  .tl-axis {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 14px;
+    height: 1px;
+    background: var(--border-strong);
+  }
+  .tl-month {
+    position: absolute;
+    bottom: 0;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .tl-month::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    width: 1px;
+    height: 4px;
+    background: var(--border-strong);
+  }
+  .tl-dot {
+    position: absolute;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    margin-left: -4.5px;
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.6);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .tl-dot:hover { transform: scale(1.6); z-index: 10; }
+  .tl-dot.s1 { background: var(--s1); box-shadow: 0 0 4px rgba(90,217,255,0.5); }
+  .tl-dot.s2 { background: var(--s2); box-shadow: 0 0 4px rgba(245,197,24,0.5); }
+  .tl-dot.s3 { background: var(--s3); box-shadow: 0 0 6px rgba(255,77,77,0.7); }
+  .tl-dot.active {
+    transform: scale(1.9);
+    z-index: 20;
+    box-shadow: 0 0 0 2px var(--accent), 0 0 12px var(--accent);
+  }
+  .tl-tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--panel);
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    padding: 6px 10px;
+    font-size: 11px;
+    z-index: 50;
+    display: none;
+    transform: translateX(-50%);
+    bottom: 64px;
+    max-width: 280px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  }
+  .tl-tooltip.visible { display: block; }
+  .tl-tooltip-title { font-weight: 600; color: var(--text); line-height: 1.3; }
+  .tl-tooltip-meta { color: var(--muted); font-size: 10px; margin-top: 3px; }
 
   /* ---------- MAP ---------- */
   .map-wrap {
@@ -568,10 +654,14 @@
   @media (max-width: 900px) {
     .topbar { grid-template-columns: 1fr auto; height: auto; padding: 10px 14px; gap: 10px; }
     .topbar .stats { display: none; }
-    .dash { grid-template-columns: 1fr; height: auto; }
-    .rail { height: 50vh; }
-    #map { height: 50vh; }
+    .dash {
+      grid-template-columns: 1fr;
+      grid-template-rows: 50vh 50vh 90px;
+      grid-template-areas: "rail" "map" "timeline";
+      height: auto;
+    }
     body { overflow: auto; }
+    .ticker-speed { padding-left: 16px; }
   }
 </style>
 </head>
@@ -600,10 +690,18 @@
       <div class="stat-value" id="stat-strain">—</div>
     </div>
   </div>
-  <div class="version">v0.1.1</div>
+  <div class="version">v0.1.2</div>
 </header>
 
-<div class="ticker"><div class="ticker-track" id="ticker"></div></div>
+<div class="ticker">
+  <div class="ticker-track" id="ticker"></div>
+  <div class="ticker-speed" id="ticker-speed">
+    <button type="button" data-speed="180">SLOW</button>
+    <button type="button" data-speed="90" class="active">NORM</button>
+    <button type="button" data-speed="45">FAST</button>
+    <button type="button" data-speed="0" title="Pause">II</button>
+  </div>
+</div>
 
 <main class="dash">
   <aside class="rail">
@@ -627,14 +725,6 @@
       <button class="chip" data-region="eurasia">EURASIA</button>
     </div>
     <div class="feed" id="feed"></div>
-    <div class="briefing">
-      <div class="brief-label">DAILY BRIEFING</div>
-      <form class="brief-form" onsubmit="return false;">
-        <input type="email" placeholder="your@email.com" disabled />
-        <button type="button" disabled>SOON</button>
-      </form>
-      <div class="brief-foot">Email digest planned for v0.2</div>
-    </div>
   </aside>
   <section class="map-wrap">
     <div id="map"></div>
@@ -644,10 +734,18 @@
       <div class="legend-row"><span class="dot s3"></span> S3 — Death or cluster &ge;3</div>
     </div>
   </section>
+  <section class="timeline">
+    <div class="tl-header">
+      <span class="tl-label">TIMELINE</span>
+      <span class="tl-hint" id="tl-hint">hover dots for details &middot; click to focus</span>
+    </div>
+    <div class="tl-track" id="tl-track"></div>
+    <div class="tl-tooltip" id="tl-tooltip"></div>
+  </section>
 </main>
 
 <footer class="bottom">
-  <div>HANTAVIRUS MONITOR &middot; v0.1.1 &middot; SEEDED REPRESENTATIVE DATA &middot; LIVE INGEST PLANNED v0.2</div>
+  <div>HANTAVIRUS MONITOR &middot; v0.1.2 &middot; SEEDED REPRESENTATIVE DATA &middot; LIVE INGEST PLANNED v0.2</div>
   <div>Always verify with state / national health authorities before action.</div>
 </footer>
 
@@ -656,7 +754,7 @@
 'use strict';
 
 // ---------- SEEDED EVENTS ----------
-// Representative dataset for v0.1.1. Mix of well-documented public events
+// Representative dataset for v0.1.2. Mix of well-documented public events
 // (Mono County 2025, Santa Fe 2025) and generic patterns matching ongoing
 // endemic surveillance. Real live ingest pipeline is the v0.2 goal.
 const NOW = new Date('2026-05-08T12:00:00Z');
@@ -852,8 +950,11 @@ const EVENTS = [
 // v0.2 plan: Worker scrapes these public-health handles for fresh hantavirus
 // posts and writes IDs to a Firestore collection the SPA reads.
 const SOCIAL = [
-  { handle: 'CDCgov', name: 'CDC', tweetId: null, note: 'Authoritative US hantavirus surveillance updates and case alerts.' },
-  { handle: 'WHO', name: 'World Health Organization', tweetId: null, note: 'Global outbreak alerts; HFRS / HPS situation reports.' },
+  { handle: 'DrTedros', name: 'Tedros Adhanom Ghebreyesus', tweetId: '2052467243502723551', note: 'WHO Director-General.' },
+  { handle: 'outbreakupdates', name: 'Outbreak Updates', tweetId: '2052403554577420387', note: 'Aggregated outbreak news.' },
+  { handle: 'WHO', name: 'World Health Organization', tweetId: '2052377940894142836', note: 'Global outbreak alerts; HFRS / HPS situation reports.' },
+  { handle: 'outbreakupdates', name: 'Outbreak Updates', tweetId: '2052361477760102899', note: 'Aggregated outbreak news.' },
+  { handle: 'CDCgov', name: 'CDC', tweetId: '2052188048520032692', note: 'Authoritative US hantavirus surveillance updates and case alerts.' },
   { handle: 'PAHO', name: 'Pan American Health Organization', tweetId: null, note: 'Andes virus and Americas-region surveillance.' },
   { handle: 'ECDC_EU', name: 'European CDC', tweetId: null, note: 'Puumala virus and European HFRS reporting.' },
   { handle: 'NMHealth', name: 'New Mexico Department of Health', tweetId: null, note: 'New Mexico case alerts and seasonal advisories.' },
@@ -920,7 +1021,7 @@ function renderSocial() {
   html += '<div class="demo-banner"><b>Social feed</b> &middot; Curated tweets from authoritative public-health accounts render here as official X embeds. v0.1.x: provide tweet IDs to populate. v0.2 plan: Worker auto-ingests fresh hantavirus posts from these handles nightly.</div>';
   for (const s of SOCIAL) {
     if (s.tweetId) {
-      html += '<div class="tweet-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-conversation="none" data-cards="hidden" data-dnt="true"><a href="https://twitter.com/' + encodeURIComponent(s.handle) + '/status/' + encodeURIComponent(s.tweetId) + '"></a></blockquote></div>';
+      html += '<div class="tweet-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-conversation="none" data-cards="hidden" data-dnt="true"><p>Loading tweet from @' + escapeHtml(s.handle) + '...</p>&mdash; <a href="https://x.com/' + encodeURIComponent(s.handle) + '/status/' + encodeURIComponent(s.tweetId) + '">View on X</a></blockquote></div>';
     } else {
       html += '<div class="tweet-card placeholder">' +
         '<div class="tweet-head">' +
@@ -960,7 +1061,7 @@ function renderFeed() {
   const events = filteredEvents();
   railCountEl.textContent = events.length + ' event' + (events.length === 1 ? '' : 's');
   let html = '';
-  html += '<div class="demo-banner"><b>v0.1.1 demo</b> &middot; Seeded with documented 2025 cases plus representative endemic-surveillance entries. Real-time ingest from state DOH press releases, news aggregators, and curated X handles is planned for v0.2.</div>';
+  html += '<div class="demo-banner"><b>v0.1.2 demo</b> &middot; Seeded with documented 2025 cases plus representative endemic-surveillance entries. Real-time ingest from state DOH press releases, news aggregators, and curated X handles is planned for v0.2.</div>';
   if (events.length === 0) {
     html += '<div class="demo-banner" style="text-align:center;color:var(--muted);">No matching events.</div>';
   }
@@ -1034,6 +1135,81 @@ function renderTicker() {
   document.getElementById('ticker').innerHTML = items.concat(items).join('');
 }
 
+function setTickerSpeed(seconds) {
+  const track = document.getElementById('ticker');
+  if (seconds === 0) {
+    track.style.animationPlayState = 'paused';
+  } else {
+    track.style.animationPlayState = 'running';
+    track.style.animationDuration = seconds + 's';
+  }
+  for (const b of document.querySelectorAll('#ticker-speed button')) {
+    b.classList.toggle('active', Number(b.dataset.speed) === seconds);
+  }
+  try { localStorage.setItem('ht-ticker-speed', String(seconds)); } catch(_){}
+}
+
+// ---------- TIMELINE ----------
+function renderTimeline() {
+  const events = filteredEvents();
+  const tlTrack = document.getElementById('tl-track');
+  if (events.length === 0) { tlTrack.innerHTML = '<div class="tl-axis"></div>'; return; }
+
+  const dates = events.map(e => new Date(e.date + 'T12:00:00Z').getTime());
+  const minDate = Math.min(...dates);
+  const startDate = new Date(minDate - 30 * 86400000);
+  const endDate = NOW;
+  const span = endDate - startDate;
+
+  let html = '<div class="tl-axis"></div>';
+
+  // Month ticks
+  let m = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), 1));
+  while (m <= endDate) {
+    const x = ((m - startDate) / span) * 100;
+    if (x >= 1 && x <= 99) {
+      const label = m.toLocaleDateString('en-US', {month: 'short', year: '2-digit', timeZone: 'UTC'});
+      html += '<div class="tl-month" style="left:' + x.toFixed(2) + '%">' + label + '</div>';
+    }
+    m = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 1));
+  }
+
+  // Group by date for stacking
+  const byDate = {};
+  for (const e of events) {
+    byDate[e.date] = byDate[e.date] || [];
+    byDate[e.date].push(e);
+  }
+  for (const dateStr of Object.keys(byDate)) {
+    const evs = byDate[dateStr];
+    const dt = new Date(dateStr + 'T12:00:00Z').getTime();
+    const x = ((dt - startDate) / span) * 100;
+    for (let i = 0; i < evs.length; i++) {
+      const e = evs[i];
+      const bottom = 18 + i * 11;
+      const activeCls = state.selectedId === e.id ? ' active' : '';
+      html += '<div class="tl-dot s' + e.sev + activeCls + '" data-id="' + e.id + '" style="left:' + x.toFixed(2) + '%;bottom:' + bottom + 'px"></div>';
+    }
+  }
+
+  tlTrack.innerHTML = html;
+
+  const tooltip = document.getElementById('tl-tooltip');
+  for (const dot of tlTrack.querySelectorAll('.tl-dot')) {
+    dot.addEventListener('mouseenter', () => {
+      const id = dot.dataset.id;
+      const e = EVENTS.find(x => x.id === id);
+      if (!e) return;
+      tooltip.innerHTML = '<div class="tl-tooltip-title">' + escapeHtml(e.title) + '</div>' +
+        '<div class="tl-tooltip-meta">' + escapeHtml(e.location) + ' &middot; ' + e.date + ' &middot; S' + e.sev + ' &middot; ' + escapeHtml(e.strain) + '</div>';
+      tooltip.style.left = dot.style.left;
+      tooltip.classList.add('visible');
+    });
+    dot.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+    dot.addEventListener('click', () => selectEvent(dot.dataset.id));
+  }
+}
+
 // ---------- MAP ----------
 let map, markerLayer;
 const markerById = {};
@@ -1088,6 +1264,7 @@ function selectEvent(id) {
   const e = EVENTS.find(x => x.id === id);
   if (!e) return;
   renderFeed();
+  renderTimeline();
   const card = feedEl.querySelector('[data-id="' + id + '"]');
   if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   if (markerById[id]) {
@@ -1110,6 +1287,7 @@ for (const tab of document.querySelectorAll('.tab')) {
     state.tab = tab.dataset.tab;
     renderRail();
     renderMarkers();
+    renderTimeline();
   });
 }
 
@@ -1131,14 +1309,28 @@ for (const chip of document.querySelectorAll('.chip')) {
     }
     renderRail();
     renderMarkers();
+    renderTimeline();
   });
 }
+
+// ---------- TICKER SPEED CONTROLS ----------
+for (const b of document.querySelectorAll('#ticker-speed button')) {
+  b.addEventListener('click', () => setTickerSpeed(Number(b.dataset.speed)));
+}
+let savedSpeed = 90;
+try {
+  const v = localStorage.getItem('ht-ticker-speed');
+  if (v !== null) savedSpeed = Number(v);
+} catch(_){}
 
 // ---------- BOOT ----------
 renderStats();
 renderTicker();
+setTickerSpeed(savedSpeed);
 renderRail();
+renderTimeline();
 initMap();
+window.addEventListener('resize', () => renderTimeline());
 </script>
 </body>
 </html>
