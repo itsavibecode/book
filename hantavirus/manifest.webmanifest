@@ -1,0 +1,15 @@
+{
+  "name": "Hantavirus Monitor",
+  "short_name": "Hantavirus",
+  "description": "Global hantavirus surveillance dashboard — HPS, HFRS, Andes virus.",
+  "start_url": "/hantavirus/",
+  "scope": "/hantavirus/",
+  "display": "standalone",
+  "background_color": "#07090e",
+  "theme_color": "#5ad9ff",
+  "icons": [
+    { "src": "/hantavirus/favicon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/hantavirus/favicon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/hantavirus/favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

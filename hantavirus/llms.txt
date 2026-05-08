@@ -1,0 +1,61 @@
+# Hantavirus Monitor
+
+> Live global hantavirus surveillance dashboard — confirmed cases, clusters, deaths, and environmental advisories for HPS (Hantavirus Pulmonary Syndrome), HFRS (Hemorrhagic Fever with Renal Syndrome), Andes virus, Sin Nombre virus, Hantaan, Puumala, Seoul, and Choclo strains.
+
+The Hantavirus Monitor (`bookhockeys.com/hantavirus`) is a single-file static SPA hosted on GitHub Pages from
+[github.com/itsavibecode/book/tree/main/hantavirus](https://github.com/itsavibecode/book/tree/main/hantavirus).
+No backend; no upload of user content; no signup. The page reads a curated event dataset and renders it as a war-monitor-style live operations dashboard.
+
+## What it shows
+
+- **World map** (Leaflet + CARTO Dark) with severity-coloured pins per event.
+- **Live wire feed** — sortable, filterable list of events with severity badges and category chips.
+- **Top stat strip** — cases (90d), deaths (18mo), most active region, dominant strain.
+- **Scrolling LIVE ticker** — eight most recent events, with user-controllable scroll speed.
+- **Timeline panel** — 16-month horizontal strip with one severity-coloured dot per event.
+- **Social tab** — official X/Twitter embeds curated from authoritative public-health accounts: CDC (@CDCgov), WHO (@WHO), the WHO Director-General (@DrTedros), and the Outbreak Updates aggregator (@outbreakupdates). PAHO, ECDC, NM Department of Health, and Colorado DPH are queued as awaiting feeds.
+
+## Severity model
+
+- **S1** — confirmed case, recovered.
+- **S2** — confirmed case, hospitalised or active.
+- **S3** — death, or cluster of three or more linked cases.
+
+Pin colours match severity: cyan = S1, yellow = S2, red = S3 (with a pulsing animation).
+
+## Categories
+
+`CASE`, `DEATH`, `CLUSTER`, `ADVISORY`, `ENV` (environmental, e.g. NPS rodent advisories), plus strain tags `HPS`, `HFRS`, `ANDES`, `HANTAAN`, `PUUMALA`, `SEOUL`, `CHOCLO`.
+
+## Data sources (current state)
+
+The current event set is a **curated mix**: documented public events (Mono County 2025 cluster, Santa Fe County 2025 fatality) plus representative endemic-surveillance entries that match real ongoing patterns (Hantaan in Shaanxi/Heilongjiang, Puumala in Bashkortostan and Finland, Andes in Patagonia, Choclo in Panama). The dashboard's footer and an in-page banner label this clearly. Authoritative live sources should be checked at `cdc.gov`, `who.int`, and the relevant state or national health departments.
+
+## Data ingest plan (v0.2+)
+
+A Cloudflare Worker on a nightly cron will ingest:
+
+1. State / national DOH RSS feeds (NM, CA, AZ, CO, UT, WA in the US; provincial CDCs in CN/AR/CL/RU/FI/KR).
+2. Google News RSS for `hantavirus`, `HPS`, `HFRS` keyword searches.
+3. NPS rodent-advisory RSS feeds.
+4. Curated X-handle posts via Nitter RSS, with a fallback list of mirror instances.
+
+The Worker writes normalised event records to Firestore; the SPA reads them at page-load. A small admin route lets the curator promote, edit, or dismiss auto-ingested items.
+
+## Privacy
+
+No image data, account data, or personally-identifying information is collected by the dashboard. Google Analytics 4 (`G-DYME377V2S`, shared with the rest of `bookhockeys.com`) records page views and a few anonymous events. Visitors with a European (`Europe/*`) timezone — plus EEA outliers like Iceland, Cyprus, and Atlantic-island EU territories — see a Google Consent Mode v2 banner on first visit and analytics is denied by default until they choose; visitors elsewhere have analytics enabled by default with no banner. Choice is persisted in `localStorage` under `greenline-consent` (shared site-wide with the rest of bookhockeys.com).
+
+X / Twitter embeds load `platform.twitter.com/widgets.js` lazily — only when the SOCIAL tab is opened **and** at least one curated tweet has a real ID.
+
+## Known limits
+
+- Snapshot data only. The dashboard is for situational awareness; clinical and public-health decisions should be made against authoritative sources.
+- The 18-month death window mid-rolls; a slow news year reads as a quiet dashboard. That is correct, not broken.
+- Nitter availability is volatile; the v0.2 ingest pipeline assumes occasional fallback to Google News RSS.
+
+## Source
+
+- Repo: [github.com/itsavibecode/book](https://github.com/itsavibecode/book)
+- Subfolder: [github.com/itsavibecode/book/tree/main/hantavirus](https://github.com/itsavibecode/book/tree/main/hantavirus)
+- Project README with changelog: [github.com/itsavibecode/book/blob/main/hantavirus/README.md](https://github.com/itsavibecode/book/blob/main/hantavirus/README.md)

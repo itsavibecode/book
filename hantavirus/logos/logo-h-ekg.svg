@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" role="img" aria-label="H-EKG logo variant">
+  <title>H + EKG — bold H letterform with a heartbeat trace</title>
+  <!-- H letterform -->
+  <path d="M22 18 L22 82 M78 18 L78 82 M22 50 L78 50"
+        stroke="#5ad9ff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- EKG trace overlay -->
+  <path d="M8 50 L30 50 L36 38 L42 64 L48 30 L54 70 L60 50 L92 50"
+        stroke="#ff4d4d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.95"/>
+</svg>

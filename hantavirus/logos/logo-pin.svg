@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" role="img" aria-label="Pin logo variant">
+  <title>Pin — map pin riding a globe arc</title>
+  <!-- Globe arc -->
+  <path d="M14 78 Q50 38 86 78" stroke="#5ad9ff" stroke-opacity="0.55" stroke-width="3" stroke-linecap="round"/>
+  <path d="M22 86 Q50 56 78 86" stroke="#5ad9ff" stroke-opacity="0.3"  stroke-width="2" stroke-linecap="round"/>
+  <!-- Map pin -->
+  <path d="M50 12 C36 12 26 22 26 36 C26 52 50 78 50 78 C50 78 74 52 74 36 C74 22 64 12 50 12 Z"
+        stroke="#5ad9ff" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="50" cy="36" r="7" fill="#5ad9ff"/>
+</svg>

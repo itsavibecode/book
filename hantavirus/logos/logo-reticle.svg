@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" role="img" aria-label="Reticle logo variant">
+  <title>Reticle — crosshair surrounding a hex cell</title>
+  <!-- Crosshair frame -->
+  <circle cx="50" cy="50" r="42" stroke="#5ad9ff" stroke-opacity="0.6" stroke-width="2"/>
+  <line x1="50" y1="6"  x2="50" y2="20" stroke="#5ad9ff" stroke-width="2.5"/>
+  <line x1="50" y1="80" x2="50" y2="94" stroke="#5ad9ff" stroke-width="2.5"/>
+  <line x1="6"  y1="50" x2="20" y2="50" stroke="#5ad9ff" stroke-width="2.5"/>
+  <line x1="80" y1="50" x2="94" y2="50" stroke="#5ad9ff" stroke-width="2.5"/>
+  <!-- Hex cell -->
+  <polygon points="50,22 73,35 73,65 50,78 27,65 27,35"
+           stroke="#5ad9ff" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="50" cy="50" r="6" fill="#5ad9ff"/>
+</svg>

@@ -3,15 +3,153 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hantavirus Monitor // OPS — Global Hantavirus Surveillance</title>
-<meta name="description" content="Live global monitoring of hantavirus cases, clusters, deaths, and environmental advisories. HPS / HFRS / Andes virus surveillance.">
-<meta name="version" content="0.1.2">
+<title>Hantavirus Monitor — Live Global Hantavirus Surveillance Dashboard | HPS, HFRS, Andes Virus</title>
+<meta name="description" content="Live global hantavirus surveillance dashboard tracking confirmed cases, clusters, deaths, and environmental advisories worldwide. Covers HPS (Sin Nombre), HFRS (Hantaan, Puumala, Seoul), Andes virus, and Choclo virus, with map, timeline, and curated public-health social feed.">
+<meta name="keywords" content="hantavirus, hantavirus outbreak, hantavirus monitor, hantavirus surveillance, hantavirus tracker, HPS, hantavirus pulmonary syndrome, HFRS, hemorrhagic fever with renal syndrome, sin nombre virus, andes virus, hantaan virus, puumala virus, seoul virus, choclo virus, deer mouse, rodent-borne disease, zoonotic disease, public health dashboard, disease outbreak map, mammoth lakes hantavirus, mono county hantavirus, santa fe hantavirus, hantavirus cluster, hantavirus death, hantavirus case, hantavirus today, hantavirus 2026">
+<meta name="theme-color" content="#5ad9ff">
+<meta name="author" content="BookHockeys">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="version" content="0.2.0">
 <link rel="canonical" href="https://bookhockeys.com/hantavirus/">
-<meta property="og:title" content="Hantavirus Monitor — Global Hantavirus Surveillance">
-<meta property="og:description" content="Live global monitoring of hantavirus cases, clusters, deaths, and environmental advisories.">
-<meta property="og:url" content="https://bookhockeys.com/hantavirus/">
+
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="Hantavirus Monitor">
+<meta property="og:title" content="Hantavirus Monitor — Live Global Hantavirus Surveillance">
+<meta property="og:description" content="Live global hantavirus surveillance dashboard: confirmed cases, clusters, deaths, environmental advisories. HPS, HFRS, Andes virus, with map, timeline, and curated public-health feed.">
+<meta property="og:url" content="https://bookhockeys.com/hantavirus/">
+<meta property="og:image" content="https://bookhockeys.com/hantavirus/og-card.png">
+<meta property="og:image:secure_url" content="https://bookhockeys.com/hantavirus/og-card.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="Hantavirus Monitor — global hantavirus surveillance dashboard with severity legend and radar-pulse logo on a dark ops-style background">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hantavirus Monitor — Live Global Hantavirus Surveillance">
+<meta name="twitter:description" content="Live global hantavirus surveillance: confirmed cases, clusters, deaths, environmental advisories. HPS, HFRS, Andes virus.">
+<meta name="twitter:image" content="https://bookhockeys.com/hantavirus/og-card.png">
+<meta name="twitter:image:alt" content="Hantavirus Monitor dashboard share card">
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="alternate" type="application/xml" title="Sitemap" href="/sitemap.xml">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://bookhockeys.com/hantavirus/#app",
+      "name": "Hantavirus Monitor",
+      "alternateName": ["Hantavirus Surveillance Dashboard", "Hantavirus Tracker"],
+      "url": "https://bookhockeys.com/hantavirus/",
+      "description": "Live global hantavirus surveillance dashboard tracking confirmed cases, clusters, deaths, and environmental advisories worldwide. Covers HPS (Sin Nombre), HFRS (Hantaan, Puumala, Seoul), Andes virus, and Choclo virus.",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Any (browser)",
+      "browserRequirements": "Requires a modern evergreen browser with JavaScript enabled.",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "BookHockeys", "url": "https://bookhockeys.com/" },
+      "image": "https://bookhockeys.com/hantavirus/og-card.png",
+      "softwareVersion": "0.2.0",
+      "about": [
+        { "@type": "MedicalCondition", "name": "Hantavirus Pulmonary Syndrome", "alternateName": "HPS" },
+        { "@type": "MedicalCondition", "name": "Hemorrhagic Fever with Renal Syndrome", "alternateName": "HFRS" }
+      ]
+    },
+    {
+      "@type": "Dataset",
+      "name": "Hantavirus event dataset",
+      "description": "Curated set of confirmed hantavirus cases, clusters, deaths, and environmental advisories used to populate the Hantavirus Monitor dashboard.",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "creator": { "@type": "Organization", "name": "BookHockeys", "url": "https://bookhockeys.com/" },
+      "url": "https://bookhockeys.com/hantavirus/",
+      "keywords": ["hantavirus", "HPS", "HFRS", "Andes virus", "Sin Nombre", "Hantaan", "Puumala", "outbreak surveillance"]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://bookhockeys.com/#org",
+      "name": "BookHockeys",
+      "url": "https://bookhockeys.com/",
+      "logo": "https://bookhockeys.com/hantavirus/favicon-512.png",
+      "sameAs": [
+        "https://google.com",
+        "https://google.com",
+        "https://google.com",
+        "https://google.com"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is hantavirus?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Hantavirus is a family of rodent-borne viruses that cause two main human syndromes: Hantavirus Pulmonary Syndrome (HPS) in the Americas, and Hemorrhagic Fever with Renal Syndrome (HFRS) in Europe and Asia. Different strains have different reservoir hosts and clinical severity." }
+        },
+        {
+          "@type": "Question",
+          "name": "How is hantavirus transmitted?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Most hantaviruses are transmitted from rodent excreta (urine, droppings, saliva) to humans by aerosol inhalation, typically when cleaning enclosed spaces with rodent infestations. The Andes virus is the only hantavirus with documented person-to-person transmission." }
+        },
+        {
+          "@type": "Question",
+          "name": "Where does hantavirus occur?",
+          "acceptedAnswer": { "@type": "Answer", "text": "HPS is endemic in the Americas, with most U.S. cases in the Four Corners region. HFRS is endemic across Eurasia, with the highest case counts reported from China, the Korean peninsula, and parts of Russia and Scandinavia. Andes virus circulates in southern Argentina and Chile; Choclo virus is endemic in Panama." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the data on this dashboard official?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The dashboard shows a curated mix of documented public events and representative endemic-surveillance entries for situational awareness only. Always verify any specific case or cluster against the relevant state, provincial, or national health authority before acting on it." }
+        },
+        {
+          "@type": "Question",
+          "name": "How often is the dashboard updated?",
+          "acceptedAnswer": { "@type": "Answer", "text": "v0.2 is a curated snapshot. A nightly Cloudflare Worker ingest pipeline pulling from state DOH RSS, Google News, and curated public-health X handles is planned." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<!-- Google Consent Mode v2 — set defaults BEFORE gtag.js loads. EU/EEA visitors must opt in. -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  (function () {
+    var tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+    var euExtras = ['Atlantic/Azores','Atlantic/Madeira','Atlantic/Canary','Atlantic/Reykjavik','Asia/Nicosia','Asia/Famagusta'];
+    var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+    var saved = null;
+    try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+    if (saved === 'granted') { gtag('consent', 'update', { 'analytics_storage': 'granted' }); }
+    else if (saved === 'denied') { /* already denied */ }
+    else if (!likelyEU) { gtag('consent', 'update', { 'analytics_storage': 'granted' }); }
+    else { window.__needsConsent = true; }
+  })();
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DYME377V2S"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-DYME377V2S');
+</script>
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <style>
   :root {
@@ -34,6 +172,15 @@
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
   body {
     background: var(--bg);
     color: var(--text);
@@ -47,7 +194,7 @@
   /* ---------- TOP BAR ---------- */
   .topbar {
     display: grid;
-    grid-template-columns: 280px 1fr auto;
+    grid-template-columns: 320px 1fr auto;
     align-items: center;
     height: 64px;
     border-bottom: 1px solid var(--border);
@@ -55,6 +202,20 @@
     padding: 0 18px;
     gap: 24px;
   }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .brand-logo {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 6px rgba(90, 217, 255, 0.35));
+  }
+  .brand-text { line-height: 1.2; }
   .brand-name {
     font-family: "SF Mono", Menlo, Consolas, monospace;
     font-size: 16px;
@@ -574,7 +735,89 @@
     color: var(--dim);
     font-family: "SF Mono", Menlo, Consolas, monospace;
     letter-spacing: 0.5px;
+    gap: 16px;
   }
+  .bottom-left, .bottom-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .bottom a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .bottom a:hover { color: var(--accent); }
+  .bottom-center {
+    flex: 1;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .social-link {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 2px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1;
+    text-decoration: none;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .social-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ---------- CONSENT BANNER ---------- */
+  .consent-banner {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--panel);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    padding: 14px 16px;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .consent-banner.visible { display: block; }
+  .consent-banner p { margin: 0 0 10px; color: var(--text); }
+  .consent-banner a { color: var(--accent); }
+  .consent-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .consent-actions button {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 6px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .consent-actions button:hover { border-color: var(--accent); color: var(--accent); }
+  .consent-actions button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
+  }
+  .consent-actions button.primary:hover { color: var(--bg); }
 
   /* ---------- tweet cards (SOCIAL tab) ---------- */
   .tweet-card {
@@ -667,11 +910,15 @@
 </head>
 <body>
 
+<h1 class="sr-only">Hantavirus Monitor — Live Global Hantavirus Surveillance</h1>
 <header class="topbar">
-  <div class="brand">
-    <div class="brand-name">Hantavirus Monitor <span class="dim">// OPS</span></div>
-    <div class="brand-tagline">GLOBAL HANTAVIRUS SURVEILLANCE</div>
-  </div>
+  <a class="brand" href="/hantavirus/" aria-label="Hantavirus Monitor home">
+    <img class="brand-logo" src="logo.svg" alt="" width="34" height="34" aria-hidden="true">
+    <div class="brand-text">
+      <div class="brand-name">Hantavirus Monitor <span class="dim">// OPS</span></div>
+      <div class="brand-tagline">GLOBAL HANTAVIRUS SURVEILLANCE</div>
+    </div>
+  </a>
   <div class="stats">
     <div class="stat">
       <div class="stat-label">CASES 90D</div>
@@ -690,7 +937,7 @@
       <div class="stat-value" id="stat-strain">—</div>
     </div>
   </div>
-  <div class="version">v0.1.2</div>
+  <div class="version">v0.2.0</div>
 </header>
 
 <div class="ticker">
@@ -745,16 +992,38 @@
 </main>
 
 <footer class="bottom">
-  <div>HANTAVIRUS MONITOR &middot; v0.1.2 &middot; SEEDED REPRESENTATIVE DATA &middot; LIVE INGEST PLANNED v0.2</div>
-  <div>Always verify with state / national health authorities before action.</div>
+  <div class="bottom-left">
+    <span>HANTAVIRUS MONITOR</span>
+    <span>&middot;</span>
+    <span>v0.2.0</span>
+    <span>&middot;</span>
+    <a href="privacy.html">PRIVACY</a>
+    <a href="#" id="cookies-link">COOKIES</a>
+    <a href="https://github.com/itsavibecode/book/tree/main/hantavirus" rel="noopener" target="_blank">SOURCE</a>
+  </div>
+  <div class="bottom-center">Always verify with state / national health authorities before action.</div>
+  <div class="bottom-right">
+    <a class="social-link" href="https://google.com" rel="noopener" target="_blank" aria-label="Facebook page">f</a>
+    <a class="social-link" href="https://google.com" rel="noopener" target="_blank" aria-label="X profile">X</a>
+    <a class="social-link" href="https://google.com" rel="noopener" target="_blank" aria-label="YouTube channel">YT</a>
+    <a class="social-link" href="https://google.com" rel="noopener" target="_blank" aria-label="LinkedIn profile">in</a>
+  </div>
 </footer>
+
+<div class="consent-banner" id="consent-banner" role="dialog" aria-label="Cookie consent">
+  <p>This dashboard uses anonymous Google Analytics to count page views. No personal data is collected. See the <a href="privacy.html">privacy policy</a>.</p>
+  <div class="consent-actions">
+    <button type="button" id="consent-deny">DECLINE</button>
+    <button type="button" class="primary" id="consent-allow">ACCEPT</button>
+  </div>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 'use strict';
 
 // ---------- SEEDED EVENTS ----------
-// Representative dataset for v0.1.2. Mix of well-documented public events
+// Representative dataset for v0.2.0. Mix of well-documented public events
 // (Mono County 2025, Santa Fe 2025) and generic patterns matching ongoing
 // endemic surveillance. Real live ingest pipeline is the v0.2 goal.
 const NOW = new Date('2026-05-08T12:00:00Z');
@@ -1061,7 +1330,7 @@ function renderFeed() {
   const events = filteredEvents();
   railCountEl.textContent = events.length + ' event' + (events.length === 1 ? '' : 's');
   let html = '';
-  html += '<div class="demo-banner"><b>v0.1.2 demo</b> &middot; Seeded with documented 2025 cases plus representative endemic-surveillance entries. Real-time ingest from state DOH press releases, news aggregators, and curated X handles is planned for v0.2.</div>';
+  html += '<div class="demo-banner"><b>v0.2.0 demo</b> &middot; Seeded with documented 2025 cases plus representative endemic-surveillance entries. Real-time ingest from state DOH press releases, news aggregators, and curated X handles is planned for v0.3.</div>';
   if (events.length === 0) {
     html += '<div class="demo-banner" style="text-align:center;color:var(--muted);">No matching events.</div>';
   }
@@ -1322,6 +1591,29 @@ try {
   const v = localStorage.getItem('ht-ticker-speed');
   if (v !== null) savedSpeed = Number(v);
 } catch(_){}
+
+// ---------- CONSENT BANNER ----------
+(function setupConsent() {
+  const banner = document.getElementById('consent-banner');
+  const allow = document.getElementById('consent-allow');
+  const deny = document.getElementById('consent-deny');
+  const cookiesLink = document.getElementById('cookies-link');
+  function setConsent(value) {
+    try { localStorage.setItem('greenline-consent', value); } catch(_){}
+    if (typeof gtag === 'function') {
+      gtag('consent', 'update', { 'analytics_storage': value === 'granted' ? 'granted' : 'denied' });
+    }
+    banner.classList.remove('visible');
+  }
+  if (window.__needsConsent) banner.classList.add('visible');
+  allow.addEventListener('click', () => setConsent('granted'));
+  deny.addEventListener('click', () => setConsent('denied'));
+  cookiesLink.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    try { localStorage.removeItem('greenline-consent'); } catch(_){}
+    banner.classList.add('visible');
+  });
+})();
 
 // ---------- BOOT ----------
 renderStats();
