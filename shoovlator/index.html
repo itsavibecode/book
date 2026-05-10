@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.5.5" />
+<meta name="version" content="0.5.6" />
 <title>Shoovlator — talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
 
 <meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy — stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
@@ -54,7 +54,7 @@
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "publisher": { "@type": "Organization", "name": "BookHockeys", "url": "https://bookhockeys.com/" },
       "image": "https://bookhockeys.com/shoovlator/og-card.png",
-      "softwareVersion": "0.5.5"
+      "softwareVersion": "0.5.6"
     }
   ]
 }
@@ -383,7 +383,7 @@
 </main>
 
 <footer>
-  <a href="/">BookHockeys</a> &middot; v0.5.5 &middot; runs entirely in your browser
+  <a href="/">BookHockeys</a> &middot; v0.5.6 &middot; runs entirely in your browser
 </footer>
 
 <script>
@@ -498,6 +498,19 @@ const ADV_SWAPS = {
   quickly: 'swiftly'
 };
 
+// Shoovy-ism: "how X" -> "how much X" in measurement questions.
+// "How expensive does this cost?" -> "How much expensive does this cost?"
+// Listed adjectives only — narrower than \bhow \w+\b avoids false positives
+// on "how are you", "how is it", "how do you", etc.
+const HOW_MUCH_ADJS = [
+  'tall','fast','expensive','big','small','heavy','light','long','short',
+  'hard','easy','good','bad','old','new','rich','poor','strong','weak',
+  'high','low','deep','wide','narrow','thick','thin','quick','slow',
+  'smart','dumb','happy','sad','cool','hot','cold','funny','great',
+  'nice','far','close','loud','quiet','dark','bright','clean','dirty',
+  'cheap','pricey','soon','late','early','sweet','sour','salty','spicy'
+];
+
 // Sentence prefixes Shoovy attaches based on context. Detection is heuristic
 // — there's no semantic understanding here, just shape/word matching.
 const POINT_PREFIX    = 'On God';
@@ -607,6 +620,15 @@ function shoovlateSentence(s, i) {
     maybe(0.70 + i * 0.25) ? wrap(m, caseMatch('thank you', m)) : m
   );
 
+  // 0x) Shoovy-ism: "thank you very much" -> "very thank you much".
+  // Runs BEFORE pass 2 (very stacking) so the inserted "very" is caught
+  // first by this phrase rule, not snipped out by pass 2. Pass 2 has a
+  // sentinel-aware boundary so it won't re-match the "very" inside this
+  // wrap.
+  s = s.replace(/\bthank you very much\b/gi, m =>
+    maybe(0.80 + i * 0.20) ? wrap(m, caseMatch('very thank you much', m)) : m
+  );
+
   // 0a) Shoovy-ism: "faster" -> "fastest" (superlative for comparative).
   for (const [k, v] of Object.entries(WRONG_SUPERLATIVE)) {
     const re = new RegExp(`\\b${k}\\b`, 'gi');
@@ -632,8 +654,10 @@ function shoovlateSentence(s, i) {
     maybe(0.55 + i * 0.40) ? wrap(m, caseMatch(pick(COMPARATIVE_STACKS), m)) : m
   );
 
-  // 2) stack "very"
-  s = s.replace(/\bvery\b/gi, m =>
+  // 2) stack "very" — sentinel-aware boundaries so we don't re-match "very"
+  // inside an earlier pass's wrap replacement (e.g., pass 0x's "very thank
+  // you much").
+  s = s.replace(/(?<![\w])very(?![\w])/gi, m =>
     maybe(0.45 + i * 0.45) ? wrap(m, caseMatch(pick(VERY_STACKS), m)) : m
   );
 
@@ -641,6 +665,17 @@ function shoovlateSentence(s, i) {
   for (const [k, v] of Object.entries(ADJ_BOOST)) {
     const re = new RegExp(`\\b${k}\\b`, 'gi');
     s = s.replace(re, m => maybe(0.30 + i * 0.50) ? wrap(m, caseMatch(v, m)) : m);
+  }
+
+  // 3b) Shoovy-ism: "how X" -> "how much X" in measurement questions.
+  // "How expensive does this cost?" -> "How much expensive does this cost?"
+  // Runs after ADJ_BOOST so if pass 3 already wrapped the adjective, the
+  // \b-anchored regex won't match across the sentinel and we skip cleanly.
+  {
+    const adjOr = HOW_MUCH_ADJS.join('|');
+    s = s.replace(new RegExp(`\\bhow (${adjOr})\\b`, 'gi'), (m, adj) =>
+      maybe(0.65 + i * 0.25) ? wrap(m, caseMatch(`how much ${adj}`, m)) : m
+    );
   }
 
   // 4) noun plural weirdness
@@ -826,6 +861,26 @@ function deshoovlateSentence(s) {
 
   // 0d) "is we are not" -> "are we not"
   s = s.replace(/\bis we are not\b/gi, m => caseMatch('are we not', m));
+
+  // 0e) "very thank you much" -> "thank you very much"
+  s = s.replace(/\bvery thank you much\b/gi, m => caseMatch('thank you very much', m));
+
+  // 0f) "how much X" -> "how X" — only for the listed measurement adjectives,
+  // so legitimate "how much money" / "how much time" / "how much does it cost"
+  // are left alone.
+  {
+    const adjOr = [
+      'tall','fast','expensive','big','small','heavy','light','long','short',
+      'hard','easy','good','bad','old','new','rich','poor','strong','weak',
+      'high','low','deep','wide','narrow','thick','thin','quick','slow',
+      'smart','dumb','happy','sad','cool','hot','cold','funny','great',
+      'nice','far','close','loud','quiet','dark','bright','clean','dirty',
+      'cheap','pricey','soon','late','early','sweet','sour','salty','spicy'
+    ].join('|');
+    s = s.replace(new RegExp(`\\bhow much (${adjOr})\\b`, 'gi'), (m, adj) =>
+      caseMatch(`how ${adj}`, m)
+    );
+  }
 
   // 1) Shoovy-isms — distinct enough to reverse confidently.
   s = s.replace(/\bdough knot\b/gi, m => caseMatch('do not', m));
