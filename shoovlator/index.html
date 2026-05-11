@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.5.6" />
+<meta name="version" content="0.5.7" />
 <title>Shoovlator — talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
 
 <meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy — stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
@@ -54,7 +54,7 @@
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "publisher": { "@type": "Organization", "name": "BookHockeys", "url": "https://bookhockeys.com/" },
       "image": "https://bookhockeys.com/shoovlator/og-card.png",
-      "softwareVersion": "0.5.6"
+      "softwareVersion": "0.5.7"
     }
   ]
 }
@@ -383,7 +383,7 @@
 </main>
 
 <footer>
-  <a href="/">BookHockeys</a> &middot; v0.5.6 &middot; runs entirely in your browser
+  <a href="/">BookHockeys</a> &middot; v0.5.7 &middot; runs entirely in your browser
 </footer>
 
 <script>
@@ -497,6 +497,16 @@ const WRONG_SUPERLATIVE = {
 const ADV_SWAPS = {
   quickly: 'swiftly'
 };
+
+// Shoovy-ism: -ly adverbs get a wrong "-ier" comparative inflection ("quickly"
+// -> "quicklier"), treating the adverb as if it were an adjective in -y.
+// Used context-free, like in "the computer is just going to die quicklier".
+const LIER_ADVERBS = [
+  'quickly','swiftly','slowly','loudly','softly','easily','quietly','sweetly',
+  'sadly','happily','carefully','tightly','lightly','nicely','badly','sharply',
+  'smoothly','rapidly','suddenly','calmly','gently','seriously','heavily',
+  'widely','perfectly','barely','clearly','hardly','sharply','warmly','coldly'
+];
 
 // Shoovy-ism: "how X" -> "how much X" in measurement questions.
 // "How expensive does this cost?" -> "How much expensive does this cost?"
@@ -633,6 +643,20 @@ function shoovlateSentence(s, i) {
   for (const [k, v] of Object.entries(WRONG_SUPERLATIVE)) {
     const re = new RegExp(`\\b${k}\\b`, 'gi');
     s = s.replace(re, m => maybe(0.80 + i * 0.20) ? wrap(m, caseMatch(v, m)) : m);
+  }
+
+  // 0a-2) Shoovy-ism: -ly adverbs get an "-ier" comparative inflection
+  // ("quickly" -> "quicklier"). Runs BEFORE pass 0b (quickly -> swiftly) so
+  // the two rules compete cleanly for "quickly" — whichever fires first
+  // wraps the word and the other won't see a raw match. No wrap-nesting
+  // because neither rule's replacement contains the other's trigger word.
+  for (const adv of LIER_ADVERBS) {
+    const re = new RegExp(`\\b${adv}\\b`, 'gi');
+    s = s.replace(re, m => {
+      if (!maybe(0.45 + i * 0.30)) return m;
+      const stem = m.slice(0, -1);    // drop trailing 'y' (preserves case)
+      return wrap(m, stem + 'ier');
+    });
   }
 
   // 0b) Shoovy-ism: "quickly" -> "swiftly" (sometimes).
@@ -864,6 +888,22 @@ function deshoovlateSentence(s) {
 
   // 0e) "very thank you much" -> "thank you very much"
   s = s.replace(/\bvery thank you much\b/gi, m => caseMatch('thank you very much', m));
+
+  // 0e-2) "-lier" wrong-comparative adverbs back to "-ly". Whitelist of the
+  // same adverb set the forward pass uses, so legitimate "earlier" / "uglier"
+  // / "homelier" (real -lier words) are left alone.
+  {
+    const lierForms = [
+      'quickly','swiftly','slowly','loudly','softly','easily','quietly','sweetly',
+      'sadly','happily','carefully','tightly','lightly','nicely','badly','sharply',
+      'smoothly','rapidly','suddenly','calmly','gently','seriously','heavily',
+      'widely','perfectly','barely','clearly','hardly','warmly','coldly'
+    ].map(a => a.slice(0, -1) + 'ier');
+    const lierOr = lierForms.join('|');
+    s = s.replace(new RegExp(`\\b(${lierOr})\\b`, 'gi'), m =>
+      m.slice(0, -3) + 'y'   // drop "ier", add "y"
+    );
+  }
 
   // 0f) "how much X" -> "how X" — only for the listed measurement adjectives,
   // so legitimate "how much money" / "how much time" / "how much does it cost"
