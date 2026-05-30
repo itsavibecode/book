@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.6.0 - double-note curveballs + now-playing panel + perspective + Kick + YouTube
+  ChordSwarm v0.7.0 - press-Play gate + double notes + now-playing panel + perspective + Kick + YouTube
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -22,6 +22,7 @@
     ?difficulty=easy|normal|hard
     ?dev=1                 dark dev backdrop + harness (works with ?channel)
     ?bg=<url>              background video for dev/preview (default media/bg.mp4 in dev)
+    ?bgzoom=<n>            zoom/crop the bg video, right-anchored (default 1.3)
     ?audio=test:128        synthetic click track at 128 BPM (no hosting needed)
     ?playlist=<json|urls>  play hosted tracks; chords land on detected beats
     ?yt=<id|url>           play a YouTube video; auto-tempo via the worker
@@ -45,13 +46,18 @@
 
   /* Dev-only background video (simulates a real stream behind the overlay).
      Never shown in a clean OBS load — only with ?sim=1 / ?dev=1 / ?bg=. */
-  #bgvid{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;display:none}
+  /* Background video. Zoomed + right-anchored so the left chat panel in the clip
+     crops off-screen (tune with ?bgzoom=, default 1.3). */
+  #bgvid{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;display:none;
+         transform:scale(var(--bgzoom,1.3));transform-origin:100% 50%}
   #stage{position:fixed;inset:0;z-index:1}
   canvas{position:absolute;inset:0;width:100%;height:100%}
 
   /* ---- HUD (non-interactive) ---- */
-  .hud{position:fixed;font-variant-numeric:tabular-nums;pointer-events:none;
-       text-shadow:0 2px 8px rgba(0,0,0,.6);z-index:5}
+  .hud{position:fixed;font-variant-numeric:tabular-nums;pointer-events:none;z-index:5;
+       /* dark outline halo so the stats stay readable over the background video */
+       text-shadow:0 0 3px #000, 0 0 3px #000, 0 1px 2px #000, 0 2px 8px rgba(0,0,0,.85);
+       -webkit-text-stroke:0.4px rgba(0,0,0,.45)}
   #hud-band{top:14px;left:48px}
   .score{font-size:38px;font-weight:800;letter-spacing:.5px;line-height:1}
   .score small{font-size:15px;font-weight:600;opacity:.7;margin-left:6px}
@@ -110,11 +116,16 @@
   body.pos-right #ver-pill{right:auto;left:10px}                 /* band is top-right here */
   body.pos-center #ver-pill{top:auto;bottom:10px;right:auto;left:10px}  /* both top corners used */
   /* getsongbpm.com backlink — REQUIRED by their free API, always visible. */
-  /* autoplay-blocked prompt (browsers only; OBS autoplays so it hides instantly) */
-  #tap-start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:8;display:none;
-        pointer-events:none;font-size:19px;font-weight:800;letter-spacing:.5px;color:var(--ink);
-        background:rgba(10,7,22,.72);border:1px solid rgba(124,92,255,.55);border-radius:12px;
-        padding:14px 22px;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+  /* centered blinking Play button — nothing starts until it's pressed (demo/sim) */
+  #play-btn{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9;display:none;
+        pointer-events:auto;cursor:pointer;font-family:inherit;font-size:30px;font-weight:900;
+        letter-spacing:3px;color:#fff;background:rgba(124,92,255,.92);border:3px solid #fff;
+        border-radius:18px;padding:22px 52px;box-shadow:0 10px 36px rgba(0,0,0,.55);
+        animation:playpulse 1.05s ease-in-out infinite}
+  #play-btn:hover{background:rgba(124,92,255,1)}
+  @keyframes playpulse{
+    0%,100%{ box-shadow:0 10px 30px rgba(124,92,255,.45); transform:translate(-50%,-50%) scale(1); }
+    50%    { box-shadow:0 10px 50px rgba(124,92,255,.95); transform:translate(-50%,-50%) scale(1.07); } }
   #gsbpm-credit{position:fixed;bottom:3px;right:8px;font-size:10px;opacity:.55;z-index:6;
         color:var(--ink);text-decoration:none}
   #gsbpm-credit:hover{opacity:.85;text-decoration:underline}
@@ -157,7 +168,7 @@
 <body>
   <video id="bgvid" muted loop playsinline></video>
   <div id="stage"><canvas id="cv"></canvas></div>
-  <div id="tap-start">&#9658;&nbsp; click anywhere to start the music</div>
+  <button id="play-btn">&#9658;&nbsp;PLAY</button>
 
   <div class="hud" id="hud-band">
     <div class="score" id="score">0<small>pts</small></div>
@@ -214,8 +225,9 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT_SRC = (qs.get('yt') || '').trim();                       // youtube id or url (auto-tempo). NOT named YT — that global belongs to the YouTube IFrame API!
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT_SRC);
-const VERSION = '0.6.0';                      // single source of truth — bump here
+const VERSION = '0.7.0';                      // single source of truth — bump here
 const BG = qs.get('bg') || (DEV ? 'media/bg.mp4' : '');   // dev background video (muted, loop)
+const BGZOOM = +qs.get('bgzoom') || 1.3;                  // zoom/crop the bg (right-anchored) to hide left chat
 
 if (DEV) document.body.classList.add('dev');
 if (HARNESS) document.body.classList.add('harness');
@@ -611,9 +623,8 @@ function startYouTube(){
           ytReady = true;
           try{ e.target.playVideo(); }catch{}      // autoplay attempt (works in OBS)
           if (wantPlay){ try{ e.target.unMute && e.target.unMute(); e.target.playVideo(); }catch{} }
-          resolveYtBpm(id); armStart();
+          resolveYtBpm(id);
         },
-        onStateChange: e => { if (e.data === 1) hideStart(); },   // 1 = YT.PlayerState.PLAYING
       },
     });
   };
@@ -645,19 +656,21 @@ async function resolveYtBpm(id){
   updateNowPlaying();
 }
 
-/* Browsers block autoplay-with-sound until a user gesture (OBS does not). Show a
-   "click to start" prompt and start playback on the first click anywhere. */
-let _startHandler = null;
-function armStart(){
-  const p = el('tap-start'); if (!p) return;
-  p.style.display = 'block';
-  if (_startHandler) return;
-  _startHandler = ()=>{ userStart(); hideStart(); };
-  document.addEventListener('pointerdown', _startHandler);
-}
-function hideStart(){
-  const p = el('tap-start'); if (p) p.style.display = 'none';
-  if (_startHandler){ document.removeEventListener('pointerdown', _startHandler); _startHandler = null; }
+/* Nothing runs until the user presses Play (browsers also block autoplay-with-
+   sound until a gesture). The centered blinking Play button — or a click anywhere
+   — starts the music, chat, emojis AND background video together. */
+let started = false, pendingKickStart = false, _startGesture = null;
+const NEEDS_PLAY = HARNESS || AUDIO_MODE;     // demo/sim or music -> wait for Play; pure live overlay auto-starts
+function showPlay(){ const b = el('play-btn'); if (b) b.style.display = 'block'; }
+function hidePlay(){ const b = el('play-btn'); if (b) b.style.display = 'none'; }
+function startGame(){
+  if (started) return;
+  started = true; hidePlay();
+  if (_startGesture){ document.removeEventListener('pointerdown', _startGesture); _startGesture = null; }
+  songStart = clock() + 800; chartIdx = 0; lastSimTick = clock();   // notes begin fresh on Play
+  if (BG){ const v = el('bgvid'); v.style.setProperty('--bgzoom', BGZOOM); v.src = BG; v.style.display = 'block'; v.play().catch(()=>{}); }
+  if (AUDIO_MODE){ wantPlay = true; startAudio(); }                 // Play click is the audio gesture
+  if (pendingKickStart && source && source.start){ source.start(); pendingKickStart = false; }
 }
 
 /* Kick connection status -> small indicator + harness label. */
@@ -921,8 +934,8 @@ function wireHarness(){
   el('ctl-swarm').addEventListener('click', ()=>{
     const now = clock(); const note = liveNote(now);
     if (!note){ el('ctl-status').textContent = 'no note'; setTimeout(()=>el('ctl-status').textContent='SIM',900); return; }
-    const need = thresholdFor(now) + 1;
-    for (let i=0;i<need;i++) ingest(note.emoji, {username:`swarm_${++testerSeq}`});
+    const need = noteReq(thresholdFor(now), note) + 1;
+    note.emojis.forEach(em=>{ for (let i=0;i<need;i++) ingest(em, {username:`swarm_${++testerSeq}`}); });
   });
   // type as YOU
   el('ctl-msg').addEventListener('keydown', e=>{
@@ -933,7 +946,7 @@ function wireHarness(){
   // audio transport (a browser tab needs a gesture to start; OBS autoplays)
   if (PLAYLIST || YT_SRC){
     el('ctl-audio').style.display = 'flex';
-    el('ctl-play').addEventListener('click', ()=>{ ensureCtx(); userStart(); });
+    el('ctl-play').addEventListener('click', startGame);
     el('ctl-skip').addEventListener('click', ()=>{ if (!YT_SRC) playTrack(plIdx+1); });
   }
 }
@@ -946,7 +959,7 @@ function startAudio(){
   } else if (YT_SRC){
     startYouTube();
   } else if (PLAYLIST){
-    loadPlaylist(PLAYLIST).then(t=>{ playlist = t; playTrack(0); armStart(); });  // autoplay (OBS); tab needs a click
+    loadPlaylist(PLAYLIST).then(t=>{ playlist = t; playTrack(0); });
   }
 }
 
@@ -956,11 +969,13 @@ let lastSimTick = 0, lastFrame = 0, lastRate = 0;
 function frame(){
   const now = clock();
   const dt = lastFrame ? (now - lastFrame)/1000 : 0; lastFrame = now;
-  score.hype = Math.max(0, score.hype - 0.035*dt);   // slow passive ebb
-  if (audioActive) ensureNotesAudio(now); else ensureNotes(now);
-  if (source && source.tick && now - lastSimTick > 90){ source.tick(now); lastSimTick = now; }
-  if (now - lastRate > 500){ computeChatRate(now); lastRate = now; }
-  resolveNotes(now);
+  if (started){                                       // nothing runs until Play
+    score.hype = Math.max(0, score.hype - 0.035*dt); // slow passive ebb
+    if (audioActive) ensureNotesAudio(now); else ensureNotes(now);
+    if (source && source.tick && now - lastSimTick > 90){ source.tick(now); lastSimTick = now; }
+    if (now - lastRate > 500){ computeChatRate(now); lastRate = now; }
+    resolveNotes(now);
+  }
   draw(now);
   paintHud();
   if (HARNESS) paintFeed();
@@ -970,30 +985,35 @@ function frame(){
 function boot(){
   resize();
   el('ver-pill').textContent = 'v' + VERSION;
-  if (BG){ const v = el('bgvid'); v.src = BG; v.style.display = 'block'; v.play().catch(()=>{}); }
   _t0 = performance.now();
-  songStart = clock() + 800;
   if (HARNESS) wireHarness();
-  if (AUDIO_MODE) startAudio();
 
+  // Build the chat source, but DON'T start anything yet (see startGame / Play).
   if (SIM){
     source = SimSource();
     source.onMessage(ingest);
     el('hint').textContent = 'ChordSwarm v'+VERSION+' · sim test harness · pos:'+POS+' · '+(qs.get('difficulty')||'normal');
   } else if (CHANNEL || CHATROOM){
-    // real Kick chat (works with ?dev=1 backdrop + harness feed for testing)
     source = KickPusherSource({ channel:CHANNEL, chatroom:CHATROOM });
     source.onMessage(ingest);
-    source.start();
+    pendingKickStart = true;            // connect on Play (or immediately if auto-start)
     if (DEV) simCfg.bots = false;
     el('hint').textContent = 'ChordSwarm v'+VERSION+' · kick:'+(CHANNEL || ('room '+CHATROOM));
   } else if (DEV){
-    // dev backdrop + harness but no auto-bots: pure manual testing
     source = SimSource(); source.onMessage(ingest); simCfg.bots = false;
     el('ctl-bots').textContent = 'Bots: OFF'; el('ctl-bots').classList.add('off');
     el('hint').textContent = 'ChordSwarm v'+VERSION+' · manual test · pos:'+POS;
   } else {
     el('hint').textContent = 'ChordSwarm v'+VERSION+' · add ?sim=1 (sim) or ?channel=<name> (live Kick)';
+  }
+
+  if (NEEDS_PLAY){
+    showPlay();                         // blinking Play button + click-anywhere
+    if (el('play-btn')) el('play-btn').addEventListener('click', startGame);
+    _startGesture = ()=> startGame();
+    document.addEventListener('pointerdown', _startGesture);
+  } else {
+    startGame();                        // pure live overlay (OBS) — auto-start
   }
   requestAnimationFrame(frame);
 }
