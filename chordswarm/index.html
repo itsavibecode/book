@@ -14,7 +14,7 @@
 <meta property="og:image" content="https://bookhockeys.com/chordswarm/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <!--
-  ChordSwarm v0.9.0 - !song chat command (live song swap, no OBS edit) + favicon/OG + smaller title
+  ChordSwarm v0.9.1 - combo lightning bolt down the highway (gold on milestones/records)
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -239,7 +239,7 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT_SRC = (qs.get('yt') || '').trim();                       // youtube id or url (auto-tempo). NOT named YT — that global belongs to the YouTube IFrame API!
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT_SRC);
-const VERSION = '0.9.0';                      // single source of truth — bump here
+const VERSION = '0.9.1';                      // single source of truth — bump here
 const BG = qs.get('bg') || (DEV ? 'media/bg.mp4' : '');   // dev background video (muted, loop)
 const BGZOOM = +qs.get('bgzoom') || 1.3;                  // zoom/crop the bg (right-anchored) to hide left chat
 
@@ -287,13 +287,14 @@ function creditUser(user, pts){
   const u = score.users.get(user) || {pts:0, hits:0};
   u.pts += pts; u.hits += 1; score.users.set(user, u);
 }
-let hitFx = 0, recordFx = 0;   // purple hit glow + gold all-time-high flash (decay in frame())
+let hitFx = 0, recordFx = 0, bolt = null;   // purple hit glow + gold record flash + lightning bolt
 function registerHit(note){
-  const prevBest = score.best;
+  const prevBest = score.best, prevMult = score.mult;
   score.combo += 1;
   const isRecord = score.combo > prevBest && score.combo >= 10;   // new all-time-high combo
   score.best = Math.max(score.best, score.combo);
   score.mult = multiplier(score.combo);
+  const milestone = score.mult > prevMult;                        // crossed x2/x3/x4
   const base = 100 * (note.emojis.length > 1 ? 1.6 : 1);   // doubles are worth more
   score.band += Math.round(base * score.mult);
   const all = noteMatchers(note);
@@ -302,6 +303,9 @@ function registerHit(note){
   score.hype = Math.min(1, score.hype + 0.045);   // ebbs via passive decay in frame()
   hitFx = Math.min(1, 0.4 + score.combo*0.025);   // brighter glow with a higher combo
   if (isRecord) recordFx = 1;                      // gold burst on a new record
+  // lightning down the highway on the bigger ones (and milestones / records)
+  if (score.combo >= 8 || milestone || isRecord)
+    fireBolt(Math.min(1, 0.45 + score.combo*0.02), isRecord || milestone);
 }
 function registerMiss(){
   score.combo = 0; score.mult = 1;
@@ -829,6 +833,31 @@ function hwAtY(y){                                              // trapezoid hal
   const f = (y - yFar)/(yNear - yFar);
   return hwTop + (hwBot - hwTop)*Math.max(0, Math.min(1.2, f));
 }
+// Build a jagged lightning path down the highway centerline (fixed for its life
+// so it doesn't flicker). Triggered on big combos / milestones / records.
+function fireBolt(intensity, gold){
+  const N = 11, pts = [];
+  for (let i=0;i<=N;i++){
+    const t = i/N, y = yFar + (strikeY - yFar)*t;
+    const jx = (i===0 || i===N) ? 0 : (Math.random()*2-1) * hwAtY(y) * 0.45;
+    pts.push({ x: centerX + jx, y });
+  }
+  bolt = { born: clock(), pts, gold, intensity };
+}
+function drawBolt(now){
+  if (!bolt) return;
+  const a = 1 - (now - bolt.born)/300;          // ~300ms life
+  if (a <= 0){ bolt = null; return; }
+  const col = bolt.gold ? '255,228,120' : '198,176,255';
+  const path = ()=>{ ctx.beginPath(); ctx.moveTo(bolt.pts[0].x, bolt.pts[0].y);
+    for (let i=1;i<bolt.pts.length;i++) ctx.lineTo(bolt.pts[i].x, bolt.pts[i].y); ctx.stroke(); };
+  ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineJoin = 'round';
+  ctx.shadowColor = `rgba(${col},${a})`; ctx.shadowBlur = 22*bolt.intensity;
+  ctx.strokeStyle = `rgba(${col},${a*0.85})`; ctx.lineWidth = 3 + 7*bolt.intensity*a; path();
+  ctx.shadowBlur = 0;                            // bright white core
+  ctx.strokeStyle = `rgba(255,255,255,${a*0.9})`; ctx.lineWidth = 1.5 + 2.5*a; path();
+  ctx.restore();
+}
 
 function draw(now){
   ctx.clearRect(0,0,W,H);
@@ -876,6 +905,8 @@ function draw(now){
     ctx.fillStyle = g; ctx.fillRect(centerX-r, strikeY-r, r*2, r*2);
     ctx.restore();
   }
+
+  drawBolt(now);   // lightning down the highway on big combos
 
   // notes — projected with perspective; tiny in the distance, rushing toward the
   // viewer (bigger) as they approach. Doubles render two emojis side by side,
