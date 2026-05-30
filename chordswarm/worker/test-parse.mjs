@@ -22,6 +22,8 @@ eq(parseTitle('Rick Astley - Never Gonna Give You Up (Official Video)'),
    { artist: 'Rick Astley', song: 'Never Gonna Give You Up', guessed: false }, 'artist - song (official video)');
 eq(parseTitle('Daft Punk - Harder, Better, Faster, Stronger [Official Music Video]'),
    { artist: 'Daft Punk', song: 'Harder, Better, Faster, Stronger', guessed: false }, 'strip [official music video]');
+eq(parseTitle('Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)'),
+   { artist: 'Rick Astley', song: 'Never Gonna Give You Up', guessed: false }, 'strip multiple parens incl (4K Remaster)');
 eq(parseTitle('Artist – Song Name (Lyrics)'),
    { artist: 'Artist', song: 'Song Name', guessed: false }, 'en-dash + (lyrics)');
 eq(parseTitle('Some Song (Official Audio)', 'CoolArtist'),

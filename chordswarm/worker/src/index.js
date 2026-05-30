@@ -44,20 +44,26 @@ const json = (obj, origin, status = 200, extra = {}) =>
   });
 
 async function fetchBpm(artist, song, key){
-  // GetSongBPM Web API base is api.getsong.co (NOT api.getsongbpm.com).
-  const lookup = encodeURIComponent(`song:${song}${artist ? ` artist:${artist}` : ''}`);
-  const r = await fetch(`https://api.getsong.co/search/?api_key=${key}&type=song&lookup=${lookup}`,
-    { headers: { 'Accept': 'application/json' } });
-  let raw = null;
-  try { raw = await r.json(); } catch { try { raw = await r.text(); } catch { raw = null; } }
-  // search results may be an array, a single object, or nested under .search
-  const list = raw && Array.isArray(raw.search) ? raw.search : (raw && raw.search ? [raw.search] : []);
-  const hit = list.find(x => x && x.tempo);
+  // GetSongBPM Web API base is api.getsong.co. Their exact lookup syntax is
+  // undocumented to us (docs 403'd), so try a few formats and use the first that
+  // returns a tempo. The loop short-circuits on the first hit, so it's normally
+  // one call.
+  // GetSongBPM search: type=song&lookup=<title> (NO "song:" prefix — the prefixed
+  // form returns "no result"). Title-only returns every cover by every artist, so
+  // disambiguate by matching the parsed artist (falling back to the first tempo).
+  const url = `https://api.getsong.co/search/?api_key=${key}&type=song&lookup=${encodeURIComponent(song)}`;
+  let raw = null, status = 0;
+  try { const r = await fetch(url, { headers: { Accept: 'application/json' } }); status = r.status; raw = await r.json().catch(() => null); }
+  catch (e){ raw = { fetchError: String((e && e.message) || e) }; }
+  const list = raw && Array.isArray(raw.search) ? raw.search : [];
+  const aLow = (artist || '').toLowerCase();
+  const cand = list.find(x => x && x.tempo && x.artist && (x.artist.name || '').toLowerCase() === aLow)
+            || list.find(x => x && x.tempo);
   return {
-    bpm: hit ? Math.round(+hit.tempo) : null,
-    dbTitle: hit ? (hit.song_title || hit.title || null) : null,
-    httpStatus: r.status,
-    raw,                       // echoed only under ?debug=1; never contains the key
+    bpm: cand ? Math.round(+cand.tempo) : null,
+    dbTitle: cand ? (cand.song_title || cand.title || null) : null,
+    dbArtist: cand && cand.artist ? cand.artist.name : null,
+    status, resultCount: list.length,        // compact debug fields (no key, no giant dump)
   };
 }
 
@@ -101,7 +107,7 @@ export default {
       } else if (env.GETSONGBPM_API_KEY && song){
         const res = await fetchBpm(artist, song, env.GETSONGBPM_API_KEY);
         if (res && res.bpm != null){ bpm = res.bpm; dbTitle = res.dbTitle; matched = true; }
-        if (debug) dbg = { httpStatus: res && res.httpStatus, raw: res && res.raw };
+        if (debug) dbg = res ? { status: res.status, resultCount: res.resultCount, dbArtist: res.dbArtist, dbTitle: res.dbTitle } : null;
       }
 
       out = { ok: matched, videoId: vid, title: meta.title, artist, song, songKey: sk, guessed, bpm, matched, dbTitle, source };

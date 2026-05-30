@@ -22,17 +22,16 @@ export function extractVideoId(input){
 }
 
 // Strip the usual YouTube-title noise so the artist/song split is cleaner.
+// Strip whole (...) and [...] groups first (covers "(Official Video)",
+// "(4K Remaster)", "[Official Music Video]", "(prod. X)", etc. in one shot —
+// stripping keywords *inside* a group used to leave junk like "( Remaster)"),
+// then any leftover standalone noise words.
 const NOISE = [
-  /\(\s*official\s*(music\s*)?video\s*\)/ig,
-  /\[\s*official\s*(music\s*)?video\s*\]/ig,
-  /\(\s*official\s*(lyric|lyrics)\s*video\s*\)/ig,
-  /\(\s*official\s*audio\s*\)/ig, /\[\s*official\s*audio\s*\]/ig,
-  /\(\s*(lyric|lyrics)\s*\)/ig, /\[\s*(lyric|lyrics)\s*\]/ig,
-  /\(\s*audio\s*\)/ig, /\(\s*visuali[sz]er\s*\)/ig,
-  /\bofficial\s*(music\s*)?video\b/ig, /\bofficial\s*audio\b/ig,
-  /\(\s*prod\.?[^)]*\)/ig,
-  /\[[^\]]*\]/g,                          // any remaining [..] tag
-  /\b(hd|hq|4k|m\/?v)\b/ig,
+  /\([^)]*\)/g,                           // any (...) group
+  /\[[^\]]*\]/g,                          // any [...] group
+  /\bofficial\s*(music\s*)?video\b/ig,
+  /\bofficial\s*audio\b/ig,
+  /\b(hd|hq|4k|m\/?v|lyrics?|visuali[sz]er|remaster(ed)?)\b/ig,
 ];
 export function cleanTitle(t){
   let s = ' ' + (t || '') + ' ';
