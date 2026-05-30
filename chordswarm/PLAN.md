@@ -293,7 +293,11 @@ worker/ (Phase 3)   resolve username -> chatroomId
   gameplay stay visible and unobstructed. HUD (score/combo/hype + leaderboard)
   re-anchors to the same side as the lane; the dev chat feed sits on the opposite
   side. Center mode is mainly for full-screen demos.
-- Vertical fall (top -> strike line near bottom), Guitar-Hero highway feel.
+- **3D perspective highway [v0.5.0]:** the lane is a trapezoid receding to a
+  vanishing point at the top; notes start tiny in the distance and rush AT the
+  viewer (growing + accelerating, screen-pos + size scale by 1/depth) through and
+  past the strike line. Receding fret rungs bunch toward the top. Tunables:
+  `PERSP_RATIO` (far/near depth), `HW_TOP_FRAC` (far width).
 - Big readable falling emoji; strike line with a "hit zone" glow.
 - On a note: burst of the emoji + combo count popup; on miss: brief fade.
 - HUD: band combo + multiplier, hype meter, small live leaderboard (top 5).

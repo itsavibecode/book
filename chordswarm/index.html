@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.4.2 - real Kick chat + audio-reactive + YouTube auto-tempo
+  ChordSwarm v0.5.0 - perspective highway + real Kick chat + audio-reactive + YouTube
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -200,7 +200,7 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT = (qs.get('yt') || '').trim();                           // youtube id or url (auto-tempo)
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT);
-const VERSION = '0.4.2';                      // single source of truth — bump here
+const VERSION = '0.5.0';                      // single source of truth — bump here
 
 if (DEV) document.body.classList.add('dev');
 if (HARNESS) document.body.classList.add('harness');
@@ -669,7 +669,16 @@ function mkPopup(note, good){
 /* ============================================================ RENDER ===== */
 const cv = document.getElementById('cv');
 const ctx = cv.getContext('2d');
-let W=0,H=0,DPR=1, laneX=0, laneW=0, strikeY=0, topY=0, laneTopY=0, badgeX=0, badgeAlign='left';
+let W=0,H=0,DPR=1, laneX=0, laneW=0, strikeY=0, laneTopY=0;
+// Perspective highway (Guitar-Hero style): a trapezoid receding to a vanishing
+// point at the top; notes start tiny in the distance and rush AT the viewer
+// (growing + accelerating) as they approach and pass the strike line. Screen
+// position + size both scale by 1/depth.
+const PERSP_RATIO = 5.5;          // far-depth / near-depth (higher = stronger perspective)
+const HW_TOP_FRAC = 0.16;         // far (top) width as a fraction of near (bottom) width
+const DNEAR = 1, DFAR = PERSP_RATIO;
+let centerX=0, yFar=0, yNear=0, hwTop=0, hwBot=0, Kp=0, yHorizon=0;
+
 function resize(){
   DPR = Math.min(2, window.devicePixelRatio||1);
   W = cv.clientWidth; H = cv.clientHeight;
@@ -679,75 +688,92 @@ function resize(){
   const margin = 48;
   laneW = POS==='center' ? Math.min(360, W*0.5) : 340;
   laneX = POS==='left' ? margin : POS==='right' ? (W - laneW - margin) : (W - laneW)/2;
-  // In side modes the band HUD sits above the lane, so start the lane lower.
-  laneTopY = POS==='center' ? 0 : 96;
-  topY = laneTopY - 60;
-  strikeY = laneTopY + (H - laneTopY)*0.80;
-  // live-count badge on the inner edge (toward screen center)
-  if (POS==='right'){ badgeX = laneX - 18; badgeAlign='right'; }
-  else { badgeX = laneX + laneW + 18; badgeAlign='left'; }
+  laneTopY = POS==='center' ? 0 : 96;          // side modes leave room for the HUD band
+  strikeY = laneTopY + (H - laneTopY)*0.78;
+
+  centerX = laneX + laneW/2;
+  yFar = laneTopY;                              // top of highway (vanishing end)
+  yNear = H;                                    // bottom of screen (nearest)
+  hwBot = laneW*0.62;                           // near half-width (wide)
+  hwTop = hwBot * HW_TOP_FRAC;                  // far half-width (narrow)
+  // screenY(D) = yHorizon + Kp/D, anchored so D=DFAR -> yFar and D=DNEAR -> strikeY
+  Kp = (strikeY - yFar) / (1 - DNEAR/DFAR);
+  yHorizon = yFar - Kp/DFAR;
 }
 window.addEventListener('resize', resize);
 
-function noteY(note, now){
-  const spawn = note.targetTime - DIFF.lead;
-  const p = (now - spawn) / DIFF.lead;
-  if (note.state==='falling') return topY + (strikeY - topY)*p;
-  const after = (now - note.resolvedAt)/700;
-  return strikeY + ((H-strikeY)*0.35)*Math.min(1,after);
+// depth for a note's time-progress p (0 = far spawn, 1 = strike, >1 = past, at viewer)
+function depthAt(p){ return DFAR + (DNEAR - DFAR)*p; }
+function projY(D){ return yHorizon + Kp/Math.max(0.34, D); }    // clamp so it can't blow up
+function hwAtY(y){                                              // trapezoid half-width at screen-y
+  const f = (y - yFar)/(yNear - yFar);
+  return hwTop + (hwBot - hwTop)*Math.max(0, Math.min(1.2, f));
 }
 
 function draw(now){
   ctx.clearRect(0,0,W,H);
 
-  // lane
-  ctx.fillStyle = 'rgba(124,92,255,0.06)';
-  ctx.fillRect(laneX, laneTopY, laneW, H-laneTopY);
-  ctx.strokeStyle = 'rgba(124,92,255,0.25)';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(laneX, laneTopY, laneW, H-laneTopY);
+  // highway trapezoid
+  ctx.beginPath();
+  ctx.moveTo(centerX-hwTop, yFar); ctx.lineTo(centerX+hwTop, yFar);
+  ctx.lineTo(centerX+hwBot, yNear); ctx.lineTo(centerX-hwBot, yNear); ctx.closePath();
+  ctx.fillStyle = 'rgba(124,92,255,0.06)'; ctx.fill();
+  ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(124,92,255,0.25)'; ctx.stroke();
 
-  // strike line + hit zone
-  const live = liveNote(now);
-  const glow = live ? 0.9 : 0.4;
-  const zoneH = (DIFF.half/DIFF.lead)*(strikeY-topY)*2;
-  ctx.fillStyle = `rgba(124,92,255,${0.10+0.12*glow})`;
-  ctx.fillRect(laneX, strikeY - zoneH/2, laneW, zoneH);
-  ctx.strokeStyle = `rgba(180,155,255,${0.5+0.5*glow})`;
-  ctx.lineWidth = 4;
-  ctx.beginPath(); ctx.moveTo(laneX, strikeY); ctx.lineTo(laneX+laneW, strikeY); ctx.stroke();
-
-  // live count badge near strike
-  if (live){
-    const thr = thresholdFor(now);
-    ctx.font = '700 22px Segoe UI, sans-serif';
-    ctx.textAlign = badgeAlign; ctx.textBaseline='middle';
-    ctx.fillStyle = live.matchers.size>=thr ? getCss('--good') : '#fff';
-    ctx.fillText(`${live.matchers.size}/${thr}`, badgeX, strikeY);
+  // receding fret rungs (perspective-spaced — bunch up toward the vanishing point)
+  ctx.strokeStyle = 'rgba(124,92,255,0.13)'; ctx.lineWidth = 1.5;
+  for (const pr of [0.2,0.4,0.6,0.8]){
+    const y = projY(depthAt(pr)), hw = hwAtY(y);
+    ctx.beginPath(); ctx.moveTo(centerX-hw, y); ctx.lineTo(centerX+hw, y); ctx.stroke();
   }
 
-  // falling chords
+  // hit zone (trapezoid slice around the strike) + strike line
+  const live = liveNote(now);
+  const glow = live ? 0.9 : 0.4;
+  const yIn  = projY(depthAt(1 - DIFF.half/DIFF.lead));
+  const yOut = projY(depthAt(1 + DIFF.half/DIFF.lead));
+  const hwIn = hwAtY(yIn), hwOut = hwAtY(yOut), hwS = hwAtY(strikeY);
+  ctx.beginPath();
+  ctx.moveTo(centerX-hwIn, yIn); ctx.lineTo(centerX+hwIn, yIn);
+  ctx.lineTo(centerX+hwOut, yOut); ctx.lineTo(centerX-hwOut, yOut); ctx.closePath();
+  ctx.fillStyle = `rgba(124,92,255,${0.10+0.12*glow})`; ctx.fill();
+  ctx.lineWidth = 4; ctx.strokeStyle = `rgba(180,155,255,${0.5+0.5*glow})`;
+  ctx.beginPath(); ctx.moveTo(centerX-hwS, strikeY); ctx.lineTo(centerX+hwS, strikeY); ctx.stroke();
+
+  // live-count badge just outside the near edge at the strike line
+  if (live){
+    const thr = thresholdFor(now);
+    const right = POS!=='right';
+    ctx.font = '700 22px Segoe UI, sans-serif';
+    ctx.textAlign = right ? 'left' : 'right'; ctx.textBaseline='middle';
+    ctx.fillStyle = live.matchers.size>=thr ? getCss('--good') : '#fff';
+    ctx.fillText(`${live.matchers.size}/${thr}`, centerX + (right ? hwS+16 : -(hwS+16)), strikeY);
+  }
+
+  // notes — projected with perspective; tiny in the distance, rushing toward the
+  // viewer (bigger) as they approach and blow past the strike line.
   ctx.textAlign='center'; ctx.textBaseline='middle';
   for (const note of notes){
-    const y = noteY(note, now);
-    const cx = laneX + laneW/2;
-    let size = 60, alpha = 1;
-    if (note.state==='hit'){ const a=(now-note.resolvedAt)/700; size=60+40*a; alpha=1-a; }
-    if (note.state==='miss'){ const a=(now-note.resolvedAt)/700; alpha=(1-a)*0.6; }
-    ctx.globalAlpha = Math.max(0, alpha);
-    ctx.font = `${size}px "Segoe UI Emoji", sans-serif`;
-    ctx.fillText(note.emoji, cx, y);
+    const p = (now - (note.targetTime - DIFF.lead)) / DIFF.lead;
+    const D = Math.max(0.34, depthAt(p));
+    const y = projY(D);
+    const size = 60 / D;                         // 60px at the strike; smaller far, huge as it passes
+    let alpha = 1;
+    if (note.state==='hit')  alpha = 1 - (now-note.resolvedAt)/600;
+    if (note.state==='miss') alpha = (1 - (now-note.resolvedAt)/600)*0.55;
+    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    ctx.font = `${Math.max(9, size)}px "Segoe UI Emoji", sans-serif`;
+    ctx.fillText(note.emoji, centerX, y);
     ctx.globalAlpha = 1;
   }
 
-  // popups
-  for (const p of popups){
-    const a = (now - p.born)/700; if (a>1) continue;
+  // popups (at the strike)
+  for (const pp of popups){
+    const a = (now - pp.born)/700; if (a>1) continue;
     ctx.globalAlpha = 1-a;
-    ctx.font = '800 30px Segoe UI, sans-serif';
-    ctx.textAlign='center';
-    ctx.fillStyle = p.good ? getCss('--good') : getCss('--bad');
-    ctx.fillText(p.label, laneX+laneW/2, strikeY - 50 - 40*a);
+    ctx.font = '800 30px Segoe UI, sans-serif'; ctx.textAlign='center';
+    ctx.fillStyle = pp.good ? getCss('--good') : getCss('--bad');
+    ctx.fillText(pp.label, centerX, strikeY - 50 - 40*a);
     ctx.globalAlpha = 1;
   }
   for (let i=popups.length-1;i>=0;i--) if (now-popups[i].born>700) popups.splice(i,1);
