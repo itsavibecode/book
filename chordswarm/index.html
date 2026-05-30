@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.4.1 - real Kick chat + audio-reactive + YouTube auto-tempo
+  ChordSwarm v0.4.2 - real Kick chat + audio-reactive + YouTube auto-tempo
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -95,6 +95,13 @@
   body.pos-right #ytwrap{right:auto;left:14px}
   body.harness #ytwrap{bottom:52px}            /* clear the control strip */
   #ytwrap iframe{width:100%;height:100%;border:0}
+  /* semver pill — top corner, opposite the HUD band so it stays clear. */
+  #ver-pill{position:fixed;top:8px;right:10px;z-index:6;font-size:10px;font-weight:800;
+        letter-spacing:.5px;padding:2px 8px;border-radius:999px;opacity:.7;
+        background:rgba(124,92,255,.22);border:1px solid rgba(124,92,255,.45);
+        color:var(--ink);font-variant-numeric:tabular-nums;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+  body.pos-right #ver-pill{right:auto;left:10px}                 /* band is top-right here */
+  body.pos-center #ver-pill{top:auto;bottom:10px;right:auto;left:10px}  /* both top corners used */
   /* getsongbpm.com backlink — REQUIRED by their free API, always visible. */
   #gsbpm-credit{position:fixed;bottom:3px;right:8px;font-size:10px;opacity:.55;z-index:6;
         color:var(--ink);text-decoration:none}
@@ -152,6 +159,7 @@
   </div>
 
   <div id="chatfeed"></div>
+  <div id="ver-pill"></div>
   <div id="connstate"></div>
   <div id="nowplaying"></div>
   <div id="ytwrap"><div id="ytplayer"></div></div>
@@ -192,6 +200,7 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT = (qs.get('yt') || '').trim();                           // youtube id or url (auto-tempo)
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT);
+const VERSION = '0.4.2';                      // single source of truth — bump here
 
 if (DEV) document.body.classList.add('dev');
 if (HARNESS) document.body.classList.add('harness');
@@ -862,6 +871,7 @@ function frame(){
 
 function boot(){
   resize();
+  el('ver-pill').textContent = 'v' + VERSION;
   _t0 = performance.now();
   songStart = clock() + 800;
   if (HARNESS) wireHarness();
@@ -870,21 +880,21 @@ function boot(){
   if (SIM){
     source = SimSource();
     source.onMessage(ingest);
-    el('hint').textContent = 'ChordSwarm v0.4.1 · sim test harness · pos:'+POS+' · '+(qs.get('difficulty')||'normal');
+    el('hint').textContent = 'ChordSwarm v'+VERSION+' · sim test harness · pos:'+POS+' · '+(qs.get('difficulty')||'normal');
   } else if (CHANNEL || CHATROOM){
     // real Kick chat (works with ?dev=1 backdrop + harness feed for testing)
     source = KickPusherSource({ channel:CHANNEL, chatroom:CHATROOM });
     source.onMessage(ingest);
     source.start();
     if (DEV) simCfg.bots = false;
-    el('hint').textContent = 'ChordSwarm v0.4.1 · kick:'+(CHANNEL || ('room '+CHATROOM));
+    el('hint').textContent = 'ChordSwarm v'+VERSION+' · kick:'+(CHANNEL || ('room '+CHATROOM));
   } else if (DEV){
     // dev backdrop + harness but no auto-bots: pure manual testing
     source = SimSource(); source.onMessage(ingest); simCfg.bots = false;
     el('ctl-bots').textContent = 'Bots: OFF'; el('ctl-bots').classList.add('off');
-    el('hint').textContent = 'ChordSwarm v0.4.1 · manual test · pos:'+POS;
+    el('hint').textContent = 'ChordSwarm v'+VERSION+' · manual test · pos:'+POS;
   } else {
-    el('hint').textContent = 'ChordSwarm v0.4.1 · add ?sim=1 (sim) or ?channel=<name> (live Kick)';
+    el('hint').textContent = 'ChordSwarm v'+VERSION+' · add ?sim=1 (sim) or ?channel=<name> (live Kick)';
   }
   requestAnimationFrame(frame);
 }
