@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.5.6 - perspective highway + real Kick chat + audio-reactive + YouTube
+  ChordSwarm v0.5.7 - perspective highway + real Kick chat + audio-reactive + YouTube
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -211,7 +211,7 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT = (qs.get('yt') || '').trim();                           // youtube id or url (auto-tempo)
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT);
-const VERSION = '0.5.6';                      // single source of truth — bump here
+const VERSION = '0.5.7';                      // single source of truth — bump here
 const BG = qs.get('bg') || (DEV ? 'media/bg.mp4' : '');   // dev background video (muted, loop)
 
 if (DEV) document.body.classList.add('dev');
@@ -550,7 +550,20 @@ function updateNowPlaying(){
    YouTube audio is unreachable for analysis, so BPM comes from the worker
    (song-id -> GetSongBPM); the IFrame's getCurrentTime() is the beat clock.
    Tempo only (no phase). Falls back to ?bpm=, then the fixed chart. */
-let ytPlayer = null;
+let ytPlayer = null, ytReady = false, wantPlay = false;
+// Shared "user wants playback now" entry — used by the click-to-start prompt AND
+// the harness Play button. Handles the readiness race (a click before the YT
+// player is ready is remembered and honored on ready) and resumes the AudioCtx
+// for playlist mode.
+function userStart(){
+  if (YT){
+    if (ytReady && ytPlayer && ytPlayer.playVideo){ try{ ytPlayer.unMute && ytPlayer.unMute(); ytPlayer.playVideo(); }catch{} }
+    else wantPlay = true;            // not ready yet -> play as soon as onReady fires
+  } else {
+    try{ if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }catch{}
+    if (PLAYLIST) playTrack(plIdx);
+  }
+}
 function ytId(input){
   if (!input) return '';
   if (/^[A-Za-z0-9_-]{11}$/.test(input)) return input;
@@ -572,7 +585,12 @@ function startYouTube(){
       videoId: id,
       playerVars: { autoplay:1, controls:0, playsinline:1, modestbranding:1, rel:0 },
       events: {
-        onReady: e => { try{ e.target.playVideo(); }catch{} resolveYtBpm(id); armStart(); },
+        onReady: e => {
+          ytReady = true;
+          try{ e.target.playVideo(); }catch{}      // autoplay attempt (works in OBS)
+          if (wantPlay){ try{ e.target.unMute && e.target.unMute(); e.target.playVideo(); }catch{} }
+          resolveYtBpm(id); armStart();
+        },
         onStateChange: e => { if (e.data === 1) hideStart(); },   // 1 = YT.PlayerState.PLAYING
       },
     });
@@ -612,11 +630,7 @@ function armStart(){
   const p = el('tap-start'); if (!p) return;
   p.style.display = 'block';
   if (_startHandler) return;
-  _startHandler = ()=>{
-    try { if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo(); } catch {}
-    try { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); } catch {}
-    hideStart();
-  };
+  _startHandler = ()=>{ userStart(); hideStart(); };
   document.addEventListener('pointerdown', _startHandler);
 }
 function hideStart(){
@@ -892,11 +906,7 @@ function wireHarness(){
   // audio transport (a browser tab needs a gesture to start; OBS autoplays)
   if (PLAYLIST || YT){
     el('ctl-audio').style.display = 'flex';
-    el('ctl-play').addEventListener('click', async ()=>{
-      if (YT){ if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo(); return; }
-      const ctx = ensureCtx(); if (ctx.state==='suspended') await ctx.resume();
-      playTrack(plIdx);
-    });
+    el('ctl-play').addEventListener('click', ()=>{ ensureCtx(); userStart(); });
     el('ctl-skip').addEventListener('click', ()=>{ if (!YT) playTrack(plIdx+1); });
   }
 }
