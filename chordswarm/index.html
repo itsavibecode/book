@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.5.7 - perspective highway + real Kick chat + audio-reactive + YouTube
+  ChordSwarm v0.5.8 - perspective highway + real Kick chat + audio-reactive + YouTube
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -208,10 +208,10 @@ const AUDIO = qs.get('audio') || '';          // '', 'test', 'test:128'
 const PLAYLIST = qs.get('playlist') || '';    // json url or comma list
 const CHANNEL = (qs.get('channel') || '').trim().toLowerCase();   // kick channel slug
 const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit chatroom id
-const YT = (qs.get('yt') || '').trim();                           // youtube id or url (auto-tempo)
+const YT_SRC = (qs.get('yt') || '').trim();                       // youtube id or url (auto-tempo). NOT named YT — that global belongs to the YouTube IFrame API!
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
-const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT);
-const VERSION = '0.5.7';                      // single source of truth — bump here
+const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT_SRC);
+const VERSION = '0.5.8';                      // single source of truth — bump here
 const BG = qs.get('bg') || (DEV ? 'media/bg.mp4' : '');   // dev background video (muted, loop)
 
 if (DEV) document.body.classList.add('dev');
@@ -556,7 +556,7 @@ let ytPlayer = null, ytReady = false, wantPlay = false;
 // player is ready is remembered and honored on ready) and resumes the AudioCtx
 // for playlist mode.
 function userStart(){
-  if (YT){
+  if (YT_SRC){
     if (ytReady && ytPlayer && ytPlayer.playVideo){ try{ ytPlayer.unMute && ytPlayer.unMute(); ytPlayer.playVideo(); }catch{} }
     else wantPlay = true;            // not ready yet -> play as soon as onReady fires
   } else {
@@ -576,7 +576,7 @@ function ytId(input){
   const m = String(input).match(/[A-Za-z0-9_-]{11}/); return m ? m[0] : '';
 }
 function startYouTube(){
-  const id = ytId(YT);
+  const id = ytId(YT_SRC);
   if (!id){ setConn('bad yt id'); return; }
   el('ytwrap').style.display = 'block';
   el('gsbpm-credit').style.display = 'block';   // getsongbpm.com attribution (required)
@@ -904,10 +904,10 @@ function wireHarness(){
     ingest(v, {username:'YOU'}); e.target.value='';
   });
   // audio transport (a browser tab needs a gesture to start; OBS autoplays)
-  if (PLAYLIST || YT){
+  if (PLAYLIST || YT_SRC){
     el('ctl-audio').style.display = 'flex';
     el('ctl-play').addEventListener('click', ()=>{ ensureCtx(); userStart(); });
-    el('ctl-skip').addEventListener('click', ()=>{ if (!YT) playTrack(plIdx+1); });
+    el('ctl-skip').addEventListener('click', ()=>{ if (!YT_SRC) playTrack(plIdx+1); });
   }
 }
 
@@ -916,7 +916,7 @@ function startAudio(){
   if (AUDIO.startsWith('test')){
     const bpm = +(AUDIO.split(':')[1]) || 120;
     startTestAudio(bpm);
-  } else if (YT){
+  } else if (YT_SRC){
     startYouTube();
   } else if (PLAYLIST){
     loadPlaylist(PLAYLIST).then(t=>{ playlist = t; playTrack(0); armStart(); });  // autoplay (OBS); tab needs a click
