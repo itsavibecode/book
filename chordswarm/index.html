@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.5.8 - perspective highway + real Kick chat + audio-reactive + YouTube
+  ChordSwarm v0.6.0 - double-note curveballs + now-playing panel + perspective + Kick + YouTube
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -88,10 +88,13 @@
 
   #hint{position:fixed;bottom:10px;left:0;right:0;text-align:center;
         font-size:12px;opacity:.4;letter-spacing:1px;z-index:5}
-  #nowplaying{position:fixed;bottom:26px;left:0;right:0;text-align:center;
-        font-size:13px;font-weight:700;letter-spacing:1px;opacity:.7;z-index:5;display:none}
-  body.harness #nowplaying{bottom:46px}    /* above the control strip */
-  #connstate{position:fixed;top:8px;left:0;right:0;text-align:center;
+  /* Now-playing panel — prominent, upper-center, so chat sees the current song. */
+  #nowplaying{position:fixed;top:14px;left:50%;transform:translateX(-50%);max-width:72%;
+        text-align:center;font-size:16px;font-weight:800;letter-spacing:.3px;color:var(--ink);
+        background:rgba(10,7,22,.62);border:1px solid rgba(124,92,255,.5);border-radius:999px;
+        padding:8px 20px;z-index:7;display:none;white-space:nowrap;overflow:hidden;
+        text-overflow:ellipsis;box-shadow:0 4px 18px rgba(0,0,0,.45)}
+  #connstate{position:fixed;top:54px;left:0;right:0;text-align:center;
         font-size:12px;font-weight:700;letter-spacing:1px;opacity:.75;z-index:6;display:none}
   /* YouTube player — small corner, opposite the lane. Adjust size/pos to taste. */
   #ytwrap{position:fixed;display:none;z-index:4;width:240px;height:135px;bottom:14px;right:14px;
@@ -211,7 +214,7 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT_SRC = (qs.get('yt') || '').trim();                       // youtube id or url (auto-tempo). NOT named YT — that global belongs to the YouTube IFrame API!
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT_SRC);
-const VERSION = '0.5.8';                      // single source of truth — bump here
+const VERSION = '0.6.0';                      // single source of truth — bump here
 const BG = qs.get('bg') || (DEV ? 'media/bg.mp4' : '');   // dev background video (muted, loop)
 
 if (DEV) document.body.classList.add('dev');
@@ -261,10 +264,11 @@ function registerHit(note){
   score.combo += 1;
   score.best = Math.max(score.best, score.combo);
   score.mult = multiplier(score.combo);
-  const base = 100;
-  score.band += base * score.mult;
-  const per = Math.max(10, Math.round((base*score.mult)/Math.max(1, note.matchers.size)));
-  note.matchers.forEach(u => creditUser(u, per));
+  const base = 100 * (note.emojis.length > 1 ? 1.6 : 1);   // doubles are worth more
+  score.band += Math.round(base * score.mult);
+  const all = noteMatchers(note);
+  const per = Math.max(10, Math.round((base*score.mult)/Math.max(1, all.size)));
+  all.forEach(u => creditUser(u, per));
   score.hype = Math.min(1, score.hype + 0.045);   // ebbs via passive decay in frame()
 }
 function registerMiss(){
@@ -280,6 +284,23 @@ function pickEmoji(){
   let e; do { e = CHORDS[(Math.random()*CHORDS.length)|0]; } while (e===lastEmoji && CHORDS.length>1);
   return lastEmoji = e;
 }
+// A note carries 1 emoji normally, or occasionally 2 side-by-side (a "double"
+// curveball that splits chat). hits[] is one matcher-Set per emoji.
+const DOUBLE_CHANCE = 0.13;       // ~1 in 8 notes is a double (never two in a row)
+let lastWasDouble = false;
+function makeNote(targetTime){
+  const a = pickEmoji();
+  let emojis = [a];
+  if (!lastWasDouble && CHORDS.length > 1 && Math.random() < DOUBLE_CHANCE){
+    let b; do { b = CHORDS[(Math.random()*CHORDS.length)|0]; } while (b === a);
+    emojis = [a, b]; lastWasDouble = true;
+  } else lastWasDouble = false;
+  lastEmoji = emojis[emojis.length-1];
+  return { emojis, targetTime, hits: emojis.map(()=>new Set()), state:'falling' };
+}
+function noteReq(thr, note){ return note.emojis.length > 1 ? Math.max(DIFF.minHit, Math.ceil(thr*0.6)) : thr; }
+function noteIsHit(note, thr){ const r = noteReq(thr, note); return note.hits.every(s => s.size >= r); }
+function noteMatchers(note){ const all = new Set(); note.hits.forEach(s => s.forEach(u => all.add(u))); return all; }
 function ensureNotes(now){
   const horizon = now + DIFF.lead + 600;
   // if we were just in audio mode (or paused), skip the chart ahead instead of
@@ -289,7 +310,7 @@ function ensureNotes(now){
     chartIdx = Math.ceil((minStart - songStart)/DIFF.spacing);
   while (songStart + chartIdx*DIFF.spacing < horizon){
     const targetTime = songStart + chartIdx*DIFF.spacing + DIFF.lead;
-    notes.push({ emoji:pickEmoji(), targetTime, matchers:new Set(), state:'falling' });
+    notes.push(makeNote(targetTime));
     chartIdx++;
   }
 }
@@ -319,7 +340,8 @@ function SimSource(){
     for (let i=0;i<n;i++){
       const u = users[i];
       if (near && Math.random() < u.eager*0.6*simCfg.eagerMult){
-        cb(near.emoji + (Math.random()<0.3?' '+near.emoji:''), {username:u.name});
+        const em = near.emojis[(Math.random()*near.emojis.length)|0];   // split across a double
+        cb(em + (Math.random()<0.3?' '+em:''), {username:u.name});
         continue;
       }
       if (Math.random() < u.rate*0.18){
@@ -476,7 +498,7 @@ function ensureNotesAudio(now){
     const beatTime = audioGrid.firstBeatMs + beatCursor*audioGrid.beatMs;
     if (beatTime > horizon) break;
     if (beatCursor % audioSub === 0 && beatTime >= pos - 60){
-      notes.push({ emoji:pickEmoji(), targetTime: now + (beatTime - pos), matchers:new Set(), state:'falling' });
+      notes.push(makeNote(now + (beatTime - pos)));
     }
     beatCursor++;
   }
@@ -663,7 +685,7 @@ function ingest(text, sender){
   // did this message land inside a live note's window?
   let hit = false;
   for (const note of notes){
-    if (note.state==='falling' && Math.abs(now - note.targetTime) <= DIFF.half && messageHits(text, note.emoji)){ hit = true; break; }
+    if (note.state==='falling' && Math.abs(now - note.targetTime) <= DIFF.half && note.emojis.some(em=>messageHits(text, em))){ hit = true; break; }
   }
   applyMatch(text, sender, now);
   if (HARNESS){
@@ -677,9 +699,10 @@ function applyMatch(text, sender, now){
   noteActivity(user, now);
   for (const note of notes){
     if (note.state!=='falling') continue;
-    if (Math.abs(now - note.targetTime) <= DIFF.half && messageHits(text, note.emoji)){
-      note.matchers.add(user);
-      break;                              // one note per message (single lane)
+    if (Math.abs(now - note.targetTime) <= DIFF.half){
+      let any = false;
+      note.emojis.forEach((em,i)=>{ if (messageHits(text, em)){ note.hits[i].add(user); any = true; } });
+      if (any) break;                     // one note per message (single lane)
     }
   }
 }
@@ -691,10 +714,11 @@ function resolveNotes(now){
   for (const note of notes){
     if (note.state!=='falling') continue;
     const past = now > note.targetTime + DIFF.half;
-    const smashed = note.matchers.size >= thr && now >= note.targetTime - DIFF.half*0.3;
+    const isHit = noteIsHit(note, thr);
+    const smashed = isHit && now >= note.targetTime - DIFF.half*0.3;
     if (smashed || past){
-      note.required = thr;
-      if (note.matchers.size >= thr){
+      note.required = noteReq(thr, note);
+      if (isHit){
         note.state = 'hit'; registerHit(note);
         popups.push(mkPopup(note, true));
       } else {
@@ -709,7 +733,7 @@ function resolveNotes(now){
   }
 }
 function mkPopup(note, good){
-  return { good, born:clock(), label: good ? `+${note.matchers.size}` : 'MISS' };
+  return { good, born:clock(), label: good ? `+${noteMatchers(note).size}` : 'MISS' };
 }
 
 /* ============================================================ RENDER ===== */
@@ -789,30 +813,33 @@ function draw(now){
   ctx.lineWidth = 4; ctx.strokeStyle = `rgba(180,155,255,${0.5+0.5*glow})`;
   ctx.beginPath(); ctx.moveTo(centerX-hwS, strikeY); ctx.lineTo(centerX+hwS, strikeY); ctx.stroke();
 
-  // live-count badge just outside the near edge at the strike line
-  if (live){
-    const thr = thresholdFor(now);
-    const right = POS!=='right';
-    ctx.font = '700 22px Segoe UI, sans-serif';
-    ctx.textAlign = right ? 'left' : 'right'; ctx.textBaseline='middle';
-    ctx.fillStyle = live.matchers.size>=thr ? getCss('--good') : '#fff';
-    ctx.fillText(`${live.matchers.size}/${thr}`, centerX + (right ? hwS+16 : -(hwS+16)), strikeY);
-  }
-
   // notes — projected with perspective; tiny in the distance, rushing toward the
-  // viewer (bigger) as they approach and blow past the strike line.
+  // viewer (bigger) as they approach. Doubles render two emojis side by side,
+  // each with its own live matcher count beneath it.
   ctx.textAlign='center'; ctx.textBaseline='middle';
+  const thrNow = thresholdFor(now);
   for (const note of notes){
     const p = (now - (note.targetTime - DIFF.lead)) / DIFF.lead;
     const D = Math.max(0.34, depthAt(p));
     const y = projY(D);
-    const size = NOTE_SIZE / D;                  // big at the strike; smaller far, huge as it passes
+    const size = NOTE_SIZE / D;
     let alpha = 1;
     if (note.state==='hit')  alpha = 1 - (now-note.resolvedAt)/600;
     if (note.state==='miss') alpha = (1 - (now-note.resolvedAt)/600)*0.55;
     ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    const n = note.emojis.length;
+    const gap = n>1 ? size*0.6 : 0;            // side-by-side offset for a double
     ctx.font = `${Math.max(9, size)}px "Segoe UI Emoji", sans-serif`;
-    ctx.fillText(note.emoji, centerX, y);
+    note.emojis.forEach((em,i)=>{ ctx.fillText(em, centerX + (n>1 ? (i?gap:-gap) : 0), y); });
+    // live per-emoji matcher counts beneath each emoji (only the active note)
+    if (note===live && note.state==='falling'){
+      const req = noteReq(thrNow, note);
+      ctx.font = `700 ${Math.max(12, size*0.28)}px Segoe UI, sans-serif`;
+      note.emojis.forEach((em,i)=>{
+        ctx.fillStyle = note.hits[i].size>=req ? getCss('--good') : '#fff';
+        ctx.fillText(`${note.hits[i].size}/${req}`, centerX + (n>1 ? (i?gap:-gap) : 0), y + size*0.58);
+      });
+    }
     ctx.globalAlpha = 1;
   }
 
