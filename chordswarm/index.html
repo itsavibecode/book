@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.5.3 - perspective highway + real Kick chat + audio-reactive + YouTube
+  ChordSwarm v0.5.4 - perspective highway + real Kick chat + audio-reactive + YouTube
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -21,7 +21,7 @@
     ?pos=left|center|right overlay position (default left, least intrusive)
     ?difficulty=easy|normal|hard
     ?dev=1                 dark dev backdrop + harness (works with ?channel)
-    ?bg=<url>              background video for dev/preview (default bg.mp4 in dev)
+    ?bg=<url>              background video for dev/preview (default media/bg.mp4 in dev)
     ?audio=test:128        synthetic click track at 128 BPM (no hosting needed)
     ?playlist=<json|urls>  play hosted tracks; chords land on detected beats
     ?yt=<id|url>           play a YouTube video; auto-tempo via the worker
@@ -205,8 +205,8 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT = (qs.get('yt') || '').trim();                           // youtube id or url (auto-tempo)
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT);
-const VERSION = '0.5.3';                      // single source of truth — bump here
-const BG = qs.get('bg') || (DEV ? 'bg.mp4' : '');   // dev background video (muted, loop)
+const VERSION = '0.5.4';                      // single source of truth — bump here
+const BG = qs.get('bg') || (DEV ? 'media/bg.mp4' : '');   // dev background video (muted, loop)
 
 if (DEV) document.body.classList.add('dev');
 if (HARNESS) document.body.classList.add('harness');
