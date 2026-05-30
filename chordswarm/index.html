@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.4.0 - real Kick chat + audio-reactive + YouTube auto-tempo
+  ChordSwarm v0.4.1 - real Kick chat + audio-reactive + YouTube auto-tempo
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -95,8 +95,10 @@
   body.pos-right #ytwrap{right:auto;left:14px}
   body.harness #ytwrap{bottom:52px}            /* clear the control strip */
   #ytwrap iframe{width:100%;height:100%;border:0}
-  #gsbpm-credit{position:fixed;bottom:2px;left:8px;font-size:9px;opacity:.45;z-index:6;
-        color:var(--ink);text-decoration:none;display:none}
+  /* getsongbpm.com backlink — REQUIRED by their free API, always visible. */
+  #gsbpm-credit{position:fixed;bottom:3px;right:8px;font-size:10px;opacity:.55;z-index:6;
+        color:var(--ink);text-decoration:none}
+  #gsbpm-credit:hover{opacity:.85;text-decoration:underline}
 
   /* ===== DEV TEST HARNESS (only with ?sim=1 / ?dev=1) ===== */
   #chatfeed{position:fixed;display:none;width:280px;top:120px;bottom:96px;
@@ -868,21 +870,21 @@ function boot(){
   if (SIM){
     source = SimSource();
     source.onMessage(ingest);
-    el('hint').textContent = 'ChordSwarm v0.4.0 · sim test harness · pos:'+POS+' · '+(qs.get('difficulty')||'normal');
+    el('hint').textContent = 'ChordSwarm v0.4.1 · sim test harness · pos:'+POS+' · '+(qs.get('difficulty')||'normal');
   } else if (CHANNEL || CHATROOM){
     // real Kick chat (works with ?dev=1 backdrop + harness feed for testing)
     source = KickPusherSource({ channel:CHANNEL, chatroom:CHATROOM });
     source.onMessage(ingest);
     source.start();
     if (DEV) simCfg.bots = false;
-    el('hint').textContent = 'ChordSwarm v0.4.0 · kick:'+(CHANNEL || ('room '+CHATROOM));
+    el('hint').textContent = 'ChordSwarm v0.4.1 · kick:'+(CHANNEL || ('room '+CHATROOM));
   } else if (DEV){
     // dev backdrop + harness but no auto-bots: pure manual testing
     source = SimSource(); source.onMessage(ingest); simCfg.bots = false;
     el('ctl-bots').textContent = 'Bots: OFF'; el('ctl-bots').classList.add('off');
-    el('hint').textContent = 'ChordSwarm v0.4.0 · manual test · pos:'+POS;
+    el('hint').textContent = 'ChordSwarm v0.4.1 · manual test · pos:'+POS;
   } else {
-    el('hint').textContent = 'ChordSwarm v0.4.0 · add ?sim=1 (sim) or ?channel=<name> (live Kick)';
+    el('hint').textContent = 'ChordSwarm v0.4.1 · add ?sim=1 (sim) or ?channel=<name> (live Kick)';
   }
   requestAnimationFrame(frame);
 }

@@ -18,8 +18,8 @@
 // REQUIRED: getsongbpm.com's free API mandates a visible backlink to
 //   getsongbpm.com on the site that uses it — add it to the overlay footer.
 //
-// NOTE: the GetSongBPM request/response shape in fetchBpm() follows their
-// documented format but was NOT verified live (docs 403'd during build).
+// NOTE: API base is api.getsong.co (confirmed). The response-shape parsing in
+// fetchBpm() (d.search[].tempo) still needs a live confirm with a real key.
 
 import { extractVideoId, parseTitle, songKey } from './parse.js';
 
@@ -42,8 +42,9 @@ const json = (obj, origin, status = 200, extra = {}) =>
   });
 
 async function fetchBpm(artist, song, key){
+  // GetSongBPM Web API base is api.getsong.co (NOT api.getsongbpm.com).
   const lookup = encodeURIComponent(`song:${song}${artist ? ` artist:${artist}` : ''}`);
-  const r = await fetch(`https://api.getsongbpm.com/search/?api_key=${key}&type=song&lookup=${lookup}`,
+  const r = await fetch(`https://api.getsong.co/search/?api_key=${key}&type=song&lookup=${lookup}`,
     { headers: { 'Accept': 'application/json' } });
   if (!r.ok) return null;
   const d = await r.json();
