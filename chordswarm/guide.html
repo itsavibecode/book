@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm — Setup Guide</title>
 <meta name="description" content="How to add ChordSwarm — the Guitar-Hero-for-Kick-chat overlay — to your stream.">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:title" content="ChordSwarm — Setup Guide">
+<meta property="og:description" content="Add the Guitar-Hero-for-Kick-chat overlay to your stream: OBS steps, URL builder, options.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bookhockeys.com/chordswarm/guide.html">
+<meta property="og:image" content="https://bookhockeys.com/chordswarm/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
   :root{ --accent:#7c5cff; --accent2:#b69bff; --gold:#ffcf3a; --good:#36e07a; --ink:#f3f0ff; --muted:#a99fce; }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -32,8 +41,9 @@
   th{color:var(--accent2);font-weight:800}
   td:first-child{white-space:nowrap}
   /* URL builder */
-  .builder input{font:inherit;color:var(--ink);background:rgba(255,255,255,.07);border:1px solid rgba(124,92,255,.4);
-      border-radius:8px;padding:9px 12px;width:100%;margin:4px 0 10px}
+  .builder input,.builder select{font:inherit;color:var(--ink);background:rgba(255,255,255,.07);
+      border:1px solid rgba(124,92,255,.4);border-radius:8px;padding:9px 12px;width:100%;margin:4px 0 10px}
+  .builder select option{background:#1a1330;color:var(--ink)}
   .builder label{font-weight:700;font-size:14px;color:var(--accent2)}
   .builder .out{display:flex;gap:8px;align-items:center}
   .builder .url{flex:1;background:rgba(10,7,22,.7);border:1px solid rgba(124,92,255,.4);border-radius:8px;
@@ -60,12 +70,31 @@
   handful of viewers to thousands, and can pulse to the beat of music it plays.</p>
 
   <h2>1 · Build your overlay link</h2>
+  <p>Fill in what you want — the link updates live. Drop it into OBS once; you never
+  need to edit it again (change songs from chat with <code>!song</code>, see below).</p>
   <div class="card builder">
     <label>Your Kick channel name</label>
     <input id="chan" type="text" placeholder="e.g. yourname" autocapitalize="off" spellcheck="false">
-    <label>Optional: a YouTube link to play &amp; beat-match (leave blank for none)</label>
-    <input id="yt" type="text" placeholder="https://youtu.be/..." spellcheck="false">
-    <div class="out">
+
+    <div style="display:flex;gap:18px;flex-wrap:wrap">
+      <div style="flex:1;min-width:150px">
+        <label>Overlay position</label>
+        <select id="pos"><option value="left">Left (default)</option><option value="center">Center</option><option value="right">Right</option></select>
+      </div>
+      <div style="flex:1;min-width:150px">
+        <label>Difficulty</label>
+        <select id="diff"><option value="normal">Normal (default)</option><option value="easy">Easy</option><option value="hard">Hard</option></select>
+      </div>
+    </div>
+
+    <label>Optional: a YouTube link to start with (or just use <code>!song</code> in chat)</label>
+    <input id="yt" type="text" placeholder="https://youtu.be/...  (leave blank for none)" spellcheck="false">
+
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px">
+      <input id="demo" type="checkbox" style="width:auto"> Demo / test mode (fake chatters + a backdrop, for trying it in a browser)
+    </label>
+
+    <div class="out" style="margin-top:12px">
       <div class="url" id="url">https://bookhockeys.com/chordswarm/</div>
       <button id="copy">Copy</button>
     </div>
@@ -89,29 +118,21 @@
     <li>Every so often a <strong>double</strong> drops — two emojis side by side. Chat has to cover <em>both</em> at once. Pure chaos, worth bonus points.</li>
   </ul>
 
-  <h2>4 · Music &amp; beat-matching</h2>
-  <p>Notes can fall on the beat of music the overlay plays. Because a browser overlay can't
-  listen to your other audio, <strong>ChordSwarm plays the music itself</strong> (and OBS
-  captures it into your stream).</p>
-  <ul>
-    <li><strong>YouTube</strong> — add <code>&amp;yt=&lt;link&gt;</code>. It plays the video and looks up the song's tempo automatically, dropping chords on the beat.</li>
-    <li><strong>Your own files</strong> — host them next to the overlay and use <code>&amp;playlist=&lt;url&gt;</code>; those get analyzed for an exact beat grid.</li>
-  </ul>
-  <div class="note">Tempo is matched, not frame-perfect to the downbeat, and song lookup is best-effort — DJ mixes, lofi streams and oddly-titled uploads fall back to a steady pace.</div>
+  <h2>4 · Change the song from chat — no OBS edits</h2>
+  <p>Drop the overlay into OBS <strong>once</strong>. To play (or switch) a song, you or a
+  mod just type a command in your Kick chat:</p>
+  <pre>!song https://youtu.be/&lt;video&gt;</pre>
+  <p>The overlay loads that video, looks up its tempo, and drops chords on the beat — then
+  type <code>!song</code> again any time to switch. (<code>!play</code> and <code>!yt</code>
+  work too. Broadcaster &amp; mods only.)</p>
+  <div class="note">Because a browser overlay can't hear your other audio, <strong>ChordSwarm
+  plays the music itself</strong> (OBS captures it into your stream). Tempo is matched, not
+  frame-perfect, and song lookup is best-effort — DJ mixes, lofi and obscure/underground
+  tracks aren't in the database and fall back to a steady pace (you can pin one with
+  <code>&amp;bpm=128</code>). For an exact beat grid on your own tracks, host the files and
+  use <code>&amp;playlist=&lt;url&gt;</code>.</div>
 
-  <h2>5 · All the options</h2>
-  <table>
-    <tr><th>Add to the URL</th><th>What it does</th></tr>
-    <tr><td><span class="k">?channel=name</span></td><td>Read that Kick channel's live chat.</td></tr>
-    <tr><td><span class="k">&amp;yt=link</span></td><td>Play a YouTube video + auto beat-match.</td></tr>
-    <tr><td><span class="k">&amp;playlist=url</span></td><td>Play hosted audio file(s) with exact beat detection.</td></tr>
-    <tr><td><span class="k">&amp;pos=left|center|right</span></td><td>Which side the highway hugs (default left).</td></tr>
-    <tr><td><span class="k">&amp;difficulty=easy|normal|hard</span></td><td>Note speed, spacing, and how big a swarm is needed.</td></tr>
-    <tr><td><span class="k">&amp;bgzoom=1.3</span></td><td>Zoom/crop the dev background video.</td></tr>
-    <tr><td><span class="k">?sim=1</span></td><td>Demo mode — fake chatters play it for you (great for testing).</td></tr>
-  </table>
-
-  <h2>6 · Try it without a stream</h2>
+  <h2>5 · Try it without a stream</h2>
   <p>Open <a href="?sim=1" target="_blank" rel="noopener">the demo (<span class="k">?sim=1</span>)</a> in a browser: press Play and watch simulated chatters swarm the notes. Turn the bots off in the control strip to tap the emojis yourself.</p>
 
   <footer>
@@ -122,21 +143,22 @@
 </div>
 
 <script>
-  const chan = document.getElementById('chan'), yt = document.getElementById('yt');
-  const out = document.getElementById('url'), open = document.getElementById('open');
-  const base = 'https://bookhockeys.com/chordswarm/';
+  const chan=document.getElementById('chan'), yt=document.getElementById('yt');
+  const pos=document.getElementById('pos'), diff=document.getElementById('diff'), demo=document.getElementById('demo');
+  const out=document.getElementById('url'), open=document.getElementById('open');
+  const base='https://bookhockeys.com/chordswarm/';
   function build(){
-    const params = [];
-    const c = chan.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
-    if (c) params.push('channel=' + c);
-    const y = yt.value.trim();
-    if (y) params.push('yt=' + encodeURIComponent(y));
-    const url = base + (params.length ? '?' + params.join('&') : '');
-    out.textContent = url;
-    open.href = url;
-    return url;
+    const p=[];
+    if (demo.checked) p.push('sim=1');                       // demo mode
+    const c=chan.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+    if (c) p.push('channel='+c);
+    const y=yt.value.trim(); if (y) p.push('yt='+encodeURIComponent(y));
+    if (pos.value!=='left') p.push('pos='+pos.value);
+    if (diff.value!=='normal') p.push('difficulty='+diff.value);
+    const url=base+(p.length?'?'+p.join('&'):'');
+    out.textContent=url; open.href=url; return url;
   }
-  chan.addEventListener('input', build); yt.addEventListener('input', build);
+  [chan,yt,pos,diff,demo].forEach(el=>el.addEventListener('input',build));
   document.getElementById('copy').addEventListener('click', ()=>{
     navigator.clipboard.writeText(build()).then(()=>{
       const b = document.getElementById('copy'); const t = b.textContent; b.textContent = 'Copied!';

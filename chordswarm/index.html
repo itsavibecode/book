@@ -4,8 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:title" content="ChordSwarm — Guitar Hero for your Kick chat">
+<meta property="og:description" content="A transparent OBS overlay: emoji chords fall, your chat swarms the match to land them. Beat-matches the music you play.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bookhockeys.com/chordswarm/">
+<meta property="og:image" content="https://bookhockeys.com/chordswarm/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <!--
-  ChordSwarm v0.8.0 - YT player upper-right, DEMO badge, solider highway, combo hit-glow + records
+  ChordSwarm v0.9.0 - !song chat command (live song swap, no OBS edit) + favicon/OG + smaller title
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -95,11 +104,12 @@
   #hint{position:fixed;bottom:10px;left:0;right:0;text-align:center;
         font-size:12px;opacity:.4;letter-spacing:1px;z-index:5}
   /* Now-playing panel — prominent, upper-center, so chat sees the current song. */
-  #nowplaying{position:fixed;top:14px;left:50%;transform:translateX(-50%);max-width:72%;
-        text-align:center;font-size:16px;font-weight:800;letter-spacing:.3px;color:var(--ink);
-        background:rgba(10,7,22,.62);border:1px solid rgba(124,92,255,.5);border-radius:999px;
-        padding:8px 20px;z-index:7;display:none;white-space:nowrap;overflow:hidden;
-        text-overflow:ellipsis;box-shadow:0 4px 18px rgba(0,0,0,.45)}
+  #nowplaying{position:fixed;top:14px;left:50%;transform:translateX(-50%);max-width:48%;
+        text-align:center;font-size:13.5px;font-weight:800;letter-spacing:.2px;color:var(--ink);
+        background:rgba(10,7,22,.62);border:1px solid rgba(124,92,255,.5);border-radius:14px;
+        padding:6px 16px;z-index:7;line-height:1.25;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.45);
+        display:none;-webkit-box-orient:vertical;-webkit-line-clamp:2}   /* wraps to max 2 lines */
+  #nowplaying.show{display:-webkit-box}
   #connstate{position:fixed;top:54px;left:0;right:0;text-align:center;
         font-size:12px;font-weight:700;letter-spacing:1px;opacity:.75;z-index:6;display:none}
   /* YouTube player — upper-right corner (above where stream chat usually sits). */
@@ -229,7 +239,7 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT_SRC = (qs.get('yt') || '').trim();                       // youtube id or url (auto-tempo). NOT named YT — that global belongs to the YouTube IFrame API!
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT_SRC);
-const VERSION = '0.8.0';                      // single source of truth — bump here
+const VERSION = '0.9.0';                      // single source of truth — bump here
 const BG = qs.get('bg') || (DEV ? 'media/bg.mp4' : '');   // dev background video (muted, loop)
 const BGZOOM = +qs.get('bgzoom') || 1.3;                  // zoom/crop the bg (right-anchored) to hide left chat
 
@@ -431,7 +441,9 @@ function KickPusherSource(opts){
           const d = typeof m.data==='string' ? JSON.parse(m.data) : m.data;
           const content = d.content || (d.message && (d.message.content || d.message.message)) || '';
           const sender = d.sender || d.user || {};
-          if (content) cb(content, { username: sender.username || sender.slug || '' });
+          const badges = (sender.identity && sender.identity.badges) || sender.badges || [];
+          const priv = badges.some(b => ['broadcaster','moderator','staff','owner'].includes(b && b.type)) || sender.is_moderator === true;
+          if (content) cb(content, { username: sender.username || sender.slug || '', priv });
         }catch{}
       }
     };
@@ -587,7 +599,7 @@ async function playTrack(i){
 function updateNowPlaying(){
   const e = el('nowplaying'); if (!e) return;
   e.textContent = nowPlaying ? '♪ ' + nowPlaying : '';
-  e.style.display = nowPlaying ? 'block' : 'none';
+  e.classList.toggle('show', !!nowPlaying);
 }
 
 /* --- YouTube source: play the embed + auto-tempo from chordswarm-worker.
@@ -619,11 +631,17 @@ function ytId(input){
   }catch{}
   const m = String(input).match(/[A-Za-z0-9_-]{11}/); return m ? m[0] : '';
 }
-function startYouTube(){
-  const id = ytId(YT_SRC);
+function startYouTube(){ playYouTubeId(ytId(YT_SRC)); }
+// Create the player on the given id, or swap the track in the existing one
+// (used by ?yt= at boot AND by the live "!song" chat command).
+function playYouTubeId(id){
   if (!id){ setConn('bad yt id'); return; }
   el('ytwrap').style.display = 'block';
   el('gsbpm-credit').style.display = 'block';   // getsongbpm.com attribution (required)
+  if (ytPlayer && ytPlayer.loadVideoById){      // swap song live, no reload
+    try{ ytPlayer.loadVideoById(id); ytPlayer.unMute && ytPlayer.unMute(); }catch{}
+    resolveYtBpm(id); return;
+  }
   const make = ()=>{
     ytPlayer = new YT.Player('ytplayer', {
       videoId: id,
@@ -703,6 +721,14 @@ const msgWin = [];            // {u, ts} over the last 60s -> chat rate readout
 function ingest(text, sender){
   const user = sender && sender.username;
   if (!user) return;
+  // Live song control from the broadcaster/mods (or YOU/sim for testing): a
+  // "!song <youtube link>" message swaps the track with no OBS edit.
+  const cmd = text.match(/^\s*!(?:song|play|yt)\s+(\S+)/i);
+  if (cmd && (sender.priv || HARNESS || user === 'YOU')){
+    const id = ytId(cmd[1]);
+    if (id){ if (!started) startGame(); wantPlay = true; playYouTubeId(id); }
+    return;                               // consume the command — not a chord
+  }
   const now = clock();
   msgWin.push({u:user, ts:now});
   // did this message land inside a live note's window?
