@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ChordSwarm</title>
+<!--
+  ChordSwarm v0.4.0 - real Kick chat + audio-reactive + YouTube auto-tempo
+  "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
+  swarms the matching emoji to land the note. Transparent OBS browser-source
+  overlay, positionable to one side so the streamer stays visible.
+
+  Reads live Kick chat over the Pusher websocket (?channel=). Music drives the
+  beat grid: hosted files are analyzed in-browser; YouTube is played + its tempo
+  looked up via chordswarm-worker (song-id -> GetSongBPM, cached).
+
+  URL params:
+    ?channel=<name>        live Kick chat for that channel (resolves chatroom id)
+    ?chatroom=<id>         explicit chatroom id (skips resolution)
+    ?sim=1                 simulated chat + dev test harness (feed + controls)
+    ?pos=left|center|right overlay position (default left, least intrusive)
+    ?difficulty=easy|normal|hard
+    ?dev=1                 dark dev backdrop + harness (works with ?channel)
+    ?audio=test:128        synthetic click track at 128 BPM (no hosting needed)
+    ?playlist=<json|urls>  play hosted tracks; chords land on detected beats
+    ?yt=<id|url>           play a YouTube video; auto-tempo via the worker
+    ?worker=<url>          override the BPM worker base URL
+    ?bpm=<n>               manual tempo fallback (e.g. when lookup misses)
+  See PLAN.md for the full design (Kick §5, audio/YouTube §6b).
+-->
+<style>
+  :root{
+    --accent:#7c5cff;       /* swarm purple */
+    --good:#36e07a;
+    --bad:#ff4d6d;
+    --gold:#ffcf3a;
+    --ink:#f3f0ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;color:var(--ink)}
+  /* Transparent by default for OBS. Dev backdrop only when requested. */
+  body{background:transparent}
+  body.dev{background:radial-gradient(1200px 800px at 50% -10%, #241b46 0%, #120c24 55%, #0a0716 100%)}
+
+  #stage{position:fixed;inset:0}
+  canvas{position:absolute;inset:0;width:100%;height:100%}
+
+  /* ---- HUD (non-interactive) ---- */
+  .hud{position:fixed;font-variant-numeric:tabular-nums;pointer-events:none;
+       text-shadow:0 2px 8px rgba(0,0,0,.6);z-index:5}
+  #hud-band{top:14px;left:48px}
+  .score{font-size:38px;font-weight:800;letter-spacing:.5px;line-height:1}
+  .score small{font-size:15px;font-weight:600;opacity:.7;margin-left:6px}
+  .combo{margin-top:5px;font-size:20px;font-weight:800}
+  .combo b{color:var(--gold)}
+  .hype-wrap{margin-top:9px;width:230px;height:11px;border-radius:8px;
+             background:rgba(255,255,255,.12);overflow:hidden;
+             box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+  .hype-fill{height:100%;width:0;border-radius:8px;
+             background:linear-gradient(90deg,var(--accent),#b69bff);
+             transition:width .12s linear}
+  .hype-wrap.full .hype-fill{background:linear-gradient(90deg,var(--gold),#fff0a8);
+             box-shadow:0 0 16px var(--gold)}
+  .hype-label{font-size:10px;letter-spacing:2px;font-weight:700;opacity:.7;margin-top:3px}
+  .chatrate{margin-top:11px;font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .chatrate b{color:var(--accent)}
+  .chatrate b.uniq{color:var(--gold)}
+  .chatrate small{display:block;font-size:9px;letter-spacing:1.5px;font-weight:700;opacity:.55;margin-top:3px}
+
+  #hud-board{bottom:16px;left:48px;text-align:left;min-width:190px}
+  .board-title{font-size:10px;letter-spacing:2px;font-weight:700;opacity:.6;margin-bottom:5px}
+  .board-row{font-size:15px;font-weight:700;display:flex;gap:10px;line-height:1.5}
+  .board-row .nm{opacity:.92;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .board-row .pt{color:var(--accent);font-weight:800}
+  .board-row.mvp .pt{color:var(--gold)}
+
+  /* Position variants: keep the HUD on the same side as the lane. */
+  body.pos-right #hud-band{left:auto;right:48px;text-align:right}
+  body.pos-right #hud-board{left:auto;right:48px;text-align:right}
+  body.pos-right .board-row{justify-content:flex-end}
+  body.pos-center #hud-band{left:22px}
+  body.pos-center #hud-board{left:auto;right:22px;top:14px;bottom:auto;text-align:right}
+  body.pos-center .board-row{justify-content:flex-end}
+
+  #hint{position:fixed;bottom:10px;left:0;right:0;text-align:center;
+        font-size:12px;opacity:.4;letter-spacing:1px;z-index:5}
+  #nowplaying{position:fixed;bottom:26px;left:0;right:0;text-align:center;
+        font-size:13px;font-weight:700;letter-spacing:1px;opacity:.7;z-index:5;display:none}
+  body.harness #nowplaying{bottom:46px}    /* above the control strip */
+  #connstate{position:fixed;top:8px;left:0;right:0;text-align:center;
+        font-size:12px;font-weight:700;letter-spacing:1px;opacity:.75;z-index:6;display:none}
+  /* YouTube player — small corner, opposite the lane. Adjust size/pos to taste. */
+  #ytwrap{position:fixed;display:none;z-index:4;width:240px;height:135px;bottom:14px;right:14px;
+        border-radius:8px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.5)}
+  body.pos-right #ytwrap{right:auto;left:14px}
+  body.harness #ytwrap{bottom:52px}            /* clear the control strip */
+  #ytwrap iframe{width:100%;height:100%;border:0}
+  #gsbpm-credit{position:fixed;bottom:2px;left:8px;font-size:9px;opacity:.45;z-index:6;
+        color:var(--ink);text-decoration:none;display:none}
+
+  /* ===== DEV TEST HARNESS (only with ?sim=1 / ?dev=1) ===== */
+  #chatfeed{position:fixed;display:none;width:280px;top:120px;bottom:96px;
+            right:22px;overflow:hidden;z-index:6;pointer-events:none;
+            -webkit-mask-image:linear-gradient(180deg,transparent,#000 18%);
+            mask-image:linear-gradient(180deg,transparent,#000 18%)}
+  body.harness #chatfeed{display:flex;flex-direction:column;justify-content:flex-end}
+  /* keep the feed on the opposite side of the lane */
+  body.pos-right #chatfeed{right:auto;left:22px}
+  .fmsg{font-size:13px;line-height:1.55;opacity:.85;text-shadow:0 1px 4px rgba(0,0,0,.7);
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fmsg .fu{font-weight:700;color:#b69bff}
+  .fmsg.hit{opacity:1}
+  .fmsg.hit .fu{color:var(--good)}
+
+  #simctl{position:fixed;left:0;right:0;bottom:0;display:none;z-index:7;
+          align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;
+          background:rgba(10,7,22,.82);border-top:1px solid rgba(124,92,255,.3);
+          backdrop-filter:blur(6px);pointer-events:auto;font-size:12px}
+  body.harness #simctl{display:flex}
+  #simctl .grp{display:flex;align-items:center;gap:6px}
+  #simctl .sep{width:1px;height:22px;background:rgba(255,255,255,.15)}
+  #simctl label{opacity:.7;font-weight:600}
+  #simctl button{font:inherit;font-weight:700;color:var(--ink);cursor:pointer;
+          background:rgba(124,92,255,.22);border:1px solid rgba(124,92,255,.45);
+          border-radius:7px;padding:5px 9px;line-height:1}
+  #simctl button:hover{background:rgba(124,92,255,.4)}
+  #simctl button.emoji{font-size:17px;padding:3px 8px}
+  #simctl button.toggle.off{background:rgba(255,77,109,.18);border-color:rgba(255,77,109,.5)}
+  #simctl input[type=range]{width:90px;accent-color:var(--accent)}
+  #simctl input[type=text]{font:inherit;color:var(--ink);background:rgba(255,255,255,.08);
+          border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:5px 8px;width:150px}
+  #simctl .val{font-weight:800;color:var(--accent);min-width:30px;text-align:right}
+  #simctl .status{font-weight:700;letter-spacing:1px;opacity:.8}
+</style>
+</head>
+<body>
+  <div id="stage"><canvas id="cv"></canvas></div>
+
+  <div class="hud" id="hud-band">
+    <div class="score" id="score">0<small>pts</small></div>
+    <div class="combo" id="combo">&nbsp;</div>
+    <div class="hype-wrap" id="hype-wrap"><div class="hype-fill" id="hype-fill"></div></div>
+    <div class="hype-label" id="hype-label">HYPE</div>
+    <div class="chatrate" id="chatrate"><b>0</b> / <b class="uniq">0</b><small>MSGS / UNIQUE PER MIN</small></div>
+  </div>
+
+  <div class="hud" id="hud-board">
+    <div class="board-title">SWARM MVPs</div>
+    <div id="board"></div>
+  </div>
+
+  <div id="chatfeed"></div>
+  <div id="connstate"></div>
+  <div id="nowplaying"></div>
+  <div id="ytwrap"><div id="ytplayer"></div></div>
+  <a id="gsbpm-credit" href="https://getsongbpm.com" target="_blank" rel="noopener">BPM data: getsongbpm.com</a>
+  <div id="hint"></div>
+
+  <!-- Dev test harness control strip -->
+  <div id="simctl">
+    <span class="status" id="ctl-status">SIM</span>
+    <div class="sep"></div>
+    <button class="toggle" id="ctl-bots">Bots: ON</button>
+    <div class="grp"><label>chatters</label><input type="range" id="ctl-count" min="0" max="200" value="42"><span class="val" id="ctl-count-v">42</span></div>
+    <div class="grp"><label>eager</label><input type="range" id="ctl-eager" min="0" max="200" value="100"><span class="val" id="ctl-eager-v">100%</span></div>
+    <div class="sep"></div>
+    <div class="grp" id="ctl-emojis"></div>
+    <button id="ctl-swarm">Swarm this note</button>
+    <div class="sep"></div>
+    <input type="text" id="ctl-msg" placeholder="type as YOU + Enter">
+    <div class="grp" id="ctl-audio" style="display:none">
+      <div class="sep"></div>
+      <button id="ctl-play">Play</button>
+      <button id="ctl-skip">Skip</button>
+    </div>
+  </div>
+
+<script>
+"use strict";
+/* ============================================================ CONFIG ===== */
+const qs = new URLSearchParams(location.search);
+const SIM = qs.get('sim') === '1';
+const DEV = qs.get('dev') === '1' || SIM;        // dark backdrop for local viewing
+const HARNESS = DEV;                              // chat feed + control strip
+const POS = ['left','center','right'].includes(qs.get('pos')) ? qs.get('pos') : 'left';
+const AUDIO = qs.get('audio') || '';          // '', 'test', 'test:128'
+const PLAYLIST = qs.get('playlist') || '';    // json url or comma list
+const CHANNEL = (qs.get('channel') || '').trim().toLowerCase();   // kick channel slug
+const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit chatroom id
+const YT = (qs.get('yt') || '').trim();                           // youtube id or url (auto-tempo)
+const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
+const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT);
+
+if (DEV) document.body.classList.add('dev');
+if (HARNESS) document.body.classList.add('harness');
+document.body.classList.add('pos-' + POS);
+
+const DIFFS = {
+  easy:   { lead:2900, half:520, P:0.12, minHit:2, maxHit:18, spacing:1700 },
+  normal: { lead:2500, half:440, P:0.15, minHit:2, maxHit:26, spacing:1350 },
+  hard:   { lead:2100, half:360, P:0.18, minHit:3, maxHit:40, spacing:1050 },
+};
+const DIFF = DIFFS[qs.get('difficulty')] || DIFFS.normal;
+
+// Curated v1 chord vocabulary (Unicode emoji, universally typable).
+const CHORDS = ['🔥','💀','😂','❤️','👏','🎉','🚀','🤡'];
+
+// Emote / shortcode stripping (reused pattern from kekw) so a chatter typing
+// "lol 🔥🔥" still counts and Kick emote tokens don't pollute matching later.
+const stripTokens = s => s.replace(/\[emote:[^\]]+\]/gi,'').replace(/:[a-zA-Z0-9_]+:/g,'');
+function messageHits(text, emoji){ return stripTokens(text).includes(emoji); }
+
+/* ===================================================== ACTIVE-CHATTER ==== */
+/* Rolling set of users seen in the last N seconds -> dynamic hit threshold. */
+const ACTIVE_WINDOW_MS = 12000;
+let activeSeen = [];               // [{user, ts}]
+function noteActivity(user, now){ activeSeen.push({user, ts:now}); }
+function activeChatterCount(now){
+  while (activeSeen.length && activeSeen[0].ts < now - ACTIVE_WINDOW_MS) activeSeen.shift();
+  return new Set(activeSeen.map(a => a.user)).size;
+}
+function thresholdFor(now){
+  const active = activeChatterCount(now);
+  return Math.min(DIFF.maxHit, Math.max(DIFF.minHit, Math.ceil(active * DIFF.P)));
+}
+
+/* ============================================================ SCORE ====== */
+const score = {
+  band:0, combo:0, best:0, mult:1, hype:0,            // band layer
+  users:new Map(),                                    // individual layer: user -> {pts,hits}
+};
+function multiplier(combo){ return combo>=30?4 : combo>=20?3 : combo>=10?2 : 1; }
+function creditUser(user, pts){
+  const u = score.users.get(user) || {pts:0, hits:0};
+  u.pts += pts; u.hits += 1; score.users.set(user, u);
+}
+function registerHit(note){
+  score.combo += 1;
+  score.best = Math.max(score.best, score.combo);
+  score.mult = multiplier(score.combo);
+  const base = 100;
+  score.band += base * score.mult;
+  const per = Math.max(10, Math.round((base*score.mult)/Math.max(1, note.matchers.size)));
+  note.matchers.forEach(u => creditUser(u, per));
+  score.hype = Math.min(1, score.hype + 0.045);   // ebbs via passive decay in frame()
+}
+function registerMiss(){
+  score.combo = 0; score.mult = 1;
+  score.hype = Math.max(0, score.hype - 0.25);
+}
+
+/* ============================================================ CHART ====== */
+let songStart = 0, chartIdx = 0;
+const notes = [];
+let lastEmoji = null;
+function pickEmoji(){
+  let e; do { e = CHORDS[(Math.random()*CHORDS.length)|0]; } while (e===lastEmoji && CHORDS.length>1);
+  return lastEmoji = e;
+}
+function ensureNotes(now){
+  const horizon = now + DIFF.lead + 600;
+  // if we were just in audio mode (or paused), skip the chart ahead instead of
+  // spawning a catch-up burst.
+  const minStart = now - DIFF.spacing;
+  if (songStart + chartIdx*DIFF.spacing < minStart)
+    chartIdx = Math.ceil((minStart - songStart)/DIFF.spacing);
+  while (songStart + chartIdx*DIFF.spacing < horizon){
+    const targetTime = songStart + chartIdx*DIFF.spacing + DIFF.lead;
+    notes.push({ emoji:pickEmoji(), targetTime, matchers:new Set(), state:'falling' });
+    chartIdx++;
+  }
+}
+function liveNote(now){
+  return notes.find(n => n.state==='falling' && Math.abs(now - n.targetTime) <= DIFF.half);
+}
+
+/* ========================================================= CHAT SOURCE === */
+/* Interface: source.onMessage(fn) where fn(text, sender:{username}).
+   simCfg is read live so the dev control strip can retune the sim on the fly. */
+const simCfg = { bots:true, count:42, eagerMult:1.0 };
+function SimSource(){
+  const MAXU = 200;
+  const adj = ['cozy','spicy','mega','tiny','lucky','grim','wild','chill','salty','hyper','zappy','noble'];
+  const noun = ['otter','goblin','ninja','toast','pixel','comet','waffle','raven','cactus','yeti','panda','drake'];
+  const users = Array.from({length:MAXU}, (_,i)=>({
+    name: `${adj[i%adj.length]}_${noun[(i*7)%noun.length]}${i}`,
+    eager: 0.4 + Math.random()*0.55,
+    rate:  0.15 + Math.random()*0.5,
+  }));
+  let cb = ()=>{};
+  const filler = ['hi','lol','LETS GO','gg','o7','what song','+2','nice','sheesh','W','pog'];
+  function tick(now){
+    if (!simCfg.bots) return;
+    const near = notes.find(n => n.state==='falling' && Math.abs(now - n.targetTime) <= DIFF.half*1.4);
+    const n = Math.min(users.length, simCfg.count);
+    for (let i=0;i<n;i++){
+      const u = users[i];
+      if (near && Math.random() < u.eager*0.6*simCfg.eagerMult){
+        cb(near.emoji + (Math.random()<0.3?' '+near.emoji:''), {username:u.name});
+        continue;
+      }
+      if (Math.random() < u.rate*0.18){
+        const r = Math.random();
+        const txt = r<0.5 ? CHORDS[(Math.random()*CHORDS.length)|0]
+                          : filler[(Math.random()*filler.length)|0];
+        cb(txt, {username:u.name});
+      }
+    }
+  }
+  return { onMessage:fn=>{cb=fn;}, tick };
+}
+
+/* Real Kick chat over the Pusher websocket — connection/resolution/parsing
+   lifted from the kekw repo (battle-tested). Routes into ingest() behind the
+   same onMessage interface as SimSource. Read-only: we subscribe to chat and
+   never send. */
+function KickPusherSource(opts){
+  const KEYS = ['32cbd69e4b950bf97679','eb1d5f283081a78b932c'];  // public Pusher keys, failover
+  let cb = ()=>{}, ws=null, pingTimer=null, keyIdx=0, connected=false, stopped=false;
+  let roomId = opts.chatroom || null;
+
+  // username -> chatroom id via public CORS proxies (kick.com API is CF-protected).
+  // (A resolver Worker on sevendwarfs is the planned robustness upgrade.)
+  async function resolveRoom(slug){
+    const apiUrl = 'https://kick.com/api/v2/channels/' + slug;
+    const enc = encodeURIComponent(apiUrl);
+    const proxies = [
+      `https://api.allorigins.win/get?url=${enc}`,
+      `https://api.codetabs.com/v1/proxy?quest=${apiUrl}`,
+      `https://thingproxy.freeboard.io/fetch/${apiUrl}`,
+      `https://corsproxy.io/?${enc}`,
+    ].sort(()=>Math.random()-0.5);
+    for (const url of proxies){
+      try{
+        const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) continue;
+        const wrapper = await res.json();
+        const raw = wrapper.contents!==undefined ? wrapper.contents : JSON.stringify(wrapper);
+        const data = typeof raw==='string' ? JSON.parse(raw) : raw;
+        if (data && data.chatroom && data.chatroom.id) return data.chatroom.id;
+      }catch{ continue; }
+    }
+    return null;
+  }
+
+  function tryWS(){
+    if (stopped) return;
+    if (keyIdx >= KEYS.length){ setConn('failed'); return; }
+    const url = `wss://ws-us2.pusher.com/app/${KEYS[keyIdx]}?protocol=7&client=js&version=8.3.0&flash=false`;
+    if (ws){ try{ ws.close(); }catch{} }
+    ws = new WebSocket(url);
+    const to = setTimeout(()=>{ if (!connected){ try{ ws.close(); }catch{} keyIdx++; tryWS(); } }, 7000);
+    ws.onopen = ()=> ws.send(JSON.stringify({ event:'pusher:subscribe', data:{ auth:'', channel:`chatrooms.${roomId}.v2` } }));
+    ws.onmessage = raw=>{
+      let m; try{ m = JSON.parse(raw.data); }catch{ return; }
+      if (m.event === 'pusher:connection_established'){
+        clearTimeout(to); connected = true; setConn('live');
+        pingTimer = setInterval(()=>{ if (ws && ws.readyState===1) ws.send(JSON.stringify({ event:'pusher:ping', data:{} })); }, 30000);
+        return;
+      }
+      // Kick sends both event names depending on context
+      if (m.event === 'App\\Events\\ChatMessageEvent' || m.event === 'App\\Events\\ChatMessageSentEvent'){
+        try{
+          const d = typeof m.data==='string' ? JSON.parse(m.data) : m.data;
+          const content = d.content || (d.message && (d.message.content || d.message.message)) || '';
+          const sender = d.sender || d.user || {};
+          if (content) cb(content, { username: sender.username || sender.slug || '' });
+        }catch{}
+      }
+    };
+    ws.onerror = ()=>{ clearTimeout(to); if (!connected){ keyIdx++; tryWS(); } };
+    ws.onclose = ()=>{
+      clearTimeout(to); clearInterval(pingTimer);
+      if (connected && !stopped){ connected = false; setConn('reconnecting'); keyIdx = 0; setTimeout(tryWS, 1500); }
+    };
+  }
+
+  async function start(){
+    setConn('looking up');
+    if (!roomId && opts.channel) roomId = await resolveRoom(opts.channel);
+    if (!roomId){ setConn('not found'); return; }
+    setConn('connecting'); keyIdx = 0; tryWS();
+  }
+  return { onMessage:fn=>{ cb=fn; }, start, stop:()=>{ stopped=true; try{ ws && ws.close(); }catch{} clearInterval(pingTimer); } };
+}
+
+/* ============================================== AUDIO-REACTIVE (§6b) ===== */
+/* The overlay owns + plays the music, analyzes the track OFFLINE up front for a
+   beat grid, then drops chords on a slow subdivision so each crosses the strike
+   line on the beat. ?playlist= for real tracks; ?audio=test:<bpm> for a built-in
+   synthetic click track (no hosting / autoplay needed). */
+let audioCtx = null, audioSrc = null;
+let audioGrid = null;              // { bpm, beatMs, firstBeatMs }
+let audioSub = 4;                  // notes every Nth beat (kept >= ~1.5s apart)
+let audioActive = false;
+let audioClockMode = 'none';       // 'buffer' = real playback | 'game' = silent test
+let audioT0 = 0;                   // start ref (audioCtx secs, or clock() ms)
+let beatCursor = 0;
+let nowPlaying = '';
+let playlist = [], plIdx = 0;
+
+function ensureCtx(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+function audioPosMs(){
+  if (audioClockMode==='buffer' && audioCtx) return (audioCtx.currentTime - audioT0)*1000;
+  if (audioClockMode==='game') return clock() - audioT0;
+  if (audioClockMode==='yt' && ytPlayer && ytPlayer.getCurrentTime) return ytPlayer.getCurrentTime()*1000;
+  return 0;
+}
+
+/* Offline tempo/beat detection: energy-flux onset envelope + autocorrelation. */
+function analyzeAudioBuffer(buf){
+  const sr = buf.sampleRate;
+  const ch0 = buf.getChannelData(0);
+  const ch1 = buf.numberOfChannels>1 ? buf.getChannelData(1) : null;
+  const hop = Math.max(1, Math.round(sr*0.01));        // ~10ms frames
+  const frames = Math.floor(ch0.length/hop);
+  if (frames < 16) return null;
+  const env = new Float32Array(frames);
+  for (let f=0; f<frames; f++){
+    let e=0; const s0=f*hop;
+    for (let i=0;i<hop;i++){ const s = ch1 ? (ch0[s0+i]+ch1[s0+i])*0.5 : ch0[s0+i]; e += s*s; }
+    env[f] = e;
+  }
+  const flux = new Float32Array(frames);
+  for (let f=1; f<frames; f++){ const d = env[f]-env[f-1]; flux[f] = d>0 ? d : 0; }
+  const fps = sr/hop;
+  const minLag = Math.max(2, Math.round(fps*60/180));  // up to 180 BPM
+  const maxLag = Math.round(fps*60/70);                // down to 70 BPM
+  let bestLag=minLag, bestVal=-1;
+  for (let lag=minLag; lag<=maxLag; lag++){
+    let sum=0;
+    for (let f=lag; f<frames; f++) sum += flux[f]*flux[f-lag];
+    if (sum>bestVal){ bestVal=sum; bestLag=lag; }
+  }
+  let bestOff=0, offVal=-1;                             // beat phase
+  for (let off=0; off<bestLag; off++){
+    let sum=0; for (let f=off; f<frames; f+=bestLag) sum += flux[f];
+    if (sum>offVal){ offVal=sum; bestOff=off; }
+  }
+  const bpm = 60*fps/bestLag;
+  return { bpm, beatMs: 60000/bpm, firstBeatMs: bestOff*1000/fps };
+}
+function setGrid(grid){
+  audioGrid = grid;
+  audioSub = Math.max(1, Math.ceil(1500/grid.beatMs));  // keep notes ~>=1.5s apart
+  beatCursor = 0;
+}
+function ensureNotesAudio(now){
+  if (!audioGrid) return;
+  const pos = audioPosMs();
+  const horizon = pos + DIFF.lead + 200;
+  while (true){
+    const beatTime = audioGrid.firstBeatMs + beatCursor*audioGrid.beatMs;
+    if (beatTime > horizon) break;
+    if (beatCursor % audioSub === 0 && beatTime >= pos - 60){
+      notes.push({ emoji:pickEmoji(), targetTime: now + (beatTime - pos), matchers:new Set(), state:'falling' });
+    }
+    beatCursor++;
+  }
+}
+
+/* Synthetic click track (no file, no autoplay) — verifies the analyzer + lets
+   you SEE the beat-aligned drop immediately. */
+async function genClickTrack(bpm, secs){
+  const sr=44100, OAC = window.OfflineAudioContext||window.webkitOfflineAudioContext;
+  const oac = new OAC(1, Math.round(sr*secs), sr);
+  const beat = 60/bpm;
+  for (let t=0; t<secs; t+=beat){
+    const o=oac.createOscillator(), g=oac.createGain();
+    o.frequency.value=1200; o.connect(g); g.connect(oac.destination);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.9, t+0.002);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+0.05);
+    o.start(t); o.stop(t+0.06);
+  }
+  return await oac.startRendering();
+}
+async function startTestAudio(bpm){
+  const buf = await genClickTrack(bpm, 12);
+  const grid = analyzeAudioBuffer(buf) || { bpm, beatMs:60000/bpm, firstBeatMs:0 };
+  setGrid(grid);
+  audioClockMode = 'game'; audioT0 = clock(); audioActive = true;   // silent, game-clock driven
+  nowPlaying = `test ${grid.bpm.toFixed(1)} BPM · note every ${audioSub} beats`;
+  updateNowPlaying();
+}
+
+async function loadPlaylist(spec){
+  try{
+    if (/\.json($|\?)/i.test(spec)){
+      const j = await (await fetch(spec)).json();
+      return Array.isArray(j) ? j : (j.tracks||[]);
+    }
+    return spec.split(',').map(u=>({url:u.trim()})).filter(t=>t.url);
+  }catch(e){ console.warn('playlist load failed', e); return []; }
+}
+async function playTrack(i){
+  if (!playlist.length) return;
+  plIdx = ((i % playlist.length)+playlist.length)%playlist.length;
+  const t = playlist[plIdx];
+  try{
+    const ctx = ensureCtx();
+    const ab = await (await fetch(t.url)).arrayBuffer();
+    const buf = await ctx.decodeAudioData(ab);
+    const grid = analyzeAudioBuffer(buf);
+    if (!grid) throw new Error('analysis failed');
+    setGrid(grid);
+    if (audioSrc) try{ audioSrc.stop(); }catch{}
+    audioSrc = ctx.createBufferSource();
+    audioSrc.buffer = buf; audioSrc.connect(ctx.destination);
+    audioSrc.onended = ()=>{ if (audioActive && audioClockMode==='buffer') playTrack(plIdx+1); };
+    audioClockMode = 'buffer'; audioT0 = ctx.currentTime; beatCursor = 0;
+    audioSrc.start(); audioActive = true;
+    nowPlaying = (t.title || t.url.split('/').pop()) + `  ·  ${grid.bpm.toFixed(0)} BPM`;
+    updateNowPlaying();
+  }catch(e){
+    console.warn('playTrack failed (CORS / decode / autoplay?)', e);
+    audioActive = false;                       // fall back to the fixed chart
+  }
+}
+function updateNowPlaying(){
+  const e = el('nowplaying'); if (!e) return;
+  e.textContent = nowPlaying ? '♪ ' + nowPlaying : '';
+  e.style.display = nowPlaying ? 'block' : 'none';
+}
+
+/* --- YouTube source: play the embed + auto-tempo from chordswarm-worker.
+   YouTube audio is unreachable for analysis, so BPM comes from the worker
+   (song-id -> GetSongBPM); the IFrame's getCurrentTime() is the beat clock.
+   Tempo only (no phase). Falls back to ?bpm=, then the fixed chart. */
+let ytPlayer = null;
+function ytId(input){
+  if (!input) return '';
+  if (/^[A-Za-z0-9_-]{11}$/.test(input)) return input;
+  try{
+    const u = new URL(input);
+    if (u.hostname.includes('youtu.be')){ const id=u.pathname.slice(1,12); if (/^[A-Za-z0-9_-]{11}$/.test(id)) return id; }
+    const v = u.searchParams.get('v'); if (v && /^[A-Za-z0-9_-]{11}$/.test(v)) return v;
+    const m = u.pathname.match(/\/(embed|shorts)\/([A-Za-z0-9_-]{11})/); if (m) return m[2];
+  }catch{}
+  const m = String(input).match(/[A-Za-z0-9_-]{11}/); return m ? m[0] : '';
+}
+function startYouTube(){
+  const id = ytId(YT);
+  if (!id){ setConn('bad yt id'); return; }
+  el('ytwrap').style.display = 'block';
+  el('gsbpm-credit').style.display = 'block';   // getsongbpm.com attribution (required)
+  const make = ()=>{
+    ytPlayer = new YT.Player('ytplayer', {
+      videoId: id,
+      playerVars: { autoplay:1, controls:0, playsinline:1, modestbranding:1, rel:0 },
+      events: {
+        onReady: e => { try{ e.target.playVideo(); }catch{} resolveYtBpm(id); },
+      },
+    });
+  };
+  if (window.YT && window.YT.Player) make();
+  else {
+    window.onYouTubeIframeAPIReady = make;
+    const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(s);
+  }
+}
+async function resolveYtBpm(id){
+  let bpm = null, label = '';
+  try{
+    const d = await (await fetch(`${WORKER_URL}/bpm?v=${id}`)).json();
+    if (d && d.ok && d.bpm){ bpm = d.bpm; const cached = d.cache || (d.source||'').includes('cache');
+      label = `${d.title || 'track'} · ${d.bpm} BPM${cached?' (cached)':''}`; }
+    else label = `${(d && d.title) ? d.title+' · ' : ''}tempo unknown`;
+  }catch{ label = 'tempo lookup failed'; }
+  const manual = +qs.get('bpm') || 0;
+  const useBpm = bpm || manual || 0;
+  if (useBpm){
+    setGrid({ bpm: useBpm, beatMs: 60000/useBpm, firstBeatMs: 0 });   // tempo only, phase=0
+    audioClockMode = 'yt'; audioActive = true; beatCursor = 0;
+    nowPlaying = label + (bpm ? '' : ` · using ${useBpm} BPM`);
+  } else {
+    audioActive = false;                       // no tempo -> fixed chart, video still plays
+    nowPlaying = label + ' · fixed pace';
+  }
+  updateNowPlaying();
+}
+
+/* Kick connection status -> small indicator + harness label. */
+let connState = '';
+function setConn(s){
+  connState = s;
+  const label = CHANNEL ? CHANNEL : ('room ' + CHATROOM);
+  const dot = s==='live' ? '🟢' : s==='failed'||s==='not found' ? '🔴' : '🟡';
+  const e = el('connstate');
+  if (e){ e.textContent = `${dot} ${label} · ${s.toUpperCase()}`; e.style.display='block'; }
+  if (el('ctl-status')) el('ctl-status').textContent = s.toUpperCase();
+}
+
+/* ============================================ INGEST + NOTE MATCHING ===== */
+/* Single entry point for every message (sim bot, manual tester, or real Kick).
+   Updates note matchers AND the visible dev chat feed. */
+const feedMsgs = [];          // {u, t, hit}
+let feedDirty = false;
+const msgWin = [];            // {u, ts} over the last 60s -> chat rate readout
+function ingest(text, sender){
+  const user = sender && sender.username;
+  if (!user) return;
+  const now = clock();
+  msgWin.push({u:user, ts:now});
+  // did this message land inside a live note's window?
+  let hit = false;
+  for (const note of notes){
+    if (note.state==='falling' && Math.abs(now - note.targetTime) <= DIFF.half && messageHits(text, note.emoji)){ hit = true; break; }
+  }
+  applyMatch(text, sender, now);
+  if (HARNESS){
+    feedMsgs.push({u:user, t:text, hit});
+    if (feedMsgs.length > 60) feedMsgs.shift();
+    feedDirty = true;
+  }
+}
+function applyMatch(text, sender, now){
+  const user = sender.username;
+  noteActivity(user, now);
+  for (const note of notes){
+    if (note.state!=='falling') continue;
+    if (Math.abs(now - note.targetTime) <= DIFF.half && messageHits(text, note.emoji)){
+      note.matchers.add(user);
+      break;                              // one note per message (single lane)
+    }
+  }
+}
+
+/* ============================================================ RESOLVE ==== */
+const popups = [];
+function resolveNotes(now){
+  const thr = thresholdFor(now);
+  for (const note of notes){
+    if (note.state!=='falling') continue;
+    const past = now > note.targetTime + DIFF.half;
+    const smashed = note.matchers.size >= thr && now >= note.targetTime - DIFF.half*0.3;
+    if (smashed || past){
+      note.required = thr;
+      if (note.matchers.size >= thr){
+        note.state = 'hit'; registerHit(note);
+        popups.push(mkPopup(note, true));
+      } else {
+        note.state = 'miss'; registerMiss();
+        popups.push(mkPopup(note, false));
+      }
+      note.resolvedAt = now;
+    }
+  }
+  for (let i=notes.length-1;i>=0;i--){
+    if (notes[i].state!=='falling' && now > notes[i].resolvedAt + 700) notes.splice(i,1);
+  }
+}
+function mkPopup(note, good){
+  return { good, born:clock(), label: good ? `+${note.matchers.size}` : 'MISS' };
+}
+
+/* ============================================================ RENDER ===== */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let W=0,H=0,DPR=1, laneX=0, laneW=0, strikeY=0, topY=0, laneTopY=0, badgeX=0, badgeAlign='left';
+function resize(){
+  DPR = Math.min(2, window.devicePixelRatio||1);
+  W = cv.clientWidth; H = cv.clientHeight;
+  cv.width = W*DPR; cv.height = H*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+
+  const margin = 48;
+  laneW = POS==='center' ? Math.min(360, W*0.5) : 340;
+  laneX = POS==='left' ? margin : POS==='right' ? (W - laneW - margin) : (W - laneW)/2;
+  // In side modes the band HUD sits above the lane, so start the lane lower.
+  laneTopY = POS==='center' ? 0 : 96;
+  topY = laneTopY - 60;
+  strikeY = laneTopY + (H - laneTopY)*0.80;
+  // live-count badge on the inner edge (toward screen center)
+  if (POS==='right'){ badgeX = laneX - 18; badgeAlign='right'; }
+  else { badgeX = laneX + laneW + 18; badgeAlign='left'; }
+}
+window.addEventListener('resize', resize);
+
+function noteY(note, now){
+  const spawn = note.targetTime - DIFF.lead;
+  const p = (now - spawn) / DIFF.lead;
+  if (note.state==='falling') return topY + (strikeY - topY)*p;
+  const after = (now - note.resolvedAt)/700;
+  return strikeY + ((H-strikeY)*0.35)*Math.min(1,after);
+}
+
+function draw(now){
+  ctx.clearRect(0,0,W,H);
+
+  // lane
+  ctx.fillStyle = 'rgba(124,92,255,0.06)';
+  ctx.fillRect(laneX, laneTopY, laneW, H-laneTopY);
+  ctx.strokeStyle = 'rgba(124,92,255,0.25)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(laneX, laneTopY, laneW, H-laneTopY);
+
+  // strike line + hit zone
+  const live = liveNote(now);
+  const glow = live ? 0.9 : 0.4;
+  const zoneH = (DIFF.half/DIFF.lead)*(strikeY-topY)*2;
+  ctx.fillStyle = `rgba(124,92,255,${0.10+0.12*glow})`;
+  ctx.fillRect(laneX, strikeY - zoneH/2, laneW, zoneH);
+  ctx.strokeStyle = `rgba(180,155,255,${0.5+0.5*glow})`;
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(laneX, strikeY); ctx.lineTo(laneX+laneW, strikeY); ctx.stroke();
+
+  // live count badge near strike
+  if (live){
+    const thr = thresholdFor(now);
+    ctx.font = '700 22px Segoe UI, sans-serif';
+    ctx.textAlign = badgeAlign; ctx.textBaseline='middle';
+    ctx.fillStyle = live.matchers.size>=thr ? getCss('--good') : '#fff';
+    ctx.fillText(`${live.matchers.size}/${thr}`, badgeX, strikeY);
+  }
+
+  // falling chords
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  for (const note of notes){
+    const y = noteY(note, now);
+    const cx = laneX + laneW/2;
+    let size = 60, alpha = 1;
+    if (note.state==='hit'){ const a=(now-note.resolvedAt)/700; size=60+40*a; alpha=1-a; }
+    if (note.state==='miss'){ const a=(now-note.resolvedAt)/700; alpha=(1-a)*0.6; }
+    ctx.globalAlpha = Math.max(0, alpha);
+    ctx.font = `${size}px "Segoe UI Emoji", sans-serif`;
+    ctx.fillText(note.emoji, cx, y);
+    ctx.globalAlpha = 1;
+  }
+
+  // popups
+  for (const p of popups){
+    const a = (now - p.born)/700; if (a>1) continue;
+    ctx.globalAlpha = 1-a;
+    ctx.font = '800 30px Segoe UI, sans-serif';
+    ctx.textAlign='center';
+    ctx.fillStyle = p.good ? getCss('--good') : getCss('--bad');
+    ctx.fillText(p.label, laneX+laneW/2, strikeY - 50 - 40*a);
+    ctx.globalAlpha = 1;
+  }
+  for (let i=popups.length-1;i>=0;i--) if (now-popups[i].born>700) popups.splice(i,1);
+}
+function getCss(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+/* ============================================================ HUD ======== */
+const el = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function paintHud(){
+  el('score').innerHTML = `${score.band.toLocaleString()}<small>pts</small>`;
+  el('combo').innerHTML = score.combo>0 ? `COMBO <b>x${score.mult}</b> &middot; ${score.combo}` : '&nbsp;';
+  el('hype-fill').style.width = (score.hype*100).toFixed(0)+'%';
+  el('hype-wrap').classList.toggle('full', score.hype>=1);
+  el('chatrate').innerHTML = `<b>${chatRate.total}</b> / <b class="uniq">${chatRate.uniq}</b><small>MSGS / UNIQUE PER MIN</small>`;
+
+  const top = [...score.users.entries()].sort((a,b)=>b[1].pts-a[1].pts).slice(0,5);
+  el('board').innerHTML = top.map(([nm,u],i)=>
+    `<div class="board-row ${i===0?'mvp':''}"><span class="nm">${esc(nm)}</span><span class="pt">${u.pts.toLocaleString()}</span></div>`
+  ).join('') || '<div class="board-row"><span class="nm" style="opacity:.4">waiting for swarm…</span></div>';
+}
+function paintFeed(){
+  if (!feedDirty) return; feedDirty = false;
+  el('chatfeed').innerHTML = feedMsgs.slice(-26).map(m=>
+    `<div class="fmsg ${m.hit?'hit':''}"><span class="fu">${esc(m.u)}:</span> ${esc(m.t)}</div>`
+  ).join('');
+}
+
+/* ====================================================== CHAT RATE ======== */
+/* messages/min and unique-chatters/min over a rolling 60s window. Recomputed
+   ~2x/sec (not per frame) since heavy chat makes the window large. */
+let chatRate = { total:0, uniq:0 };
+function computeChatRate(now){
+  const cut = now - 60000;
+  while (msgWin.length && msgWin[0].ts < cut) msgWin.shift();
+  const s = new Set();
+  for (const m of msgWin) s.add(m.u);
+  chatRate = { total: msgWin.length, uniq: s.size };
+}
+
+/* ============================================================ CLOCK ====== */
+let _t0 = null;
+function clock(){ return _t0===null ? 0 : performance.now() - _t0; }
+
+/* =================================================== DEV TEST HARNESS ==== */
+let testerSeq = 0;
+function wireHarness(){
+  // one-tap emoji buttons: each tap = a fresh distinct chatter typing that emoji,
+  // so you can build (or miss) a note's swarm by hand, bots on or off.
+  el('ctl-emojis').innerHTML = CHORDS.map(e=>`<button class="emoji" data-e="${e}">${e}</button>`).join('');
+  el('ctl-emojis').addEventListener('click', ev=>{
+    const b = ev.target.closest('button'); if(!b) return;
+    ingest(b.dataset.e, {username:`chatter_${++testerSeq}`});
+  });
+  // bots toggle
+  el('ctl-bots').addEventListener('click', ()=>{
+    simCfg.bots = !simCfg.bots;
+    el('ctl-bots').textContent = 'Bots: ' + (simCfg.bots?'ON':'OFF');
+    el('ctl-bots').classList.toggle('off', !simCfg.bots);
+  });
+  // sliders
+  el('ctl-count').addEventListener('input', e=>{
+    simCfg.count = +e.target.value; el('ctl-count-v').textContent = simCfg.count;
+  });
+  el('ctl-eager').addEventListener('input', e=>{
+    simCfg.eagerMult = (+e.target.value)/100; el('ctl-eager-v').textContent = e.target.value+'%';
+  });
+  // swarm-this-note: one click lands the current note
+  el('ctl-swarm').addEventListener('click', ()=>{
+    const now = clock(); const note = liveNote(now);
+    if (!note){ el('ctl-status').textContent = 'no note'; setTimeout(()=>el('ctl-status').textContent='SIM',900); return; }
+    const need = thresholdFor(now) + 1;
+    for (let i=0;i<need;i++) ingest(note.emoji, {username:`swarm_${++testerSeq}`});
+  });
+  // type as YOU
+  el('ctl-msg').addEventListener('keydown', e=>{
+    if (e.key!=='Enter') return;
+    const v = e.target.value.trim(); if(!v) return;
+    ingest(v, {username:'YOU'}); e.target.value='';
+  });
+  // audio transport (a browser tab needs a gesture to start; OBS autoplays)
+  if (PLAYLIST || YT){
+    el('ctl-audio').style.display = 'flex';
+    el('ctl-play').addEventListener('click', async ()=>{
+      if (YT){ if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo(); return; }
+      const ctx = ensureCtx(); if (ctx.state==='suspended') await ctx.resume();
+      playTrack(plIdx);
+    });
+    el('ctl-skip').addEventListener('click', ()=>{ if (!YT) playTrack(plIdx+1); });
+  }
+}
+
+/* Audio entry point: synthetic test track, or load + (auto)play a playlist. */
+function startAudio(){
+  if (AUDIO.startsWith('test')){
+    const bpm = +(AUDIO.split(':')[1]) || 120;
+    startTestAudio(bpm);
+  } else if (YT){
+    startYouTube();
+  } else if (PLAYLIST){
+    loadPlaylist(PLAYLIST).then(t=>{ playlist = t; playTrack(0); });  // autoplay (OBS); tab needs Play
+  }
+}
+
+/* ============================================================ LOOP ======= */
+let source = null;
+let lastSimTick = 0, lastFrame = 0, lastRate = 0;
+function frame(){
+  const now = clock();
+  const dt = lastFrame ? (now - lastFrame)/1000 : 0; lastFrame = now;
+  score.hype = Math.max(0, score.hype - 0.035*dt);   // slow passive ebb
+  if (audioActive) ensureNotesAudio(now); else ensureNotes(now);
+  if (source && source.tick && now - lastSimTick > 90){ source.tick(now); lastSimTick = now; }
+  if (now - lastRate > 500){ computeChatRate(now); lastRate = now; }
+  resolveNotes(now);
+  draw(now);
+  paintHud();
+  if (HARNESS) paintFeed();
+  requestAnimationFrame(frame);
+}
+
+function boot(){
+  resize();
+  _t0 = performance.now();
+  songStart = clock() + 800;
+  if (HARNESS) wireHarness();
+  if (AUDIO_MODE) startAudio();
+
+  if (SIM){
+    source = SimSource();
+    source.onMessage(ingest);
+    el('hint').textContent = 'ChordSwarm v0.4.0 · sim test harness · pos:'+POS+' · '+(qs.get('difficulty')||'normal');
+  } else if (CHANNEL || CHATROOM){
+    // real Kick chat (works with ?dev=1 backdrop + harness feed for testing)
+    source = KickPusherSource({ channel:CHANNEL, chatroom:CHATROOM });
+    source.onMessage(ingest);
+    source.start();
+    if (DEV) simCfg.bots = false;
+    el('hint').textContent = 'ChordSwarm v0.4.0 · kick:'+(CHANNEL || ('room '+CHATROOM));
+  } else if (DEV){
+    // dev backdrop + harness but no auto-bots: pure manual testing
+    source = SimSource(); source.onMessage(ingest); simCfg.bots = false;
+    el('ctl-bots').textContent = 'Bots: OFF'; el('ctl-bots').classList.add('off');
+    el('hint').textContent = 'ChordSwarm v0.4.0 · manual test · pos:'+POS;
+  } else {
+    el('hint').textContent = 'ChordSwarm v0.4.0 · add ?sim=1 (sim) or ?channel=<name> (live Kick)';
+  }
+  requestAnimationFrame(frame);
+}
+boot();
+</script>
+</body>
+</html>

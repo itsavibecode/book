@@ -1,0 +1,22 @@
+name = "chordswarm-worker"
+main = "src/index.js"
+compatibility_date = "2026-04-28"
+
+# Pin to the sevendwarfs Cloudflare account (see cf account routing). The default
+# wrangler auth on this machine resolves to the umbrella tenant, so pinning makes
+# a wrong-account deploy fail loudly. Run `cf sevendwarfs` before `wrangler deploy`.
+account_id = "fe16eca597b8d5afa20dfe7b2550640b"
+
+[vars]
+# CORS allow-list (comma-separated). Canonical host is bookhockeys.com/chordswarm.
+ALLOWED_ORIGINS = "https://bookhockeys.com,http://localhost:8102,http://127.0.0.1:8102"
+
+# Durable BPM cache (by video id AND normalized song key). Create the namespace
+# and paste its id here:  wrangler kv namespace create BPM_CACHE
+# The worker still runs without it (just no persistence) — bind it to enable caching.
+[[kv_namespaces]]
+binding = "BPM_CACHE"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# Secret (never in this file or source):
+#   wrangler secret put GETSONGBPM_API_KEY   # free key from getsongbpm.com/api (requires a backlink to getsongbpm.com)
