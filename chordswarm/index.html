@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.5.5 - perspective highway + real Kick chat + audio-reactive + YouTube
+  ChordSwarm v0.5.6 - perspective highway + real Kick chat + audio-reactive + YouTube
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -107,6 +107,11 @@
   body.pos-right #ver-pill{right:auto;left:10px}                 /* band is top-right here */
   body.pos-center #ver-pill{top:auto;bottom:10px;right:auto;left:10px}  /* both top corners used */
   /* getsongbpm.com backlink — REQUIRED by their free API, always visible. */
+  /* autoplay-blocked prompt (browsers only; OBS autoplays so it hides instantly) */
+  #tap-start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:8;display:none;
+        pointer-events:none;font-size:19px;font-weight:800;letter-spacing:.5px;color:var(--ink);
+        background:rgba(10,7,22,.72);border:1px solid rgba(124,92,255,.55);border-radius:12px;
+        padding:14px 22px;text-shadow:0 2px 8px rgba(0,0,0,.6)}
   #gsbpm-credit{position:fixed;bottom:3px;right:8px;font-size:10px;opacity:.55;z-index:6;
         color:var(--ink);text-decoration:none}
   #gsbpm-credit:hover{opacity:.85;text-decoration:underline}
@@ -149,6 +154,7 @@
 <body>
   <video id="bgvid" muted loop playsinline></video>
   <div id="stage"><canvas id="cv"></canvas></div>
+  <div id="tap-start">&#9658;&nbsp; click anywhere to start the music</div>
 
   <div class="hud" id="hud-band">
     <div class="score" id="score">0<small>pts</small></div>
@@ -205,7 +211,7 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT = (qs.get('yt') || '').trim();                           // youtube id or url (auto-tempo)
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT);
-const VERSION = '0.5.5';                      // single source of truth — bump here
+const VERSION = '0.5.6';                      // single source of truth — bump here
 const BG = qs.get('bg') || (DEV ? 'media/bg.mp4' : '');   // dev background video (muted, loop)
 
 if (DEV) document.body.classList.add('dev');
@@ -566,7 +572,8 @@ function startYouTube(){
       videoId: id,
       playerVars: { autoplay:1, controls:0, playsinline:1, modestbranding:1, rel:0 },
       events: {
-        onReady: e => { try{ e.target.playVideo(); }catch{} resolveYtBpm(id); },
+        onReady: e => { try{ e.target.playVideo(); }catch{} resolveYtBpm(id); armStart(); },
+        onStateChange: e => { if (e.data === 1) hideStart(); },   // 1 = YT.PlayerState.PLAYING
       },
     });
   };
@@ -596,6 +603,25 @@ async function resolveYtBpm(id){
     nowPlaying = label + ' · fixed pace';
   }
   updateNowPlaying();
+}
+
+/* Browsers block autoplay-with-sound until a user gesture (OBS does not). Show a
+   "click to start" prompt and start playback on the first click anywhere. */
+let _startHandler = null;
+function armStart(){
+  const p = el('tap-start'); if (!p) return;
+  p.style.display = 'block';
+  if (_startHandler) return;
+  _startHandler = ()=>{
+    try { if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo(); } catch {}
+    try { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); } catch {}
+    hideStart();
+  };
+  document.addEventListener('pointerdown', _startHandler);
+}
+function hideStart(){
+  const p = el('tap-start'); if (p) p.style.display = 'none';
+  if (_startHandler){ document.removeEventListener('pointerdown', _startHandler); _startHandler = null; }
 }
 
 /* Kick connection status -> small indicator + harness label. */
@@ -883,7 +909,7 @@ function startAudio(){
   } else if (YT){
     startYouTube();
   } else if (PLAYLIST){
-    loadPlaylist(PLAYLIST).then(t=>{ playlist = t; playTrack(0); });  // autoplay (OBS); tab needs Play
+    loadPlaylist(PLAYLIST).then(t=>{ playlist = t; playTrack(0); armStart(); });  // autoplay (OBS); tab needs a click
   }
 }
 
