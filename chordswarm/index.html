@@ -14,7 +14,7 @@
 <meta property="og:image" content="https://bookhockeys.com/chordswarm/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <!--
-  ChordSwarm v0.9.2 - ?stream=1 embeds the live Kick stream as the test backdrop
+  ChordSwarm v0.9.3 - mobile/responsive pass (HUD + chat feed + lane scale on narrow screens)
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -179,6 +179,30 @@
           border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:5px 8px;width:150px}
   #simctl .val{font-weight:800;color:var(--accent);min-width:30px;text-align:right}
   #simctl .status{font-weight:700;letter-spacing:1px;opacity:.8}
+
+  /* ===== Mobile / narrow (the overlay is built for 16:9 OBS; this keeps the
+     demo + ?stream= test usable on a phone). ===== */
+  @media (max-width:700px){
+    #hud-band{top:8px;left:12px}
+    .score{font-size:25px} .score small{font-size:11px}
+    .combo{font-size:14px;margin-top:3px}
+    .hype-wrap{width:140px;height:9px;margin-top:7px} .hype-label{font-size:9px}
+    .chatrate{font-size:13px;margin-top:8px} .chatrate small{font-size:8px}
+    #hud-board{left:12px;bottom:8px;min-width:0}
+    body.pos-right #hud-board{left:auto;right:12px}
+    .board-title{font-size:9px} .board-row{font-size:11px;gap:6px} .board-row .nm{max-width:90px}
+    /* chat feed: small, upper area + far edge so it clears the widening lane */
+    #chatfeed{width:120px;max-width:120px;top:76px;bottom:48%;right:4px;opacity:.8}
+    body.pos-right #chatfeed{right:auto;left:4px}
+    .fmsg{font-size:10px;line-height:1.4}
+    #nowplaying{font-size:12px;max-width:62%;padding:5px 12px;top:10px}
+    body.sim #nowplaying{top:42px}
+    #demo-badge{font-size:11px;letter-spacing:2px;padding:4px 12px}
+    #ytwrap{width:150px;height:84px;top:10px;right:10px}
+    #play-btn{font-size:22px;padding:16px 34px}
+    #simctl{font-size:11px;padding:6px 8px;gap:7px}
+    #simctl input[type=text]{width:110px}
+  }
 </style>
 </head>
 <body>
@@ -243,7 +267,7 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT_SRC = (qs.get('yt') || '').trim();                       // youtube id or url (auto-tempo). NOT named YT — that global belongs to the YouTube IFrame API!
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT_SRC);
-const VERSION = '0.9.2';                      // single source of truth — bump here
+const VERSION = '0.9.3';                      // single source of truth — bump here
 const BG = qs.get('bg') || (DEV ? 'media/bg.mp4' : '');   // dev background video (muted, loop)
 const BGZOOM = +qs.get('bgzoom') || 1.3;                  // zoom/crop the bg (right-anchored) to hide left chat
 const STREAM = qs.get('stream') === '1';                  // testing: embed the live Kick stream as the background
@@ -816,10 +840,11 @@ function resize(){
   cv.width = W*DPR; cv.height = H*DPR;
   ctx.setTransform(DPR,0,0,DPR,0,0);
 
-  const margin = 48;
-  laneW = POS==='center' ? Math.min(360, W*0.5) : 340;
+  const mobile = W < 700;
+  const margin = mobile ? 12 : 48;
+  laneW = POS==='center' ? Math.min(360, W*0.5) : Math.min(340, W*0.62);   // adapt on narrow/mobile
   laneX = POS==='left' ? margin : POS==='right' ? (W - laneW - margin) : (W - laneW)/2;
-  laneTopY = POS==='center' ? 0 : 96;          // side modes leave room for the HUD band
+  laneTopY = POS==='center' ? 0 : (mobile ? 70 : 96);   // side modes leave room for the HUD band
   strikeY = laneTopY + (H - laneTopY)*0.78;
 
   centerX = laneX + laneW/2;
