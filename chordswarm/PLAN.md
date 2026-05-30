@@ -349,16 +349,15 @@ sim mode is a hands-on testbed, not just a self-playing demo:
   phase nudge if it feels off). Best-effort: fails on DJ mixes / lofi / nightcore
   / obscure / odd titles -> graceful fallback to a default tempo or the fixed
   chart. Honest coverage limit, logged for the operator.
-  - **Worker built [worker/, untested live]:** oEmbed + `parseTitle`/`extractVideoId`/
-    `songKey` (17 node tests pass) + GetSongBPM proxy + CORS. **Durable KV cache
-    keyed BOTH by video id (`v:<id>`) AND normalized song key (`s:<artist|song>`)**
-    so a repeat video *and* a different upload of the same song both skip the
-    lookup; matched results stored forever, misses 1d. NEEDS: `wrangler kv
-    namespace create BPM_CACHE` (paste id into wrangler.toml), free GetSongBPM key
-    -> `wrangler secret put GETSONGBPM_API_KEY`, `cf sevendwarfs` + `wrangler
-    deploy`, then confirm the GetSongBPM request/response shape (coded to docs but
-    not verified — docs 403'd during build).
-  - **Overlay wiring (next):** `?yt=<id|url>` -> IFrame embed + fetch worker BPM +
+  - **Worker DEPLOYED + WORKING** at chordswarm-worker.sevendwarfs.workers.dev:
+    oEmbed + `parseTitle`/`extractVideoId`/`songKey` (18 node tests) + GetSongBPM
+    proxy + CORS. Live-verified Rick Astley NGGYU -> 112 BPM. Key learnings:
+    GetSongBPM base = api.getsong.co; correct lookup is `type=song&lookup=<title>`
+    with **no `song:` prefix**; title-only returns all covers so we artist-match;
+    strip whole `(...)`/`[...]` title groups. **Durable KV cache LIVE** (namespace
+    BPM_CACHE, keyed by video id AND `songKey`) — verified `"cache":"video"` on
+    repeat. `?debug=1` returns compact lookup diagnostics.
+  - **Overlay wiring DONE:** `?yt=<id|url>` -> IFrame embed + fetch worker BPM +
     schedule on `getCurrentTime()` + fallback + getsongbpm.com attribution link.
 - **Phase 3 — emotes + stretch.** Parse Kick emote tokens as chords; explore
   multi-lane chords.
