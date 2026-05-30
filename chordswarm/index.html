@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.7.0 - press-Play gate + double notes + now-playing panel + perspective + Kick + YouTube
+  ChordSwarm v0.8.0 - YT player upper-right, DEMO badge, solider highway, combo hit-glow + records
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -102,19 +102,22 @@
         text-overflow:ellipsis;box-shadow:0 4px 18px rgba(0,0,0,.45)}
   #connstate{position:fixed;top:54px;left:0;right:0;text-align:center;
         font-size:12px;font-weight:700;letter-spacing:1px;opacity:.75;z-index:6;display:none}
-  /* YouTube player — small corner, opposite the lane. Adjust size/pos to taste. */
-  #ytwrap{position:fixed;display:none;z-index:4;width:240px;height:135px;bottom:14px;right:14px;
+  /* YouTube player — upper-right corner (above where stream chat usually sits). */
+  #ytwrap{position:fixed;display:none;z-index:4;width:240px;height:135px;top:14px;right:14px;
         border-radius:8px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.5)}
-  body.pos-right #ytwrap{right:auto;left:14px}
-  body.harness #ytwrap{bottom:52px}            /* clear the control strip */
+  body.pos-right #ytwrap{right:auto;left:14px}   /* lane on the right -> player to the left */
   #ytwrap iframe{width:100%;height:100%;border:0}
-  /* semver pill — top corner, opposite the HUD band so it stays clear. */
-  #ver-pill{position:fixed;top:8px;right:10px;z-index:6;font-size:10px;font-weight:800;
+  /* semver pill — bottom-right, clear of the HUD + YT player. */
+  #ver-pill{position:fixed;bottom:18px;right:12px;z-index:6;font-size:10px;font-weight:800;
         letter-spacing:.5px;padding:2px 8px;border-radius:999px;opacity:.7;
         background:rgba(124,92,255,.22);border:1px solid rgba(124,92,255,.45);
         color:var(--ink);font-variant-numeric:tabular-nums;text-shadow:0 1px 4px rgba(0,0,0,.6)}
-  body.pos-right #ver-pill{right:auto;left:10px}                 /* band is top-right here */
-  body.pos-center #ver-pill{top:auto;bottom:10px;right:auto;left:10px}  /* both top corners used */
+  /* DEMO badge — makes clear the sim is a demo (simulated chat), not a live stream. */
+  #demo-badge{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:8;display:none;
+        font-size:13px;font-weight:900;letter-spacing:3px;color:#1a1330;background:var(--gold);
+        border-radius:999px;padding:5px 16px;box-shadow:0 4px 16px rgba(255,207,58,.4)}
+  body.sim #demo-badge{display:block}
+  body.sim #nowplaying{top:48px}                 /* sit below the DEMO badge */
   /* getsongbpm.com backlink — REQUIRED by their free API, always visible. */
   /* centered blinking Play button — nothing starts until it's pressed (demo/sim) */
   #play-btn{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9;display:none;
@@ -185,6 +188,7 @@
 
   <div id="chatfeed"></div>
   <div id="ver-pill"></div>
+  <div id="demo-badge">DEMO</div>
   <div id="connstate"></div>
   <div id="nowplaying"></div>
   <div id="ytwrap"><div id="ytplayer"></div></div>
@@ -225,12 +229,13 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT_SRC = (qs.get('yt') || '').trim();                       // youtube id or url (auto-tempo). NOT named YT — that global belongs to the YouTube IFrame API!
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT_SRC);
-const VERSION = '0.7.0';                      // single source of truth — bump here
+const VERSION = '0.8.0';                      // single source of truth — bump here
 const BG = qs.get('bg') || (DEV ? 'media/bg.mp4' : '');   // dev background video (muted, loop)
 const BGZOOM = +qs.get('bgzoom') || 1.3;                  // zoom/crop the bg (right-anchored) to hide left chat
 
 if (DEV) document.body.classList.add('dev');
 if (HARNESS) document.body.classList.add('harness');
+if (SIM) document.body.classList.add('sim');     // shows the DEMO badge
 document.body.classList.add('pos-' + POS);
 
 const DIFFS = {
@@ -272,8 +277,11 @@ function creditUser(user, pts){
   const u = score.users.get(user) || {pts:0, hits:0};
   u.pts += pts; u.hits += 1; score.users.set(user, u);
 }
+let hitFx = 0, recordFx = 0;   // purple hit glow + gold all-time-high flash (decay in frame())
 function registerHit(note){
+  const prevBest = score.best;
   score.combo += 1;
+  const isRecord = score.combo > prevBest && score.combo >= 10;   // new all-time-high combo
   score.best = Math.max(score.best, score.combo);
   score.mult = multiplier(score.combo);
   const base = 100 * (note.emojis.length > 1 ? 1.6 : 1);   // doubles are worth more
@@ -282,6 +290,8 @@ function registerHit(note){
   const per = Math.max(10, Math.round((base*score.mult)/Math.max(1, all.size)));
   all.forEach(u => creditUser(u, per));
   score.hype = Math.min(1, score.hype + 0.045);   // ebbs via passive decay in frame()
+  hitFx = Math.min(1, 0.4 + score.combo*0.025);   // brighter glow with a higher combo
+  if (isRecord) recordFx = 1;                      // gold burst on a new record
 }
 function registerMiss(){
   score.combo = 0; score.mult = 1;
@@ -801,8 +811,8 @@ function draw(now){
   ctx.beginPath();
   ctx.moveTo(centerX-hwTop, yFar); ctx.lineTo(centerX+hwTop, yFar);
   ctx.lineTo(centerX+hwBot, yNear); ctx.lineTo(centerX-hwBot, yNear); ctx.closePath();
-  ctx.fillStyle = 'rgba(124,92,255,0.06)'; ctx.fill();
-  ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(124,92,255,0.25)'; ctx.stroke();
+  ctx.fillStyle = 'rgba(124,92,255,0.12)'; ctx.fill();
+  ctx.lineWidth = 2.5; ctx.strokeStyle = 'rgba(124,92,255,0.38)'; ctx.stroke();
 
   // receding fret rungs (perspective-spaced — bunch up toward the vanishing point)
   ctx.strokeStyle = 'rgba(124,92,255,0.13)'; ctx.lineWidth = 1.5;
@@ -825,6 +835,21 @@ function draw(now){
   ctx.fillStyle = `rgba(124,92,255,${0.10+0.12*glow})`; ctx.fill();
   ctx.lineWidth = 4; ctx.strokeStyle = `rgba(180,155,255,${0.5+0.5*glow})`;
   ctx.beginPath(); ctx.moveTo(centerX-hwS, strikeY); ctx.lineTo(centerX+hwS, strikeY); ctx.stroke();
+
+  // hit glow — additive burst at the strike; brighter with combo, gold on a record
+  if (hitFx > 0.01 || recordFx > 0.01){
+    const fx = Math.max(hitFx, recordFx);
+    const gold = recordFx > hitFx*0.9;
+    const col = gold ? '255,207,58' : '150,110,255';
+    const r = hwS * (1.5 + 2.4*fx);
+    const g = ctx.createRadialGradient(centerX, strikeY, 0, centerX, strikeY, r);
+    g.addColorStop(0,   `rgba(${col},${0.55*fx})`);
+    g.addColorStop(0.55,`rgba(${col},${0.18*fx})`);
+    g.addColorStop(1,   `rgba(${col},0)`);
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = g; ctx.fillRect(centerX-r, strikeY-r, r*2, r*2);
+    ctx.restore();
+  }
 
   // notes — projected with perspective; tiny in the distance, rushing toward the
   // viewer (bigger) as they approach. Doubles render two emojis side by side,
@@ -971,6 +996,7 @@ function frame(){
   const dt = lastFrame ? (now - lastFrame)/1000 : 0; lastFrame = now;
   if (started){                                       // nothing runs until Play
     score.hype = Math.max(0, score.hype - 0.035*dt); // slow passive ebb
+    hitFx = Math.max(0, hitFx - dt*2.6); recordFx = Math.max(0, recordFx - dt*1.1);
     if (audioActive) ensureNotesAudio(now); else ensureNotes(now);
     if (source && source.tick && now - lastSimTick > 90){ source.tick(now); lastSimTick = now; }
     if (now - lastRate > 500){ computeChatRate(now); lastRate = now; }
