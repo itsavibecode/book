@@ -1,5 +1,7 @@
 // ChordSwarm BPM worker
 // GET /bpm?v=<videoId|youtubeUrl>  ->  { ok, videoId, title, artist, song, bpm, ... }
+// GET /bpm?v=<...>&debug=1  ->  also echoes _lookup + _getsongbpm.raw (the raw API
+//   response, never the key) and skips the cache — use it to confirm parsing.
 //
 // Pipeline (PLAN §6b, "Song-ID + BPM database"):
 //   1. KV cache by video id        (instant repeat of the same video)
@@ -46,12 +48,17 @@ async function fetchBpm(artist, song, key){
   const lookup = encodeURIComponent(`song:${song}${artist ? ` artist:${artist}` : ''}`);
   const r = await fetch(`https://api.getsong.co/search/?api_key=${key}&type=song&lookup=${lookup}`,
     { headers: { 'Accept': 'application/json' } });
-  if (!r.ok) return null;
-  const d = await r.json();
-  const list = Array.isArray(d.search) ? d.search : (d.search ? [d.search] : []);
+  let raw = null;
+  try { raw = await r.json(); } catch { try { raw = await r.text(); } catch { raw = null; } }
+  // search results may be an array, a single object, or nested under .search
+  const list = raw && Array.isArray(raw.search) ? raw.search : (raw && raw.search ? [raw.search] : []);
   const hit = list.find(x => x && x.tempo);
-  if (!hit) return null;
-  return { bpm: Math.round(+hit.tempo), dbTitle: hit.song_title || null };
+  return {
+    bpm: hit ? Math.round(+hit.tempo) : null,
+    dbTitle: hit ? (hit.song_title || hit.title || null) : null,
+    httpStatus: r.status,
+    raw,                       // echoed only under ?debug=1; never contains the key
+  };
 }
 
 export default {
@@ -67,9 +74,10 @@ export default {
 
     const KV = env.BPM_CACHE || null;           // durable store (optional until namespace bound)
     const HIT_HDR = { 'cache-control': 'max-age=2592000' };
+    const debug = url.searchParams.get('debug') === '1';   // echo raw GetSongBPM, skip cache
 
     // 1) durable cache by video id
-    if (KV){
+    if (KV && !debug){
       const v = await KV.get('v:' + vid, 'json');
       if (v) return json({ ...v, cache: 'video' }, origin, 200, HIT_HDR);
     }
@@ -85,21 +93,23 @@ export default {
 
       // 3) durable cache by SONG (a different upload of the same track)
       let cachedSong = null;
-      if (KV && sk) cachedSong = await KV.get('s:' + sk, 'json');
+      if (KV && !debug && sk) cachedSong = await KV.get('s:' + sk, 'json');
 
-      let bpm = null, matched = false, dbTitle = null, source = 'getsongbpm';
+      let bpm = null, matched = false, dbTitle = null, source = 'getsongbpm', dbg = null;
       if (cachedSong && cachedSong.bpm){
         bpm = cachedSong.bpm; dbTitle = cachedSong.dbTitle || null; matched = true; source = 'getsongbpm(song-cache)';
       } else if (env.GETSONGBPM_API_KEY && song){
         const res = await fetchBpm(artist, song, env.GETSONGBPM_API_KEY);
-        if (res){ bpm = res.bpm; dbTitle = res.dbTitle; matched = true; }
+        if (res && res.bpm != null){ bpm = res.bpm; dbTitle = res.dbTitle; matched = true; }
+        if (debug) dbg = { httpStatus: res && res.httpStatus, raw: res && res.raw };
       }
 
       out = { ok: matched, videoId: vid, title: meta.title, artist, song, songKey: sk, guessed, bpm, matched, dbTitle, source };
       if (!env.GETSONGBPM_API_KEY && !cachedSong) out.note = 'GETSONGBPM_API_KEY not set';
+      if (debug){ out._lookup = { artist, song, songKey: sk }; out._getsongbpm = dbg; }
 
-      // 4) persist: video-id key always; song key when freshly matched.
-      if (KV){
+      // 4) persist: video-id key always; song key when freshly matched. (not in debug)
+      if (KV && !debug){
         const vOpts = out.ok ? {} : { expirationTtl: 86400 };   // retry unresolved sooner
         ctx.waitUntil(KV.put('v:' + vid, JSON.stringify(out), vOpts));
         if (matched && sk && !cachedSong){
