@@ -30,6 +30,7 @@ const NOISE = [
   /\([^)]*\)/g,                           // any (...) group
   /\[[^\]]*\]/g,                          // any [...] group
   /\bofficial\s*(music\s*)?video\b/ig,
+  /\b(music|lyric)\s*video\b/ig,           // bare "music video" / "lyric video"
   /\bofficial\s*audio\b/ig,
   /\b(hd|hq|4k|m\/?v|lyrics?|visuali[sz]er|remaster(ed)?)\b/ig,
 ];
