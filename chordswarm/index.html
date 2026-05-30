@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.5.0 - perspective highway + real Kick chat + audio-reactive + YouTube
+  ChordSwarm v0.5.1 - perspective highway + real Kick chat + audio-reactive + YouTube
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -200,7 +200,7 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT = (qs.get('yt') || '').trim();                           // youtube id or url (auto-tempo)
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT);
-const VERSION = '0.5.0';                      // single source of truth — bump here
+const VERSION = '0.5.1';                      // single source of truth — bump here
 
 if (DEV) document.body.classList.add('dev');
 if (HARNESS) document.body.classList.add('harness');
@@ -730,8 +730,10 @@ function draw(now){
   // hit zone (trapezoid slice around the strike) + strike line
   const live = liveNote(now);
   const glow = live ? 0.9 : 0.4;
-  const yIn  = projY(depthAt(1 - DIFF.half/DIFF.lead));
-  const yOut = projY(depthAt(1 + DIFF.half/DIFF.lead));
+  // compact glowing pad straddling the strike (projecting the full time-window
+  // would balloon far down the screen due to perspective, so use a fixed band)
+  const yIn  = strikeY - 34;
+  const yOut = Math.min(H, strikeY + 92);
   const hwIn = hwAtY(yIn), hwOut = hwAtY(yOut), hwS = hwAtY(strikeY);
   ctx.beginPath();
   ctx.moveTo(centerX-hwIn, yIn); ctx.lineTo(centerX+hwIn, yIn);
