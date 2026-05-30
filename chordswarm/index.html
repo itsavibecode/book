@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ChordSwarm</title>
 <!--
-  ChordSwarm v0.5.1 - perspective highway + real Kick chat + audio-reactive + YouTube
+  ChordSwarm v0.5.2 - perspective highway + real Kick chat + audio-reactive + YouTube
   "Guitar Hero for Kick chat": emoji chords fall toward a strike line and chat
   swarms the matching emoji to land the note. Transparent OBS browser-source
   overlay, positionable to one side so the streamer stays visible.
@@ -200,7 +200,7 @@ const CHATROOM = (qs.get('chatroom') || '').trim();               // explicit ch
 const YT = (qs.get('yt') || '').trim();                           // youtube id or url (auto-tempo)
 const WORKER_URL = (qs.get('worker') || 'https://chordswarm-worker.sevendwarfs.workers.dev').replace(/\/+$/,'');
 const AUDIO_MODE = !!(AUDIO || PLAYLIST || YT);
-const VERSION = '0.5.1';                      // single source of truth — bump here
+const VERSION = '0.5.2';                      // single source of truth — bump here
 
 if (DEV) document.body.classList.add('dev');
 if (HARNESS) document.body.classList.add('harness');
@@ -674,8 +674,8 @@ let W=0,H=0,DPR=1, laneX=0, laneW=0, strikeY=0, laneTopY=0;
 // point at the top; notes start tiny in the distance and rush AT the viewer
 // (growing + accelerating) as they approach and pass the strike line. Screen
 // position + size both scale by 1/depth.
-const PERSP_RATIO = 5.5;          // far-depth / near-depth (higher = stronger perspective)
-const HW_TOP_FRAC = 0.16;         // far (top) width as a fraction of near (bottom) width
+const PERSP_RATIO = 7.5;          // far-depth / near-depth (higher = stronger perspective)
+const HW_TOP_FRAC = 0.09;         // far (top) width as a fraction of near (bottom) width
 const DNEAR = 1, DFAR = PERSP_RATIO;
 let centerX=0, yFar=0, yNear=0, hwTop=0, hwBot=0, Kp=0, yHorizon=0;
 
@@ -692,10 +692,10 @@ function resize(){
   strikeY = laneTopY + (H - laneTopY)*0.78;
 
   centerX = laneX + laneW/2;
-  yFar = laneTopY;                              // top of highway (vanishing end)
+  yFar = laneTopY + Math.round((H - laneTopY)*0.06); // top of highway, pulled down a bit (shorter back)
   yNear = H;                                    // bottom of screen (nearest)
-  hwBot = laneW*0.62;                           // near half-width (wide)
-  hwTop = hwBot * HW_TOP_FRAC;                  // far half-width (narrow)
+  hwBot = laneW*0.82;                           // near half-width (wider front)
+  hwTop = hwBot * HW_TOP_FRAC;                  // far half-width (thinner back)
   // screenY(D) = yHorizon + Kp/D, anchored so D=DFAR -> yFar and D=DNEAR -> strikeY
   Kp = (strikeY - yFar) / (1 - DNEAR/DFAR);
   yHorizon = yFar - Kp/DFAR;
@@ -759,7 +759,7 @@ function draw(now){
     const p = (now - (note.targetTime - DIFF.lead)) / DIFF.lead;
     const D = Math.max(0.34, depthAt(p));
     const y = projY(D);
-    const size = 60 / D;                         // 60px at the strike; smaller far, huge as it passes
+    const size = 72 / D;                         // 72px at the strike; smaller far, huge as it passes
     let alpha = 1;
     if (note.state==='hit')  alpha = 1 - (now-note.resolvedAt)/600;
     if (note.state==='miss') alpha = (1 - (now-note.resolvedAt)/600)*0.55;
