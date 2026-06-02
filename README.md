@@ -22,7 +22,7 @@ The home page plays a rotation of background videos behind the page. The origina
    ```
    python .scripts/build-clips.py
    ```
-   It transcodes each raw clip to 720p30 H.264 (~1 Mbps, no audio, faststart) into `clips/<slug>.mp4`, then regenerates `clips/playlist.json` in alphabetical order.
+   It transcodes each raw clip to 720p30 H.264 + 128 kbps AAC stereo (~1 Mbps video + ~128 kbps audio, faststart) into `clips/<slug>.mp4`, then regenerates `clips/playlist.json` in alphabetical order. Audio is preserved so the "TAP FOR SOUND" button on the page works for each clip.
 3. **Commit** the new `clips/*.mp4` and the updated `clips/playlist.json`.
 
 Re-runs are idempotent — a clip is only re-encoded if its source file is newer than the existing output. If you want to drop a clip from rotation, delete it from `clips/` and re-run the script.
@@ -35,6 +35,9 @@ Re-runs are idempotent — a clip is only re-encoded if its source file is newer
 - A small "Cookies" link in the bottom-right of the home page (and the footer of `/greenline/`) clears the decision and re-shows the banner.
 
 ## Changelog — home page
+
+### v0.1.4 — 2026-06-02
+- Build script now preserves audio. Transcodes the audio track to 128 kbps AAC stereo at 44.1 kHz instead of stripping it. Rotation clips will play their original audio when the user taps for sound. Roughly +1 MB per minute of clip versus the audio-less v0.1.3 encode.
 
 ### v0.1.3 — 2026-06-02
 Background video is now a playlist instead of a single looping file.

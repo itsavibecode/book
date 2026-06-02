@@ -27,14 +27,19 @@ PLAYLIST = OUTDIR / "playlist.json"
 # leads off (it's already the LCP-optimized hero clip with the poster).
 HEAD_CLIPS = ["/bookmentions.mp4"]
 
-# Encode target: 720p30, H.264 ~1 Mbps, no audio (page mutes anyway),
-# faststart so playback can begin before the file fully buffers.
+# Encode target: 720p30 H.264 video ~1 Mbps + 128 kbps AAC stereo audio,
+# faststart so playback can begin before the file fully buffers. The page
+# starts muted (autoplay policy requires it) but users can tap-for-sound
+# to hear the clip audio.
 ENCODE_ARGS = [
     "-vf", "scale=-2:720,fps=30",
     "-c:v", "libx264",
     "-preset", "slow",
     "-crf", "24",
-    "-an",
+    "-c:a", "aac",
+    "-b:a", "128k",
+    "-ac", "2",
+    "-ar", "44100",
     "-movflags", "+faststart",
 ]
 
