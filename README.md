@@ -11,7 +11,21 @@ Personal site of streamer Book Hockeys. Live at **[bookhockeys.com](https://book
 | `/shoovlator/` | Toy translator that re-writes English with stacked comparatives and redundant fillers | inline `<meta name="version">` on the page |
 | `/hantavirus/` | War-monitor-style global hantavirus surveillance dashboard — Leaflet world map + severity-color pins + curated public-health social feed | [`hantavirus/README.md`](hantavirus/README.md) |
 
-Site-wide assets live at the repo root: `robots.txt`, `sitemap.xml`, `llms.txt`, `CNAME`, favicon set, `og-card.jpg`, `poster.jpg`, `bookmentions.mp4`, `logo.png`.
+Site-wide assets live at the repo root: `robots.txt`, `sitemap.xml`, `llms.txt`, `CNAME`, favicon set, `og-card.jpg`, `poster.jpg`, `bookmentions.mp4`, `logo.png`. Additional rotating background clips live in [`clips/`](clips/) — see "Adding background clips" below.
+
+## Adding background clips
+
+The home page plays a rotation of background videos behind the page. The original `bookmentions.mp4` always leads off; everything else is loaded from `clips/playlist.json`.
+
+1. **Drop the raw video** into `clips/source/`. Any format ffmpeg can read works: `.mp4`, `.mov`, `.webm`, `.mkv`, `.avi`, `.m4v`. The folder is gitignored, so the original never ships.
+2. **Run the build script** from the repo root:
+   ```
+   python .scripts/build-clips.py
+   ```
+   It transcodes each raw clip to 720p30 H.264 (~1 Mbps, no audio, faststart) into `clips/<slug>.mp4`, then regenerates `clips/playlist.json` in alphabetical order.
+3. **Commit** the new `clips/*.mp4` and the updated `clips/playlist.json`.
+
+Re-runs are idempotent — a clip is only re-encoded if its source file is newer than the existing output. If you want to drop a clip from rotation, delete it from `clips/` and re-run the script.
 
 ## Analytics & privacy
 
@@ -21,6 +35,13 @@ Site-wide assets live at the repo root: `robots.txt`, `sitemap.xml`, `llms.txt`,
 - A small "Cookies" link in the bottom-right of the home page (and the footer of `/greenline/`) clears the decision and re-shows the banner.
 
 ## Changelog — home page
+
+### v0.1.3 — 2026-06-02
+Background video is now a playlist instead of a single looping file.
+- New `clips/` folder with `playlist.json` driving the rotation. The original `bookmentions.mp4` stays at the repo root and always leads off; everything else lives in `clips/`.
+- New `clips/source/` drop folder (gitignored) — drop raw videos in any format, run `.scripts/build-clips.py`, and they get transcoded to web-friendly 720p30 H.264 (~1 Mbps, no audio, faststart) and added to the rotation.
+- New `.scripts/build-clips.py` orchestrates the transcode + playlist regeneration. Idempotent on re-runs.
+- JS controller in `index.html` reads `/clips/playlist.json` after page load, takes over from the `<video loop>` fallback, and advances to the next clip on each `ended` event. If the playlist fails to load, the built-in loop keeps the original video cycling on its own — graceful degradation.
 
 ### v0.1.2 — 2026-05-08
 Performance pass driven by a Lighthouse audit. Mobile perf score went from 74 to ~95 and LCP from 5.9 s to under 2 s.

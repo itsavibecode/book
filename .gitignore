@@ -4,6 +4,11 @@ greenline/testimage.png
 greenline/testimage.jpeg
 greenline/testimage.webp
 
+# Raw clip drops — these get transcoded into clips/*.mp4 by
+# .scripts/build-clips.py, so the originals don't ship.
+clips/source/*
+!clips/source/.gitkeep
+
 # OS / editor crud
 Thumbs.db
 .DS_Store

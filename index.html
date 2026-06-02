@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.1.2" />
+<meta name="version" content="0.1.3" />
 <title>BookHockeys — Kick &amp; Twitch streamer</title>
 
 <meta name="description" content="Official site of streamer Book Hockeys. Catch the live streams on Kick and Twitch." />
@@ -466,7 +466,7 @@
     </div>
   </div>
   <button id="cookieReset" type="button" class="cookie-reset">Cookies</button>
-  <p class="version-tag" id="version">v0.1.2</p>
+  <p class="version-tag" id="version">v0.1.3</p>
 
   <script>
     (function(){
@@ -523,6 +523,68 @@
           setMutedUI();
         }
       });
+    })();
+  </script>
+
+  <!-- Background-clip rotation: plays through /clips/playlist.json in order
+       and loops back to the start. If the playlist fails to load, the video's
+       built-in `loop` attribute keeps bookmentions.mp4 cycling on its own. -->
+  <script>
+    (function(){
+      const vid = document.getElementById('bgvid');
+      if (!vid) return;
+
+      let clips = null;  // null until playlist loads
+      let idx = 0;
+
+      function currentName(){
+        try { return new URL(vid.currentSrc, location.href).pathname; }
+        catch(e) { return ''; }
+      }
+
+      function tryPlay(){
+        const p = vid.play();
+        if (p && p.catch) p.catch(() => {});
+      }
+
+      function playAt(i){
+        if (!clips || !clips.length) return;
+        idx = ((i % clips.length) + clips.length) % clips.length;
+        if (currentName() === clips[idx]) {
+          // Same clip — just restart it (handles a single-clip playlist)
+          vid.currentTime = 0;
+          tryPlay();
+        } else {
+          // Swap src. play() right after load() rejects silently because
+          // the media engine resets — wait for loadeddata first.
+          vid.src = clips[idx];
+          vid.addEventListener('loadeddata', tryPlay, { once: true });
+          vid.load();
+        }
+      }
+
+      // When a clip ends, move to the next one (only active once the
+      // playlist has loaded; until then the <video loop> attribute handles it).
+      vid.addEventListener('ended', function(){
+        if (clips && clips.length) playAt(idx + 1);
+      });
+
+      // Load the playlist asynchronously. Once it's in, take over from <video loop>.
+      fetch('/clips/playlist.json', { cache: 'no-cache' })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(data){
+          if (!data || !Array.isArray(data.clips) || !data.clips.length) return;
+          clips = data.clips.slice();
+          // Cede control from the built-in loop attribute to the JS rotation.
+          vid.loop = false;
+          // Locate the currently-playing clip in the playlist so the next
+          // "ended" event advances correctly. If not found, the next clip
+          // will be clips[0].
+          var name = currentName();
+          var i = clips.findIndex(function(c){ return c === name || name.endsWith(c); });
+          idx = i >= 0 ? i : -1;
+        })
+        .catch(function(){ /* keep the built-in loop fallback */ });
     })();
   </script>
 
