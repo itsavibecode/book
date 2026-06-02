@@ -36,6 +36,9 @@ Re-runs are idempotent — a clip is only re-encoded if its source file is newer
 
 ## Changelog — home page
 
+### v0.1.5 — 2026-06-02
+- Replaced the corner `v0.1.x` tag with a proper centered `<footer>` at the bottom of the page. Same minimal style — small, system font, ~60% opacity — but easier to spot than the bottom-left corner placement. The "Cookies" link stays at bottom-right.
+
 ### v0.1.4 — 2026-06-02
 - Build script now preserves audio. Transcodes the audio track to 128 kbps AAC stereo at 44.1 kHz instead of stripping it. Rotation clips will play their original audio when the user taps for sound. Roughly +1 MB per minute of clip versus the audio-less v0.1.3 encode.
 

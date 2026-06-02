@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.1.4" />
+<meta name="version" content="0.1.5" />
 <title>BookHockeys — Kick &amp; Twitch streamer</title>
 
 <meta name="description" content="Official site of streamer Book Hockeys. Catch the live streams on Kick and Twitch." />
@@ -383,17 +383,18 @@
   }
   .cookie-reset:hover{ opacity: 0.9; }
 
-  .version-tag{
+  .footer{
     position: fixed;
+    left: 0;
+    right: 0;
     bottom: 8px;
-    left: 12px;
     z-index: 11;
+    text-align: center;
     font-family: system-ui, sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 1px;
     color: #0a0a0a;
-    opacity: 0.55;
-    padding: 2px 6px;
+    opacity: 0.6;
     pointer-events: none;
     user-select: none;
   }
@@ -466,7 +467,7 @@
     </div>
   </div>
   <button id="cookieReset" type="button" class="cookie-reset">Cookies</button>
-  <p class="version-tag" id="version">v0.1.4</p>
+  <footer class="footer"><span id="version">v0.1.5</span></footer>
 
   <script>
     (function(){
