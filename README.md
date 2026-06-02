@@ -36,6 +36,9 @@ Re-runs are idempotent — a clip is only re-encoded if its source file is newer
 
 ## Changelog — home page
 
+### v0.1.6 — 2026-06-02
+- Fixed the KICK button icon. The old path was the full Kick wordmark squeezed into 28×28 px, which rendered as garbage pixels. Replaced with the official Kick brand "K" glyph from SimpleIcons — proper 24×24 viewBox, scales cleanly at icon size. Added `aria-hidden="true"` since the visible "KICK" text already names the link.
+
 ### v0.1.5 — 2026-06-02
 - Replaced the corner `v0.1.x` tag with a proper centered `<footer>` at the bottom of the page. Same minimal style — small, system font, ~60% opacity — but easier to spot than the bottom-left corner placement. The "Cookies" link stays at bottom-right.
 
