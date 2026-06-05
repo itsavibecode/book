@@ -88,10 +88,43 @@ def main() -> int:
     if skipped:
         print(f"skipped {len(skipped)} up-to-date clip(s)")
 
-    # Rebuild the playlist: bookmentions.mp4 first, then every .mp4 in
-    # clips/ in alphabetical order.
-    clip_files = sorted(p.name for p in OUTDIR.glob("*.mp4"))
-    clips = list(HEAD_CLIPS) + [f"/clips/{n}" for n in clip_files]
+    # Rebuild the playlist while preserving any manual ordering already
+    # in playlist.json:
+    #   1. HEAD_CLIPS always lead (bookmentions.mp4 first).
+    #   2. Existing playlist body order is preserved for any clip still
+    #      present in clips/ — so manual reorders survive re-runs.
+    #   3. Newly-encoded clips not yet in the playlist are appended at
+    #      the end in alphabetical order for stability.
+    #   4. Clips removed from disk drop out of the playlist silently.
+    on_disk = {f"/clips/{p.name}" for p in OUTDIR.glob("*.mp4")} | set(HEAD_CLIPS)
+
+    existing = []
+    if PLAYLIST.exists():
+        try:
+            existing = json.loads(PLAYLIST.read_text(encoding="utf-8")).get("clips", [])
+        except (json.JSONDecodeError, OSError):
+            existing = []
+
+    clips: list[str] = []
+    seen: set[str] = set()
+
+    # 1. HEAD_CLIPS pinned to the top in declared order
+    for url in HEAD_CLIPS:
+        if url not in seen:
+            clips.append(url)
+            seen.add(url)
+
+    # 2. Preserve existing body order for clips that are still on disk
+    for url in existing:
+        if url in on_disk and url not in seen:
+            clips.append(url)
+            seen.add(url)
+
+    # 3. Append any on-disk clips not yet in the playlist (alphabetical)
+    for url in sorted(on_disk):
+        if url not in seen:
+            clips.append(url)
+            seen.add(url)
 
     PLAYLIST.write_text(json.dumps({"clips": clips}, indent=2) + "\n", encoding="utf-8")
     print(f"\nplaylist: {PLAYLIST.relative_to(ROOT)} ({len(clips)} entries)")

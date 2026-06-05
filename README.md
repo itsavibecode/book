@@ -27,6 +27,8 @@ The home page plays a rotation of background videos behind the page. The origina
 
 Re-runs are idempotent — a clip is only re-encoded if its source file is newer than the existing output. If you want to drop a clip from rotation, delete it from `clips/` and re-run the script.
 
+**Reordering:** edit `clips/playlist.json` directly to change rotation order. The build script preserves manual ordering on re-runs — newly-encoded clips are appended to the end, removed clips drop out, but the order you set in the JSON is kept.
+
 ## Analytics & privacy
 
 - Google Analytics 4 (`G-DYME377V2S`) is shared between `/` and `/greenline/`.
@@ -35,6 +37,10 @@ Re-runs are idempotent — a clip is only re-encoded if its source file is newer
 - A small "Cookies" link in the bottom-right of the home page (and the footer of `/greenline/`) clears the decision and re-shows the banner.
 
 ## Changelog — home page
+
+### v0.1.7 — 2026-06-05
+- Build script now preserves manual playlist ordering. Previously it re-sorted `clips/playlist.json` alphabetically on every run, so any manual reorder got blown away. Now: HEAD clips stay pinned to the top, existing body order is preserved for clips still on disk, newly-encoded clips are appended to the end, removed clips drop out. Reorder by editing `clips/playlist.json` directly.
+- Reordered rotation to lead the new clips with `mayatv` before `1lei235-edit`.
 
 ### v0.1.6 — 2026-06-02
 - Fixed the KICK button icon. The old path was the full Kick wordmark squeezed into 28×28 px, which rendered as garbage pixels. Replaced with the official Kick brand "K" glyph from SimpleIcons — proper 24×24 viewBox, scales cleanly at icon size. Added `aria-hidden="true"` since the visible "KICK" text already names the link.
