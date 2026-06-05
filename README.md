@@ -38,6 +38,9 @@ Re-runs are idempotent — a clip is only re-encoded if its source file is newer
 
 ## Changelog — home page
 
+### v0.1.8 — 2026-06-05
+- Added a branded `404.html`. Previously bookhockeys.com served GitHub Pages' generic Helvetica "Page not found" page for unknown paths. Now: neon green, Luckiest Guy "404", "That page isn't here", and a GO HOME button matching the home page's button style. `noindex` so 404 hits don't get indexed. `canonical` points to the home page. Covers `/greenline/` and any other future subpath that 404s.
+
 ### v0.1.7 — 2026-06-05
 - Build script now preserves manual playlist ordering. Previously it re-sorted `clips/playlist.json` alphabetically on every run, so any manual reorder got blown away. Now: HEAD clips stay pinned to the top, existing body order is preserved for clips still on disk, newly-encoded clips are appended to the end, removed clips drop out. Reorder by editing `clips/playlist.json` directly.
 - Reordered rotation to lead the new clips with `mayatv` before `1lei235-edit`.
