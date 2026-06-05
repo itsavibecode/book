@@ -38,6 +38,9 @@ Re-runs are idempotent — a clip is only re-encoded if its source file is newer
 
 ## Changelog — home page
 
+### v0.1.10 — 2026-06-05
+- Fixed the 404 splat overflowing into the "That page isn't here." headline below. The splat was sized 140% of the 404 text wrap with translate-centered absolute positioning, so its bottom edge extended past the wrap and covered the headline. Now: the wrap has its own padding and the splat is `object-fit: contain`'d inside, so it stays within its container. Added defensive `z-index: 1` on the headline and button so any future overflow can't hide them.
+
 ### v0.1.9 — 2026-06-05
 - Added the white logo splat behind the "404" on `404.html`. Extracted from `logo.png` via a tiny Pillow flatten (all non-transparent pixels → white) into `splat.png` (32 KB) + `splat.webp` (15 KB), then dropped in via `<picture>` behind the number with the same `drop-shadow(6px 8px 0 rgba(0,0,0,0.5))` as the home logo. Sized 140% of the text so the splat pokes out around the 404 edges.
 
