@@ -38,6 +38,9 @@ Re-runs are idempotent — a clip is only re-encoded if its source file is newer
 
 ## Changelog — home page
 
+### v0.1.9 — 2026-06-05
+- Added the white logo splat behind the "404" on `404.html`. Extracted from `logo.png` via a tiny Pillow flatten (all non-transparent pixels → white) into `splat.png` (32 KB) + `splat.webp` (15 KB), then dropped in via `<picture>` behind the number with the same `drop-shadow(6px 8px 0 rgba(0,0,0,0.5))` as the home logo. Sized 140% of the text so the splat pokes out around the 404 edges.
+
 ### v0.1.8 — 2026-06-05
 - Added a branded `404.html`. Previously bookhockeys.com served GitHub Pages' generic Helvetica "Page not found" page for unknown paths. Now: neon green, Luckiest Guy "404", "That page isn't here", and a GO HOME button matching the home page's button style. `noindex` so 404 hits don't get indexed. `canonical` points to the home page. Covers `/greenline/` and any other future subpath that 404s.
 
