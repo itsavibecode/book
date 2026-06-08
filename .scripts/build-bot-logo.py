@@ -29,7 +29,9 @@ SRC = ROOT / "logo.png"
 OUT = ROOT / "logo-bot.png"
 
 CANVAS = 1024
-WORDMARK_WIDTH_FRAC = 0.78   # wordmark fills 78% of canvas width
+WORDMARK_WIDTH_FRAC = 0.70   # wordmark slightly smaller so the bot mascot
+                              # above it has room to be a real focal point
+                              # rather than feeling like a corner sticker.
 
 # Comic-book palette from the existing wordmark.
 BLUE_PRIMARY = (32, 188, 232, 255)   # the BOOK blue
@@ -49,10 +51,12 @@ def composite_wordmark(canvas):
     target_w = int(CANVAS * WORDMARK_WIDTH_FRAC)
     target_h = int(src.size[1] * (target_w / src.size[0]))
     resized = src.resize((target_w, target_h), Image.LANCZOS)
-    # Position: horizontally centered, vertically slightly below
-    # center so there's breathing room above for the bot badge.
+    # Position: horizontally centered, vertically pushed well below
+    # center so the bot mascot above it has room to breathe at full
+    # size (canvas-center-ish) rather than getting shoved into a
+    # corner.
     x = (CANVAS - target_w) // 2
-    y = (CANVAS - target_h) // 2 + 60
+    y = (CANVAS - target_h) // 2 + 140
     canvas.alpha_composite(resized, (x, y))
 
 
@@ -152,11 +156,13 @@ def main():
     canvas = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
     composite_wordmark(canvas)
 
-    # Badge: top-right corner. Centered at ~(78% across, 22% down)
-    # of the canvas, sized so it reads clearly even at 64x64.
-    badge_r = int(CANVAS * 0.16)
-    cx = int(CANVAS * 0.80)
-    cy = int(CANVAS * 0.22)
+    # Badge: ABOVE the wordmark, slightly off-center to the right so
+    # the composition reads as "mascot + brand name" without being
+    # boringly symmetrical. Larger size than the corner-sticker
+    # version since the bot is the visual anchor here.
+    badge_r = int(CANVAS * 0.20)
+    cx = int(CANVAS * 0.54)
+    cy = int(CANVAS * 0.28)
     draw_bot_badge(canvas, cx, cy, badge_r)
 
     canvas.save(OUT, "PNG", optimize=True)
