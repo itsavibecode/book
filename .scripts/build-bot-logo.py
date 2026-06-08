@@ -1,63 +1,96 @@
 #!/usr/bin/env python3
-"""Generate a square BookHockeys logo with a bot badge in the corner
-for use as the OAuth app icon on Kick's developer portal.
+"""Generate a square BookHockeys bot logo for use as the OAuth app
+icon on Kick's developer portal.
 
 Output: book/logo-bot.png (1024x1024 transparent)
 
 Design:
-  - Take the existing wordmark, scale it to ~78% of the canvas width,
-    center it vertically + slightly biased toward the bottom so the
-    bot badge has clear top-right real estate.
-  - Bot badge sits in the top-right corner: a yellow disc with a
-    thick black outline matching the wordmark style. Inside the disc
-    is a simple comic-style robot head (head outline + two eyes +
-    antenna) in the same blue as the wordmark's BOOK letters.
-  - All elements get the wordmark's signature offset-black drop
-    shadow so the badge reads as part of the same logo system, not
-    a sticker someone slapped on top.
-
-The result reads as "BookHockeys" + an unmistakable "this is the bot
-/dev app" marker. Suitable for Kick's tiny app-icon display sizes
-since the wordmark stays readable and the bot badge is a clear
-silhouette.
+  - Dead-center bot icon (comic robot head + antenna in BookHockeys
+    blue/yellow) over a white comic-book starburst.
+  - No wordmark -- the burst + bot is the whole composition. Reads
+    cleanly at every size from 64x64 up to 1024x1024 since there's
+    no fine type to lose at small sizes.
+  - The starburst echoes the small white "sparkle" element in the
+    original BookHockeys wordmark (the little burst between the B
+    and the H), scaled up to a full backdrop. 12 sharp points with
+    slight irregularity per point so it feels hand-drawn rather
+    than perfectly mathematical.
+  - All elements use the wordmark's signature offset-black drop
+    shadow + heavy black outline so the bot mark reads as part of
+    the same logo system.
 """
+import math
 from PIL import Image, ImageDraw
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
-SRC = ROOT / "logo.png"
 OUT = ROOT / "logo-bot.png"
 
 CANVAS = 1024
-WORDMARK_WIDTH_FRAC = 0.70   # wordmark slightly smaller so the bot mascot
-                              # above it has room to be a real focal point
-                              # rather than feeling like a corner sticker.
 
 # Comic-book palette from the existing wordmark.
 BLUE_PRIMARY = (32, 188, 232, 255)   # the BOOK blue
 YELLOW = (252, 226, 80, 255)         # the HOCKEYS yellow
+WHITE = (255, 255, 255, 255)         # the splash burst fill
 INK = (0, 0, 0, 255)                 # the heavy black outline/drop-shadow
 
 # Drop-shadow tunables — match the wordmark's chunky offset shadow.
 SHADOW_OFFSET = 9
-SHADOW_BLUR = 0  # the wordmark uses a hard offset, no blur
 
 
-def composite_wordmark(canvas):
-    """Resize the existing wordmark to WORDMARK_WIDTH_FRAC of the
-    canvas, then paste it slightly above the vertical center so the
-    bot badge in the corner doesn't visually crowd the title."""
-    src = Image.open(SRC).convert("RGBA")
-    target_w = int(CANVAS * WORDMARK_WIDTH_FRAC)
-    target_h = int(src.size[1] * (target_w / src.size[0]))
-    resized = src.resize((target_w, target_h), Image.LANCZOS)
-    # Position: horizontally centered, vertically pushed well below
-    # center so the bot mascot above it has room to breathe at full
-    # size (canvas-center-ish) rather than getting shoved into a
-    # corner.
-    x = (CANVAS - target_w) // 2
-    y = (CANVAS - target_h) // 2 + 140
-    canvas.alpha_composite(resized, (x, y))
+def starburst_points(cx, cy, n_points, outer_r, inner_r):
+    """Build a starburst polygon as an alternating outer/inner ring
+    of (x, y) points. Each ray gets a slight per-index size jitter
+    so the burst feels comic-book-organic rather than perfectly
+    geometric. Jitter is deterministic (math-based, not random) so
+    every build of the logo produces the same shape."""
+    pts = []
+    # Start with the first ray pointing straight up.
+    start_angle = -math.pi / 2
+    for i in range(n_points):
+        # Outer point.
+        ang = start_angle + (i / n_points) * 2 * math.pi
+        # Deterministic jitter: combine two sin waves at different
+        # frequencies so adjacent rays have visibly different lengths
+        # without any one being a clear outlier.
+        jitter = 0.08 * math.sin(i * 1.7) + 0.05 * math.sin(i * 3.1)
+        r = outer_r * (1 + jitter)
+        pts.append((cx + math.cos(ang) * r, cy + math.sin(ang) * r))
+        # Inner valley between this ray and the next.
+        valley_ang = ang + (math.pi / n_points)
+        valley_jitter = 0.04 * math.sin(i * 2.3 + 1)
+        valley_r = inner_r * (1 + valley_jitter)
+        pts.append((cx + math.cos(valley_ang) * valley_r,
+                    cy + math.sin(valley_ang) * valley_r))
+    return pts
+
+
+def draw_starburst(canvas, cx, cy, outer_r, inner_r):
+    """Comic-book splash: white-filled 12-point burst with a heavy
+    black outline + offset black drop shadow. Drawn before the bot
+    so the bot sits over it."""
+    pts = starburst_points(cx, cy, n_points=12,
+                           outer_r=outer_r, inner_r=inner_r)
+
+    # Drop shadow needs to be VERY offset for a 12-pointed burst,
+    # because the sharp points cover up small offsets when stacked.
+    # 18px is just enough to peek out from each ray and read as a
+    # proper comic shadow.
+    shadow_offset = SHADOW_OFFSET * 2
+
+    # 1. Shadow layer (offset solid-black copy of the burst).
+    shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shadow)
+    shadow_pts = [(x + shadow_offset, y + shadow_offset) for (x, y) in pts]
+    sd.polygon(shadow_pts, fill=INK)
+    canvas.alpha_composite(shadow)
+
+    # 2. White burst with a thick black outline. PIL's polygon
+    # supports a `width` parameter for the outline that does proper
+    # corner joins (no overlapping line ends like manual line-drawing
+    # would produce).
+    bd = ImageDraw.Draw(canvas)
+    bd.polygon(pts, fill=WHITE, outline=INK, width=10)
 
 
 def stroked_circle(draw, cx, cy, r, fill, stroke=INK, stroke_w=8):
@@ -154,15 +187,22 @@ def draw_bot_badge(canvas, cx, cy, badge_r):
 
 def main():
     canvas = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
-    composite_wordmark(canvas)
 
-    # Badge: ABOVE the wordmark, slightly off-center to the right so
-    # the composition reads as "mascot + brand name" without being
-    # boringly symmetrical. Larger size than the corner-sticker
-    # version since the bot is the visual anchor here.
-    badge_r = int(CANVAS * 0.20)
-    cx = int(CANVAS * 0.54)
-    cy = int(CANVAS * 0.28)
+    # Bot dead-center, large. With no wordmark to share the canvas
+    # with, the bot disc gets to be the whole show.
+    cx = CANVAS // 2
+    cy = CANVAS // 2
+    badge_r = int(CANVAS * 0.24)
+
+    # Starburst BEHIND the bot. Outer points sit ~1.55x past the
+    # bot's edge, inner valleys ~1.05x so the burst peeks around the
+    # bot without the bot disc covering the valleys -- the burst's
+    # ragged silhouette is the whole visual identity of this mark.
+    draw_starburst(canvas, cx, cy,
+                   outer_r=int(badge_r * 1.55),
+                   inner_r=int(badge_r * 1.05))
+
+    # Bot on top.
     draw_bot_badge(canvas, cx, cy, badge_r)
 
     canvas.save(OUT, "PNG", optimize=True)
