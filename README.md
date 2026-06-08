@@ -38,6 +38,9 @@ Re-runs are idempotent — a clip is only re-encoded if its source file is newer
 
 ## Changelog — home page
 
+### v0.1.12 — 2026-06-08
+- Reordered the secondary launcher row so SpaceX and Anduril sit next to each other at the end (the two IPO trackers cluster). New order: BigText, Green Line, Shoovlator, SpaceX, Anduril.
+
 ### v0.1.11 — 2026-06-08
 - Added a small secondary launcher row under the KICK / TWITCH buttons linking to the rest of the site family (Anduril, BigText, Green Line, Shoovlator, SpaceX). Each chip has the target site's own favicon on the left + name on the right. Sized clearly smaller than the main buttons (14 px Luckiest Guy, thin border, light shadow) so the streaming buttons stay the focal point. Favicons copied locally into `links/` (~5 KB total) to avoid third-party requests.
 
