@@ -38,6 +38,9 @@ Re-runs are idempotent — a clip is only re-encoded if its source file is newer
 
 ## Changelog — home page
 
+### v0.1.11 — 2026-06-08
+- Added a small secondary launcher row under the KICK / TWITCH buttons linking to the rest of the site family (Anduril, BigText, Green Line, Shoovlator, SpaceX). Each chip has the target site's own favicon on the left + name on the right. Sized clearly smaller than the main buttons (14 px Luckiest Guy, thin border, light shadow) so the streaming buttons stay the focal point. Favicons copied locally into `links/` (~5 KB total) to avoid third-party requests.
+
 ### v0.1.10 — 2026-06-05
 - Fixed the 404 splat overflowing into the "That page isn't here." headline below. The splat was sized 140% of the 404 text wrap with translate-centered absolute positioning, so its bottom edge extended past the wrap and covered the headline. Now: the wrap has its own padding and the splat is `object-fit: contain`'d inside, so it stays within its container. Added defensive `z-index: 1` on the headline and button so any future overflow can't hide them.
 
