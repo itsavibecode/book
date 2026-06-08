@@ -40,25 +40,33 @@ SHADOW_OFFSET = 9
 
 def starburst_points(cx, cy, n_points, outer_r, inner_r):
     """Build a starburst polygon as an alternating outer/inner ring
-    of (x, y) points. Each ray gets a slight per-index size jitter
-    so the burst feels comic-book-organic rather than perfectly
-    geometric. Jitter is deterministic (math-based, not random) so
-    every build of the logo produces the same shape."""
+    of (x, y) points, tuned to match the BookHockeys wordmark's own
+    small white splash element (the sparkle between the B and the
+    H). That splash has chunky uneven spikes, not a clean star —
+    so jitter is intentionally aggressive and asymmetric.
+
+    Jitter is deterministic (math-based, not random) so every build
+    of the logo produces the same shape."""
     pts = []
     # Start with the first ray pointing straight up.
     start_angle = -math.pi / 2
     for i in range(n_points):
-        # Outer point.
+        # Outer point with chunky asymmetric jitter — combine three
+        # sin waves at relatively prime frequencies so adjacent rays
+        # land at very different lengths. Magnitudes (±25%, ±15%,
+        # ±8%) deliberately heavy so the result reads "hand-drawn
+        # comic splash" not "neat starburst".
         ang = start_angle + (i / n_points) * 2 * math.pi
-        # Deterministic jitter: combine two sin waves at different
-        # frequencies so adjacent rays have visibly different lengths
-        # without any one being a clear outlier.
-        jitter = 0.08 * math.sin(i * 1.7) + 0.05 * math.sin(i * 3.1)
+        jitter = (0.25 * math.sin(i * 1.7)
+                  + 0.15 * math.sin(i * 3.1 + 0.4)
+                  + 0.08 * math.sin(i * 5.3 + 1.2))
         r = outer_r * (1 + jitter)
         pts.append((cx + math.cos(ang) * r, cy + math.sin(ang) * r))
-        # Inner valley between this ray and the next.
+        # Inner valley between this ray and the next. Push valleys
+        # deeper than before so spikes read as sharp rather than
+        # gentle teeth.
         valley_ang = ang + (math.pi / n_points)
-        valley_jitter = 0.04 * math.sin(i * 2.3 + 1)
+        valley_jitter = 0.10 * math.sin(i * 2.3 + 1)
         valley_r = inner_r * (1 + valley_jitter)
         pts.append((cx + math.cos(valley_ang) * valley_r,
                     cy + math.sin(valley_ang) * valley_r))
@@ -66,10 +74,12 @@ def starburst_points(cx, cy, n_points, outer_r, inner_r):
 
 
 def draw_starburst(canvas, cx, cy, outer_r, inner_r):
-    """Comic-book splash: white-filled 12-point burst with a heavy
+    """Comic-book splash: white-filled 8-point burst with a heavy
     black outline + offset black drop shadow. Drawn before the bot
-    so the bot sits over it."""
-    pts = starburst_points(cx, cy, n_points=12,
+    so the bot sits over it. 8 points (was 12) matches the original
+    BookHockeys splash element more closely — chunkier, fewer,
+    more uneven spikes."""
+    pts = starburst_points(cx, cy, n_points=8,
                            outer_r=outer_r, inner_r=inner_r)
 
     # Drop shadow needs to be VERY offset for a 12-pointed burst,
@@ -194,13 +204,14 @@ def main():
     cy = CANVAS // 2
     badge_r = int(CANVAS * 0.24)
 
-    # Starburst BEHIND the bot. Outer points sit ~1.55x past the
-    # bot's edge, inner valleys ~1.05x so the burst peeks around the
-    # bot without the bot disc covering the valleys -- the burst's
-    # ragged silhouette is the whole visual identity of this mark.
+    # Starburst BEHIND the bot. Outer points reach further out
+    # (1.65x) and inner valleys sit closer to the bot's edge (1.08x)
+    # to give the chunkier 8-point burst dramatic spikes. The burst's
+    # ragged silhouette is the whole visual identity of this mark,
+    # so the spikes need to read at glance.
     draw_starburst(canvas, cx, cy,
-                   outer_r=int(badge_r * 1.55),
-                   inner_r=int(badge_r * 1.05))
+                   outer_r=int(badge_r * 1.65),
+                   inner_r=int(badge_r * 1.08))
 
     # Bot on top.
     draw_bot_badge(canvas, cx, cy, badge_r)
