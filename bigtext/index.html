@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BigText — Large Text Display</title>
+<meta name="description" content="Display anything, big. A fullscreen large-text tool with theme picker, screenshot export, copy-to-clipboard, share, and ALL CAPS toggle.">
+<meta name="version" content="0.1.5">
+<meta name="theme-color" content="#000000">
+<link rel="canonical" href="https://bookhockeys.com/bigtext/">
+<link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BigText">
+<meta property="og:title" content="BigText — Large Text Display">
+<meta property="og:description" content="Display anything, big. Fullscreen text with theme picker, screenshot export, copy/share, and ALL CAPS toggle.">
+<meta property="og:url" content="https://bookhockeys.com/bigtext/">
+<meta property="og:image" content="https://bookhockeys.com/bigtext/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BigText — Display anything, big.">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BigText — Large Text Display">
+<meta name="twitter:description" content="Display anything, big. Fullscreen text with theme picker, screenshot export, copy/share, and ALL CAPS toggle.">
+<meta name="twitter:image" content="https://bookhockeys.com/bigtext/og-image.png">
+<meta name="twitter:image:alt" content="BigText — Display anything, big.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Instrument+Sans:wght@700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Instrument+Sans:wght@700&display=swap"></noscript>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #000000;
+    --text: #FFFFFF;
+    --ui-bg: rgba(255,255,255,0.06);
+    --ui-bg-hover: rgba(255,255,255,0.12);
+    --ui-border: rgba(255,255,255,0.1);
+    --ui-text: rgba(255,255,255,0.7);
+    --ui-text-bright: #FFFFFF;
+    --accent: #6EE7B7;
+    --accent-dim: rgba(110,231,183,0.15);
+    --toast-bg: rgba(20,20,20,0.95);
+    --font-body: 'DM Sans', sans-serif;
+    --font-display: 'Instrument Sans', sans-serif;
+  }
+
+  .theme-light {
+    --bg: #F5F0EB;
+    --text: #1A1A1A;
+    --ui-bg: rgba(0,0,0,0.05);
+    --ui-bg-hover: rgba(0,0,0,0.1);
+    --ui-border: rgba(0,0,0,0.1);
+    --ui-text: rgba(0,0,0,0.5);
+    --ui-text-bright: #1A1A1A;
+    --accent: #10B981;
+    --accent-dim: rgba(16,185,129,0.12);
+    --toast-bg: rgba(240,240,240,0.95);
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  /* ─── DISPLAY AREA ─── */
+  #display-area {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    background: var(--bg);
+    transition: background 0.4s ease;
+    cursor: text;
+    z-index: 1;
+  }
+
+  #big-text {
+    max-width: 100%;
+    text-align: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.08;
+    color: var(--text);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    transition: color 0.4s ease;
+    user-select: none;
+  }
+
+  #big-text.placeholder { opacity: 0.4; }
+
+  /* ─── INPUT OVERLAY ─── */
+  #input-overlay {
+    position: fixed; inset: 0;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    z-index: 100;
+    animation: fadeIn 0.2s ease;
+  }
+  #input-overlay.active { display: flex; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .input-card {
+    background: rgba(30,30,30,0.95);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 36px;
+    width: 90%;
+    max-width: 560px;
+    animation: slideUp 0.3s ease;
+  }
+  .theme-light .input-card {
+    background: rgba(255,255,255,0.97);
+    border-color: rgba(0,0,0,0.08);
+  }
+
+  .input-card h2 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ui-text-bright);
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+  .input-hint {
+    font-size: 12px;
+    color: var(--ui-text);
+    margin-bottom: 14px;
+    opacity: 0.7;
+  }
+
+  .input-card textarea {
+    width: 100%;
+    height: 140px;
+    background: var(--ui-bg);
+    border: 1.5px solid var(--ui-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--ui-text-bright);
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-card textarea:focus { border-color: var(--accent); }
+  .input-card textarea::placeholder { color: var(--ui-text); }
+
+  .input-actions {
+    display: flex; gap: 10px;
+    margin-top: 16px;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 10px 22px;
+    border-radius: 10px;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-ghost { background: var(--ui-bg); color: var(--ui-text); }
+  .btn-ghost:hover { background: var(--ui-bg-hover); color: var(--ui-text-bright); }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+  .btn-caps {
+    background: var(--ui-bg);
+    color: var(--ui-text);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 7px 14px;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+  }
+  .btn-caps:hover { background: var(--ui-bg-hover); color: var(--ui-text-bright); }
+  .btn-caps.active {
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  /* ─── TOOLBAR ─── */
+  #toolbar {
+    position: fixed;
+    bottom: 28px;
+    left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px;
+    background: var(--ui-bg);
+    border: 1px solid var(--ui-border);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 50;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  #toolbar.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    pointer-events: none;
+  }
+
+  .tool-btn {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 11px;
+    color: var(--ui-text);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .tool-btn:hover { background: var(--ui-bg-hover); color: var(--ui-text-bright); }
+  .tool-btn:active { transform: scale(0.96); }
+  .tool-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  .tool-divider { width: 1px; height: 24px; background: var(--ui-border); flex-shrink: 0; }
+
+  /* ─── COLOR PICKER POPUP ─── */
+  .color-picker-popup {
+    position: fixed;
+    bottom: 90px;
+    left: 50%; transform: translateX(-50%);
+    display: none;
+    background: rgba(30,30,30,0.97);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 18px;
+    z-index: 60;
+    animation: slideUp 0.2s ease;
+  }
+  .color-picker-popup.active { display: block; }
+  .theme-light .color-picker-popup { background: rgba(255,255,255,0.97); border-color: rgba(0,0,0,0.08); }
+
+  .color-section { margin-bottom: 14px; }
+  .color-section:last-child { margin-bottom: 0; }
+  .color-label {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ui-text); margin-bottom: 8px;
+  }
+  .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+  .swatch {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid transparent; cursor: pointer;
+    transition: all 0.15s; position: relative;
+  }
+  .swatch:hover { transform: scale(1.15); }
+  .swatch.active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+
+  /* ─── TOAST ─── */
+  #toast {
+    position: fixed; top: 28px;
+    left: 50%; transform: translateX(-50%) translateY(-20px);
+    padding: 12px 24px;
+    background: var(--toast-bg);
+    border: 1px solid var(--ui-border);
+    border-radius: 12px;
+    font-size: 14px; font-weight: 500;
+    color: var(--accent);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 200; backdrop-filter: blur(12px);
+    text-align: center; max-width: 90vw;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ─── OFFSCREEN CAPTURE ─── */
+  #capture-offscreen {
+    position: fixed; left: -99999px; top: -99999px;
+    pointer-events: none; z-index: -1;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 640px) {
+    #display-area { padding: 16px; }
+    #toolbar {
+      flex-wrap: wrap; max-width: 92vw; justify-content: center;
+      border-radius: 20px; bottom: 16px; gap: 2px; padding: 4px;
+    }
+    .tool-btn span.label { display: none; }
+    .tool-btn { padding: 10px 12px; }
+    .input-card { padding: 24px; }
+    .color-picker-popup { bottom: 80px; width: 88vw; }
+  }
+</style>
+</head>
+<body>
+
+<div id="display-area">
+  <div id="big-text" class="placeholder">Tap to edit</div>
+</div>
+
+<div id="capture-offscreen"></div>
+
+<div id="input-overlay">
+  <div class="input-card">
+    <h2>Enter your text</h2>
+    <div class="input-hint">Enter for line breaks · Ctrl+Enter to display</div>
+    <textarea id="text-input" placeholder="Type something big…" autofocus></textarea>
+    <div class="input-actions">
+      <button class="btn btn-caps" id="btn-caps" title="Toggle ALL CAPS">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M3 20h4l10-10a2.83 2.83 0 00-4-4L3 16v4z"/></svg>
+        ALL CAPS
+      </button>
+      <span style="flex:1"></span>
+      <button class="btn btn-ghost" id="btn-cancel">Cancel</button>
+      <button class="btn btn-primary" id="btn-apply">Display</button>
+    </div>
+  </div>
+</div>
+
+<div id="toolbar">
+  <button class="tool-btn" id="tool-edit" title="Edit text">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+    <span class="label">Edit</span>
+  </button>
+  <div class="tool-divider"></div>
+
+  <button class="tool-btn" id="tool-color" title="Colors">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 000 14 3.5 3.5 0 013.5 3.5A3.5 3.5 0 0019 16a7 7 0 000-14"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.5" fill="currentColor"/></svg>
+    <span class="label">Theme</span>
+  </button>
+  <div class="tool-divider"></div>
+
+  <button class="tool-btn" id="tool-download" title="Download screenshot">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span class="label">Save</span>
+  </button>
+
+  <button class="tool-btn" id="tool-copy" title="Copy / Share screenshot">
+    <svg id="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+    <svg id="share-icon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    <span class="label" id="copy-label">Copy</span>
+  </button>
+  <div class="tool-divider"></div>
+
+  <button class="tool-btn" id="tool-fullscreen" title="Fullscreen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+    <span class="label">Fullscreen</span>
+  </button>
+</div>
+
+<div class="color-picker-popup" id="color-popup">
+  <div class="color-section">
+    <div class="color-label">Background</div>
+    <div class="color-swatches" id="bg-swatches"></div>
+  </div>
+  <div class="color-section">
+    <div class="color-label">Text</div>
+    <div class="color-swatches" id="text-swatches"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const APP_VERSION = '0.1.5';
+
+  // Lazy-load html2canvas only when the user actually triggers a capture.
+  // Saves ~50KB and a render-blocking request on initial page load.
+  let _html2canvasPromise = null;
+  function ensureHtml2Canvas() {
+    if (window.html2canvas) return Promise.resolve();
+    if (_html2canvasPromise) return _html2canvasPromise;
+    _html2canvasPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.onload = () => resolve();
+      s.onerror = () => { _html2canvasPromise = null; reject(new Error('html2canvas failed to load')); };
+      document.head.appendChild(s);
+    });
+    return _html2canvasPromise;
+  }
+
+  // After initial render + idle, opportunistically prefetch html2canvas so the
+  // first Save / Copy click feels instant.
+  const _idlePrefetch = () => { ensureHtml2Canvas().catch(() => {}); };
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(_idlePrefetch, { timeout: 4000 });
+  } else {
+    setTimeout(_idlePrefetch, 2500);
+  }
+  const displayArea = document.getElementById('display-area');
+  const bigText = document.getElementById('big-text');
+  const overlay = document.getElementById('input-overlay');
+  const textInput = document.getElementById('text-input');
+  const btnCancel = document.getElementById('btn-cancel');
+  const btnApply = document.getElementById('btn-apply');
+  const toolbar = document.getElementById('toolbar');
+  const toastEl = document.getElementById('toast');
+  const colorPopup = document.getElementById('color-popup');
+  const captureOffscreen = document.getElementById('capture-offscreen');
+
+  let currentText = '';
+  let hideToolbarTimer = null;
+
+  // ─── DEVICE DETECTION ───
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (isMobile) {
+    document.getElementById('copy-icon').style.display = 'none';
+    document.getElementById('share-icon').style.display = '';
+    document.getElementById('copy-label').textContent = 'Share';
+  }
+
+  // ─── TEXT SIZING (binary search — works well on narrow mobile portrait) ───
+  // Offscreen probe for measuring natural text dimensions
+  const probe = document.createElement('div');
+  probe.style.cssText = `
+    position:fixed; left:-99999px; top:-99999px;
+    visibility:hidden; pointer-events:none;
+    font-family:'Instrument Sans',sans-serif; font-weight:700;
+    line-height:1.08; white-space:pre-wrap;
+    display:inline-block;
+  `;
+  document.body.appendChild(probe);
+
+  function autoSizeText() {
+    const el = bigText;
+    const pad = isMobile ? 32 : 80;
+    const maxW = window.innerWidth - pad;
+    const maxH = window.innerHeight - pad;
+
+    // Copy content into probe (no width constraint → natural size)
+    probe.innerHTML = el.innerHTML || el.textContent;
+
+    // Helper: check if text fits at given font size
+    // For single-line text: measure unconstrained width
+    // For multi-line (has <br>): measure with maxW constraint for height
+    const hasBreaks = el.innerHTML.includes('<br>');
+
+    function fits(size) {
+      probe.style.fontSize = size + 'px';
+
+      if (hasBreaks) {
+        // Multi-line: constrain width, check height
+        probe.style.width = maxW + 'px';
+        probe.style.whiteSpace = 'pre-wrap';
+        probe.style.wordBreak = 'break-word';
+        const h = probe.scrollHeight;
+        // Also check each line doesn't overflow
+        probe.style.width = 'auto';
+        probe.style.whiteSpace = 'pre';
+        probe.style.wordBreak = 'normal';
+        const w = probe.scrollWidth;
+        return w <= maxW && h <= maxH;
+      } else {
+        // Single line: natural width must fit
+        probe.style.width = 'auto';
+        probe.style.whiteSpace = 'pre';
+        probe.style.wordBreak = 'normal';
+        const w = probe.scrollWidth;
+        const h = probe.scrollHeight;
+        return w <= maxW && h <= maxH;
+      }
+    }
+
+    let lo = 14, hi = 1200;
+
+    if (!fits(lo)) { el.style.fontSize = lo + 'px'; return; }
+
+    while (hi - lo > 1) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (fits(mid)) lo = mid;
+      else hi = mid;
+    }
+
+    el.style.fontSize = lo + 'px';
+  }
+
+  // ─── EDITOR (line breaks fully supported) ───
+  function openEditor() {
+    textInput.value = currentText;
+    textInput.style.textTransform = capsOn ? 'uppercase' : 'none';
+    btnCaps.classList.toggle('active', capsOn);
+    overlay.classList.add('active');
+    setTimeout(() => {
+      textInput.focus();
+      textInput.setSelectionRange(textInput.value.length, textInput.value.length);
+    }, 120);
+    colorPopup.classList.remove('active');
+  }
+
+  function closeEditor() {
+    overlay.classList.remove('active');
+  }
+
+  function applyText() {
+    let t = textInput.value.trim();
+    if (capsOn) t = t.toUpperCase();
+    currentText = t;
+    if (t) {
+      // Build DOM with <br> for line breaks (safe — no innerHTML from user input)
+      bigText.innerHTML = '';
+      const lines = t.split('\n');
+      lines.forEach((line, i) => {
+        bigText.appendChild(document.createTextNode(line));
+        if (i < lines.length - 1) bigText.appendChild(document.createElement('br'));
+      });
+      bigText.classList.remove('placeholder');
+    } else {
+      bigText.textContent = 'Tap to edit';
+      bigText.classList.add('placeholder');
+    }
+    closeEditor();
+    autoSizeText();
+  }
+
+  displayArea.addEventListener('click', (e) => {
+    if (e.target.closest('#toolbar') || e.target.closest('.color-picker-popup')) return;
+    openEditor();
+  });
+  document.getElementById('tool-edit').addEventListener('click', (e) => { e.stopPropagation(); openEditor(); });
+  btnCancel.addEventListener('click', closeEditor);
+  btnApply.addEventListener('click', applyText);
+
+  // ALL CAPS toggle
+  let capsOn = false;
+  const btnCaps = document.getElementById('btn-caps');
+  btnCaps.addEventListener('click', () => {
+    capsOn = !capsOn;
+    btnCaps.classList.toggle('active', capsOn);
+    if (capsOn) {
+      textInput.value = textInput.value.toUpperCase();
+      textInput.style.textTransform = 'uppercase';
+    } else {
+      textInput.style.textTransform = 'none';
+    }
+    textInput.focus();
+  });
+
+  // Enter = newline (default textarea behavior), Ctrl/Cmd+Enter = display
+  textInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      applyText();
+    }
+  });
+
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeEditor(); });
+
+  // ─── TOAST ───
+  let toastTimer = null;
+  function showToast(msg) {
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+  }
+
+  // ─── SCREENSHOT CAPTURE ───
+  // Mobile: renders to offscreen 4:3 canvas for clean, shareable image
+  // Desktop: captures viewport as-is
+  let activeBg = '#000000';
+  let activeText = '#FFFFFF';
+
+  async function captureCanvas() {
+    // Make sure html2canvas is loaded before we touch the toolbar — keeps the
+    // toolbar visible if the lazy-load fails so the user can retry.
+    try { await ensureHtml2Canvas(); }
+    catch (e) { showToast('Couldn’t load capture library'); throw e; }
+
+    toolbar.classList.add('hidden');
+    colorPopup.classList.remove('active');
+    await new Promise(r => setTimeout(r, 120));
+
+    let canvas;
+
+    if (isMobile) {
+      // Offscreen 4:3 render
+      const W = 1200, H = 900;
+      const clone = document.createElement('div');
+      clone.style.cssText = `
+        width:${W}px; height:${H}px;
+        display:flex; align-items:center; justify-content:center;
+        background:${activeBg}; padding:60px; position:relative;
+      `;
+      const textClone = document.createElement('div');
+      textClone.style.cssText = `
+        max-width:100%; text-align:center;
+        font-family:'Instrument Sans',sans-serif; font-weight:700;
+        line-height:1.08; color:${activeText};
+        word-break:break-word; overflow-wrap:break-word; white-space:pre-wrap;
+      `;
+      textClone.innerHTML = bigText.innerHTML;
+      clone.appendChild(textClone);
+
+      captureOffscreen.innerHTML = '';
+      captureOffscreen.appendChild(clone);
+
+      // Size text inside clone using a probe (same approach as main autoSize)
+      const captureProbe = document.createElement('div');
+      captureProbe.style.cssText = `
+        position:fixed; left:-99999px; top:-99999px;
+        visibility:hidden; pointer-events:none;
+        font-family:'Instrument Sans',sans-serif; font-weight:700;
+        line-height:1.08; white-space:pre-wrap; display:inline-block;
+      `;
+      captureProbe.innerHTML = bigText.innerHTML;
+      document.body.appendChild(captureProbe);
+
+      const innerW = W - 120, innerH = H - 120;
+      const capHasBreaks = bigText.innerHTML.includes('<br>');
+      let lo = 16, hi = 500;
+
+      function capFits(size) {
+        captureProbe.style.fontSize = size + 'px';
+        if (capHasBreaks) {
+          captureProbe.style.width = innerW + 'px';
+          captureProbe.style.whiteSpace = 'pre-wrap';
+          captureProbe.style.wordBreak = 'break-word';
+          const h = captureProbe.scrollHeight;
+          captureProbe.style.width = 'auto';
+          captureProbe.style.whiteSpace = 'pre';
+          captureProbe.style.wordBreak = 'normal';
+          const w = captureProbe.scrollWidth;
+          return w <= innerW && h <= innerH;
+        } else {
+          captureProbe.style.width = 'auto';
+          captureProbe.style.whiteSpace = 'pre';
+          captureProbe.style.wordBreak = 'normal';
+          return captureProbe.scrollWidth <= innerW && captureProbe.scrollHeight <= innerH;
+        }
+      }
+
+      while (hi - lo > 1) {
+        const mid = Math.floor((lo + hi) / 2);
+        if (capFits(mid)) lo = mid; else hi = mid;
+      }
+      textClone.style.fontSize = lo + 'px';
+      document.body.removeChild(captureProbe);
+
+      canvas = await html2canvas(clone, { backgroundColor: null, scale: 2, width: W, height: H });
+      captureOffscreen.innerHTML = '';
+    } else {
+      canvas = await html2canvas(displayArea, {
+        backgroundColor: null, scale: 2, useCORS: true,
+        width: window.innerWidth, height: window.innerHeight,
+      });
+    }
+
+    toolbar.classList.remove('hidden');
+    return canvas;
+  }
+
+  // ─── DOWNLOAD ───
+  document.getElementById('tool-download').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    showToast('Capturing…');
+    try {
+      const canvas = await captureCanvas();
+      if (isMobile && navigator.share) {
+        canvas.toBlob(async (blob) => {
+          const file = new File([blob], 'bigtext.png', { type: 'image/png' });
+          try { await navigator.share({ files: [file] }); showToast('Done!'); }
+          catch { dlViaLink(canvas); }
+        }, 'image/png');
+      } else {
+        dlViaLink(canvas);
+      }
+    } catch (err) { showToast('Capture failed'); console.error(err); }
+  });
+
+  function dlViaLink(canvas) {
+    const a = document.createElement('a');
+    a.download = 'bigtext-' + Date.now() + '.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+    showToast('Screenshot saved!');
+  }
+
+  // ─── COPY / SHARE ───
+  document.getElementById('tool-copy').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    showToast(isMobile ? 'Preparing…' : 'Copying…');
+    try {
+      const canvas = await captureCanvas();
+      if (isMobile && navigator.share) {
+        // iOS doesn't support clipboard.write for images — use Share sheet instead
+        canvas.toBlob(async (blob) => {
+          const file = new File([blob], 'bigtext.png', { type: 'image/png' });
+          try { await navigator.share({ files: [file] }); showToast('Shared!'); }
+          catch (err) { if (err.name !== 'AbortError') showToast('Share cancelled'); }
+        }, 'image/png');
+      } else {
+        // Desktop: clipboard copy
+        canvas.toBlob(async (blob) => {
+          try {
+            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+            showToast('Copied to clipboard!');
+          } catch { showToast('Copy failed — try Save instead'); }
+        }, 'image/png');
+      }
+    } catch (err) { showToast('Capture failed'); console.error(err); }
+  });
+
+  // ─── FULLSCREEN ───
+  document.getElementById('tool-fullscreen').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+    else document.exitFullscreen();
+  });
+
+  // ─── COLORS ───
+  const bgColors = [
+    { color: '#000000', label: 'Black' },
+    { color: '#FFFFFF', label: 'White' },
+    { color: '#1A1A2E', label: 'Navy' },
+    { color: '#0D1B2A', label: 'Deep Blue' },
+    { color: '#1B4332', label: 'Forest' },
+    { color: '#7F1D1D', label: 'Wine' },
+    { color: '#F59E0B', label: 'Amber' },
+    { color: '#6D28D9', label: 'Purple' },
+  ];
+  const textColors = [
+    { color: '#FFFFFF', label: 'White' },
+    { color: '#000000', label: 'Black' },
+    { color: '#F87171', label: 'Red' },
+    { color: '#60A5FA', label: 'Blue' },
+    { color: '#34D399', label: 'Green' },
+    { color: '#FBBF24', label: 'Yellow' },
+    { color: '#F472B6', label: 'Pink' },
+    { color: '#A78BFA', label: 'Violet' },
+  ];
+
+  function renderSwatches() {
+    const bgC = document.getElementById('bg-swatches');
+    const txC = document.getElementById('text-swatches');
+    bgC.innerHTML = ''; txC.innerHTML = '';
+
+    bgColors.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'swatch' + (c.color === activeBg ? ' active' : '');
+      el.style.background = c.color;
+      if (c.color === '#000000') el.style.border = '2px solid rgba(255,255,255,0.2)';
+      if (c.color === activeBg) el.style.borderColor = 'var(--accent)';
+      el.title = c.label;
+      el.addEventListener('click', () => { activeBg = c.color; applyColors(); renderSwatches(); });
+      bgC.appendChild(el);
+    });
+
+    textColors.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'swatch' + (c.color === activeText ? ' active' : '');
+      el.style.background = c.color;
+      if (c.color === '#FFFFFF') el.style.border = '2px solid rgba(0,0,0,0.15)';
+      if (c.color === activeText) el.style.borderColor = 'var(--accent)';
+      el.title = c.label;
+      el.addEventListener('click', () => { activeText = c.color; applyColors(); renderSwatches(); });
+      txC.appendChild(el);
+    });
+  }
+
+  function applyColors() {
+    displayArea.style.background = activeBg;
+    bigText.style.color = activeText;
+    const r = parseInt(activeBg.slice(1,3),16), g = parseInt(activeBg.slice(3,5),16), b = parseInt(activeBg.slice(5,7),16);
+    if ((0.299*r + 0.587*g + 0.114*b) > 160) document.body.classList.add('theme-light');
+    else document.body.classList.remove('theme-light');
+  }
+
+  document.getElementById('tool-color').addEventListener('click', (e) => { e.stopPropagation(); colorPopup.classList.toggle('active'); });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#color-popup') && !e.target.closest('#tool-color')) colorPopup.classList.remove('active');
+  });
+
+  // ─── AUTO-HIDE TOOLBAR ───
+  function resetToolbarTimer() {
+    toolbar.classList.remove('hidden');
+    clearTimeout(hideToolbarTimer);
+    hideToolbarTimer = setTimeout(() => {
+      if (!colorPopup.classList.contains('active') && !overlay.classList.contains('active'))
+        toolbar.classList.add('hidden');
+    }, 4000);
+  }
+  document.addEventListener('mousemove', resetToolbarTimer);
+  document.addEventListener('touchstart', resetToolbarTimer);
+  toolbar.addEventListener('mouseenter', () => { clearTimeout(hideToolbarTimer); toolbar.classList.remove('hidden'); });
+
+  // ─── INIT ───
+  renderSwatches();
+  autoSizeText();
+  window.addEventListener('resize', autoSizeText);
+  window.addEventListener('orientationchange', () => setTimeout(autoSizeText, 250));
+  resetToolbarTimer();
+</script>
+</body>
+</html>

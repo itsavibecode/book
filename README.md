@@ -7,6 +7,7 @@ Personal site of streamer Book Hockeys. Live at **[bookhockeys.com](https://book
 | Path | What it is | Versioned in |
 | --- | --- | --- |
 | `/` | Landing page — Kick + Twitch links over the brand video | this README |
+| `/bigtext/` | Fullscreen large-text display with theme picker, screenshot export, copy/share, ALL CAPS toggle | [`bigtext/README.md`](bigtext/README.md) |
 | `/greenline/` | Green Line Theory auto-tester (in-browser, BlazeFace + MoveNet) | [`greenline/README.md`](greenline/README.md) |
 | `/shoovlator/` | Toy translator that re-writes English with stacked comparatives and redundant fillers | inline `<meta name="version">` on the page |
 | `/hantavirus/` | War-monitor-style global hantavirus surveillance dashboard — Leaflet world map + severity-color pins + curated public-health social feed | [`hantavirus/README.md`](hantavirus/README.md) |
