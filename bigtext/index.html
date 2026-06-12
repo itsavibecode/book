@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BigText — Large Text Display</title>
 <meta name="description" content="Display anything, big. A fullscreen large-text tool with theme picker, screenshot export, copy-to-clipboard, share, and ALL CAPS toggle.">
-<meta name="version" content="0.1.5">
+<meta name="version" content="0.2.0">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://bookhockeys.com/bigtext/">
 <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
@@ -326,7 +326,7 @@
 <div id="input-overlay">
   <div class="input-card">
     <h2>Enter your text</h2>
-    <div class="input-hint">Enter for line breaks · Ctrl+Enter to display</div>
+    <div class="input-hint">Enter for line breaks · Ctrl+Enter to display · Esc to cancel</div>
     <textarea id="text-input" placeholder="Type something big…" autofocus></textarea>
     <div class="input-actions">
       <button class="btn btn-caps" id="btn-caps" title="Toggle ALL CAPS">
@@ -341,31 +341,31 @@
 </div>
 
 <div id="toolbar">
-  <button class="tool-btn" id="tool-edit" title="Edit text">
+  <button class="tool-btn" id="tool-edit" title="Edit text (E)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
     <span class="label">Edit</span>
   </button>
   <div class="tool-divider"></div>
 
-  <button class="tool-btn" id="tool-color" title="Colors">
+  <button class="tool-btn" id="tool-color" title="Colors (T)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 000 14 3.5 3.5 0 013.5 3.5A3.5 3.5 0 0019 16a7 7 0 000-14"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.5" fill="currentColor"/></svg>
     <span class="label">Theme</span>
   </button>
   <div class="tool-divider"></div>
 
-  <button class="tool-btn" id="tool-download" title="Download screenshot">
+  <button class="tool-btn" id="tool-download" title="Download screenshot (S)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     <span class="label">Save</span>
   </button>
 
-  <button class="tool-btn" id="tool-copy" title="Copy / Share screenshot">
+  <button class="tool-btn" id="tool-copy" title="Copy / Share screenshot (C)">
     <svg id="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
     <svg id="share-icon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
     <span class="label" id="copy-label">Copy</span>
   </button>
   <div class="tool-divider"></div>
 
-  <button class="tool-btn" id="tool-fullscreen" title="Fullscreen">
+  <button class="tool-btn" id="tool-fullscreen" title="Fullscreen (F)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
     <span class="label">Fullscreen</span>
   </button>
@@ -385,7 +385,7 @@
 <div id="toast"></div>
 
 <script>
-  const APP_VERSION = '0.1.5';
+  const APP_VERSION = '0.2.0';
 
   // Lazy-load html2canvas only when the user actually triggers a capture.
   // Saves ~50KB and a render-blocking request on initial page load.
@@ -424,6 +424,30 @@
 
   let currentText = '';
   let hideToolbarTimer = null;
+
+  // ─── PERSISTENCE ───
+  // Saves text + theme + caps state under one key so a refresh restores
+  // the exact same display. Wrapped in try/catch — private-mode Safari
+  // and Storage-disabled browsers fail silently with no user impact.
+  const STORAGE_KEY = 'bigtext:state';
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        text: currentText,
+        bg: activeBg,
+        fg: activeText,
+        caps: capsOn,
+      }));
+    } catch (_) {}
+  }
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const s = JSON.parse(raw);
+      return (s && typeof s === 'object') ? s : null;
+    } catch (_) { return null; }
+  }
 
   // ─── DEVICE DETECTION ───
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -517,12 +541,9 @@
     overlay.classList.remove('active');
   }
 
-  function applyText() {
-    let t = textInput.value.trim();
-    if (capsOn) t = t.toUpperCase();
-    currentText = t;
+  // Build the display DOM from a raw string. Safe — uses textNode, not innerHTML.
+  function renderDisplay(t) {
     if (t) {
-      // Build DOM with <br> for line breaks (safe — no innerHTML from user input)
       bigText.innerHTML = '';
       const lines = t.split('\n');
       lines.forEach((line, i) => {
@@ -534,8 +555,16 @@
       bigText.textContent = 'Tap to edit';
       bigText.classList.add('placeholder');
     }
+  }
+
+  function applyText() {
+    let t = textInput.value.trim();
+    if (capsOn) t = t.toUpperCase();
+    currentText = t;
+    renderDisplay(t);
     closeEditor();
     autoSizeText();
+    saveState();
   }
 
   displayArea.addEventListener('click', (e) => {
@@ -559,6 +588,7 @@
       textInput.style.textTransform = 'none';
     }
     textInput.focus();
+    saveState();
   });
 
   // Enter = newline (default textarea behavior), Ctrl/Cmd+Enter = display
@@ -767,7 +797,7 @@
       if (c.color === '#000000') el.style.border = '2px solid rgba(255,255,255,0.2)';
       if (c.color === activeBg) el.style.borderColor = 'var(--accent)';
       el.title = c.label;
-      el.addEventListener('click', () => { activeBg = c.color; applyColors(); renderSwatches(); });
+      el.addEventListener('click', () => { activeBg = c.color; applyColors(); renderSwatches(); saveState(); });
       bgC.appendChild(el);
     });
 
@@ -778,7 +808,7 @@
       if (c.color === '#FFFFFF') el.style.border = '2px solid rgba(0,0,0,0.15)';
       if (c.color === activeText) el.style.borderColor = 'var(--accent)';
       el.title = c.label;
-      el.addEventListener('click', () => { activeText = c.color; applyColors(); renderSwatches(); });
+      el.addEventListener('click', () => { activeText = c.color; applyColors(); renderSwatches(); saveState(); });
       txC.appendChild(el);
     });
   }
@@ -809,7 +839,56 @@
   document.addEventListener('touchstart', resetToolbarTimer);
   toolbar.addEventListener('mouseenter', () => { clearTimeout(hideToolbarTimer); toolbar.classList.remove('hidden'); });
 
+  // ─── KEYBOARD SHORTCUTS ───
+  // Single-letter shortcuts when the display is focused (editor closed).
+  // Modifier keys, typing in inputs, and the editor's own keys are all
+  // passed through untouched.
+  document.addEventListener('keydown', (e) => {
+    // Editor open → only handle Escape to cancel; let the textarea take everything else.
+    if (overlay.classList.contains('active')) {
+      if (e.key === 'Escape') { e.preventDefault(); closeEditor(); }
+      return;
+    }
+    // Typing into any other input → no shortcuts
+    const tag = e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    // Let the browser keep ctrl/cmd/alt combos (Ctrl+S, etc.)
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    let handled = true;
+    switch (e.key) {
+      case 'e': case 'E': case 'Enter':
+        openEditor(); break;
+      case 'f': case 'F':
+        document.getElementById('tool-fullscreen').click(); break;
+      case 's': case 'S':
+        document.getElementById('tool-download').click(); break;
+      case 'c': case 'C':
+        document.getElementById('tool-copy').click(); break;
+      case 't': case 'T':
+        document.getElementById('tool-color').click(); break;
+      case 'Escape':
+        if (colorPopup.classList.contains('active')) colorPopup.classList.remove('active');
+        else handled = false;
+        break;
+      default:
+        handled = false;
+    }
+    if (handled) { e.preventDefault(); resetToolbarTimer(); }
+  });
+
   // ─── INIT ───
+  // Restore previous session before first render so the user lands on
+  // their last text + theme + caps state, no flash of defaults.
+  const saved = loadState();
+  if (saved) {
+    if (typeof saved.text === 'string') currentText = saved.text;
+    if (typeof saved.bg === 'string') activeBg = saved.bg;
+    if (typeof saved.fg === 'string') activeText = saved.fg;
+    if (typeof saved.caps === 'boolean') capsOn = saved.caps;
+  }
+  applyColors();
+  renderDisplay(currentText);
   renderSwatches();
   autoSizeText();
   window.addEventListener('resize', autoSizeText);

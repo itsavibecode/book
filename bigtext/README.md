@@ -25,6 +25,20 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.2.0 — 2026-06-12
+- **localStorage persistence** — saves text, background color, text color, and ALL CAPS state on every change under the `bigtext:state` key. Reload the page and you land on your last setup, no flash of defaults. Wrapped in try/catch so private-mode Safari and storage-disabled browsers fail silently.
+- **Keyboard shortcuts in display mode**
+  - `E` or `Enter` — open editor
+  - `T` — toggle theme picker
+  - `S` — save screenshot
+  - `C` — copy / share screenshot
+  - `F` — toggle fullscreen
+  - `Esc` — close theme picker (display mode) / cancel edit (editor mode)
+  - Skip when typing in any input, when modifier keys are held, or when the editor is open (so the textarea owns every key)
+- Toolbar tooltips now show the shortcut letter in parens
+- Editor hint now mentions `Esc to cancel`
+- Refactored `applyText` so the DOM-build step is reusable from init (no double work to restore saved state)
+
 ### v0.1.5 — 2026-06-12
 - **Moved home** from `itsavibecode.github.io/bigtext/` to `bookhockeys.com/bigtext/`, joining the same subfolder pattern as Green Line and Shoovlator
 - Updated all canonical / OG / Twitter URLs to the new origin
