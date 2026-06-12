@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.1.12" />
+<meta name="version" content="0.1.13" />
 <title>BookHockeys — Kick &amp; Twitch streamer</title>
 
 <meta name="description" content="Official site of streamer Book Hockeys. Catch the live streams on Kick and Twitch." />
@@ -532,7 +532,7 @@
     </div>
   </div>
   <button id="cookieReset" type="button" class="cookie-reset">Cookies</button>
-  <footer class="footer"><span id="version">v0.1.12</span></footer>
+  <footer class="footer"><span id="version">v0.1.13</span></footer>
 
   <script>
     (function(){
@@ -602,6 +602,14 @@
 
       let clips = null;  // null until playlist loads
       let idx = 0;
+
+      // The poster attribute is great for LCP on first load but the
+      // browser flashes it during every src swap between clips —
+      // looks like a glitch back to bookmentions.mp4's first frame.
+      // Clear it once playback has actually started.
+      vid.addEventListener('playing', function clearPosterOnce(){
+        vid.removeAttribute('poster');
+      }, { once: true });
 
       function currentName(){
         try { return new URL(vid.currentSrc, location.href).pathname; }

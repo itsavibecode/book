@@ -38,6 +38,9 @@ Re-runs are idempotent — a clip is only re-encoded if its source file is newer
 
 ## Changelog — home page
 
+### v0.1.13 — 2026-06-12
+- Fixed a transition glitch where the background flashed the first frame of `bookmentions.mp4` between every rotation clip. The cause: `poster="poster.jpg"` (a frame from bookmentions) was still set on the `<video>`, and Chrome re-displays the poster every time you swap `src` and call `load()`. Now the JS controller removes the poster attribute after the first `playing` event — keeps the LCP win on initial page load, drops it before any clip transitions happen.
+
 ### v0.1.12 — 2026-06-08
 - Reordered the secondary launcher row so SpaceX and Anduril sit next to each other at the end (the two IPO trackers cluster). New order: BigText, Green Line, Shoovlator, SpaceX, Anduril.
 
