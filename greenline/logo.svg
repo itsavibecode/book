@@ -1,10 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120">
   <style>
-    .title { font-family: 'Luckiest Guy', 'Arial Black', sans-serif; font-size: 64px; fill: #0a0a0a; letter-spacing: 2px; }
-    .sub { font-family: 'Luckiest Guy', 'Arial Black', sans-serif; font-size: 16px; fill: #0a0a0a; letter-spacing: 1px; }
+    .title { font-family: 'Luckiest Guy', 'Arial Black', sans-serif; font-size: 58px; fill: #0a0a0a; letter-spacing: 2px; }
+    .sub   { font-family: 'Luckiest Guy', 'Arial Black', sans-serif; font-size: 12px; fill: #0a0a0a; letter-spacing: 3.5px; }
   </style>
+
+  <!-- Container -->
   <rect x="6" y="6" width="468" height="108" fill="#39ff14" stroke="#0a0a0a" stroke-width="6"/>
-  <text x="24" y="68" class="title">GREEN LINE</text>
-  <rect x="24" y="78" width="380" height="12" fill="#0a0a0a"/>
-  <text x="24" y="106" class="sub">MOST CONFIDENT VS LESS DOMINANT</text>
+
+  <!-- Word mark -->
+  <text x="24" y="60" class="title">GREEN LINE</text>
+
+  <!-- Thin black accent under the wordmark (replaces the heavy 12px bar) -->
+  <line x1="24" y1="72" x2="280" y2="72" stroke="#0a0a0a" stroke-width="3" stroke-linecap="square"/>
+
+  <!-- Subtitle -->
+  <text x="24" y="92" class="sub">MOST CONFIDENT  vs  LESS DOMINANT</text>
+
+  <!-- Inset icon on the right — mirrors the favicon so brand reads
+       consistently across favicon, logo, and OG card. -->
+  <g transform="translate(370, 14)">
+    <!-- Black inset card with thin border for contrast against the green ground -->
+    <rect x="0" y="0" width="92" height="92" fill="#0a0a0a" stroke="#0a0a0a" stroke-width="2"/>
+
+    <!-- Figure 1 — upright -->
+    <circle cx="28" cy="26" r="9" fill="#ffe082"/>
+    <rect x="20" y="38" width="16" height="34" rx="4" fill="#ffe082"/>
+    <line x1="28" y1="12" x2="28" y2="82" stroke="#39ff14" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- Figure 2 — leaning toward figure 1 -->
+    <circle cx="64" cy="28" r="9" fill="#ffe082"/>
+    <rect x="56" y="40" width="16" height="34" rx="4" fill="#ffe082"/>
+    <line x1="70" y1="12" x2="58" y2="82" stroke="#39ff14" stroke-width="5" stroke-linecap="round"/>
+  </g>
 </svg>

@@ -104,6 +104,16 @@ via the existing root `CNAME`, so the live URL is
 
 ## Changelog
 
+### v0.4.6 — 2026-05-08
+**Logo cleanup.** Dropped the heavy 12 px black bar between title
+and subtitle (replaced with a thin 3 px accent rule), tightened
+the wordmark to 58 px, added breathing room around the subtitle,
+and put the favicon's two-figures-with-axis-lines design as a
+black-card inset on the right side of the wordmark. The logo now
+matches the favicon and OG card visually and demonstrates the
+concept at a glance — left figure upright (MOST CONFIDENT), right
+figure leaning (LESS DOMINANT).
+
 ### v0.4.5 — 2026-05-08
 **PageSpeed perf tuning.** Three real wins on initial-load:
 
