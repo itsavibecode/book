@@ -23,9 +23,17 @@ SOURCE = ROOT / "clips" / "source"
 OUTDIR = ROOT / "clips"
 PLAYLIST = OUTDIR / "playlist.json"
 
-# Always start the rotation with the original root-level video so it
-# leads off (it's already the LCP-optimized hero clip with the poster).
-HEAD_CLIPS = ["/bookmentions.mp4"]
+# Rotation pin points enforced on every build:
+#   slot 1 = PIN_FIRST  (always plays first)
+#   slot 2 = the clip with the most-recent source/<name>.<ext> mtime
+#   slot 3 = PIN_THIRD  (the long lead-off clip, always third)
+#   slot 4+ = everything else, preserving the existing playlist.json
+#            order so manual reorders within the tail survive re-runs
+#
+# When a new clip is encoded, it lands at slot 2 by mtime and bumps
+# whatever was previously at slot 2 down past bookmentions.
+PIN_FIRST = "/clips/hampton.mp4"
+PIN_THIRD = "/bookmentions.mp4"
 
 # Encode target: 720p30 H.264 video ~1 Mbps + 128 kbps AAC stereo audio,
 # faststart so playback can begin before the file fully buffers. The page
@@ -88,16 +96,11 @@ def main() -> int:
     if skipped:
         print(f"skipped {len(skipped)} up-to-date clip(s)")
 
-    # Rebuild the playlist while preserving any manual ordering already
-    # in playlist.json:
-    #   1. HEAD_CLIPS always lead (bookmentions.mp4 first).
-    #   2. Existing playlist body order is preserved for any clip still
-    #      present in clips/ — so manual reorders survive re-runs.
-    #   3. Newly-encoded clips not yet in the playlist are appended at
-    #      the end in alphabetical order for stability.
-    #   4. Clips removed from disk drop out of the playlist silently.
-    on_disk = {f"/clips/{p.name}" for p in OUTDIR.glob("*.mp4")} | set(HEAD_CLIPS)
+    # Universe of URLs that may appear in the playlist.
+    on_disk = {f"/clips/{p.name}" for p in OUTDIR.glob("*.mp4")} | {PIN_THIRD}
 
+    # Read the existing playlist so we can preserve manual reorders in
+    # slots 4+ across re-runs.
     existing = []
     if PLAYLIST.exists():
         try:
@@ -105,22 +108,51 @@ def main() -> int:
         except (json.JSONDecodeError, OSError):
             existing = []
 
+    # Slot 2 candidate: the clip with the most-recent source/<name>.<ext>
+    # mtime. Hampton and bookmentions are excluded because they have
+    # their own pinned slots.
+    newest_url = None
+    candidates: list[tuple[float, str]] = []
+    for src in SOURCE.iterdir():
+        if not src.is_file() or src.name.startswith("."):
+            continue
+        if src.suffix.lower() not in ACCEPTED_SUFFIXES:
+            continue
+        url = f"/clips/{slugify(src.name)}.mp4"
+        if url not in on_disk or url in (PIN_FIRST, PIN_THIRD):
+            continue
+        candidates.append((src.stat().st_mtime, url))
+    if candidates:
+        candidates.sort(reverse=True)
+        newest_url = candidates[0][1]
+
     clips: list[str] = []
     seen: set[str] = set()
 
-    # 1. HEAD_CLIPS pinned to the top in declared order
-    for url in HEAD_CLIPS:
-        if url not in seen:
-            clips.append(url)
-            seen.add(url)
+    # Slot 1: PIN_FIRST (hampton)
+    if PIN_FIRST in on_disk:
+        clips.append(PIN_FIRST)
+        seen.add(PIN_FIRST)
 
-    # 2. Preserve existing body order for clips that are still on disk
+    # Slot 2: newest clip by source mtime
+    if newest_url and newest_url not in seen:
+        clips.append(newest_url)
+        seen.add(newest_url)
+
+    # Slot 3: PIN_THIRD (bookmentions)
+    if PIN_THIRD in on_disk and PIN_THIRD not in seen:
+        clips.append(PIN_THIRD)
+        seen.add(PIN_THIRD)
+
+    # Slot 4+: preserve existing order for the rest. Clips that used to
+    # be at slot 1, 2, or 3 in the old playlist naturally slide here.
     for url in existing:
         if url in on_disk and url not in seen:
             clips.append(url)
             seen.add(url)
 
-    # 3. Append any on-disk clips not yet in the playlist (alphabetical)
+    # Catch any on-disk clips not yet in the playlist (e.g. brand-new
+    # builds with no prior history) — append alphabetically for stability.
     for url in sorted(on_disk):
         if url not in seen:
             clips.append(url)

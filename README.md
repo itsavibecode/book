@@ -28,7 +28,13 @@ The home page plays a rotation of background videos behind the page. The origina
 
 Re-runs are idempotent — a clip is only re-encoded if its source file is newer than the existing output. If you want to drop a clip from rotation, delete it from `clips/` and re-run the script.
 
-**Reordering:** edit `clips/playlist.json` directly to change rotation order. The build script preserves manual ordering on re-runs — newly-encoded clips are appended to the end, removed clips drop out, but the order you set in the JSON is kept.
+**Rotation order (enforced on every build):**
+1. `/clips/hampton.mp4` is always slot 1.
+2. The clip with the most recent `clips/source/<name>.<ext>` mtime is always slot 2 — drop in a new clip and it jumps to the front of the rotation after hampton.
+3. `/bookmentions.mp4` is always slot 3.
+4. Everything else fills slots 4+, preserving the existing `clips/playlist.json` order so manual reorders within the tail survive re-runs. When a new clip takes slot 2, whatever used to be at slot 2 slides past bookmentions into slot 4 or beyond.
+
+To force a specific order in slots 4+, edit `clips/playlist.json` directly — the script will respect your ordering there as long as the pinned slots stay pinned.
 
 ## Analytics & privacy
 
@@ -38,6 +44,11 @@ Re-runs are idempotent — a clip is only re-encoded if its source file is newer
 - A small "Cookies" link in the bottom-right of the home page (and the footer of `/greenline/`) clears the decision and re-shows the banner.
 
 ## Changelog — home page
+
+### v0.1.15 — 2026-06-12
+- Build script now enforces a pinned rotation order: slot 1 = `hampton.mp4`, slot 2 = the clip with the most recent `clips/source/` mtime, slot 3 = `bookmentions.mp4`, slot 4+ = everything else preserving existing order. Drop in a new clip and it auto-jumps to slot 2; the previous slot-2 clip slides past bookmentions to slot 4+. Replaces the old `HEAD_CLIPS = [bookmentions]` lead-off behavior.
+- Regenerated `clips/playlist.json` under the new rule. New rotation: hampton → vitaly1 → bookmentions → mayatv → 1lei235-edit → alyb → frnd69 → gracey → santi2 → vitaly2.
+- Changed the `<video>`'s default `<source>` to `clips/hampton.mp4` so the first clip the visitor sees actually matches slot 1. Regenerated `poster.jpg` from hampton at t=0.5 s so the LCP placeholder matches the first frame the user is about to see.
 
 ### v0.1.14 — 2026-06-12
 - Repointed the BigText launcher link from `itsavibecode.github.io/bigtext/` to `/bigtext/`, matching the same `bookhockeys.com/<subfolder>` pattern as Green Line and Shoovlator.
