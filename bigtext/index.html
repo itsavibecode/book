@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BigText — Large Text Display</title>
 <meta name="description" content="Display anything, big. A fullscreen large-text tool with theme picker, screenshot export, copy-to-clipboard, share, and ALL CAPS toggle.">
-<meta name="version" content="0.2.0">
+<meta name="version" content="0.2.1">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://bookhockeys.com/bigtext/">
 <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
@@ -278,6 +278,23 @@
   .swatch:hover { transform: scale(1.15); }
   .swatch.active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
 
+  .toggle-row {
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; user-select: none;
+    color: var(--ui-text-bright);
+    font-size: 13px; font-weight: 500;
+  }
+  .toggle-row input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .toggle-hint {
+    display: block; margin-top: 4px;
+    font-size: 11px; color: var(--ui-text);
+  }
+
   /* ─── TOAST ─── */
   #toast {
     position: fixed; top: 28px;
@@ -380,12 +397,20 @@
     <div class="color-label">Text</div>
     <div class="color-swatches" id="text-swatches"></div>
   </div>
+  <div class="color-section">
+    <div class="color-label">On save</div>
+    <label class="toggle-row">
+      <input type="checkbox" id="caption-toggle">
+      <span>Add REACT WITH ⭐ caption</span>
+    </label>
+    <span class="toggle-hint">Small caption added to the bottom of saved / shared screenshots.</span>
+  </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-  const APP_VERSION = '0.2.0';
+  const APP_VERSION = '0.2.1';
 
   // Lazy-load html2canvas only when the user actually triggers a capture.
   // Saves ~50KB and a render-blocking request on initial page load.
@@ -423,6 +448,7 @@
   const captureOffscreen = document.getElementById('capture-offscreen');
 
   let currentText = '';
+  let captionOn = false;
   let hideToolbarTimer = null;
 
   // ─── PERSISTENCE ───
@@ -437,6 +463,7 @@
         bg: activeBg,
         fg: activeText,
         caps: capsOn,
+        caption: captionOn,
       }));
     } catch (_) {}
   }
@@ -702,6 +729,30 @@
     }
 
     toolbar.classList.remove('hidden');
+    return stampCaption(canvas);
+  }
+
+  // Stamp "REACT WITH ⭐" centered at the bottom of the captured canvas.
+  // Color is the active text color at 70% alpha so it reads as a caption,
+  // not a primary line. Font scales with canvas height so it looks
+  // consistent on both desktop and the offscreen mobile 4:3 render.
+  // Note: html2canvas leaves its scale:2 transform on the context, so we
+  // reset to identity before drawing — otherwise our coords double and
+  // the text lands well below the canvas.
+  function stampCaption(canvas) {
+    if (!captionOn) return canvas;
+    const ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const fontPx = Math.max(18, Math.round(canvas.height * 0.035));
+    const padBottom = Math.max(20, Math.round(canvas.height * 0.04));
+    ctx.fillStyle = activeText;
+    ctx.globalAlpha = 0.7;
+    ctx.font = `bold ${fontPx}px "Instrument Sans", system-ui, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('REACT WITH ⭐', canvas.width / 2, canvas.height - padBottom);
+    ctx.restore();
     return canvas;
   }
 
@@ -839,6 +890,15 @@
   document.addEventListener('touchstart', resetToolbarTimer);
   toolbar.addEventListener('mouseenter', () => { clearTimeout(hideToolbarTimer); toolbar.classList.remove('hidden'); });
 
+  // ─── CAPTION TOGGLE ───
+  const captionToggle = document.getElementById('caption-toggle');
+  captionToggle.addEventListener('change', () => {
+    captionOn = captionToggle.checked;
+    saveState();
+  });
+  // Keep the click on the row from bubbling up and closing the popup
+  document.querySelector('.color-picker-popup .toggle-row').addEventListener('click', (e) => e.stopPropagation());
+
   // ─── KEYBOARD SHORTCUTS ───
   // Single-letter shortcuts when the display is focused (editor closed).
   // Modifier keys, typing in inputs, and the editor's own keys are all
@@ -886,7 +946,9 @@
     if (typeof saved.bg === 'string') activeBg = saved.bg;
     if (typeof saved.fg === 'string') activeText = saved.fg;
     if (typeof saved.caps === 'boolean') capsOn = saved.caps;
+    if (typeof saved.caption === 'boolean') captionOn = saved.caption;
   }
+  captionToggle.checked = captionOn;
   applyColors();
   renderDisplay(currentText);
   renderSwatches();

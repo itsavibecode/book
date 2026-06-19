@@ -25,6 +25,11 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.2.1 — 2026-06-12
+- **"REACT WITH ⭐" caption toggle on save / share** — new checkbox in the Theme picker under an "On save" section. When checked, the saved or shared screenshot gets a small "REACT WITH ⭐" caption centered at the bottom, rendered in the active text color at 70% alpha so it reads as a caption, not a primary line. Font size scales with canvas height so it looks consistent on both the desktop viewport capture and the offscreen mobile 4:3 render.
+- State persists in localStorage under the existing `bigtext:state` key as `caption: true|false`
+- Implementation note: `html2canvas` leaves its `scale: 2` transform on the returned context, so the stamp helper resets to identity before drawing — otherwise coordinates double and the text lands off-canvas
+
 ### v0.2.0 — 2026-06-12
 - **localStorage persistence** — saves text, background color, text color, and ALL CAPS state on every change under the `bigtext:state` key. Reload the page and you land on your last setup, no flash of defaults. Wrapped in try/catch so private-mode Safari and storage-disabled browsers fail silently.
 - **Keyboard shortcuts in display mode**
