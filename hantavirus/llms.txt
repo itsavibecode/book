@@ -2,9 +2,10 @@
 
 > Live global hantavirus surveillance dashboard — confirmed cases, clusters, deaths, and environmental advisories for HPS (Hantavirus Pulmonary Syndrome), HFRS (Hemorrhagic Fever with Renal Syndrome), Andes virus, Sin Nombre virus, Hantaan, Puumala, Seoul, and Choclo strains.
 
-The Hantavirus Monitor (`bookhockeys.com/hantavirus`) is a single-file static SPA hosted on GitHub Pages from
-[github.com/itsavibecode/book/tree/main/hantavirus](https://github.com/itsavibecode/book/tree/main/hantavirus).
-No backend; no upload of user content; no signup. The page reads a curated event dataset and renders it as a war-monitor-style live operations dashboard.
+The Hantavirus Monitor (`bookhockeys.com/hantavirus`) is a single-file
+static SPA. No backend; no upload of user content; no signup. The page
+reads a curated event dataset and renders it as a war-monitor-style
+live operations dashboard.
 
 ## What it shows
 
@@ -54,8 +55,3 @@ X / Twitter embeds load `platform.twitter.com/widgets.js` lazily — only when t
 - The 18-month death window mid-rolls; a slow news year reads as a quiet dashboard. That is correct, not broken.
 - Nitter availability is volatile; the v0.2 ingest pipeline assumes occasional fallback to Google News RSS.
 
-## Source
-
-- Repo: [github.com/itsavibecode/book](https://github.com/itsavibecode/book)
-- Subfolder: [github.com/itsavibecode/book/tree/main/hantavirus](https://github.com/itsavibecode/book/tree/main/hantavirus)
-- Project README with changelog: [github.com/itsavibecode/book/blob/main/hantavirus/README.md](https://github.com/itsavibecode/book/blob/main/hantavirus/README.md)

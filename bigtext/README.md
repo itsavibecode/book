@@ -26,7 +26,7 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 ## Changelog
 
 ### v0.2.3 — 2026-06-12
-- **Regenerate `og-image.png`** — the URL footer was still rendering `itsavibecode.github.io/bigtext` from the original standalone-repo build. Now reads `bookhockeys.com/bigtext` to match the actual home. Social scrapers that already cached the old image will need a re-scrape (FB debugger / Twitter validator) to pick up the new one.
+- **Regenerate `og-image.png`** — the URL footer was still rendering the old standalone-repo subdomain. Now reads `bookhockeys.com/bigtext` to match the actual home. Social scrapers that already cached the old image will need a re-scrape (FB debugger / Twitter validator) to pick up the new one.
 - **Editor modal no longer closes when clicking outside the card** — the previous behavior would drop whatever the user typed if they tapped the backdrop. Now the only ways to close the modal are: X button (new, top right), Cancel button, Display button, or Esc.
 - **Add X button to the top-right of the editor card** with hover state and `aria-label="Close"`.
 - Bump APP_VERSION to 0.2.3.
@@ -55,9 +55,8 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 - Refactored `applyText` so the DOM-build step is reusable from init (no double work to restore saved state)
 
 ### v0.1.5 — 2026-06-12
-- **Moved home** from `itsavibecode.github.io/bigtext/` to `bookhockeys.com/bigtext/`, joining the same subfolder pattern as Green Line and Shoovlator
+- **Moved home** to `bookhockeys.com/bigtext/`, joining the same subfolder pattern as Green Line and Shoovlator
 - Updated all canonical / OG / Twitter URLs to the new origin
-- The original `itsavibecode/bigtext` repo now serves a redirect stub pointing here so any existing links keep working
 - Bump APP_VERSION to 0.1.5
 
 ### v0.1.4 — 2026-04-29

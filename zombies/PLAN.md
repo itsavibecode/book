@@ -2,9 +2,9 @@
 
 Working title: **Cx Zombies**
 Live URL (planned): **bookhockeys.com/zombies/**
-Repo location: subfolder of `itsavibecode/book` at `T:\ClaudeCodeRepo\book\zombies\`
+Repo location: subfolder of the BookHockeys repo at `T:\ClaudeCodeRepo\book\zombies\`
 (Sibling to `/greenline/`. Same pattern: independently versioned subproject
-under the BookHockeys umbrella, deployed via the parent repo's GitHub Pages.)
+under the BookHockeys umbrella.)
 
 ---
 

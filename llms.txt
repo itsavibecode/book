@@ -2,11 +2,9 @@
 
 > Personal site of streamer Book Hockeys (Kick / Twitch) plus a small collection of in-browser tools — currently the Green Line Theory auto-tester.
 
-BookHockeys (`bookhockeys.com`) is a static site hosted on GitHub Pages from
-[github.com/itsavibecode/book](https://github.com/itsavibecode/book). The
-home page is a streaming landing page; sub-paths host self-contained
-browser tools. Everything is client-side — no backend, no upload of
-user content.
+BookHockeys (`bookhockeys.com`) is a static site. The home page is a
+streaming landing page; sub-paths host self-contained browser tools.
+Everything is client-side — no backend, no upload of user content.
 
 ## Pages
 
@@ -31,8 +29,3 @@ The Green Line Theory **only applies to staged photos** where both subjects knew
 
 No image data leaves the browser. There is no upload, no server-side processing, no per-user storage. Google Analytics 4 records page views and a few anonymous events (`detect_complete` with a face count, `download`, `share_click`) but never any image content. Visitors with a European (`Europe/*`) timezone — plus EEA outliers like Iceland, Cyprus, and the Atlantic island EU territories — see a Google Consent Mode v2 banner on first visit and analytics is denied by default until they choose; visitors elsewhere have analytics enabled by default with no banner. Choice is persisted in `localStorage` and can be revisited via a small "Cookies" link in the footer.
 
-## Source
-
-- Repo: [github.com/itsavibecode/book](https://github.com/itsavibecode/book)
-- Greenline subfolder: [github.com/itsavibecode/book/tree/main/greenline](https://github.com/itsavibecode/book/tree/main/greenline)
-- Project README with changelog: [github.com/itsavibecode/book/blob/main/greenline/README.md](https://github.com/itsavibecode/book/blob/main/greenline/README.md)

@@ -101,7 +101,7 @@ First production-ready release. SEO + brand pass:
 - Removed the placeholder DAILY BRIEFING email signup section.
 
 ### v0.1.1 &mdash; 2026-05-07
-- Relocated from a standalone `itsavibecode/hantavirus` repo to `book/hantavirus/`. Live URL set to `bookhockeys.com/hantavirus/`.
+- Relocated to `book/hantavirus/` as a subfolder of the parent BookHockeys repo. Live URL set to `bookhockeys.com/hantavirus/`.
 - Added the SOCIAL tab to the rail with skeleton placeholder cards for six public-health X handles (CDCgov, WHO, PAHO, ECDC_EU, NMHealth, CDPHE).
 - Wired Twitter widgets.js to be lazy-loaded only when at least one tweet ID is set, so the FEED tab makes no network calls to twitter.com.
 

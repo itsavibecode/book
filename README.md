@@ -51,7 +51,7 @@ To force a specific order in slots 4+, edit `clips/playlist.json` directly — t
 - Changed the `<video>`'s default `<source>` to `clips/hampton.mp4` so the first clip the visitor sees actually matches slot 1. Regenerated `poster.jpg` from hampton at t=0.5 s so the LCP placeholder matches the first frame the user is about to see.
 
 ### v0.1.14 — 2026-06-12
-- Repointed the BigText launcher link from `itsavibecode.github.io/bigtext/` to `/bigtext/`, matching the same `bookhockeys.com/<subfolder>` pattern as Green Line and Shoovlator.
+- Repointed the BigText launcher link to the local `/bigtext/` path, matching the same `bookhockeys.com/<subfolder>` pattern as Green Line and Shoovlator.
 
 ### v0.1.13 — 2026-06-12
 - Fixed a transition glitch where the background flashed the first frame of `bookmentions.mp4` between every rotation clip. The cause: `poster="poster.jpg"` (a frame from bookmentions) was still set on the `<video>`, and Chrome re-displays the poster every time you swap `src` and call `load()`. Now the JS controller removes the poster attribute after the first `playing` event — keeps the LCP win on initial page load, drops it before any clip transitions happen.

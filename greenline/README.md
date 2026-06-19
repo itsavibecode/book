@@ -96,13 +96,19 @@ python -m http.server 8091 --directory book
 
 ## Deployment
 
-Served from the same `itsavibecode/book` GitHub Pages repo as the parent
-BookHockeys site, under the `/greenline/` path. A push to `main`
-triggers a Pages rebuild. The custom domain (`bookhockeys.com`) is set
-via the existing root `CNAME`, so the live URL is
-<https://bookhockeys.com/greenline/>.
+Served from the same repository as the parent BookHockeys site, under
+the `/greenline/` path. A push to `main` triggers a rebuild. The custom
+domain (`bookhockeys.com`) is set via the existing root `CNAME`, so the
+live URL is <https://bookhockeys.com/greenline/>.
 
 ## Changelog
+
+### v0.4.7 — 2026-06-12
+**Logo simplified.** Removed the inset icon from v0.4.6 — Luckiest
+Guy rendered much wider in the browser than the local SVG preview
+suggested and the figures overlapped the wordmark. Reverted to a
+clean centered wordmark with the subtitle below; no icon, no
+divider bar.
 
 ### v0.4.6 — 2026-05-08
 **Logo cleanup.** Dropped the heavy 12 px black bar between title
