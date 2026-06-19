@@ -25,6 +25,9 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.2.5 — 2026-06-19
+- **Caption sits closer to the bottom edge** so it stops crowding the main text. `padBottom` dropped from 4% to 1.5% of canvas height (~73 px → ~28 px on a mobile capture); the main text's auto-size still fills the same viewport area, so the net effect is more breathing room between caption and main text.
+
 ### v0.2.4 — 2026-06-19
 - **Analytics** — drops the same GA4 setup (`G-DYME377V2S`) used on `/` and `/greenline/` so visits, sessions, and engagement on `/bigtext/` now show up in the same property.
 - **Shared consent decision** — reads / writes the same `greenline-consent` localStorage key as the home and greenline pages. Accept once anywhere on bookhockeys.com and it carries here automatically. EU/EEA/UK/CH visitors (detected by timezone) stay denied by default until they accept on `/` — no consent banner on this page by design (kept the minimalist look).

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BigText — Large Text Display</title>
 <meta name="description" content="Display anything, big. A fullscreen large-text tool with theme picker, screenshot export, copy-to-clipboard, share, and ALL CAPS toggle.">
-<meta name="version" content="0.2.4">
+<meta name="version" content="0.2.5">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://bookhockeys.com/bigtext/">
 <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
@@ -474,7 +474,7 @@
 <div id="toast"></div>
 
 <script>
-  const APP_VERSION = '0.2.4';
+  const APP_VERSION = '0.2.5';
 
   // Lazy-load html2canvas only when the user actually triggers a capture.
   // Saves ~50KB and a render-blocking request on initial page load.
@@ -824,7 +824,7 @@
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     const fontPx = Math.max(18, Math.round(canvas.height * 0.035));
-    const padBottom = Math.max(20, Math.round(canvas.height * 0.04));
+    const padBottom = Math.max(12, Math.round(canvas.height * 0.015));
     ctx.fillStyle = activeText;
     ctx.globalAlpha = 0.7;
     ctx.font = `bold ${fontPx}px "Instrument Sans", system-ui, sans-serif`;
