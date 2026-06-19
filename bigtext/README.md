@@ -25,6 +25,9 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.2.6 — 2026-06-19
+- **Semver in the tab title** — `document.title` is now `BigText v{APP_VERSION} — Large Text Display`. Set dynamically from the `APP_VERSION` constant so future releases self-update by bumping that one source line. OG / Twitter / SEO titles intentionally stay version-free so social embeds and search results don't show stale numbers.
+
 ### v0.2.5 — 2026-06-19
 - **Caption sits closer to the bottom edge** so it stops crowding the main text. `padBottom` dropped from 4% to 1.5% of canvas height (~73 px → ~28 px on a mobile capture); the main text's auto-size still fills the same viewport area, so the net effect is more breathing room between caption and main text.
 
