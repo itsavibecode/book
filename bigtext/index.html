@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BigText — Large Text Display</title>
 <meta name="description" content="Display anything, big. A fullscreen large-text tool with theme picker, screenshot export, copy-to-clipboard, share, and ALL CAPS toggle.">
-<meta name="version" content="0.2.1">
+<meta name="version" content="0.2.3">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://bookhockeys.com/bigtext/">
 <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
@@ -124,6 +124,7 @@
   }
 
   .input-card {
+    position: relative;
     background: rgba(30,30,30,0.95);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 20px;
@@ -132,6 +133,18 @@
     max-width: 560px;
     animation: slideUp 0.3s ease;
   }
+  .input-card-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; border: 0; cursor: pointer;
+    color: var(--ui-text);
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .input-card-close:hover { background: var(--ui-bg-hover); color: var(--ui-text-bright); }
+  .input-card-close svg { width: 18px; height: 18px; }
   .theme-light .input-card {
     background: rgba(255,255,255,0.97);
     border-color: rgba(0,0,0,0.08);
@@ -242,6 +255,7 @@
   }
   .tool-btn:hover { background: var(--ui-bg-hover); color: var(--ui-text-bright); }
   .tool-btn:active { transform: scale(0.96); }
+  .tool-btn.on, .tool-btn.on:hover { color: var(--accent); }
   .tool-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
   .tool-divider { width: 1px; height: 24px; background: var(--ui-border); flex-shrink: 0; }
@@ -342,6 +356,9 @@
 
 <div id="input-overlay">
   <div class="input-card">
+    <button class="input-card-close" id="btn-close" title="Close (Esc)" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
     <h2>Enter your text</h2>
     <div class="input-hint">Enter for line breaks · Ctrl+Enter to display · Esc to cancel</div>
     <textarea id="text-input" placeholder="Type something big…" autofocus></textarea>
@@ -367,6 +384,11 @@
   <button class="tool-btn" id="tool-color" title="Colors (T)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 000 14 3.5 3.5 0 013.5 3.5A3.5 3.5 0 0019 16a7 7 0 000-14"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.5" fill="currentColor"/></svg>
     <span class="label">Theme</span>
+  </button>
+
+  <button class="tool-btn" id="tool-caption" title="Caption (R)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span class="label">Caption</span>
   </button>
   <div class="tool-divider"></div>
 
@@ -397,6 +419,9 @@
     <div class="color-label">Text</div>
     <div class="color-swatches" id="text-swatches"></div>
   </div>
+</div>
+
+<div class="color-picker-popup" id="caption-popup">
   <div class="color-section">
     <div class="color-label">On save</div>
     <label class="toggle-row">
@@ -410,7 +435,7 @@
 <div id="toast"></div>
 
 <script>
-  const APP_VERSION = '0.2.1';
+  const APP_VERSION = '0.2.3';
 
   // Lazy-load html2canvas only when the user actually triggers a capture.
   // Saves ~50KB and a render-blocking request on initial page load.
@@ -445,6 +470,7 @@
   const toolbar = document.getElementById('toolbar');
   const toastEl = document.getElementById('toast');
   const colorPopup = document.getElementById('color-popup');
+  const captionPopup = document.getElementById('caption-popup');
   const captureOffscreen = document.getElementById('capture-offscreen');
 
   let currentText = '';
@@ -626,7 +652,8 @@
     }
   });
 
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeEditor(); });
+  document.getElementById('btn-close').addEventListener('click', closeEditor);
+  // Outside-click no longer closes the modal — user explicitly closes via X / Cancel / Display / Esc.
 
   // ─── TOAST ───
   let toastTimer = null;
@@ -872,9 +899,30 @@
     else document.body.classList.remove('theme-light');
   }
 
-  document.getElementById('tool-color').addEventListener('click', (e) => { e.stopPropagation(); colorPopup.classList.toggle('active'); });
+  // Toolbar popups — Theme (colors) and Caption (on-save options).
+  // Both float in the same screen region, so only one is open at a time.
+  function openOnly(target) {
+    [colorPopup, captionPopup].forEach(p => p.classList.toggle('active', p === target));
+  }
+  function closeAllPopups() {
+    colorPopup.classList.remove('active');
+    captionPopup.classList.remove('active');
+  }
+  document.getElementById('tool-color').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (colorPopup.classList.contains('active')) closeAllPopups();
+    else openOnly(colorPopup);
+  });
+  document.getElementById('tool-caption').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (captionPopup.classList.contains('active')) closeAllPopups();
+    else openOnly(captionPopup);
+  });
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('#color-popup') && !e.target.closest('#tool-color')) colorPopup.classList.remove('active');
+    if (!e.target.closest('#color-popup') && !e.target.closest('#tool-color')
+        && !e.target.closest('#caption-popup') && !e.target.closest('#tool-caption')) {
+      closeAllPopups();
+    }
   });
 
   // ─── AUTO-HIDE TOOLBAR ───
@@ -882,7 +930,7 @@
     toolbar.classList.remove('hidden');
     clearTimeout(hideToolbarTimer);
     hideToolbarTimer = setTimeout(() => {
-      if (!colorPopup.classList.contains('active') && !overlay.classList.contains('active'))
+      if (!colorPopup.classList.contains('active') && !captionPopup.classList.contains('active') && !overlay.classList.contains('active'))
         toolbar.classList.add('hidden');
     }, 4000);
   }
@@ -892,12 +940,17 @@
 
   // ─── CAPTION TOGGLE ───
   const captionToggle = document.getElementById('caption-toggle');
+  const toolCaptionBtn = document.getElementById('tool-caption');
+  function syncCaptionButton() {
+    toolCaptionBtn.classList.toggle('on', captionOn);
+  }
   captionToggle.addEventListener('change', () => {
     captionOn = captionToggle.checked;
+    syncCaptionButton();
     saveState();
   });
   // Keep the click on the row from bubbling up and closing the popup
-  document.querySelector('.color-picker-popup .toggle-row').addEventListener('click', (e) => e.stopPropagation());
+  document.querySelector('#caption-popup .toggle-row').addEventListener('click', (e) => e.stopPropagation());
 
   // ─── KEYBOARD SHORTCUTS ───
   // Single-letter shortcuts when the display is focused (editor closed).
@@ -927,8 +980,10 @@
         document.getElementById('tool-copy').click(); break;
       case 't': case 'T':
         document.getElementById('tool-color').click(); break;
+      case 'r': case 'R':
+        document.getElementById('tool-caption').click(); break;
       case 'Escape':
-        if (colorPopup.classList.contains('active')) colorPopup.classList.remove('active');
+        if (colorPopup.classList.contains('active') || captionPopup.classList.contains('active')) closeAllPopups();
         else handled = false;
         break;
       default:
@@ -949,6 +1004,7 @@
     if (typeof saved.caption === 'boolean') captionOn = saved.caption;
   }
   captionToggle.checked = captionOn;
+  syncCaptionButton();
   applyColors();
   renderDisplay(currentText);
   renderSwatches();

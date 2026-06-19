@@ -25,6 +25,16 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.2.3 — 2026-06-12
+- **Regenerate `og-image.png`** — the URL footer was still rendering `itsavibecode.github.io/bigtext` from the original standalone-repo build. Now reads `bookhockeys.com/bigtext` to match the actual home. Social scrapers that already cached the old image will need a re-scrape (FB debugger / Twitter validator) to pick up the new one.
+- **Editor modal no longer closes when clicking outside the card** — the previous behavior would drop whatever the user typed if they tapped the backdrop. Now the only ways to close the modal are: X button (new, top right), Cancel button, Display button, or Esc.
+- **Add X button to the top-right of the editor card** with hover state and `aria-label="Close"`.
+- Bump APP_VERSION to 0.2.3.
+
+### v0.2.2 — 2026-06-12
+- **Caption gets its own toolbar button + popup** instead of being tucked into the Theme picker. Star icon, sits between Theme and Save, hotkey `R`. Theme and Caption popups are mutually exclusive (opening one closes the other).
+- Caption button highlights in accent green when the toggle is on, so it's obvious at a glance that screenshots will get the caption.
+
 ### v0.2.1 — 2026-06-12
 - **"REACT WITH ⭐" caption toggle on save / share** — new checkbox in the Theme picker under an "On save" section. When checked, the saved or shared screenshot gets a small "REACT WITH ⭐" caption centered at the bottom, rendered in the active text color at 70% alpha so it reads as a caption, not a primary line. Font size scales with canvas height so it looks consistent on both the desktop viewport capture and the offscreen mobile 4:3 render.
 - State persists in localStorage under the existing `bigtext:state` key as `caption: true|false`

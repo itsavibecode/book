@@ -206,8 +206,8 @@ clicking. Config:
 - `?playlist=<url-to-json>` where the JSON is `[{url,title?}, ...]` or
   `{tracks:[...]}`; or `?playlist=url1,url2,...` for a quick inline list.
 - **CORS:** `decodeAudioData` needs the audio fetched with CORS allowed. The
-  zero-friction path is **hosting tracks same-origin** (in the repo / next to the
-  overlay on GitHub Pages) — then no CORS headers are needed. Cross-origin hosts
+  zero-friction path is **hosting tracks same-origin** (next to the
+  overlay) — then no CORS headers are needed. Cross-origin hosts
   must send `Access-Control-Allow-Origin`.
 - Auto-play works in an OBS browser source (autoplay-with-sound is permitted
   there). In a normal browser tab it needs a user gesture, so the dev harness
@@ -247,8 +247,8 @@ The clock is the file/playback position (or game clock for mic/tap).
 
 ## 7. Tech stack
 
-Matches the established single-file static-site pattern used across these
-projects (vanilla HTML/CSS/JS, GitHub Pages hosting), plus optional Worker.
+Matches the established single-file static-site pattern (vanilla HTML/CSS/JS,
+static Pages hosting), plus optional Worker.
 
 - **Overlay**: single-file `index.html` — Canvas render loop for falling chords,
   strike line, combo/hype meters, leaderboard. Transparent for OBS. Config via
@@ -261,10 +261,8 @@ projects (vanilla HTML/CSS/JS, GitHub Pages hosting), plus optional Worker.
   (Phase 0 uses an in-code looping chart; JSON songs are Phase 4.)
 - **Resolver Worker** (built up front, Phase 1): small CF Worker, `sevendwarfs`
   account, pinned `account_id`, auto-routed via the existing wrangler wrapper.
-- **Hosting**: lives in the `itsavibecode/book` repo as the `chordswarm/`
-  subfolder -> **bookhockeys.com/chordswarm** (custom-domain Pages), alongside the
-  other book projects (greenline, shoovlator, zombies, hantavirus, letterplex).
-  OBS points a browser source at that URL.
+- **Hosting**: served at **bookhockeys.com/chordswarm** (custom-domain static
+  hosting). OBS points a browser source at that URL.
 
 ## 8. Architecture / components
 
