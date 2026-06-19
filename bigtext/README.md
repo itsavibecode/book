@@ -25,6 +25,15 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.2.4 — 2026-06-19
+- **Analytics** — drops the same GA4 setup (`G-DYME377V2S`) used on `/` and `/greenline/` so visits, sessions, and engagement on `/bigtext/` now show up in the same property.
+- **Shared consent decision** — reads / writes the same `greenline-consent` localStorage key as the home and greenline pages. Accept once anywhere on bookhockeys.com and it carries here automatically. EU/EEA/UK/CH visitors (detected by timezone) stay denied by default until they accept on `/` — no consent banner on this page by design (kept the minimalist look).
+- **Custom events** for the actions worth knowing about:
+  - `text_displayed` — fires on Display, with `length`, `has_newlines`, `all_caps`
+  - `screenshot_saved` — fires on successful Save, with `method` (download / share) and `caption` (true / false)
+  - `screenshot_shared` — fires on successful Copy / Share, with `method` (clipboard / share) and `caption`
+- Bump APP_VERSION to 0.2.4.
+
 ### v0.2.3 — 2026-06-12
 - **Regenerate `og-image.png`** — the URL footer was still rendering the old standalone-repo subdomain. Now reads `bookhockeys.com/bigtext` to match the actual home. Social scrapers that already cached the old image will need a re-scrape (FB debugger / Twitter validator) to pick up the new one.
 - **Editor modal no longer closes when clicking outside the card** — the previous behavior would drop whatever the user typed if they tapped the backdrop. Now the only ways to close the modal are: X button (new, top right), Cancel button, Display button, or Esc.

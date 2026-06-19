@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BigText — Large Text Display</title>
 <meta name="description" content="Display anything, big. A fullscreen large-text tool with theme picker, screenshot export, copy-to-clipboard, share, and ALL CAPS toggle.">
-<meta name="version" content="0.2.3">
+<meta name="version" content="0.2.4">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://bookhockeys.com/bigtext/">
 <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
@@ -32,6 +32,45 @@
 <meta name="twitter:description" content="Display anything, big. Fullscreen text with theme picker, screenshot export, copy/share, and ALL CAPS toggle.">
 <meta name="twitter:image" content="https://bookhockeys.com/bigtext/og-image.png">
 <meta name="twitter:image:alt" content="BigText — Display anything, big.">
+
+<!-- Google Consent Mode v2 — set defaults BEFORE gtag.js loads so GA4
+     honours them from the very first page-view request. Shares the
+     decision key `greenline-consent` with the bookhockeys home and
+     /greenline/, so accepting once anywhere applies site-wide.
+     EU/EEA/UK/CH visitors who haven't accepted on the home page yet
+     stay denied here (no banner on this page — minimalist by design). -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  (function () {
+    var tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+    var euExtras = [
+      'Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+      'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'
+    ];
+    var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+    var saved = null;
+    try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+    if (saved === 'granted') {
+      gtag('consent', 'update', { 'analytics_storage': 'granted' });
+    } else if (!likelyEU && saved !== 'denied') {
+      gtag('consent', 'update', { 'analytics_storage': 'granted' });
+    }
+  })();
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DYME377V2S"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-DYME377V2S');
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -435,7 +474,7 @@
 <div id="toast"></div>
 
 <script>
-  const APP_VERSION = '0.2.3';
+  const APP_VERSION = '0.2.4';
 
   // Lazy-load html2canvas only when the user actually triggers a capture.
   // Saves ~50KB and a render-blocking request on initial page load.
@@ -476,6 +515,14 @@
   let currentText = '';
   let captionOn = false;
   let hideToolbarTimer = null;
+
+  // ─── ANALYTICS ───
+  // Custom events sent to the shared GA4 property. Wrapped because
+  // Consent Mode may drop them server-side and gtag.js may still be
+  // loading; the try/catch keeps the page healthy if anything throws.
+  function track(name, params) {
+    try { if (window.gtag) gtag('event', name, params || {}); } catch (_) {}
+  }
 
   // ─── PERSISTENCE ───
   // Saves text + theme + caps state under one key so a refresh restores
@@ -618,6 +665,11 @@
     closeEditor();
     autoSizeText();
     saveState();
+    if (t) track('text_displayed', {
+      length: t.length,
+      has_newlines: t.includes('\n'),
+      all_caps: capsOn
+    });
   }
 
   displayArea.addEventListener('click', (e) => {
@@ -792,7 +844,11 @@
       if (isMobile && navigator.share) {
         canvas.toBlob(async (blob) => {
           const file = new File([blob], 'bigtext.png', { type: 'image/png' });
-          try { await navigator.share({ files: [file] }); showToast('Done!'); }
+          try {
+            await navigator.share({ files: [file] });
+            showToast('Done!');
+            track('screenshot_saved', { method: 'share', caption: captionOn });
+          }
           catch { dlViaLink(canvas); }
         }, 'image/png');
       } else {
@@ -807,6 +863,7 @@
     a.href = canvas.toDataURL('image/png');
     a.click();
     showToast('Screenshot saved!');
+    track('screenshot_saved', { method: 'download', caption: captionOn });
   }
 
   // ─── COPY / SHARE ───
@@ -819,7 +876,11 @@
         // iOS doesn't support clipboard.write for images — use Share sheet instead
         canvas.toBlob(async (blob) => {
           const file = new File([blob], 'bigtext.png', { type: 'image/png' });
-          try { await navigator.share({ files: [file] }); showToast('Shared!'); }
+          try {
+            await navigator.share({ files: [file] });
+            showToast('Shared!');
+            track('screenshot_shared', { method: 'share', caption: captionOn });
+          }
           catch (err) { if (err.name !== 'AbortError') showToast('Share cancelled'); }
         }, 'image/png');
       } else {
@@ -828,6 +889,7 @@
           try {
             await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
             showToast('Copied to clipboard!');
+            track('screenshot_shared', { method: 'clipboard', caption: captionOn });
           } catch { showToast('Copy failed — try Save instead'); }
         }, 'image/png');
       }
