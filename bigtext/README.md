@@ -25,6 +25,12 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.2.7 — 2026-06-19
+- **Caption is now ON by default for new visitors** — the REACT WITH ⭐ caption is the more useful default for the streamer-screenshot use case. Users who explicitly toggled it off keep their preference (localStorage wins).
+- **First-visit hint** on the Caption button — green tooltip with a downward arrow, "REACT WITH ⭐ is on by default — tap here to turn it off." Appears 800 ms after first paint, auto-dismisses after 8 s. Also dismisses immediately when the user opens the Caption popup or flips the toggle (either of those means they found the feature it was pointing at). Persisted as `bigtext:seenCaptionHint` in localStorage so it never reappears.
+- **Text is no longer persisted across sessions** — only theme + caps + caption preferences are saved under `bigtext:state`. Every visit starts with a fresh "Tap to edit" placeholder so users aren't greeted by stale words from a prior session.
+- Toolbar auto-hide pauses while the hint is showing so the anchor stays visible.
+
 ### v0.2.6 — 2026-06-19
 - **Semver in the tab title** — `document.title` is now `BigText v{APP_VERSION} — Large Text Display`. Set dynamically from the `APP_VERSION` constant so future releases self-update by bumping that one source line. OG / Twitter / SEO titles intentionally stay version-free so social embeds and search results don't show stale numbers.
 

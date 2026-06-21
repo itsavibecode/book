@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BigText — Large Text Display</title>
 <meta name="description" content="Display anything, big. A fullscreen large-text tool with theme picker, screenshot export, copy-to-clipboard, share, and ALL CAPS toggle.">
-<meta name="version" content="0.2.6">
+<meta name="version" content="0.2.7">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://bookhockeys.com/bigtext/">
 <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
@@ -348,6 +348,42 @@
     font-size: 11px; color: var(--ui-text);
   }
 
+  /* ─── FIRST-VISIT HINT ─── */
+  .hint-tooltip {
+    position: fixed;
+    background: var(--accent);
+    color: #0a0a0a;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    max-width: 260px;
+    text-align: center;
+    line-height: 1.35;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+    z-index: 150;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+    left: 0; top: 0;
+  }
+  .hint-tooltip.visible {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+  .hint-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -8px;
+    width: 0; height: 0;
+    border: 8px solid transparent;
+    border-top-color: var(--accent);
+  }
+
   /* ─── TOAST ─── */
   #toast {
     position: fixed; top: 28px;
@@ -473,8 +509,10 @@
 
 <div id="toast"></div>
 
+<div class="hint-tooltip" id="caption-hint">REACT WITH ⭐ is on by default — tap here to turn it off.</div>
+
 <script>
-  const APP_VERSION = '0.2.6';
+  const APP_VERSION = '0.2.7';
   // Stamp the version into the tab title — bumping APP_VERSION above
   // is now enough to surface the change everywhere we want it visible.
   document.title = 'BigText v' + APP_VERSION + ' — Large Text Display';
@@ -516,7 +554,7 @@
   const captureOffscreen = document.getElementById('capture-offscreen');
 
   let currentText = '';
-  let captionOn = false;
+  let captionOn = true;   // default ON for new visitors; localStorage overrides if user has toggled
   let hideToolbarTimer = null;
 
   // ─── ANALYTICS ───
@@ -532,10 +570,12 @@
   // the exact same display. Wrapped in try/catch — private-mode Safari
   // and Storage-disabled browsers fail silently with no user impact.
   const STORAGE_KEY = 'bigtext:state';
+  // Persist only preferences (theme + caps + caption). Text is intentionally
+  // NOT persisted — every visit starts with a fresh "Tap to edit" placeholder
+  // so the user isn't greeted by stale words from a previous session.
   function saveState() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        text: currentText,
         bg: activeBg,
         fg: activeText,
         caps: capsOn,
@@ -982,6 +1022,7 @@
     e.stopPropagation();
     if (captionPopup.classList.contains('active')) closeAllPopups();
     else openOnly(captionPopup);
+    hideCaptionHint();   // user found the button; hint has served its purpose
   });
   document.addEventListener('click', (e) => {
     if (!e.target.closest('#color-popup') && !e.target.closest('#tool-color')
@@ -995,7 +1036,7 @@
     toolbar.classList.remove('hidden');
     clearTimeout(hideToolbarTimer);
     hideToolbarTimer = setTimeout(() => {
-      if (!colorPopup.classList.contains('active') && !captionPopup.classList.contains('active') && !overlay.classList.contains('active'))
+      if (!colorPopup.classList.contains('active') && !captionPopup.classList.contains('active') && !overlay.classList.contains('active') && !captionHint.classList.contains('visible'))
         toolbar.classList.add('hidden');
     }, 4000);
   }
@@ -1013,9 +1054,43 @@
     captionOn = captionToggle.checked;
     syncCaptionButton();
     saveState();
+    hideCaptionHint();   // user has interacted with the toggle, no need to keep prompting
   });
   // Keep the click on the row from bubbling up and closing the popup
   document.querySelector('#caption-popup .toggle-row').addEventListener('click', (e) => e.stopPropagation());
+
+  // ─── FIRST-VISIT CAPTION HINT ───
+  // One-time green tooltip pointing at the Caption button so new users
+  // know caption is on by default and where to turn it off.
+  const HINT_SEEN_KEY = 'bigtext:seenCaptionHint';
+  const captionHint = document.getElementById('caption-hint');
+  let hintTimer = null;
+  function positionCaptionHint() {
+    const rect = toolCaptionBtn.getBoundingClientRect();
+    captionHint.style.left = (rect.left + rect.width / 2) + 'px';
+    captionHint.style.top  = (rect.top - 18) + 'px';
+    captionHint.style.transform = 'translate(-50%, -100%)';
+  }
+  function showCaptionHint() {
+    if (!captionOn) return;          // nothing to suggest if the user disabled it
+    try { if (localStorage.getItem(HINT_SEEN_KEY)) return; } catch (_) {}
+    positionCaptionHint();
+    captionHint.classList.add('visible');
+    // Auto-dismiss after 8s. Otherwise the hint is dismissed only when the
+    // user actually engages with the feature it's pointing at — opens the
+    // Caption popup or flips the toggle. No global pointer listeners.
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(hideCaptionHint, 8000);
+  }
+  function hideCaptionHint() {
+    if (!captionHint.classList.contains('visible')) return;
+    captionHint.classList.remove('visible');
+    clearTimeout(hintTimer);
+    try { localStorage.setItem(HINT_SEEN_KEY, '1'); } catch (_) {}
+  }
+  window.addEventListener('resize', () => {
+    if (captionHint.classList.contains('visible')) positionCaptionHint();
+  });
 
   // ─── KEYBOARD SHORTCUTS ───
   // Single-letter shortcuts when the display is focused (editor closed).
@@ -1062,7 +1137,6 @@
   // their last text + theme + caps state, no flash of defaults.
   const saved = loadState();
   if (saved) {
-    if (typeof saved.text === 'string') currentText = saved.text;
     if (typeof saved.bg === 'string') activeBg = saved.bg;
     if (typeof saved.fg === 'string') activeText = saved.fg;
     if (typeof saved.caps === 'boolean') capsOn = saved.caps;
@@ -1077,6 +1151,11 @@
   window.addEventListener('resize', autoSizeText);
   window.addEventListener('orientationchange', () => setTimeout(autoSizeText, 250));
   resetToolbarTimer();
+
+  // Show the first-visit caption hint after first paint so the Caption
+  // button has its final layout position to anchor against. The dismiss
+  // listeners are wired inside showCaptionHint itself.
+  setTimeout(showCaptionHint, 800);
 </script>
 </body>
 </html>
