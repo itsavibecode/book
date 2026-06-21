@@ -25,6 +25,9 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.2.8 — 2026-06-21
+- **Helpful tip in the editor modal** explaining that line breaks scale each line up. Added between the keybind hint and the textarea, styled in accent green so it reads as guidance rather than just controls reference. Copy: *"Tip: line breaks make each line appear larger — try a few short lines instead of one long one."*
+
 ### v0.2.7 — 2026-06-19
 - **Caption is now ON by default for new visitors** — the REACT WITH ⭐ caption is the more useful default for the streamer-screenshot use case. Users who explicitly toggled it off keep their preference (localStorage wins).
 - **First-visit hint** on the Caption button — green tooltip with a downward arrow, "REACT WITH ⭐ is on by default — tap here to turn it off." Appears 800 ms after first paint, auto-dismisses after 8 s. Also dismisses immediately when the user opens the Caption popup or flips the toggle (either of those means they found the feature it was pointing at). Persisted as `bigtext:seenCaptionHint` in localStorage so it never reappears.
