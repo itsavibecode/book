@@ -25,6 +25,9 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.2.10 — 2026-06-23
+- **Editor actions row fits on mobile** — four buttons in a single right-justified flex row overflowed off-screen on iPhone-width viewports. Now switches to a 2×2 CSS grid below 640 px: `[ALL CAPS] [Clear]` on top, `[Cancel] [Display]` on the bottom. Full-width touch targets, deterministic layout regardless of button text width.
+
 ### v0.2.9 — 2026-06-21
 - **Clear button in the editor** — sits between ALL CAPS and the spacer on the left side of the actions row. Same ghost-button style as Cancel. Empties the textarea without closing the modal and keeps focus on the input so the user can immediately retype. Doesn't commit anything — Display is still required to push the cleared (or new) value to the big display.
 
