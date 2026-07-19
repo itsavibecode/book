@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.5.10" />
+<meta name="version" content="0.6.0" />
 <title>Shoovlator — talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
 
 <meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy — stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
@@ -54,7 +54,7 @@
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "publisher": { "@type": "Organization", "name": "BookHockeys", "url": "https://bookhockeys.com/" },
       "image": "https://bookhockeys.com/shoovlator/og-card.png",
-      "softwareVersion": "0.5.10"
+      "softwareVersion": "0.6.0"
     }
   ]
 }
@@ -367,6 +367,8 @@
       <li><button type="button" data-ex="I don't know what to do about this.">I don't know what to do about this.</button></li>
       <li><button type="button" data-ex="Wow that is faster than I expected!">Wow that is faster than I expected!</button></li>
       <li><button type="button" data-ex="Sorry, I forgot to call you back yesterday.">Sorry, I forgot to call you back yesterday.</button></li>
+      <li><button type="button" data-ex="Am I speaking badly? The food was not good.">Am I speaking badly? The food was not good.</button></li>
+      <li><button type="button" data-ex="I am getting bitten by bugs and we don't have much more spray.">I am getting bitten by bugs and we don't have much more spray.</button></li>
     </ul>
   </div>
 
@@ -378,12 +380,13 @@
       <li><button type="button" data-ex="Move swiftly and donut be late than usually.">Move swiftly and donut be late than usually.</button></li>
       <li><button type="button" data-ex="He has just given many advices to the peoples and stuff.">He has just given many advices to the peoples and stuff.</button></li>
       <li><button type="button" data-ex="Dough knot, I repeat, dough knot press that button and such things.">Dough knot, I repeat, dough knot press that button and such things.</button></li>
+      <li><button type="button" data-ex="Am I speaking ungood? I am getting bits by bugs.">Am I speaking ungood? I am getting bits by bugs.</button></li>
     </ul>
   </div>
 </main>
 
 <footer>
-  <a href="/">BookHockeys</a> &middot; v0.5.10 &middot; runs entirely in your browser
+  <a href="/">BookHockeys</a> &middot; v0.6.0 &middot; runs entirely in your browser
 </footer>
 
 <script>
@@ -399,7 +402,8 @@ const COMPARATIVE_STACKS = [
   'way most more',
   'more enough than',
   'much more better',
-  'more many enough'
+  'more many enough',
+  'much many more'
 ];
 
 const VERY_STACKS = [
@@ -536,6 +540,66 @@ const WRONG_SUPERLATIVE = {
 const ADV_SWAPS = {
   quickly: 'swiftly'
 };
+
+// Shoovy-ism: "un-" negation prefix stuck onto a positive adjective instead of
+// using the real negative word. Quote: "Am I speaking ungood?"
+// Two entry points, both landing on the same forms:
+//   (a) a negative word swapped outright   — badly / bad  -> ungood
+//   (b) an explicit "not X" collapsed      — not good     -> ungood
+// Whitelist only forms where "un" + word is NOT already standard English, so
+// we never emit real words like "unsure", "unfair", "unkind", "unclear".
+const UN_ADJECTIVES = [
+  'good','right','nice','smart','big','small','fast','slow','hard','loud',
+  'tall','short','strong','cheap','hot','cold','rich','old','new','quick',
+  'great','close','clean','sweet','deep','wide','bright','heavy'
+];
+const UN_NEGATIVE_SWAPS = {
+  badly:       'ungood',
+  bad:         'ungood',
+  poorly:      'ungood',
+  wrong:       'unright',
+  wrongly:     'unright',
+  incorrect:   'unright',
+  incorrectly: 'unright'
+};
+
+// Shoovy-ism: irregular past participles collapse to the third-person-singular
+// present form. Quote: "I'm getting bits by bugs" (bitten -> bits).
+const PARTICIPLE_SWAPS = {
+  bitten:    'bits',
+  eaten:     'eats',
+  written:   'writes',
+  driven:    'drives',
+  taken:     'takes',
+  given:     'gives',
+  broken:    'breaks',
+  spoken:    'speaks',
+  stolen:    'steals',
+  chosen:    'chooses',
+  frozen:    'freezes',
+  forgotten: 'forgets',
+  hidden:    'hides',
+  ridden:    'rides',
+  shaken:    'shakes',
+  woken:     'wakes',
+  beaten:    'beats',
+  fallen:    'falls',
+  risen:     'rises',
+  known:     'knows',
+  grown:     'grows',
+  thrown:    'throws',
+  blown:     'blows',
+  flown:     'flies',
+  drawn:     'draws',
+  worn:      'wears',
+  torn:      'tears'
+};
+
+// Auxiliaries that can precede a past participle. Used to gate the REVERSE
+// pass only — forward doesn't need it because the participle forms above are
+// unambiguous, but the reversed forms ("takes", "gives") are ordinary verbs.
+const PARTICIPLE_AUX =
+  'am|is|are|was|were|be|been|being|get|gets|got|getting|gotten|have|has|had|having';
 
 // Shoovy-ism: -ly adverbs get a wrong "-ier" comparative inflection ("quickly"
 // -> "quicklier"), treating the adverb as if it were an adjective in -y.
@@ -683,6 +747,31 @@ function shoovlateSentence(s, i) {
     maybe(0.80 + i * 0.20) ? wrap(m, caseMatch('very thank you much', m)) : m
   );
 
+  // 0v) Shoovy-ism: "un-" negation ("Am I speaking ungood?"). Runs BEFORE
+  // pass 0a-2 (-lier adverbs) and pass 3 (ADJ_BOOST) because it shares
+  // trigger words with both ("badly", "bad", "good"). Whichever rule fires
+  // first wraps the word and the others won't see a raw match.
+  // (a) explicit "not X" -> "unX"
+  {
+    const adjOr = UN_ADJECTIVES.join('|');
+    s = s.replace(new RegExp(`\\bnot (${adjOr})\\b`, 'gi'), (m, adj) =>
+      maybe(0.60 + i * 0.30) ? wrap(m, caseMatch('un' + adj.toLowerCase(), m)) : m
+    );
+  }
+  // (b) a negative word swapped outright
+  for (const [k, v] of Object.entries(UN_NEGATIVE_SWAPS)) {
+    const re = new RegExp(`\\b${k}\\b`, 'gi');
+    s = s.replace(re, m => maybe(0.50 + i * 0.30) ? wrap(m, caseMatch(v, m)) : m);
+  }
+
+  // 0u) Shoovy-ism: irregular past participle -> third-person present
+  // ("getting bitten by bugs" -> "getting bits by bugs"). No auxiliary gate
+  // needed on the forward pass — these participle forms are unambiguous.
+  for (const [k, v] of Object.entries(PARTICIPLE_SWAPS)) {
+    const re = new RegExp(`\\b${k}\\b`, 'gi');
+    s = s.replace(re, m => maybe(0.65 + i * 0.25) ? wrap(m, caseMatch(v, m)) : m);
+  }
+
   // 0a) Shoovy-ism: "faster" -> "fastest" (superlative for comparative).
   for (const [k, v] of Object.entries(WRONG_SUPERLATIVE)) {
     const re = new RegExp(`\\b${k}\\b`, 'gi');
@@ -717,8 +806,10 @@ function shoovlateSentence(s, i) {
     maybe(0.85 + i * 0.15) ? wrap(m, caseMatch('dough knot', m)) : m
   );
 
-  // 1) stack "more"
-  s = s.replace(/\bmore\b/gi, m =>
+  // 1) stack "more". Absorbs a preceding "much"/"many" into the match so
+  // "much more" becomes "much many more" rather than "much much many more" —
+  // the stacks already carry their own quantifier.
+  s = s.replace(/\b(?:(much|many)\s+)?more\b/gi, m =>
     maybe(0.55 + i * 0.40) ? wrap(m, caseMatch(pick(COMPARATIVE_STACKS), m)) : m
   );
 
@@ -940,6 +1031,31 @@ function deshoovlateSentence(s) {
   // 0e-1) "me self" -> "myself"
   s = s.replace(/\bme self\b/gi, m => caseMatch('myself', m));
 
+  // 0e-3) "unX" -> "not X". Both forward entry points (badly/bad/poorly and
+  // "not good") collapse onto the same "ungood", so the reverse can't
+  // recover which one it was — "not X" is the canonical best guess.
+  {
+    const unOr = UN_ADJECTIVES.join('|');
+    s = s.replace(new RegExp(`\\bun(${unOr})\\b`, 'gi'), (m, adj) =>
+      caseMatch('not ' + adj.toLowerCase(), m)
+    );
+  }
+
+  // 0e-4) Third-person present back to past participle, but ONLY after an
+  // auxiliary — "getting bits by bugs" -> "getting bitten by bugs", while an
+  // ordinary "he takes the bus" / "she writes books" is left alone.
+  {
+    const inverse = {};
+    for (const [participle, present] of Object.entries(PARTICIPLE_SWAPS)) {
+      inverse[present] = participle;
+    }
+    const presentOr = Object.keys(inverse).join('|');
+    s = s.replace(
+      new RegExp(`\\b(${PARTICIPLE_AUX})(\\s+)(${presentOr})\\b`, 'gi'),
+      (m, aux, gap, verb) => aux + gap + caseMatch(inverse[verb.toLowerCase()], verb)
+    );
+  }
+
   // 0e-2) "-lier" wrong-comparative adverbs back to "-ly". Whitelist of the
   // same adverb set the forward pass uses, so legitimate "earlier" / "uglier"
   // / "homelier" (real -lier words) are left alone.
@@ -993,14 +1109,16 @@ function deshoovlateSentence(s) {
     s = s.replace(re, m => caseMatch(k, m));
   }
 
-  // 4) Comparative stacks -> "more".
-  for (const stack of COMPARATIVE_STACKS) {
+  // 4) Comparative stacks -> "more". Longest-first: stacks overlap ("much
+  // many more" contains "many more"), so a shorter entry matching first
+  // would leave a stray fragment behind.
+  for (const stack of [...COMPARATIVE_STACKS].sort((a, b) => b.length - a.length)) {
     const re = new RegExp('\\b' + escapeRe(stack) + '\\b', 'gi');
     s = s.replace(re, m => caseMatch('more', m));
   }
 
-  // 5) Very stacks -> "very".
-  for (const stack of VERY_STACKS) {
+  // 5) Very stacks -> "very". Longest-first for the same reason.
+  for (const stack of [...VERY_STACKS].sort((a, b) => b.length - a.length)) {
     const re = new RegExp('\\b' + escapeRe(stack) + '\\b', 'gi');
     s = s.replace(re, m => caseMatch('very', m));
   }
