@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.1.10" />
+<meta name="version" content="0.1.16" />
 <title>404 — BookHockeys</title>
 
-<meta name="description" content="That page isn't here. Head back to the home page." />
+<meta name="description" content="404. Touch grass." />
 <meta name="theme-color" content="#39ff14" />
 <meta name="robots" content="noindex" />
 <link rel="canonical" href="https://bookhockeys.com/" />
@@ -32,87 +32,65 @@
     overflow: hidden;
   }
 
+  /* Background video */
+  .bg-video{
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+
+  /* Same double-tint pattern as the home page so the neon-green brand
+     colour still reads even over an arbitrary background clip. */
+  .tint{
+    position: fixed;
+    inset: 0;
+    background: #39ff14;
+    opacity: 0.55;
+    mix-blend-mode: multiply;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .tint-2{
+    position: fixed;
+    inset: 0;
+    background: #39ff14;
+    opacity: 0.30;
+    z-index: 2;
+    pointer-events: none;
+  }
+
   .wrap{
+    position: relative;
+    z-index: 3;
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
-    gap: 28px;
+    gap: 16px;
     text-align: center;
   }
 
-  .four-oh-four-wrap{
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    /* Padding gives the splat room around the 404 numerals without
-       letting it escape into the headline below. */
-    padding: clamp(20px, 4vw, 60px) clamp(30px, 6vw, 90px);
-  }
-  .splat{
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    z-index: 0;
-    pointer-events: none;
-    user-select: none;
-    filter: drop-shadow(6px 8px 0 rgba(0,0,0,0.5));
-  }
   .four-oh-four{
-    position: relative;
-    z-index: 1;
     font-size: clamp(120px, 28vw, 320px);
     line-height: 0.9;
     text-shadow: 8px 10px 0 rgba(0,0,0,0.5);
   }
 
-  .msg{
-    position: relative;
-    z-index: 1;
-    font-size: clamp(22px, 3.6vw, 32px);
-    max-width: 720px;
-    text-shadow: 3px 4px 0 rgba(0,0,0,0.35);
-  }
-
-  .btn{
-    position: relative;
-    z-index: 1;
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    color: #0a0a0a;
-    background: #ffffff;
-    padding: 16px 28px;
-    font-family: 'Luckiest Guy', sans-serif;
-    font-size: 26px;
-    letter-spacing: 1px;
-    border: 4px solid #0a0a0a;
-    box-shadow: 6px 6px 0 #0a0a0a;
-    transition: transform .12s ease, box-shadow .12s ease;
-  }
-  .btn:hover, .btn:focus-visible{
-    transform: translate(-3px, -3px);
-    box-shadow: 9px 9px 0 #0a0a0a;
-    outline: none;
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    .btn{ transition: none; }
-  }
-
-  @media (max-width: 480px){
-    .btn{ font-size: 20px; padding: 14px 22px; }
+  .touch-grass{
+    font-size: clamp(36px, 8vw, 96px);
+    line-height: 1;
+    text-shadow: 5px 6px 0 rgba(0,0,0,0.5);
   }
 
   .footer{
     position: fixed;
     left: 0; right: 0; bottom: 8px;
+    z-index: 4;
     text-align: center;
     font-family: system-ui, sans-serif;
     font-size: 12px;
@@ -125,17 +103,19 @@
 </style>
 </head>
 <body>
+
+  <video class="bg-video" autoplay muted loop playsinline preload="metadata">
+    <source src="/404-bg.mp4" type="video/mp4">
+  </video>
+
+  <div class="tint"></div>
+  <div class="tint-2"></div>
+
   <div class="wrap">
-    <div class="four-oh-four-wrap">
-      <picture>
-        <source srcset="/splat.webp" type="image/webp">
-        <img class="splat" src="/splat.png" alt="" width="1120" height="862" aria-hidden="true" />
-      </picture>
-      <div class="four-oh-four" aria-hidden="true">404</div>
-    </div>
-    <h1 class="msg">That page isn't here.</h1>
-    <a class="btn" href="/">GO HOME</a>
+    <div class="four-oh-four" aria-hidden="true">404</div>
+    <h1 class="touch-grass">TOUCH GRASS</h1>
   </div>
-  <footer class="footer">v0.1.10</footer>
+
+  <footer class="footer">v0.1.16</footer>
 </body>
 </html>

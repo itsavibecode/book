@@ -45,6 +45,9 @@ To force a specific order in slots 4+, edit `clips/playlist.json` directly — t
 
 ## Changelog — home page
 
+### v0.1.16 — 2026-07-22
+- Rewrote `404.html` with a video-background Windows-XP-error meme aesthetic. `404-bg.mp4` (1.07 MB, 1280×536, 12 s, 707 kbps H.264 + faststart, no audio, re-encoded from a 3.6 MB source) loops as full-bleed background under the same two neon-green tint overlays the home page uses. Two lines of Luckiest Guy centered: giant "404" over a smaller "TOUCH GRASS". Dropped the previous splat + "That page isn't here." + GO HOME button combo — the joke IS "you found nothing, go outside instead," so we don't offer the button back. `noindex` + canonical still point to `/`.
+
 ### v0.1.15 — 2026-06-12
 - Build script now enforces a pinned rotation order: slot 1 = `hampton.mp4`, slot 2 = the clip with the most recent `clips/source/` mtime, slot 3 = `bookmentions.mp4`, slot 4+ = everything else preserving existing order. Drop in a new clip and it auto-jumps to slot 2; the previous slot-2 clip slides past bookmentions to slot 4+. Replaces the old `HEAD_CLIPS = [bookmentions]` lead-off behavior.
 - Regenerated `clips/playlist.json` under the new rule. New rotation: hampton → vitaly1 → bookmentions → mayatv → 1lei235-edit → alyb → frnd69 → gracey → santi2 → vitaly2.
