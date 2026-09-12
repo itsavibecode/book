@@ -44,6 +44,14 @@ To force a specific order in slots 4+, edit `clips/playlist.json` directly — t
 - The decision is stored in `localStorage` under the key `greenline-consent` and persists across both pages — accept or reject once and you're set site-wide.
 - A small "Cookies" link in the bottom-right of the home page (and the footer of `/greenline/`) clears the decision and re-shows the banner.
 
+## Changelog — /fish
+
+### v0.1.1 — 2026-09-12
+- Re-cut the plug, sinkhole and kayak from the text-free source scene instead of the sticker sheet. The plug and kayak now come from hue masks (the only blue and purple objects in the frame), so their edges are clean instead of ragged, and the sinkhole is a feathered photo crop rather than a jagged cut-out. The kayak now leans into the Demands section; it had been dropped in v0.1.0 because the sticker-sheet cut was unusable.
+
+### v0.1.0 — 2026-09-12
+- First release. Protest-style landing page around the LET US !FISH poster: chant ticker, poster on a picket stick, cardboard story and demands, copyable chants, share button. Static, no analytics.
+
 ## Changelog — home page
 
 ### v0.1.16 — 2026-07-22
