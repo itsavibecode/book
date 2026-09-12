@@ -46,6 +46,9 @@ To force a specific order in slots 4+, edit `clips/playlist.json` directly — t
 
 ## Changelog — /fish
 
+### v0.1.3 — 2026-09-12
+- The sinkhole sticker at the hero's bottom-left hung below the section edge and got clipped. Replaced it with a second donut that sits fully inside the hero. The sinkhole still appears in The Situation card.
+
 ### v0.1.2 — 2026-09-12
 - Removed the two water cut-outs (droplets, splash) that sat on the left of the hero; they were the weakest cuts from the sticker sheet and read as smudges. The left side now uses the clean elements instead, spread apart: the kayak leans in a third of the way down the hero, the sinkhole sits at the hero's bottom-left corner, and a mirrored plug pokes in at the bottom-left of the Demands section. Right side unchanged (plug, donut, sign).
 
