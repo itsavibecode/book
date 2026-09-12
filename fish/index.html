@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.1.1" />
+<meta name="version" content="0.1.2" />
 <title>LET US !FISH — Donut let Lake Shoovy dry up | BookHockeys</title>
 
 <meta name="description" content="Somebody pulled the plug on Lake Shoovy. Join the protest: type !fish in chat, bring the chants, and donut let the lake dry up. Lakes feed life." />
@@ -211,11 +211,11 @@
   /* Stickers */
   .sticker { position: absolute; pointer-events: none; filter: drop-shadow(0 10px 14px rgba(0,0,0,0.6)); z-index: 3; }
   .sticker--donut { width: clamp(70px, 10vw, 150px); right: 4%; top: 5%; transform: rotate(18deg); }
-  .sticker--drops { width: clamp(60px, 8vw, 120px); left: 2%; top: 38%; transform: rotate(-12deg); }
-  .sticker--splash { width: clamp(160px, 26vw, 360px); left: -4%; bottom: 2%; transform: rotate(6deg); z-index: 1; }
   .sticker--sign { width: clamp(110px, 14vw, 200px); right: 2%; bottom: 6%; transform: rotate(7deg); }
   .sticker--plug { width: clamp(180px, 30vw, 420px); right: -3%; top: 3%; transform: rotate(-10deg); z-index: 1; }
-  .sticker--kayak { width: clamp(120px, 16vw, 230px); right: -2%; bottom: -3%; transform: rotate(-24deg); z-index: 1; }
+  .sticker--kayak { width: clamp(120px, 15vw, 220px); left: -3%; top: 30%; transform: rotate(28deg); z-index: 1; }
+  .sticker--hole { width: clamp(200px, 26vw, 380px); left: -8%; bottom: -6%; transform: rotate(-8deg); z-index: 1; }
+  .sticker--plug2 { width: clamp(160px, 22vw, 320px); left: -5%; bottom: -4%; transform: scaleX(-1) rotate(12deg); z-index: 1; }
   .section--clip { overflow: hidden; }
 
   /* Cardboard sections */
@@ -364,8 +364,9 @@
     .situation__art { order: -1; }
     .sticker--plug { width: 46vw; right: -14%; top: -4%; }
     .sticker--sign { display: none; }
-    .sticker--drops { display: none; }
-    .sticker--kayak { width: 30vw; right: -8%; bottom: -2%; }
+    .sticker--kayak { width: 26vw; left: -6%; top: 34%; }
+    .sticker--hole { display: none; }
+    .sticker--plug2 { width: 38vw; left: -12%; bottom: -3%; }
     .tape { width: 80px; height: 24px; }
     .hero__head, .hero__sub { transform: none; }
     .demand__sign { min-height: 96px; padding: 16px 14px 14px; }
@@ -394,8 +395,8 @@
   <section class="hero">
     <img class="sticker sticker--plug" src="img/plug.webp" alt="" width="596" height="348" loading="eager" />
     <img class="sticker sticker--donut" src="img/donut.webp" alt="" width="148" height="142" />
-    <img class="sticker sticker--drops" src="img/droplets.webp" alt="" width="145" height="155" />
-    <img class="sticker sticker--splash" src="img/splash.webp" alt="" width="375" height="180" />
+    <img class="sticker sticker--kayak" src="img/kayak.webp" alt="" width="301" height="345" />
+    <img class="sticker sticker--hole" src="img/sinkhole.webp" alt="" width="640" height="395" />
     <img class="sticker sticker--sign" src="img/sign.webp" alt="" width="200" height="354" />
 
     <div class="wrap" style="position:relative; z-index:2;">
@@ -437,7 +438,7 @@
   </section>
 
   <section class="section--clip">
-    <img class="sticker sticker--kayak" src="img/kayak.webp" alt="" width="301" height="345" loading="lazy" />
+    <img class="sticker sticker--plug2" src="img/plug.webp" alt="" width="596" height="348" loading="lazy" />
     <div class="wrap">
       <h2 class="section-title stroke">OUR <span class="red">DEMANDS</span></h2>
       <div class="demands">
@@ -495,7 +496,7 @@
 <footer>
   <div class="wrap">
     <p>Satire. A lake protest for a chat command. No lakes, plugs, or donuts were harmed.</p>
-    <p><a href="https://bookhockeys.com/">bookhockeys.com</a> <span class="ver">&middot; v0.1.1</span></p>
+    <p><a href="https://bookhockeys.com/">bookhockeys.com</a> <span class="ver">&middot; v0.1.2</span></p>
   </div>
 </footer>
 

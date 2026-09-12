@@ -46,6 +46,9 @@ To force a specific order in slots 4+, edit `clips/playlist.json` directly — t
 
 ## Changelog — /fish
 
+### v0.1.2 — 2026-09-12
+- Removed the two water cut-outs (droplets, splash) that sat on the left of the hero; they were the weakest cuts from the sticker sheet and read as smudges. The left side now uses the clean elements instead, spread apart: the kayak leans in a third of the way down the hero, the sinkhole sits at the hero's bottom-left corner, and a mirrored plug pokes in at the bottom-left of the Demands section. Right side unchanged (plug, donut, sign).
+
 ### v0.1.1 — 2026-09-12
 - Re-cut the plug, sinkhole and kayak from the text-free source scene instead of the sticker sheet. The plug and kayak now come from hue masks (the only blue and purple objects in the frame), so their edges are clean instead of ragged, and the sinkhole is a feathered photo crop rather than a jagged cut-out. The kayak now leans into the Demands section; it had been dropped in v0.1.0 because the sticker-sheet cut was unusable.
 
