@@ -10,6 +10,7 @@ Personal site of streamer Book Hockeys. Live at **[bookhockeys.com](https://book
 | `/bigtext/` | Fullscreen large-text display with theme picker, screenshot export, copy/share, ALL CAPS toggle | [`bigtext/README.md`](bigtext/README.md) |
 | `/greenline/` | Green Line Theory auto-tester (in-browser, BlazeFace + MoveNet) | [`greenline/README.md`](greenline/README.md) |
 | `/shoovlator/` | Toy translator that re-writes English with stacked comparatives and redundant fillers | inline `<meta name="version">` on the page |
+| `/fish/` | Protest-style landing page: LET US !FISH — donut let Lake Shoovy dry up. Poster, demands, copyable chants, share button. Static, no analytics | inline `<meta name="version">` on the page |
 | `/hantavirus/` | War-monitor-style global hantavirus surveillance dashboard — Leaflet world map + severity-color pins + curated public-health social feed | [`hantavirus/README.md`](hantavirus/README.md) |
 
 Site-wide assets live at the repo root: `robots.txt`, `sitemap.xml`, `llms.txt`, `CNAME`, favicon set, `og-card.jpg`, `poster.jpg`, `bookmentions.mp4`, `logo.png`. Additional rotating background clips live in [`clips/`](clips/) — see "Adding background clips" below.

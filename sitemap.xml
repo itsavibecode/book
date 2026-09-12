@@ -51,4 +51,15 @@
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  <url>
+    <loc>https://bookhockeys.com/fish/</loc>
+    <lastmod>2026-09-12T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://bookhockeys.com/fish/og-card.jpg</image:loc>
+      <image:title>LET US !FISH — Donut let Lake Shoovy dry up</image:title>
+      <image:caption>Protest poster share card for the Lake Shoovy !fish protest page</image:caption>
+    </image:image>
+  </url>
 </urlset>

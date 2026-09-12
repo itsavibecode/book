@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="version" content="0.1.0" />
+<title>LET US !FISH — Donut let Lake Shoovy dry up | BookHockeys</title>
+
+<meta name="description" content="Somebody pulled the plug on Lake Shoovy. Join the protest: type !fish in chat, bring the chants, and donut let the lake dry up. Lakes feed life." />
+<meta name="theme-color" content="#e3242b" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="https://bookhockeys.com/fish/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="LET US !FISH — Donut let Lake Shoovy dry up" />
+<meta property="og:description" content="Somebody pulled the plug on Lake Shoovy. Type !fish in chat and join the protest. Lakes feed life." />
+<meta property="og:url" content="https://bookhockeys.com/fish/" />
+<meta property="og:image" content="https://bookhockeys.com/fish/og-card.jpg" />
+<meta property="og:image:secure_url" content="https://bookhockeys.com/fish/og-card.jpg" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:alt" content="Protest poster: LET US !FISH. Donut let Lake Shoovy dry up. A drained lake, a giant blue plug labelled Lake Shoovy, and a sign reading Lakes Feed Life." />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="LET US !FISH — Donut let Lake Shoovy dry up" />
+<meta name="twitter:description" content="Somebody pulled the plug on Lake Shoovy. Type !fish in chat and join the protest." />
+<meta name="twitter:image" content="https://bookhockeys.com/fish/og-card.jpg" />
+<meta name="twitter:image:alt" content="LET US !FISH protest poster" />
+
+<link rel="icon" href="favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<link rel="alternate" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Permanent+Marker&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="img/poster.jpg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://bookhockeys.com/fish/#page",
+  "name": "LET US !FISH — Donut let Lake Shoovy dry up",
+  "url": "https://bookhockeys.com/fish/",
+  "description": "A satirical protest landing page. Somebody pulled the plug on Lake Shoovy; chat demands the right to !fish.",
+  "image": "https://bookhockeys.com/fish/og-card.jpg",
+  "isPartOf": { "@type": "WebSite", "name": "BookHockeys", "url": "https://bookhockeys.com/" },
+  "publisher": { "@type": "Organization", "name": "BookHockeys", "url": "https://bookhockeys.com/" }
+}
+</script>
+
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --asphalt: #161616;
+    --red: #e3242b;
+    --red-dark: #a8161b;
+    --white: #f5f2ea;
+    --card: #c9a262;
+    --card-dark: #a8823f;
+    --card-ink: #1b1409;
+    --paper: #efe3c6;
+    --tape: rgba(255, 248, 220, 0.55);
+    --head: 'Luckiest Guy', 'Impact', 'Arial Black', sans-serif;
+    --marker: 'Permanent Marker', 'Comic Sans MS', cursive;
+    --body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: clip; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--body);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(227, 36, 43, 0.18), transparent 55%),
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 14px),
+      var(--asphalt);
+    color: var(--white);
+    line-height: 1.5;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: inherit; }
+  button { font: inherit; cursor: pointer; }
+
+  .stroke {
+    color: var(--white);
+    -webkit-text-stroke: 0.045em var(--ink);
+    paint-order: stroke fill;
+    text-shadow: 0.06em 0.06em 0 var(--ink), 0.12em 0.12em 0 rgba(0,0,0,0.45);
+  }
+  .stroke .red { color: var(--red); }
+
+  /* Ticker */
+  .ticker-wrap { position: sticky; top: 0; z-index: 20; overflow: hidden; }
+  .ticker {
+    background: var(--red);
+    border-top: 4px solid var(--ink);
+    border-bottom: 4px solid var(--ink);
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: var(--head);
+    font-size: clamp(18px, 2.6vw, 28px);
+    letter-spacing: 0.04em;
+    color: var(--white);
+    text-shadow: 2px 2px 0 var(--ink);
+    transform: rotate(-0.6deg) scale(1.02);
+    transform-origin: center;
+  }
+  .ticker__track { display: inline-flex; padding: 8px 0; animation: ticker 32s linear infinite; }
+  .ticker__track span { padding: 0 1.2em; }
+  .ticker__track span::after { content: "\2022"; margin-left: 2.4em; opacity: 0.85; }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* Layout */
+  .wrap { width: min(1120px, 100% - 32px); margin: 0 auto; }
+  section { position: relative; padding: clamp(40px, 7vw, 96px) 0; }
+
+  /* Hero */
+  .hero { padding-top: clamp(28px, 5vw, 64px); overflow: hidden; }
+  .eyebrow {
+    display: inline-block;
+    font-family: var(--marker);
+    font-size: clamp(14px, 1.8vw, 20px);
+    color: var(--red);
+    border: 3px solid var(--red);
+    padding: 4px 14px;
+    transform: rotate(-3deg);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 18px;
+    background: rgba(13,13,13,0.6);
+  }
+  .hero__head {
+    font-family: var(--head);
+    font-size: clamp(44px, 9.5vw, 128px);
+    line-height: 0.92;
+    margin: 0 0 8px;
+    letter-spacing: 0.01em;
+    transform: rotate(-2deg);
+    transform-origin: left bottom;
+  }
+  .hero__sub {
+    font-family: var(--head);
+    font-size: clamp(20px, 3.6vw, 44px);
+    line-height: 1;
+    margin: 0 0 clamp(24px, 4vw, 48px);
+    transform: rotate(-1deg);
+    transform-origin: left top;
+  }
+
+  .picket { position: relative; max-width: 980px; margin: 0 auto; padding: 0 12px; }
+  .picket__board {
+    position: relative;
+    background: var(--paper);
+    padding: clamp(8px, 1.4vw, 16px);
+    border: 4px solid var(--ink);
+    box-shadow: 10px 12px 0 var(--ink), 0 30px 60px rgba(0,0,0,0.55);
+    transform: rotate(-1.4deg);
+  }
+  .picket__board img { width: 100%; border: 2px solid var(--ink); }
+  .tape {
+    position: absolute; width: 120px; height: 34px;
+    background: var(--tape);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    backdrop-filter: blur(1px);
+    pointer-events: none;
+  }
+  .tape--tl { top: -16px; left: 28px; transform: rotate(-32deg); }
+  .tape--tr { top: -16px; right: 28px; transform: rotate(30deg); }
+  .tape--bl { bottom: -16px; left: 60px; transform: rotate(24deg); }
+  .tape--br { bottom: -16px; right: 60px; transform: rotate(-26deg); }
+  .picket__stick {
+    width: 34px; height: clamp(90px, 14vw, 160px);
+    margin: -6px auto 0;
+    background: linear-gradient(90deg, #7a5326, #b98a4e 40%, #8c6230 70%, #5e3d1a);
+    border: 3px solid var(--ink);
+    border-top: 0;
+    transform: rotate(-1.4deg);
+    transform-origin: top center;
+  }
+
+  .cta { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin-top: clamp(20px, 3vw, 36px); }
+  .btn {
+    font-family: var(--head);
+    font-size: clamp(20px, 2.6vw, 30px);
+    letter-spacing: 0.04em;
+    padding: 12px 26px 8px;
+    border: 4px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    background: var(--white);
+    color: var(--ink);
+    transform: rotate(-1deg);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    min-height: 44px;
+  }
+  .btn:nth-child(2n) { transform: rotate(1deg); }
+  .btn--red { background: var(--red); color: var(--white); text-shadow: 2px 2px 0 var(--ink); }
+  .btn:hover { transform: translate(-2px, -2px) rotate(-1deg); box-shadow: 8px 8px 0 var(--ink); }
+  .btn:active { transform: translate(4px, 4px) rotate(-1deg); box-shadow: 2px 2px 0 var(--ink); }
+  .btn:focus-visible { outline: 4px solid var(--red); outline-offset: 3px; }
+
+  /* Stickers */
+  .sticker { position: absolute; pointer-events: none; filter: drop-shadow(0 10px 14px rgba(0,0,0,0.6)); z-index: 3; }
+  .sticker--donut { width: clamp(70px, 10vw, 150px); right: 4%; top: 5%; transform: rotate(18deg); }
+  .sticker--drops { width: clamp(60px, 8vw, 120px); left: 2%; top: 38%; transform: rotate(-12deg); }
+  .sticker--splash { width: clamp(160px, 26vw, 360px); left: -4%; bottom: 2%; transform: rotate(6deg); z-index: 1; }
+  .sticker--sign { width: clamp(110px, 14vw, 200px); right: 2%; bottom: 6%; transform: rotate(7deg); }
+  .sticker--plug { width: clamp(180px, 30vw, 420px); right: -6%; top: -8%; transform: rotate(-14deg); z-index: 1; }
+
+  /* Cardboard sections */
+  .card {
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0 1px, transparent 1px 7px),
+      linear-gradient(180deg, var(--card), var(--card-dark));
+    color: var(--card-ink);
+    border: 4px solid var(--ink);
+    box-shadow: 10px 10px 0 var(--ink);
+    padding: clamp(22px, 3.6vw, 44px);
+    position: relative;
+  }
+  .card h2 {
+    font-family: var(--marker);
+    font-size: clamp(30px, 5vw, 58px);
+    line-height: 1;
+    margin: 0 0 18px;
+    text-transform: uppercase;
+    transform: rotate(-1.5deg);
+    transform-origin: left;
+  }
+  .card p { font-size: clamp(17px, 1.6vw, 21px); margin: 0 0 14px; max-width: 62ch; }
+  .card p:last-child { margin-bottom: 0; }
+  .card strong { font-family: var(--marker); font-weight: 400; color: var(--red-dark); }
+  .card--tilt-l { transform: rotate(-0.8deg); }
+  .card--tilt-r { transform: rotate(0.8deg); }
+
+  .situation { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 48px); align-items: center; }
+  .situation__art { position: relative; min-height: 220px; }
+  .situation__art img { width: 100%; filter: drop-shadow(0 18px 24px rgba(0,0,0,0.6)); transform: rotate(3deg); }
+  .situation__caption {
+    position: absolute; left: 6%; bottom: -6px;
+    font-family: var(--marker); font-size: clamp(16px, 1.8vw, 22px);
+    background: var(--white); color: var(--ink);
+    padding: 4px 12px; border: 3px solid var(--ink);
+    transform: rotate(-4deg);
+  }
+
+  /* Demands */
+  .section-title {
+    font-family: var(--head);
+    font-size: clamp(38px, 7vw, 84px);
+    line-height: 0.95;
+    text-align: center;
+    margin: 0 0 clamp(24px, 4vw, 48px);
+    transform: rotate(-1.5deg);
+  }
+  .demands { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: clamp(20px, 3vw, 36px); align-items: end; }
+  .demand { text-align: center; }
+  .demand__sign {
+    background: var(--paper);
+    color: var(--ink);
+    border: 4px solid var(--ink);
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 22px 16px 18px;
+    font-family: var(--marker);
+    font-size: clamp(22px, 2.6vw, 32px);
+    line-height: 1.05;
+    text-transform: uppercase;
+    min-height: 150px;
+    display: flex; flex-direction: column; justify-content: center; gap: 10px;
+    position: relative;
+  }
+  .demand__sign img { width: 64px; margin: 0 auto; }
+  .demand__num {
+    position: absolute; top: -18px; left: -18px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--red); color: var(--white);
+    border: 4px solid var(--ink);
+    font-family: var(--head); font-size: 24px; line-height: 40px;
+    text-shadow: 2px 2px 0 var(--ink);
+  }
+  .demand:nth-child(odd) .demand__sign { transform: rotate(-2.5deg); }
+  .demand:nth-child(even) .demand__sign { transform: rotate(2deg); }
+  .demand__stick { width: 22px; height: 60px; margin: -4px auto 0; background: linear-gradient(90deg, #7a5326, #b98a4e 50%, #5e3d1a); border: 3px solid var(--ink); border-top: 0; }
+
+  /* Steps */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(20px, 3vw, 36px); }
+  .step { display: flex; flex-direction: column; gap: 14px; }
+  .step h3 {
+    font-family: var(--marker);
+    font-size: clamp(24px, 2.6vw, 32px);
+    margin: 0;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+  .step p { margin: 0; font-size: clamp(16px, 1.5vw, 19px); }
+  .chant {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--white); color: var(--ink);
+    border: 3px solid var(--ink);
+    padding: 10px 12px;
+    font-family: var(--marker);
+    font-size: clamp(16px, 1.6vw, 20px);
+    text-transform: uppercase;
+    text-align: left;
+    width: 100%;
+    line-height: 1.15;
+  }
+  .chant small { font-family: var(--body); font-size: 12px; text-transform: none; opacity: 0.6; white-space: nowrap; }
+  .chant:hover { background: #fff; }
+  .chant:focus-visible { outline: 4px solid var(--red); outline-offset: 2px; }
+  .chant-list { display: flex; flex-direction: column; gap: 10px; }
+  .code {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 1.05em;
+    background: var(--ink); color: var(--white);
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 4px solid var(--ink);
+    background: var(--ink);
+    padding: 36px 0 44px;
+    font-size: 14px;
+    color: rgba(245,242,234,0.75);
+    text-align: center;
+  }
+  footer p { margin: 6px 0; }
+  footer a { color: var(--white); text-decoration-color: var(--red); text-underline-offset: 3px; }
+  .ver { font-family: ui-monospace, Consolas, monospace; opacity: 0.6; }
+
+  /* Toast */
+  .toast {
+    position: fixed; top: 18px; left: 50%; transform: translate(-50%, -20px);
+    z-index: 50;
+    background: var(--white); color: var(--ink);
+    border: 4px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    font-family: var(--marker);
+    font-size: 18px;
+    padding: 10px 18px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    max-width: calc(100vw - 32px);
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 760px) {
+    .situation { grid-template-columns: minmax(0, 1fr); }
+    .situation__art { order: -1; }
+    .sticker--plug { width: 46vw; right: -14%; top: -4%; }
+    .sticker--sign { display: none; }
+    .sticker--drops { display: none; }
+    .tape { width: 80px; height: 24px; }
+    .hero__head, .hero__sub { transform: none; }
+    .demand__sign { min-height: 96px; padding: 16px 14px 14px; }
+    .demand__stick { height: 40px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .ticker__track { animation: none; padding-left: 12px; }
+    .btn, .toast { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ticker-wrap" aria-hidden="true">
+<div class="ticker">
+  <div class="ticker__track">
+    <span>LET US !FISH</span><span>DONUT LET LAKE SHOOVY DRY UP</span><span>LAKES FEED LIFE</span><span>PUT THE PLUG BACK</span><span>NO LAKE NO PEACE</span><span>SPAM !FISH</span>
+    <span>LET US !FISH</span><span>DONUT LET LAKE SHOOVY DRY UP</span><span>LAKES FEED LIFE</span><span>PUT THE PLUG BACK</span><span>NO LAKE NO PEACE</span><span>SPAM !FISH</span>
+  </div>
+</div>
+</div>
+
+<main>
+  <section class="hero">
+    <img class="sticker sticker--plug" src="img/plug.webp" alt="" width="533" height="336" loading="eager" />
+    <img class="sticker sticker--donut" src="img/donut.webp" alt="" width="148" height="142" />
+    <img class="sticker sticker--drops" src="img/droplets.webp" alt="" width="145" height="155" />
+    <img class="sticker sticker--splash" src="img/splash.webp" alt="" width="375" height="180" />
+    <img class="sticker sticker--sign" src="img/sign.webp" alt="" width="200" height="354" />
+
+    <div class="wrap" style="position:relative; z-index:2;">
+      <p class="eyebrow">An official unofficial protest</p>
+      <h1 class="hero__head stroke">LET US <span class="red">!FISH.</span></h1>
+      <p class="hero__sub stroke"><span class="red">DONUT</span> LET LAKE SHOOVY <span class="red">DRY UP!</span></p>
+
+      <div class="picket">
+        <div class="picket__board">
+          <span class="tape tape--tl"></span><span class="tape tape--tr"></span>
+          <span class="tape tape--bl"></span><span class="tape tape--br"></span>
+          <img src="img/poster.jpg" width="1600" height="901" alt="Protest poster: LET US !FISH. Donut let Lake Shoovy dry up. A lake draining into a sinkhole beside a giant blue plug labelled Lake Shoovy, a stranded kayak, and a sign reading Lakes Feed Life." fetchpriority="high" />
+        </div>
+        <div class="picket__stick"></div>
+      </div>
+
+      <div class="cta">
+        <button class="btn btn--red" type="button" data-copy="!fish">COPY !FISH</button>
+        <button class="btn" type="button" id="shareBtn">SHARE THE PROTEST</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="card card--tilt-l situation">
+        <div>
+          <h2>The situation</h2>
+          <p>Every stream, chat gathers on the shore of Lake Shoovy to <strong>!fish</strong>. It is peaceful. It is wholesome. Occasionally somebody catches a boot.</p>
+          <p>Then somebody <strong>pulled the plug</strong>. Now the water is going down a hole, the kayak is on dry land, and nobody in charge will say who did it or when it gets put back.</p>
+          <p>We are not asking for much. We are asking for a lake. <strong>Lakes feed life.</strong></p>
+        </div>
+        <div class="situation__art">
+          <img src="img/sinkhole.webp" width="520" height="291" alt="A muddy sinkhole with lake water pouring into it" loading="lazy" />
+          <span class="situation__caption">this used to be the lake</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title stroke">OUR <span class="red">DEMANDS</span></h2>
+      <div class="demands">
+        <div class="demand">
+          <div class="demand__sign"><span class="demand__num">1</span>Let us <span style="color:var(--red)">!fish</span></div>
+          <div class="demand__stick"></div>
+        </div>
+        <div class="demand">
+          <div class="demand__sign"><span class="demand__num">2</span>Put the plug back in</div>
+          <div class="demand__stick"></div>
+        </div>
+        <div class="demand">
+          <div class="demand__sign"><span class="demand__num">3</span>Restock the lake</div>
+          <div class="demand__stick"></div>
+        </div>
+        <div class="demand">
+          <div class="demand__sign"><span class="demand__num">4</span><img src="img/donut.webp" alt="" width="64" height="61" loading="lazy" />Donuts for everyone</div>
+          <div class="demand__stick"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="card card--tilt-r">
+        <h2>How to protest</h2>
+        <div class="steps">
+          <div class="step">
+            <h3>1. Type it in chat</h3>
+            <p>Open chat. Type <span class="code">!fish</span>. Send it. Repeat until the lake comes back. Tap any line below to copy it.</p>
+          </div>
+          <div class="step">
+            <h3>2. Bring the chants</h3>
+            <div class="chant-list">
+              <button class="chant" type="button" data-copy="!fish">!fish <small>copy</small></button>
+              <button class="chant" type="button" data-copy="LET US !FISH">Let us !fish <small>copy</small></button>
+              <button class="chant" type="button" data-copy="DONUT LET LAKE SHOOVY DRY UP">Donut let Lake Shoovy dry up <small>copy</small></button>
+              <button class="chant" type="button" data-copy="LAKES FEED LIFE">Lakes feed life <small>copy</small></button>
+              <button class="chant" type="button" data-copy="NO LAKE NO PEACE">No lake, no peace <small>copy</small></button>
+              <button class="chant" type="button" data-copy="PUT THE PLUG BACK">Put the plug back <small>copy</small></button>
+            </div>
+          </div>
+          <div class="step">
+            <h3>3. Spread the word</h3>
+            <p>Send this page to a friend, a mod, or the person holding the plug.</p>
+            <button class="chant" type="button" data-copy="https://bookhockeys.com/fish/">bookhockeys.com/fish <small>copy link</small></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Satire. A lake protest for a chat command. No lakes, plugs, or donuts were harmed.</p>
+    <p><a href="https://bookhockeys.com/">bookhockeys.com</a> <span class="ver">&middot; v0.1.0</span></p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var toast = document.getElementById('toast');
+  var timer = null;
+  function say(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(timer);
+    timer = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+  }
+
+  function copyLegacy(text) {
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy') ? resolve() : reject(); }
+      catch (e) { reject(e); }
+      document.body.removeChild(ta);
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).catch(function () { return copyLegacy(text); });
+    }
+    return copyLegacy(text);
+  }
+
+  document.querySelectorAll('[data-copy]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      var text = el.getAttribute('data-copy');
+      copyText(text).then(function () {
+        say('Copied "' + text + '" — now go paste it');
+      }, function () {
+        say('Could not copy. Type it yourself: ' + text);
+      });
+    });
+  });
+
+  var shareBtn = document.getElementById('shareBtn');
+  var shareData = {
+    title: 'LET US !FISH',
+    text: 'Donut let Lake Shoovy dry up. Join the protest.',
+    url: 'https://bookhockeys.com/fish/'
+  };
+  shareBtn.addEventListener('click', function () {
+    if (navigator.share) {
+      navigator.share(shareData).catch(function () {});
+    } else {
+      copyText(shareData.url).then(function () { say('Link copied — send it to everyone'); },
+                                   function () { say('Copy this: ' + shareData.url); });
+    }
+  });
+})();
+</script>
+</body>
+</html>
