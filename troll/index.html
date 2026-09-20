@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.1.2" />
-<title>Baited v0.1.2 — Troll video maker | BookHockeys</title>
+<meta name="version" content="0.1.3" />
+<title>Baited v0.1.3 — Troll video maker | BookHockeys</title>
 
 <meta name="description" content="Make a troll video in your browser. Drop in an image or clip as the bait, pick a sound or a clip to cut to, set a length, and get an 854x480 MP4. Nothing is uploaded — the whole render runs locally with ffmpeg.wasm." />
 <meta name="theme-color" content="#17191c" />
@@ -288,7 +288,7 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
     </svg>
     <span class="name">Baited</span>
   </div>
-  <span class="ver">v0.1.2</span>
+  <span class="ver">v0.1.3</span>
 </header>
 
 <main>
@@ -370,10 +370,11 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
       <!-- duration + boost -->
       <div>
         <div class="row">
-          <label class="lbl-row" for="durationInput">Duration<button type="button" class="tip" data-tip="How long the finished video runs, 1 to 60 seconds. It starts on a random value between 9 and 23 each visit; change it once and this tool remembers your number.">?</button></label>
+          <label class="lbl-row" for="durationInput">Duration<button type="button" class="tip" data-tip="How long the finished video runs, 1 to 60 seconds. It starts on a random value between 9 and 23 each visit; change it once and this tool remembers your number. Picking a clip preset fixes this to the clip's own length, because clips play whole instead of looping.">?</button></label>
           <input class="inp w16" type="number" id="durationInput" min="1" max="60" step="1" inputmode="numeric" />
           <span class="unit">sec</span>
         </div>
+        <p class="help hidden" id="durationLock"></p>
         <div class="switchrow">
           <button class="sw" type="button" id="boostSwitch" role="switch" aria-checked="false" aria-labelledby="boostLabel"><span class="knob"></span></button>
           <span class="swlbl" id="boostLabel">Extra Volume Boost<button type="button" class="tip" data-tip="Off already plays the sound at 2x. On pushes it to 3x. Both are louder than the source on purpose — that is the joke. Only applies to sound presets; clip presets keep the clip's own audio.">?</button></span>
@@ -404,7 +405,7 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
 
 <footer class="site-foot">
   <div>Troll video maker</div>
-  <div class="tiny">Baited v0.1.2</div>
+  <div class="tiny">Baited v0.1.3</div>
 </footer>
 
 <div id="tipbubble" role="tooltip"></div>
@@ -418,7 +419,7 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
   /* ─────────────────────────────────────────────────────────────
      Config
      ───────────────────────────────────────────────────────────── */
-  var APP = { name: 'Baited', tagline: 'Troll video maker', version: '0.1.2' };
+  var APP = { name: 'Baited', tagline: 'Troll video maker', version: '0.1.3' };
 
   // ffmpeg core, pinned. Hosted on R2 (see PLAN 5.2) because the wasm is 32 MB.
   var CORE_BASE = 'https://pub-516bf519bcaf4ebba2d1e3006fafce78.r2.dev/ffmpeg/0.12.10';
@@ -477,7 +478,7 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
     presetUploadBtn: $('presetUploadBtn'), presetUploadLabel: $('presetUploadLabel'),
     presetFileInput: $('presetFileInput'), presetFileMeta: $('presetFileMeta'),
     presetHelp: $('presetHelp'),
-    durationInput: $('durationInput'),
+    durationInput: $('durationInput'), durationLock: $('durationLock'),
     boostSwitch: $('boostSwitch'), boostNote: $('boostNote'),
     wmSwitch: $('wmSwitch'),
     createBtn: $('createBtn'),
@@ -497,7 +498,8 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
     bait: null,          // {source:'file'|'url', file, url, kind, ext, name, size}
     presetMedia: null,   // {file, kind:'audio'|'video', ext, name}
     resultUrl: null,
-    durationTouched: false
+    durationTouched: false,
+    userDuration: null     // what the user wants when a sound preset is active
   };
 
   /* ─────────────────────────────────────────────────────────────
@@ -798,6 +800,86 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
     if (saved && PRESETS.some(function (p) { return p.id === saved; })) el.presetSelect.value = saved;
   }
 
+  // Clip presets play whole and never loop, so the duration is not the user's to
+  // choose - it is a property of the clip. Measure it and lock the field.
+  var clipSeconds = {};   // cache key -> seconds (or null when it could not be read)
+  var lockToken = 0;      // guards against a slow probe landing after a preset switch
+
+  function probeMediaDuration(src) {
+    return new Promise(function (resolve) {
+      var v = document.createElement('video');
+      var settled = false;
+      function done(val) {
+        if (settled) return;
+        settled = true;
+        v.removeAttribute('src');
+        resolve(val);
+      }
+      v.preload = 'metadata';
+      v.muted = true;
+      v.addEventListener('loadedmetadata', function () {
+        done(isFinite(v.duration) && v.duration > 0 ? v.duration : null);
+      }, { once: true });
+      v.addEventListener('error', function () { done(null); }, { once: true });
+      setTimeout(function () { done(null); }, 20000);
+      v.src = src;
+    });
+  }
+
+  function unlockDuration() {
+    el.durationInput.disabled = false;
+    show(el.durationLock, false);
+    if (state.userDuration) el.durationInput.value = state.userDuration;
+  }
+
+  async function applyDurationLock() {
+    var myToken = ++lockToken;
+    if (effectivePresetKind() !== 'video') { unlockDuration(); return; }
+
+    var preset = currentPreset();
+    var key, src, objectUrl = null;
+    if (preset.kind === 'custom') {
+      if (!state.presetMedia) { unlockDuration(); return; }
+      key = 'custom:' + state.presetMedia.name + ':' + state.presetMedia.file.size;
+      src = objectUrl = URL.createObjectURL(state.presetMedia.file);
+    } else {
+      key = preset.id;
+      src = preset.url;
+    }
+
+    el.durationInput.disabled = true;
+    el.durationLock.textContent = 'Measuring the clip\u2026';
+    show(el.durationLock, true);
+
+    var secs = clipSeconds[key];
+    if (secs === undefined) {
+      secs = await probeMediaDuration(src);
+      clipSeconds[key] = secs;
+    }
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    if (myToken !== lockToken) return;           // a different preset won the race
+
+    if (!secs) {
+      // Could not read it - leave the field editable rather than lock a wrong number.
+      el.durationLock.textContent =
+        'Could not read this clip\u2019s length, so Duration is yours to set. A clip is never ' +
+        'looped, and Duration only trims it.';
+      el.durationInput.disabled = false;
+      return;
+    }
+
+    // +INTRO covers the 5 bait frames in front of the clip, so nothing is clipped off
+    // the end. -t only ever trims, so rounding up is safe.
+    var total = Math.ceil(secs + INTRO);
+    var capped = total > MAX_DURATION;
+    if (capped) total = MAX_DURATION;
+    el.durationInput.value = total;
+    el.durationLock.textContent = capped
+      ? 'This clip runs ' + secs.toFixed(1) + 's, past the ' + MAX_DURATION +
+        's limit, so it will be cut short at ' + MAX_DURATION + 's.'
+      : 'Fixed to the clip: ' + secs.toFixed(1) + 's. Clips play whole instead of looping.';
+  }
+
   function syncPresetUI() {
     var p = currentPreset();
     var custom = p.kind === 'custom';
@@ -807,6 +889,7 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
     var boostApplies = kind !== 'video';
     el.boostSwitch.disabled = !boostApplies;
     show(el.boostNote, !boostApplies);
+    applyDurationLock();
     syncCreateButton();
   }
 
@@ -1165,13 +1248,19 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
     if (el.presetFileInput.files && el.presetFileInput.files[0]) setPresetFile(el.presetFileInput.files[0]);
   });
 
+  // Only a duration the user actually typed is remembered - the value a clip preset
+  // forces into the field is the clip's, not theirs, and must not overwrite it.
   el.durationInput.addEventListener('input', function () {
+    if (el.durationInput.disabled) return;
     state.durationTouched = true;
-    writePrefs({ duration: readDuration() });
+    state.userDuration = readDuration();
+    writePrefs({ duration: state.userDuration });
   });
   el.durationInput.addEventListener('blur', function () {
+    if (el.durationInput.disabled) return;
     el.durationInput.value = readDuration();
-    writePrefs({ duration: readDuration() });
+    state.userDuration = readDuration();
+    writePrefs({ duration: state.userDuration });
   });
 
   function wireSwitch(node, onChange) {
@@ -1208,6 +1297,7 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
     } else {
       el.durationInput.value = Math.floor(Math.random() * 15) + 9;
     }
+    state.userDuration = readDuration();
 
     if (prefs.boost) el.boostSwitch.setAttribute('aria-checked', 'true');
     if (prefs.watermark) el.wmSwitch.setAttribute('aria-checked', 'true');

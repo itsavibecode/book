@@ -8,10 +8,16 @@ Live at **https://bookhockeys.com/troll/**
 
 Two ways a video can come out, decided by what you attach as the preset:
 
-| Preset is | What you get |
-|---|---|
-| **audio** | The bait holds (a still image, or your clip with its own sound stripped) while the sound loops for the whole duration. |
-| **video** | The bait shows for exactly **5 frames** (0.2083 s at 24 fps), then hard-cuts to the clip, which supplies the audio. |
+| Preset is | What you get | Duration |
+|---|---|---|
+| **audio** | The bait holds (a still image, or your clip with its own sound stripped) while the sound loops for the whole duration. | Yours to set; the sound loops to fill it |
+| **video** | The bait shows for exactly **5 frames** (0.2083 s at 24 fps), then hard-cuts to the clip, which supplies the audio. | Fixed to the clip's own length |
+
+Duration behaves differently in the two modes because the media does. A sound can be
+looped to whatever length you ask for; a clip cannot — stretching it is not an option and
+cutting it short loses the ending. So picking a clip preset measures that clip and locks
+the Duration field to it (plus the 5 intro frames, rounded up). Your own duration is
+remembered and comes straight back when you switch to a sound preset.
 
 Every output is 854x480 letterboxed on black, 24 fps, H.264 `ultrafast` CRF 28,
 AAC 96k, `+faststart`, downloaded under a random 8-character name.
@@ -101,10 +107,12 @@ it. Only ship clips you have the rights to redistribute.
   image hosts will refuse. Uploading always works; the tooltip says so.
 - **Volume boost only affects sound presets.** A clip preset keeps its own audio, so the
   switch disables itself and explains why rather than pretending to do something.
-- **Clip presets do not loop, and Duration only ever trims them.** A 15 s clip with
-  Duration set to 10 gives you 10 s and loses the last 5 — including the punchline, if
-  the clip has one. Sound presets loop to fill the time; clips do not. This is parity
-  with the original, but it means Duration and a clip preset fight each other.
+- **A clip longer than 60 s still gets cut.** The duration cap exists to keep phones
+  from running out of memory mid-render, so a clip past it is trimmed and the field says
+  so. Keep hosted clips under a minute.
+- **Duration is measured in the browser.** If a clip's metadata cannot be read (an odd
+  container, a network hiccup), the field stays editable and says so rather than locking
+  to a wrong number.
 - **iOS memory.** A long render plus a 32 MB wasm can run a phone out of memory. Duration
   is capped at 60 s and long renders warn on iOS.
 - **First load is ~32 MB.** Cached immutably after that.
@@ -118,6 +126,20 @@ art and all the code are ours.
 ---
 
 ## Changelog
+
+### v0.1.3 — 2026-09-20
+
+Duration and clip presets used to fight each other. A clip never loops, so the random
+9–23 default was silently cutting the ending off a 15 s clip — which, on a bait-and-switch
+clip, is the whole joke.
+
+- Choosing a clip preset now **measures the clip and locks Duration to its real length**,
+  so it always plays whole. Applies to hosted clips and to your own uploaded ones.
+- Sound presets are unchanged: you set the duration, the sound loops to fill it.
+- A duration you typed is remembered as yours. The number a clip forces into the field is
+  the clip's, is never saved over yours, and your value returns when you switch back.
+- If a clip's length cannot be read, the field stays editable and explains why instead of
+  locking to a guess.
 
 ### v0.1.2 — 2026-09-20
 
