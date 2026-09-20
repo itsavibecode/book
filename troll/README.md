@@ -77,15 +77,22 @@ or call `baitedSelfTest()` from the console.
 `PRESETS` near the top of the script is the whole registry:
 
 ```js
+var PRESET_BASE = 'https://pub-516bf519bcaf4ebba2d1e3006fafce78.r2.dev/presets';
 var PRESETS = [
+  { id: 'moaner', name: 'Moaner', kind: 'audio', url: PRESET_BASE + '/moaner.mp3' },
   { id: 'custom', name: 'Custom sound or clip (upload)', kind: 'custom' }
 ];
 ```
 
-v0.1.0 ships with only the custom-upload entry — no clips are bundled. To add a real
-preset, drop the media on the R2 bucket next to the core and add
-`{ id, name, kind: 'audio' | 'video', url }`. Nothing else needs to change. Keep preset
-media off this public repo if it features anyone's face or voice.
+**The first entry is what a first-time visitor gets**, so ordering is the whole of the
+default-preset logic. To add another, upload the media to the `tools-static` bucket
+under `presets/` and add one `{ id, name, kind: 'audio' | 'video', url }` object —
+nothing else changes.
+
+Preset media lives on R2, never in this repo: anything committed here is published in a
+public repo as well as on the site. Files on that bucket are world-readable by design,
+so a preset is a plain downloadable URL and it is baked into every video rendered with
+it. Only ship clips you have the rights to redistribute.
 
 ## Known limits
 
@@ -106,6 +113,17 @@ art and all the code are ours.
 ---
 
 ## Changelog
+
+### v0.1.1 — 2026-09-19
+
+Gave the tool something to do on first load. v0.1.0 opened with nothing but an upload
+button, so the first run needed you to go and find a file before the tool did anything
+at all.
+
+- **Moaner** ships as the default sound preset, hosted on R2 beside the ffmpeg core and
+  fetched at render time. Custom upload is still there, one place down the list.
+- `PRESET_BASE` + a first-in-the-list convention, so adding the next preset is an upload
+  and one line.
 
 ### v0.1.0 — 2026-09-19
 

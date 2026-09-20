@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.1.0" />
-<title>Baited v0.1.0 — Troll video maker | BookHockeys</title>
+<meta name="version" content="0.1.1" />
+<title>Baited v0.1.1 — Troll video maker | BookHockeys</title>
 
 <meta name="description" content="Make a troll video in your browser. Drop in an image or clip as the bait, pick a sound or a clip to cut to, set a length, and get an 854x480 MP4. Nothing is uploaded — the whole render runs locally with ffmpeg.wasm." />
 <meta name="theme-color" content="#17191c" />
@@ -288,7 +288,7 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
     </svg>
     <span class="name">Baited</span>
   </div>
-  <span class="ver">v0.1.0</span>
+  <span class="ver">v0.1.1</span>
 </header>
 
 <main>
@@ -404,7 +404,7 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
 
 <footer class="site-foot">
   <div>Troll video maker</div>
-  <div class="tiny">Baited v0.1.0</div>
+  <div class="tiny">Baited v0.1.1</div>
 </footer>
 
 <div id="tipbubble" role="tooltip"></div>
@@ -418,7 +418,7 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
   /* ─────────────────────────────────────────────────────────────
      Config
      ───────────────────────────────────────────────────────────── */
-  var APP = { name: 'Baited', tagline: 'Troll video maker', version: '0.1.0' };
+  var APP = { name: 'Baited', tagline: 'Troll video maker', version: '0.1.1' };
 
   // ffmpeg core, pinned. Hosted on R2 (see PLAN 5.2) because the wasm is 32 MB.
   var CORE_BASE = 'https://pub-516bf519bcaf4ebba2d1e3006fafce78.r2.dev/ffmpeg/0.12.10';
@@ -447,9 +447,12 @@ input[type=number].inp::-webkit-inner-spin-button{-webkit-appearance:none;margin
   var IMAGE_EXT = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
   var VIDEO_EXT = ['mp4', 'webm', 'mov', 'avi', 'mkv'];
 
-  // Data-driven preset registry. No clips are bundled in v0.1.0 — a preset with a
-  // `url` (hosted alongside the core) can be added here without touching anything else.
+  // Data-driven preset registry. Hosted presets sit on the same R2 bucket as the
+  // core; adding one is a single entry here plus the upload. The first entry is
+  // what a first-time visitor gets.
+  var PRESET_BASE = 'https://pub-516bf519bcaf4ebba2d1e3006fafce78.r2.dev/presets';
   var PRESETS = [
+    { id: 'moaner', name: 'Moaner', kind: 'audio', url: PRESET_BASE + '/moaner.mp3' },
     { id: 'custom', name: 'Custom sound or clip (upload)', kind: 'custom' }
   ];
 
