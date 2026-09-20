@@ -62,4 +62,15 @@
       <image:caption>Protest poster share card for the Lake Shoovy !fish protest page</image:caption>
     </image:image>
   </url>
+  <url>
+    <loc>https://bookhockeys.com/troll/</loc>
+    <lastmod>2026-09-20T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://bookhockeys.com/troll/og-card.png</image:loc>
+      <image:title>Baited — troll video maker</image:title>
+      <image:caption>Share card for Baited, the in-browser troll video generator</image:caption>
+    </image:image>
+  </url>
 </urlset>

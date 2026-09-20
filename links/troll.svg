@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Baited">
+  <rect width="32" height="32" rx="7" fill="#17191c"/>
+  <g fill="none" stroke="#b5e853" stroke-linecap="round">
+    <circle cx="16" cy="7.6" r="2.4" stroke-width="2.2"/>
+    <path d="M16 10 V19.4" stroke-width="2.4"/>
+    <path d="M22.6 19.4 A6.6 6.6 0 1 1 10.1 16.4" stroke-width="2.4"/>
+    <path d="M10.1 16.4 L13.6 13.9" stroke-width="2.2"/>
+  </g>
+</svg>
