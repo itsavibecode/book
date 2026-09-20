@@ -79,7 +79,8 @@ or call `baitedSelfTest()` from the console.
 ```js
 var PRESET_BASE = 'https://pub-516bf519bcaf4ebba2d1e3006fafce78.r2.dev/presets';
 var PRESETS = [
-  { id: 'moaner', name: 'Moaner', kind: 'audio', url: PRESET_BASE + '/moaner.mp3' },
+  { id: 'moaner', name: 'Moaner (sound)', kind: 'audio', url: PRESET_BASE + '/moaner.mp3' },
+  { id: 'denino', name: 'Emo Denino (clip)', kind: 'video', url: PRESET_BASE + '/emo-denino.mp4' },
   { id: 'custom', name: 'Custom sound or clip (upload)', kind: 'custom' }
 ];
 ```
@@ -100,6 +101,10 @@ it. Only ship clips you have the rights to redistribute.
   image hosts will refuse. Uploading always works; the tooltip says so.
 - **Volume boost only affects sound presets.** A clip preset keeps its own audio, so the
   switch disables itself and explains why rather than pretending to do something.
+- **Clip presets do not loop, and Duration only ever trims them.** A 15 s clip with
+  Duration set to 10 gives you 10 s and loses the last 5 — including the punchline, if
+  the clip has one. Sound presets loop to fill the time; clips do not. This is parity
+  with the original, but it means Duration and a clip preset fight each other.
 - **iOS memory.** A long render plus a 32 MB wasm can run a phone out of memory. Duration
   is capped at 60 s and long renders warn on iOS.
 - **First load is ~32 MB.** Cached immutably after that.
@@ -113,6 +118,18 @@ art and all the code are ours.
 ---
 
 ## Changelog
+
+### v0.1.2 — 2026-09-20
+
+Added the first hosted **clip** preset, so both preset modes now ship with something
+real rather than only the sound one.
+
+- **Emo Denino (clip)** — bait holds for 5 frames, then hard-cuts to the clip with its
+  own audio. 15.4 s, 720p source, downscaled to 854x480 by the render.
+- Preset labels now say which mode they are, `(sound)` or `(clip)`, because the two
+  behave differently enough that the name should tell you.
+- Moaner stays first, so it remains the default: it works with any bait and respects
+  the Duration setting, which a clip does not.
 
 ### v0.1.1 — 2026-09-19
 
