@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="version" content="0.1.0" />
+<title>Stacked v0.1.0 - Watch several Kick streams at once | BookHockeys</title>
+
+<meta name="description" content="Watch up to eight Kick streams side by side in one tab. Add channels, click a tile to move the sound to it, and share the link: the address is the session. Free, no sign-in, not affiliated with Kick." />
+<meta name="theme-color" content="#050506" />
+<meta name="color-scheme" content="dark" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="https://bookhockeys.com/stacked/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="Stacked - Watch several Kick streams at once" />
+<meta property="og:description" content="Up to eight Kick streams in one tab, one voice at a time. The link is the session." />
+<meta property="og:url" content="https://bookhockeys.com/stacked/" />
+<meta property="og:image" content="https://bookhockeys.com/stacked/og-card.png" />
+<meta property="og:image:secure_url" content="https://bookhockeys.com/stacked/og-card.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content="Stacked - the neon wordmark beside a grid of four live stream tiles." />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Stacked - Watch several Kick streams at once" />
+<meta name="twitter:description" content="Up to eight Kick streams in one tab, one voice at a time. The link is the session." />
+<meta name="twitter:image" content="https://bookhockeys.com/stacked/og-card.png" />
+<meta name="twitter:image:alt" content="Stacked - multi-stream viewer for Kick" />
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Stacked" />
+<meta name="application-name" content="Stacked" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<link rel="preconnect" href="https://kick.com" crossorigin />
+<link rel="preconnect" href="https://player.kick.com" />
+
+<!-- Analytics: per-device opt-out first (?ga=off / ?ga=on, remembered in
+     localStorage), then Google Consent Mode v2 defaults, then GA4. The
+     consent decision shares the site-wide `greenline-consent` key, so a
+     choice made on any bookhockeys.com page applies here too. -->
+<script>
+(function () {
+  var GA_ID = 'G-DYME377V2S';
+  var OPT_KEY = 'bookhockeys_ga_optout';
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.get('ga') === 'off') localStorage.setItem(OPT_KEY, '1');
+    if (p.get('ga') === 'on') localStorage.removeItem(OPT_KEY);
+  } catch (e) {}
+  var optedOut = false;
+  try { optedOut = localStorage.getItem(OPT_KEY) === '1'; } catch (e) {}
+  window['ga-disable-' + GA_ID] = optedOut;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  if (optedOut) return;
+
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  // EU/EEA/UK/CH by browser timezone: no IP lookup, errs toward asking.
+  var tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  var euExtras = ['Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+    'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'];
+  var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+  var saved = null;
+  try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+  if (saved === 'granted' || (saved !== 'denied' && !likelyEU)) {
+    gtag('consent', 'update', { 'analytics_storage': 'granted' });
+  } else if (saved !== 'denied') {
+    window.__needsConsent = true;
+  }
+
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  document.head.appendChild(s);
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+})();
+</script>
+
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app" id="app">
+
+  <header class="hd">
+    <div class="wm" title="Stacked - watch several Kick streams at once">Stacked<small>v0.1.0</small></div>
+    <div class="sp"></div>
+    <button class="btn" id="addBtn" type="button" title="Add a Kick channel to this session (up to 8)">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Add stream</span>
+    </button>
+    <button class="ib soon" type="button" aria-disabled="true" data-soon="Favorites" title="Favorites - coming in a later version">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    </button>
+    <div class="grp" id="layGrp" role="group" aria-label="Layout preset">
+      <button class="ib on" type="button" aria-pressed="true" title="Auto grid: 16:9 tiles packed into the space (the only layout in this version)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+      </button>
+      <button class="ib soon" type="button" aria-disabled="true" data-soon="Side by side layout" title="Side by side - coming in a later version">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1"/><rect x="13" y="4" width="8" height="16" rx="1"/></svg>
+      </button>
+      <button class="ib soon" type="button" aria-disabled="true" data-soon="Stack layout" title="Stack (one above the other) - coming in a later version">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="8" rx="1"/><rect x="4" y="13" width="16" height="8" rx="1"/></svg>
+      </button>
+      <button class="ib soon" type="button" aria-disabled="true" data-soon="Focus layout" title="Focus one stream - coming in a later version">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="11" rx="1"/><rect x="3" y="17" width="5" height="4" rx="1"/><rect x="10" y="17" width="5" height="4" rx="1"/><rect x="17" y="17" width="4" height="4" rx="1"/></svg>
+      </button>
+    </div>
+    <button class="ib soon" type="button" aria-disabled="true" data-soon="Share" title="Share - coming in a later version (for now, copy the address bar: the link is the session)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+    </button>
+    <button class="ib on" id="chatBtn" type="button" aria-pressed="true" title="Hide chat (c)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </button>
+  </header>
+
+  <div class="bd">
+    <main class="area" id="area">
+
+      <section class="landing" id="landing">
+        <div class="land-in">
+          <h1>Watch several Kick streams at once</h1>
+          <p class="lede">Up to eight channels in one tab. Everyone starts muted; click a tile to hear it.</p>
+          <div class="land-cta">
+            <button class="btn btn-lg" id="landAdd" type="button" title="Add a Kick channel by name or link">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Add stream</span>
+            </button>
+            <button class="btn-ol" id="resumeBtn" type="button" hidden title="Re-open the channels you were watching last time"></button>
+          </div>
+          <div class="or"><span>or open a link like this</span></div>
+          <div class="ex" title="Put channel names after the # separated by slashes. Adding or removing a stream rewrites this part of the address, so the address bar is always your share link.">
+            <code>bookhockeys.com/stacked/<b>#channel1/channel2/channel3</b></code>
+          </div>
+          <div class="feats">
+            <div class="feat">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+              <h2>Auto grid</h2>
+              <p>Tiles keep their 16:9 shape and re-pack as you add or remove streams.</p>
+            </div>
+            <div class="feat">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
+              <h2>The link is the session</h2>
+              <p>Channel names live in the address. Send it to a friend and they see the same wall.</p>
+            </div>
+            <div class="feat">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
+              <h2>One voice at a time</h2>
+              <p>Unmute a tile and every other tile goes quiet, so audio never piles up.</p>
+            </div>
+          </div>
+          <footer class="land-ft">
+            <span>Not affiliated with Kick.</span>
+            <a href="/" title="BookHockeys home">BookHockeys</a>
+            <button type="button" id="cookieReset" class="linkish" title="Change your analytics cookie choice">Cookies</button>
+          </footer>
+        </div>
+      </section>
+
+      <div class="grid" id="grid" aria-label="Streams"></div>
+    </main>
+
+    <aside class="chat" id="chat" aria-label="Chat">
+      <div class="ch-hd">Chat</div>
+      <div class="ch-sel" title="Pick one channel's chat or all of them merged - arrives with chat in v0.3.0">
+        <span class="av" aria-hidden="true"></span><span>All chats</span>
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="msgs">
+        <div class="ch-empty">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <p>Chat arrives in v0.3.0</p>
+          <p class="sub">Read-only, with all your channels merged into one column.</p>
+        </div>
+      </div>
+      <div class="ch-ft">
+        <span class="k" title="Press 1 to 9 to move the sound to that tile">1-9</span> audio
+        <span class="k" title="Press m to mute every tile">m</span> mute
+        <span class="k" title="Press c to hide or show this chat column">c</span> chat
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- Add Stream modal. Closes only via X, Cancel, or a successful add. -->
+<div class="backdrop" id="addModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addTitle">
+    <div class="mo-hd">
+      <span id="addTitle">Add a stream</span>
+      <button class="ib" type="button" id="addClose" title="Close without adding">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <form class="mo-bd" id="addForm" autocomplete="off" novalidate>
+      <label class="search" title="The channel name as it appears in kick.com/name. Pasting a full kick.com link works too.">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <span class="sr">Kick channel name or link</span>
+        <input id="addInput" type="text" spellcheck="false" autocapitalize="off" placeholder="Channel name or kick.com link" />
+      </label>
+      <p class="mo-err" id="addErr" role="alert" hidden></p>
+      <p class="mo-hint">Press Enter to add. Live channels play right away; offline ones wait on a card and switch over when they go live.</p>
+      <div class="recent" id="recentWrap" hidden>
+        <span class="recent-lbl">Recent</span>
+        <div class="recent-list" id="recentList"></div>
+      </div>
+    </form>
+    <div class="mo-ft">
+      <button class="ghost" type="button" id="addCancel" title="Close without adding">Cancel</button>
+      <button class="btn" type="submit" form="addForm" id="addGo" title="Check the channel exists and add it">Add</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<div class="consent" id="consentBanner" hidden role="dialog" aria-labelledby="consentTitle" aria-describedby="consentDesc">
+  <div class="consent-text">
+    <strong id="consentTitle">Cookies for analytics</strong>
+    <p id="consentDesc">Stacked uses Google Analytics to count anonymous visits. No ads, no personal data sold. The page works either way.</p>
+  </div>
+  <div class="consent-btns">
+    <button class="btn-ol" id="consentReject" type="button" title="No analytics cookies">Reject</button>
+    <button class="btn" id="consentAccept" type="button" title="Allow anonymous analytics">Accept</button>
+  </div>
+</div>
+
+<script src="kick.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
