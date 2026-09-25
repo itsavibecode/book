@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.1.0" />
-<title>Stacked v0.1.0 - Watch several Kick streams at once | BookHockeys</title>
+<meta name="version" content="0.2.0" />
+<title>Stacked v0.2.0 - Watch several Kick streams at once | BookHockeys</title>
 
-<meta name="description" content="Watch up to eight Kick streams side by side in one tab. Add channels, click a tile to move the sound to it, and share the link: the address is the session. Free, no sign-in, not affiliated with Kick." />
+<meta name="description" content="Watch up to eight Kick streams in one tab: in a grid, side by side, stacked one above the other, or one big with the rest in a strip. Drag the bars between tiles to size them, click a tile to move the sound to it, and share the link: the address is the session, layout included. Free, no sign-in, not affiliated with Kick." />
 <meta name="theme-color" content="#050506" />
 <meta name="color-scheme" content="dark" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
@@ -101,7 +101,7 @@
 <div class="app" id="app">
 
   <header class="hd">
-    <div class="wm" title="Stacked - watch several Kick streams at once">Stacked<small>v0.1.0</small></div>
+    <div class="wm" title="Stacked - watch several Kick streams at once">Stacked<small>v0.2.0</small></div>
     <div class="sp"></div>
     <button class="btn" id="addBtn" type="button" title="Add a Kick channel to this session (up to 8)">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Add stream</span>
@@ -110,16 +110,16 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
     </button>
     <div class="grp" id="layGrp" role="group" aria-label="Layout preset">
-      <button class="ib on" type="button" aria-pressed="true" title="Auto grid: 16:9 tiles packed into the space (the only layout in this version)">
+      <button class="ib on" type="button" data-lay="grid" aria-pressed="true" title="Auto grid (g): 16:9 tiles packed into the space">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
       </button>
-      <button class="ib soon" type="button" aria-disabled="true" data-soon="Side by side layout" title="Side by side - coming in a later version">
+      <button class="ib" type="button" data-lay="side" aria-pressed="false" title="Side by side: every stream in one row">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1"/><rect x="13" y="4" width="8" height="16" rx="1"/></svg>
       </button>
-      <button class="ib soon" type="button" aria-disabled="true" data-soon="Stack layout" title="Stack (one above the other) - coming in a later version">
+      <button class="ib" type="button" data-lay="stack" aria-pressed="false" title="Stack: full-width rows, one above the other">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="8" rx="1"/><rect x="4" y="13" width="16" height="8" rx="1"/></svg>
       </button>
-      <button class="ib soon" type="button" aria-disabled="true" data-soon="Focus layout" title="Focus one stream - coming in a later version">
+      <button class="ib" type="button" data-lay="focus" aria-pressed="false" title="Focus (f): the audible stream big on top, the rest in a strip below">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="11" rx="1"/><rect x="3" y="17" width="5" height="4" rx="1"/><rect x="10" y="17" width="5" height="4" rx="1"/><rect x="17" y="17" width="4" height="4" rx="1"/></svg>
       </button>
     </div>
@@ -151,13 +151,13 @@
           <div class="feats">
             <div class="feat">
               <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
-              <h2>Auto grid</h2>
-              <p>Tiles keep their 16:9 shape and re-pack as you add or remove streams.</p>
+              <h2>Grid, row, stack or focus</h2>
+              <p>Pick a layout, then drag the bars between tiles to size them by hand. Players always keep their 16:9 shape.</p>
             </div>
             <div class="feat">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
               <h2>The link is the session</h2>
-              <p>Channel names live in the address. Send it to a friend and they see the same wall.</p>
+              <p>Channel names and the layout live in the address. Send it to a friend and they see the same wall.</p>
             </div>
             <div class="feat">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
@@ -173,7 +173,10 @@
         </div>
       </section>
 
-      <div class="grid" id="grid" aria-label="Streams"></div>
+      <div class="grid" id="grid" aria-label="Streams">
+        <div class="splits" id="splits"></div>
+        <div class="shield" id="shield" hidden></div>
+      </div>
     </main>
 
     <aside class="chat" id="chat" aria-label="Chat">
@@ -193,6 +196,8 @@
         <span class="k" title="Press 1 to 9 to move the sound to that tile">1-9</span> audio
         <span class="k" title="Press m to mute every tile">m</span> mute
         <span class="k" title="Press c to hide or show this chat column">c</span> chat
+        <span class="k" title="Press f to put the audible stream big on top; press f again to go back to the layout you had">f</span> focus
+        <span class="k" title="Press g to go back to the auto grid (drops any sizes you dragged)">g</span> grid
       </div>
     </aside>
   </div>
@@ -241,6 +246,7 @@
 </div>
 
 <script src="kick.js"></script>
+<script src="layout.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
