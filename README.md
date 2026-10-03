@@ -63,6 +63,9 @@ To force a specific order in slots 4+, edit `clips/playlist.json` directly — t
 
 ## Changelog — home page
 
+### v0.1.18 — 2026-10-02
+- Added a **GIF Clipper** button to the small links row, right after Baited, so people who land on the home page can find the clip-to-GIF add-on for Kick. Its icon (`links/gifclipper.svg`) is the same lime GIF badge as the GIF Clipper page's favicon.
+
 ### v0.1.16 — 2026-07-22
 - Rewrote `404.html` with a video-background Windows-XP-error meme aesthetic. `404-bg.mp4` (1.07 MB, 1280×536, 12 s, 707 kbps H.264 + faststart, no audio, re-encoded from a 3.6 MB source) loops as full-bleed background under the same two neon-green tint overlays the home page uses. Two lines of Luckiest Guy centered: giant "404" over a smaller "TOUCH GRASS". Dropped the previous splat + "That page isn't here." + GO HOME button combo — the joke IS "you found nothing, go outside instead," so we don't offer the button back. `noindex` + canonical still point to `/`.
 

@@ -1,6 +1,7 @@
 # GIF Clipper (install page)
 
-Live at **https://bookhockeys.com/gifclipper/** (not linked from the home page yet).
+Live at **https://bookhockeys.com/gifclipper/**, linked from the home page's small
+links row (home v0.1.18).
 
 The home of the Kick GIF Clipper Tampermonkey add-on: what it does, how to set it
 up, shortcuts and questions, and a big **Install GIF Clipper** button.
