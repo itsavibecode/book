@@ -73,4 +73,15 @@
       <image:caption>Share card for Baited, the in-browser troll video generator</image:caption>
     </image:image>
   </url>
+  <url>
+    <loc>https://bookhockeys.com/gifclipper/</loc>
+    <lastmod>2026-10-02T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://bookhockeys.com/gifclipper/og-card.png</image:loc>
+      <image:title>GIF Clipper - clip live Kick moments to GIF or WebM</image:title>
+      <image:caption>Share card for the GIF Clipper add-on for Kick</image:caption>
+    </image:image>
+  </url>
 </urlset>

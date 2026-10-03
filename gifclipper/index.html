@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="version" content="0.2.1" />
+<title>GIF Clipper v0.2.1 - Clip live Kick moments to GIF | BookHockeys</title>
+
+<meta name="description" content="A free browser add-on for kick.com: record a live stream (or grab the last 15 seconds), trim, crop and caption it, and download a GIF or a small WebM. Runs in your browser; nothing is uploaded." />
+<meta name="theme-color" content="#1b1d20" />
+<meta name="color-scheme" content="dark" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="https://bookhockeys.com/gifclipper/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="GIF Clipper - Clip live Kick moments to GIF" />
+<meta property="og:description" content="Record or rewind a live Kick stream, trim, crop and caption it, and download a GIF or WebM. Free, runs in your browser, nothing uploaded." />
+<meta property="og:url" content="https://bookhockeys.com/gifclipper/" />
+<meta property="og:image" content="https://bookhockeys.com/gifclipper/og-card.png" />
+<meta property="og:image:secure_url" content="https://bookhockeys.com/gifclipper/og-card.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content="GIF Clipper - a lime GIF badge beside the launcher with Record and Last 15 s buttons." />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="GIF Clipper - Clip live Kick moments to GIF" />
+<meta name="twitter:description" content="Record or rewind a live Kick stream, trim, crop and caption it, and download a GIF or WebM. Free, runs in your browser." />
+<meta name="twitter:image" content="https://bookhockeys.com/gifclipper/og-card.png" />
+<meta name="twitter:image:alt" content="GIF Clipper share card" />
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="GIF Clipper" />
+<meta name="application-name" content="GIF Clipper" />
+
+<!-- Analytics: per-device opt-out first (?ga=off / ?ga=on, remembered in
+     localStorage), then Google Consent Mode v2 defaults, then GA4. The
+     consent decision shares the site-wide `greenline-consent` key, so a
+     choice made on any bookhockeys.com page applies here too. -->
+<script>
+(function () {
+  var GA_ID = 'G-DYME377V2S';
+  var OPT_KEY = 'bookhockeys_ga_optout';
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.get('ga') === 'off') localStorage.setItem(OPT_KEY, '1');
+    if (p.get('ga') === 'on') localStorage.removeItem(OPT_KEY);
+  } catch (e) {}
+  var optedOut = false;
+  try { optedOut = localStorage.getItem(OPT_KEY) === '1'; } catch (e) {}
+  window['ga-disable-' + GA_ID] = optedOut;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  if (optedOut) return;
+
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  // EU/EEA/UK/CH by browser timezone: no IP lookup, errs toward asking.
+  var tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  var euExtras = ['Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+    'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'];
+  var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+  var saved = null;
+  try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+  if (saved === 'granted' || (saved !== 'denied' && !likelyEU)) {
+    gtag('consent', 'update', { 'analytics_storage': 'granted' });
+  } else if (saved !== 'denied') {
+    window.__needsConsent = true;
+  }
+
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  document.head.appendChild(s);
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+})();
+</script>
+
+<style>
+/* Design direction B "Graphite Calm" - same tokens as the userscript's panels. */
+:root{
+  --bg:#1b1d20;--surface:#1f2124;--raised:#26292d;--border:#34383d;--text:#eceef0;--muted:#9aa2aa;
+  --accent:#c6ff3d;--ink:#131509;--rec:#ff4d4d;--sel:rgba(198,255,61,.16);--r:12px;--rs:8px;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.55;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+a{color:var(--accent)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid rgba(198,255,61,.7);outline-offset:2px}
+.wrap{width:100%;max-width:1040px;margin:0 auto;padding:0 20px}
+
+.site-head{border-bottom:1px solid var(--border)}
+.site-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;padding-bottom:16px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);min-width:0}
+.brand svg{width:30px;height:30px;flex:none}
+.brand b{font-size:20px;letter-spacing:-.02em}
+.ver{font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.home{font-size:13px;color:var(--muted);text-decoration:none;white-space:nowrap}
+.home:hover{color:var(--text)}
+
+main{flex:1}
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:40px;align-items:center;padding:56px 0 40px}
+.hero h1{font-size:clamp(30px,4.6vw,46px);line-height:1.08;letter-spacing:-.03em;margin-bottom:14px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.lede{color:var(--muted);font-size:17px;max-width:46ch;margin-bottom:24px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;height:46px;padding:0 20px;border-radius:var(--rs);font-weight:700;font-size:15px;text-decoration:none;white-space:nowrap}
+.btn.acc{background:var(--accent);color:var(--ink)}
+.btn.acc:hover{filter:brightness(1.06)}
+.btn.ol{border:1px solid var(--border);color:var(--text);background:var(--surface)}
+.btn.ol:hover{border-color:var(--accent)}
+.fine{font-size:13px;color:var(--muted);margin-top:12px;max-width:52ch}
+
+/* mock player with the launcher pill (drawn, not a screenshot) */
+.mock{position:relative;aspect-ratio:16/10;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);
+  background:radial-gradient(60% 55% at 62% 42%,rgba(255,196,120,.28),transparent 60%),radial-gradient(45% 60% at 22% 70%,rgba(80,140,255,.22),transparent 60%),linear-gradient(180deg,#1a1c22,#0e1014)}
+.mock .live{position:absolute;left:12px;top:12px;font-size:10px;font-weight:800;background:#e03131;color:#fff;border-radius:4px;padding:2px 6px;letter-spacing:.04em}
+.mock .cap{position:absolute;left:0;right:0;top:9%;text-align:center;font:900 clamp(16px,3.2vw,26px)/1 Impact,"Arial Black",sans-serif;color:#fff;
+  text-shadow:-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,2px 2px 0 #000,0 2px 0 #000,2px 0 0 #000,-2px 0 0 #000,0 -2px 0 #000;letter-spacing:.01em}
+.mock .figure{position:absolute;left:48%;top:30%;width:20%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 40% 35%,#d9b08c,#8a5e42 70%)}
+.mock .body{position:absolute;left:40%;top:56%;width:36%;height:50%;border-radius:40% 40% 0 0;background:linear-gradient(180deg,#2d2f36,#15161a)}
+.mock .bar{position:absolute;left:0;right:0;bottom:0;height:12%;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55))}
+.pill{position:absolute;right:12px;bottom:15%;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:5px 6px;max-width:calc(100% - 24px);
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 14px 40px rgba(0,0,0,.5);font-size:12px}
+.pill .grip{width:10px;height:18px;border-left:2px dotted var(--muted);border-right:2px dotted var(--muted);opacity:.7;margin:0 2px}
+.pill span.b{height:28px;padding:0 10px;border-radius:7px;display:inline-flex;align-items:center;gap:6px;font-weight:600;background:var(--raised);border:1px solid var(--border);white-space:nowrap}
+.pill span.b.rec{background:var(--rec);border-color:var(--rec);color:#fff}
+.pill span.b.go{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:#fff}
+.pill .chip{height:22px;padding:0 8px;border-radius:999px;display:inline-flex;align-items:center;font-size:11px;font-weight:600;background:var(--sel);color:var(--accent);border:1px solid var(--accent);white-space:nowrap}
+
+section{padding:36px 0}
+h2{font-size:24px;letter-spacing:-.02em;margin-bottom:6px}
+.sub{color:var(--muted);margin-bottom:22px;max-width:60ch}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;counter-reset:s}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;position:relative}
+.step::before{counter-increment:s;content:counter(s);display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;
+  background:var(--accent);color:var(--ink);font-weight:800;margin-bottom:10px}
+.step h3{font-size:16px;margin-bottom:4px}
+.step p{color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.card h3{font-size:15px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card h3 i{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);flex:none}
+.card p{color:var(--muted);font-size:14px}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+tr:last-child td{border-bottom:0}
+kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:1px 6px;background:var(--bg);white-space:nowrap}
+details{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:0 18px;margin-bottom:10px}
+summary{cursor:pointer;padding:14px 0;font-weight:600;list-style-position:outside}
+details p{color:var(--muted);padding:0 0 14px;font-size:14px}
+.new{background:var(--sel);border:1px solid rgba(198,255,61,.4);border-radius:var(--r);padding:16px 18px}
+.new ul{padding-left:18px;color:var(--text)}
+.new li{margin:4px 0}
+
+footer{border-top:1px solid var(--border);margin-top:20px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:22px;font-size:13px;color:var(--muted)}
+footer a,footer button{color:var(--muted);text-decoration:underline}
+.consent{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--surface);border-top:1px solid var(--accent);padding:14px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
+.consent[hidden]{display:none}
+.consent-text{max-width:640px;font-size:13px;color:var(--muted)}
+.consent-text strong{display:block;color:var(--text);font-size:14px}
+.consent-btns{display:flex;gap:8px}
+.consent-btns .btn{height:36px;font-size:14px}
+
+@media (max-width:820px){
+  .hero{grid-template-columns:minmax(0,1fr);padding-top:36px;gap:28px}
+  .steps{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  table,thead,tbody,tr,th,td{display:block}
+  thead{display:none}
+  tr{border-bottom:1px solid var(--border);padding:8px 0}
+  td{border:0;padding:4px 14px}
+  td:first-child{font-weight:600}
+}
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="./" title="GIF Clipper">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#c6ff3d"/><text x="16" y="21" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-weight="900" font-size="12" fill="#131509">GIF</text></svg>
+      <b>GIF Clipper</b>
+      <span class="ver" id="ver">v0.2.1</span>
+    </a>
+    <a class="home" href="/" title="BookHockeys home">BookHockeys</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>Clip the moment <em>while it's still live.</em></h1>
+        <p class="lede">A free add-on for kick.com. Hit record, or grab the last 15 seconds after something happens, then trim, crop and caption it and download a GIF. Everything happens in your browser.</p>
+        <div class="cta">
+          <a class="btn acc" id="install" href="kick-gif-clipper.user.js" title="Opens the Tampermonkey install screen for GIF Clipper">Install GIF Clipper</a>
+          <a class="btn ol" href="https://www.tampermonkey.net/" target="_blank" rel="noopener" title="GIF Clipper runs inside the free Tampermonkey extension">Get Tampermonkey first</a>
+        </div>
+        <p class="fine">Needs a desktop browser with the free <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener">Tampermonkey</a> extension. If clicking Install shows a page of code instead of an install screen, Tampermonkey isn't installed yet.</p>
+      </div>
+      <div class="mock" role="img" aria-label="Drawing of a Kick stream with the GIF Clipper launcher in the corner: Record, Last 15 s and a green 15 s ready badge.">
+        <span class="live">LIVE</span>
+        <div class="figure"></div><div class="body"></div><div class="bar"></div>
+        <div class="cap">WHEN THE STREAM HITS</div>
+        <div class="pill" aria-hidden="true">
+          <span class="grip"></span>
+          <span class="b rec"><span class="dot"></span>Record</span>
+          <span class="b go">&#10226; Last 15 s</span>
+          <span class="chip">&#10226; 15 s ready</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <h2>Set up in a minute</h2>
+      <p class="sub">GIF Clipper is a userscript: a small add-on that runs on kick.com inside the Tampermonkey extension.</p>
+      <div class="steps">
+        <div class="step"><h3>Add Tampermonkey</h3><p>Install the free Tampermonkey extension for Chrome, Edge, Firefox or Brave.</p></div>
+        <div class="step"><h3>Install GIF Clipper</h3><p>Click <b>Install GIF Clipper</b> above, then <b>Install</b> on the screen Tampermonkey opens.</p></div>
+        <div class="step"><h3>Open a live channel</h3><p>The launcher shows up in the corner of the player. Press <b>Record</b>, then <b>Stop</b>, and the editor opens.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>What it does</h2>
+      <p class="sub">Everything you need to turn a moment into something you can post, without leaving the stream.</p>
+      <div class="grid">
+        <div class="card"><h3><i></i>Record or rewind</h3><p>Record until you stop, or turn on the rewind buffer and grab the last 10, 15 or 30 seconds after the moment already happened.</p></div>
+        <div class="card"><h3><i></i>Trim and cut</h3><p>Drag the handles to keep just the good part, or cut a boring bit out of the middle.</p></div>
+        <div class="card"><h3><i></i>Crop</h3><p>Draw a box on the preview, or lock it to 16:9, square, 4:5 or 9:16.</p></div>
+        <div class="card"><h3><i></i>Captions</h3><p>Top and bottom text in classic meme style or as subtitles. What you see in the preview is what you get.</p></div>
+        <div class="card"><h3><i></i>Boomerang</h3><p>Plays forward then backward, so the loop never jumps.</p></div>
+        <div class="card"><h3><i></i>GIF or WebM</h3><p>GIF by default. WebM is a real video, usually 10 to 20 times smaller with full colour. Or get both.</p></div>
+        <div class="card"><h3><i></i>Fits your upload limit</h3><p>Pick 5, 8, 10 or 25 MB and the export shrinks the file until it fits.</p></div>
+        <div class="card"><h3><i></i>Never lose a clip</h3><p>Your last 5 clips are kept in your browser, edits and all, so a reload or crash doesn't eat your capture.</p></div>
+        <div class="card"><h3><i></i>Private</h3><p>No account, no uploads, no servers. The stream's frames never leave your computer.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Shortcuts</h2>
+      <p class="sub">They need Alt, so they never fire while you're typing in chat. You can change them in the gear menu.</p>
+      <table>
+        <thead><tr><th>Keys</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd></td><td>Start or stop recording</td></tr>
+          <tr><td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd></td><td>Clip the last 15 seconds (turns the rewind buffer on the first time)</td></tr>
+          <tr><td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>G</kbd></td><td>Show or hide the launcher</td></tr>
+          <tr><td><kbd>Space</kbd>, <kbd>&larr;</kbd> <kbd>&rarr;</kbd>, <kbd>I</kbd> / <kbd>O</kbd></td><td>In the editor: play / pause, step a frame, set the start / end at the playhead</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Questions</h2>
+      <details><summary>Is it free? Does it upload anything?</summary><p>Free, and nothing is uploaded. The add-on reads the video that's already playing in your tab, and builds the GIF or WebM on your computer. There's no account and no server.</p></details>
+      <details><summary>Does it work on my phone?</summary><p>No. Tampermonkey is a desktop browser extension, so you need Chrome, Edge, Firefox or Brave on a computer.</p></details>
+      <details><summary>Why is my GIF so big?</summary><p>GIFs are an old format and moving camera footage is hard to squeeze. Set a size limit, lower the width or fps, crop tighter, or switch to WebM, which is usually well under 1 MB for the same clip.</p></details>
+      <details><summary>The launcher says "no player on this page"</summary><p>The stream hasn't started in your tab yet. That's usually an offline channel, or a mature channel still showing its "I am 18+" screen. Once the video plays, the launcher wakes up.</p></details>
+      <details><summary>Keep the tab visible while recording</summary><p>Browsers slow down tabs you aren't looking at. If you switch away mid-recording, the launcher says so and those seconds are missing from the clip.</p></details>
+      <details><summary>How do updates work?</summary><p>Tampermonkey checks this page's copy of the script and updates GIF Clipper by itself. You can also click Install again at any time.</p></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="new">
+        <h2 style="font-size:18px">New in 0.2</h2>
+        <ul>
+          <li>WebM export (or GIF + WebM), set in the gear menu or per clip.</li>
+          <li>Size limit: the file shrinks until it fits.</li>
+          <li>Captions, boomerang loops, and Recent clips that survive a reload.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>GIF Clipper <span id="fver">v0.2.1</span> · Not affiliated with Kick.</span>
+    <span><a href="/" title="BookHockeys home">BookHockeys</a> · <button type="button" id="cookieReset" title="Change your analytics cookie choice">Cookies</button></span>
+  </div>
+</footer>
+
+<div class="consent" id="consentBanner" hidden role="dialog" aria-labelledby="consentTitle" aria-describedby="consentDesc">
+  <div class="consent-text">
+    <strong id="consentTitle">Cookies for analytics</strong>
+    <p id="consentDesc">This page uses Google Analytics to count anonymous visits. No ads, no personal data sold. The page works either way.</p>
+  </div>
+  <div class="consent-btns">
+    <button class="btn ol" id="consentReject" type="button" title="No analytics cookies">Reject</button>
+    <button class="btn acc" id="consentAccept" type="button" title="Allow anonymous analytics">Accept</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var VERSION = '0.2.1';
+  document.title = 'GIF Clipper v' + VERSION + ' - Clip live Kick moments to GIF | BookHockeys';
+  document.getElementById('ver').textContent = 'v' + VERSION;
+  document.getElementById('fver').textContent = 'v' + VERSION;
+
+  // Count install clicks (no-op when analytics is off or declined).
+  document.getElementById('install').addEventListener('click', function () {
+    try { if (window.gtag) window.gtag('event', 'gifclipper_install_click', { version: VERSION }); } catch (e) {}
+  });
+
+  // Consent banner (site-wide `greenline-consent` key).
+  var banner = document.getElementById('consentBanner');
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function record(state) {
+    try { if (window.gtag) window.gtag('consent', 'update', { 'analytics_storage': state }); } catch (e) {}
+    lsSet('greenline-consent', state);
+    banner.hidden = true;
+  }
+  document.getElementById('consentAccept').addEventListener('click', function () { record('granted'); });
+  document.getElementById('consentReject').addEventListener('click', function () { record('denied'); });
+  document.getElementById('cookieReset').addEventListener('click', function () {
+    try { localStorage.removeItem('greenline-consent'); } catch (e) {}
+    try { if (window.gtag) window.gtag('consent', 'update', { 'analytics_storage': 'denied' }); } catch (e) {}
+    banner.hidden = false;
+  });
+  if (window.__needsConsent) banner.hidden = false;
+})();
+</script>
+</body>
+</html>
