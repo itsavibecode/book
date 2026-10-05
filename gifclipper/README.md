@@ -37,6 +37,10 @@ Install button also sends a `gifclipper_install_click` event.
 
 ## Changelog
 
+### 0.4.0
+- Serves add-on v0.4.0 (PNG snapshots stamped with the VOD time or live uptime).
+  Feature card and "New in 0.4" box updated.
+
 ### 0.3.0
 - Serves add-on v0.3.0 (one-click PNG frame snapshots). Added a "Save a frame as
   PNG" feature card, the Alt + Shift + S shortcut row, and a "New in 0.3" box.
