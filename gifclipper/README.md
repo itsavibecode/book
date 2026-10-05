@@ -37,6 +37,9 @@ Install button also sends a `gifclipper_install_click` event.
 
 ## Changelog
 
+### 0.4.1
+- Serves add-on v0.4.1 (live snapshots stamped 5:00:03 / 8:00:02 from Kick's seek bar; time no longer missing when the player controls are hidden).
+
 ### 0.4.0
 - Serves add-on v0.4.0 (PNG snapshots stamped with the VOD time or live uptime).
   Feature card and "New in 0.4" box updated.
