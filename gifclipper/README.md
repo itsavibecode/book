@@ -37,6 +37,9 @@ Install button also sends a `gifclipper_install_click` event.
 
 ## Changelog
 
+### 0.5.1
+- Serves add-on v0.5.1 (steady launcher width while recording).
+
 ### 0.5.0
 - Serves add-on v0.5.0 (PNG info bar: time, date, stream title). Feature card and "New in 0.5" box updated.
 
