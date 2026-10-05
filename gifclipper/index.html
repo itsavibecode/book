@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.2.1" />
-<title>GIF Clipper v0.2.1 - Clip live Kick moments to GIF | BookHockeys</title>
+<meta name="version" content="0.3.0" />
+<title>GIF Clipper v0.3.0 - Clip live Kick moments to GIF | BookHockeys</title>
 
 <meta name="description" content="A free browser add-on for kick.com: record a live stream (or grab the last 15 seconds), trim, crop and caption it, and download a GIF or a small WebM. Runs in your browser; nothing is uploaded." />
 <meta name="theme-color" content="#1b1d20" />
@@ -199,7 +199,7 @@ footer a,footer button{color:var(--muted);text-decoration:underline}
     <a class="brand" href="./" title="GIF Clipper">
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#c6ff3d"/><text x="16" y="21" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-weight="900" font-size="12" fill="#131509">GIF</text></svg>
       <b>GIF Clipper</b>
-      <span class="ver" id="ver">v0.2.1</span>
+      <span class="ver" id="ver">v0.3.0</span>
     </a>
     <a class="home" href="/" title="BookHockeys home">BookHockeys</a>
   </div>
@@ -252,6 +252,7 @@ footer a,footer button{color:var(--muted);text-decoration:underline}
         <div class="card"><h3><i></i>Trim and cut</h3><p>Drag the handles to keep just the good part, or cut a boring bit out of the middle.</p></div>
         <div class="card"><h3><i></i>Crop</h3><p>Draw a box on the preview, or lock it to 16:9, square, 4:5 or 9:16.</p></div>
         <div class="card"><h3><i></i>Captions</h3><p>Top and bottom text in classic meme style or as subtitles. What you see in the preview is what you get.</p></div>
+        <div class="card"><h3><i></i>Save a frame as PNG</h3><p>One click (or Alt + Shift + S) saves the current frame at full resolution straight to your downloads. No prompts.</p></div>
         <div class="card"><h3><i></i>Boomerang</h3><p>Plays forward then backward, so the loop never jumps.</p></div>
         <div class="card"><h3><i></i>GIF or WebM</h3><p>GIF by default. WebM is a real video, usually 10 to 20 times smaller with full colour. Or get both.</p></div>
         <div class="card"><h3><i></i>Fits your upload limit</h3><p>Pick 5, 8, 10 or 25 MB and the export shrinks the file until it fits.</p></div>
@@ -270,6 +271,7 @@ footer a,footer button{color:var(--muted);text-decoration:underline}
         <tbody>
           <tr><td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd></td><td>Start or stop recording</td></tr>
           <tr><td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd></td><td>Clip the last 15 seconds (turns the rewind buffer on the first time)</td></tr>
+          <tr><td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td><td>Save the current frame as a PNG</td></tr>
           <tr><td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>G</kbd></td><td>Show or hide the launcher</td></tr>
           <tr><td><kbd>Space</kbd>, <kbd>&larr;</kbd> <kbd>&rarr;</kbd>, <kbd>I</kbd> / <kbd>O</kbd></td><td>In the editor: play / pause, step a frame, set the start / end at the playhead</td></tr>
         </tbody>
@@ -292,8 +294,9 @@ footer a,footer button{color:var(--muted);text-decoration:underline}
   <section>
     <div class="wrap">
       <div class="new">
-        <h2 style="font-size:18px">New in 0.2</h2>
+        <h2 style="font-size:18px">New in 0.3</h2>
         <ul>
+          <li>Save the current frame as a PNG with one click or Alt + Shift + S, no prompts.</li>
           <li>WebM export (or GIF + WebM), set in the gear menu or per clip.</li>
           <li>Size limit: the file shrinks until it fits.</li>
           <li>Captions, boomerang loops, and Recent clips that survive a reload.</li>
@@ -305,7 +308,7 @@ footer a,footer button{color:var(--muted);text-decoration:underline}
 
 <footer>
   <div class="wrap">
-    <span>GIF Clipper <span id="fver">v0.2.1</span> · Not affiliated with Kick.</span>
+    <span>GIF Clipper <span id="fver">v0.3.0</span> · Not affiliated with Kick.</span>
     <span><a href="/" title="BookHockeys home">BookHockeys</a> · <button type="button" id="cookieReset" title="Change your analytics cookie choice">Cookies</button></span>
   </div>
 </footer>
@@ -323,7 +326,7 @@ footer a,footer button{color:var(--muted);text-decoration:underline}
 
 <script>
 (function () {
-  var VERSION = '0.2.1';
+  var VERSION = '0.3.0';
   document.title = 'GIF Clipper v' + VERSION + ' - Clip live Kick moments to GIF | BookHockeys';
   document.getElementById('ver').textContent = 'v' + VERSION;
   document.getElementById('fver').textContent = 'v' + VERSION;

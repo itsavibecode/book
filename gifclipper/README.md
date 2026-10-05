@@ -37,6 +37,10 @@ Install button also sends a `gifclipper_install_click` event.
 
 ## Changelog
 
+### 0.3.0
+- Serves add-on v0.3.0 (one-click PNG frame snapshots). Added a "Save a frame as
+  PNG" feature card, the Alt + Shift + S shortcut row, and a "New in 0.3" box.
+
 ### 0.2.1
 - First release of the page, serving add-on v0.2.1. Installs and updates now come
   from bookhockeys.com instead of a GitHub link.
