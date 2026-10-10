@@ -1,0 +1,2180 @@
+{
+ "generated": "2026-10-10",
+ "subject": {
+  "username": "MASTUHSPLINTER",
+  "slug": "mastuhsplinter",
+  "userId": 21478801,
+  "channelId": 20492407,
+  "created": "2023-10-23",
+  "followers": 149,
+  "platformBanned": false
+ },
+ "assumptions": {
+  "subPrice": 4.99,
+  "streamerShare": 0.95,
+  "kicksPer1000": 15.0
+ },
+ "totals": {
+  "subs": 2830,
+  "kicks": 269555,
+  "channels": 39,
+  "subChannels": 34,
+  "kickChannels": 23
+ },
+ "channels": [
+  {
+   "slug": "suspendas",
+   "name": "Suspendas",
+   "followers": 50237,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/78345/profile_image/conversion/7182cab4-9b58-4a50-a65f-95a8590bb728-fullsize.webp",
+   "subs": 408,
+   "subsSource": "kicklogz",
+   "kicks": 33000,
+   "msgs": 121,
+   "lastGift": "2026-09-24T15:42:57.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": [
+    {
+     "label": "Read it",
+     "href": "suspendas-2026-09-24.html"
+    }
+   ]
+  },
+  {
+   "slug": "wvagabond",
+   "name": "wvagabond",
+   "followers": 44673,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/23111830/profile_image/conversion/2cd7ae86-ab46-4b54-a8e0-8f0668b33faa-fullsize.webp",
+   "subs": 399,
+   "subsSource": "kicklogz",
+   "kicks": 49000,
+   "msgs": 343,
+   "lastGift": "2026-09-28T23:42:10.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": [
+    {
+     "label": "23 Sept",
+     "href": "wvagabond-2026-09-23.html"
+    },
+    {
+     "label": "19",
+     "href": "wvagabond-2026-09-19.html"
+    },
+    {
+     "label": "22",
+     "href": "wvagabond-2026-09-22.html"
+    },
+    {
+     "label": "25",
+     "href": "wvagabond-2026-09-25.html"
+    },
+    {
+     "label": "26",
+     "href": "wvagabond-2026-09-26.html"
+    },
+    {
+     "label": "27",
+     "href": "wvagabond-2026-09-27.html"
+    },
+    {
+     "label": "29",
+     "href": "wvagabond-2026-09-29.html"
+    },
+    {
+     "label": "9 Oct",
+     "href": "wvagabond-2026-10-09.html"
+    }
+   ]
+  },
+  {
+   "slug": "twigggs",
+   "name": "Twigggs",
+   "followers": 5334,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/63674387/profile_image/conversion/0013679a-326d-4950-9113-84eebb8c9859-fullsize.webp",
+   "subs": 367,
+   "subsSource": "leaderboard",
+   "kicks": 36000,
+   "msgs": null,
+   "lastGift": "2026-09-26T07:07:26.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": [
+    {
+     "label": "Read it",
+     "href": "twigggs-2026-09-26.html"
+    }
+   ]
+  },
+  {
+   "slug": "sam",
+   "name": "Sam",
+   "followers": 117485,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/336946/profile_image/conversion/3bcd1076-84a3-4f3c-97fc-dd22366d2aaa-fullsize.webp",
+   "subs": 240,
+   "subsSource": "kicklogz",
+   "kicks": 5000,
+   "msgs": 27,
+   "lastGift": "2026-09-24T16:01:12.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": [
+    {
+     "label": "Read it",
+     "href": "sam-2026-09-24.html"
+    }
+   ]
+  },
+  {
+   "slug": "zuesirl",
+   "name": "ZuesIRL",
+   "followers": 7967,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/53556044/profile_image/conversion/3173bfb2-b810-4562-bb6a-b0b3011e6a57-fullsize.webp",
+   "subs": 212,
+   "subsSource": "leaderboard",
+   "kicks": 17021,
+   "msgs": null,
+   "lastGift": "2026-10-06T11:46:51.000Z",
+   "bannedAt": "2026-10-09T16:12:10.000Z",
+   "banActive": false,
+   "nights": [
+    {
+     "label": "6 Oct",
+     "href": "zuesirl-2026-10-06.html"
+    },
+    {
+     "label": "29",
+     "href": "zuesirl-2026-09-29.html"
+    },
+    {
+     "label": "4",
+     "href": "zuesirl-2026-10-04.html"
+    },
+    {
+     "label": "5",
+     "href": "zuesirl-2026-10-05.html"
+    },
+    {
+     "label": "10 Oct: the chargeback",
+     "href": "zuesirl-2026-10-10.html"
+    }
+   ]
+  },
+  {
+   "slug": "monkeykingcobra",
+   "name": "MonkeyKingCobra",
+   "followers": 6779,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/49428396/profile_image/conversion/ca212d95-bfab-456e-a31a-44a277ec46aa-fullsize.webp",
+   "subs": 187,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": 50,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": [
+    {
+     "label": "Read it",
+     "href": "monkeykingcobra-2026-10-06.html"
+    }
+   ]
+  },
+  {
+   "slug": "loulz",
+   "name": "Loulz",
+   "followers": 36596,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/112894/profile_image/conversion/aa2cb3f6-fbff-4169-ac84-e5b26f6c5da5-fullsize.webp",
+   "subs": 141,
+   "subsSource": "kicklogz",
+   "kicks": 5000,
+   "msgs": 25,
+   "lastGift": "2026-09-24T03:07:23.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "ozemi",
+   "name": "ozemi",
+   "followers": 17640,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/5595522/profile_image/conversion/c55628eb-e2bb-4e8c-95b1-aa4b1e3e631f-fullsize.webp",
+   "subs": 108,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": 1,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": [
+    {
+     "label": "Chat only (VOD private)",
+     "href": "ozemi-2026-09-23.html"
+    }
+   ]
+  },
+  {
+   "slug": "irishmuldogz",
+   "name": "IrishMuldogz",
+   "followers": 332,
+   "verified": false,
+   "pic": "https://files.kick.com/images/user/395012/profile_image/conversion/51345796-a314-49ea-92ef-a8e1eec48f2b-fullsize.webp",
+   "subs": 106,
+   "subsSource": "kicklogz",
+   "kicks": 7979,
+   "msgs": null,
+   "lastGift": "2026-10-06T13:26:21.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "billybetz",
+   "name": "BillyBetz",
+   "followers": 2754,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/108876928/profile_image/conversion/4dfe0808-ca45-4e12-b7b9-5dfe85e5c441-fullsize.webp",
+   "subs": 90,
+   "subsSource": "kicklogz",
+   "kicks": 6500,
+   "msgs": null,
+   "lastGift": "2026-09-24T04:30:51.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "hamptonbrando",
+   "name": "HAMPTONBRANDO",
+   "followers": 15918,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/3261056/profile_image/conversion/dcd6f8fa-b2d1-4030-b04d-a9777eaf74b3-fullsize.webp",
+   "subs": 80,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": 11,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "tiedyez",
+   "name": "TieDyez",
+   "followers": 6055,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/26054763/profile_image/conversion/7c064514-1770-4518-b357-e313d12ecff1-fullsize.webp",
+   "subs": 64,
+   "subsSource": "kicklogz",
+   "kicks": 12500,
+   "msgs": 60,
+   "lastGift": "2026-10-06T03:45:28.000Z",
+   "bannedAt": "2026-10-10T04:18:40.000Z",
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "dtanmanb",
+   "name": "dtanmanb",
+   "followers": 19960,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/4721309/profile_image/conversion/b432eddd-8372-419b-a3c1-dc37be672256-fullsize.webp",
+   "subs": 62,
+   "subsSource": "kicklogz",
+   "kicks": 5000,
+   "msgs": 27,
+   "lastGift": "2026-10-05T00:13:41.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "carldo",
+   "name": "carldo",
+   "followers": 20846,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/377660/profile_image/conversion/20112549-6d90-4aa7-9693-39666df7a4d9-fullsize.webp",
+   "subs": 50,
+   "subsSource": "kicklogz",
+   "kicks": 5000,
+   "msgs": 10,
+   "lastGift": "2026-10-07T05:03:14.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "soultravels",
+   "name": "SoulTravels",
+   "followers": 4780,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/26277287/profile_image/conversion/6ac6264a-f1b1-4efb-a20e-c3956943deb6-fullsize.webp",
+   "subs": 45,
+   "subsSource": "kicklogz",
+   "kicks": 5820,
+   "msgs": null,
+   "lastGift": "2026-10-06T04:07:06.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "iceposeidon",
+   "name": "Ice Poseidon",
+   "followers": 262232,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/146923/profile_image/conversion/f13387ea-e14f-477f-8d59-742250aac30a-fullsize.webp",
+   "subs": 40,
+   "subsSource": "kicklogz",
+   "kicks": 0,
+   "msgs": 325,
+   "lastGift": "2026-09-22T08:48:50.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "mohdoesirl",
+   "name": "MohDoesIRL",
+   "followers": 53,
+   "verified": false,
+   "pic": "https://files.kick.com/images/user/46251629/profile_image/conversion/66f3397c-2835-4e44-b7fb-537194cc6ee8-fullsize.webp",
+   "subs": 39,
+   "subsSource": "kicklogz",
+   "kicks": 500,
+   "msgs": null,
+   "lastGift": "2026-10-03T11:28:05.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "oceanadventures",
+   "name": "Oceanadventures",
+   "followers": 2797,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/278950/profile_image/conversion/6bb86bb2-4e10-47ab-9103-66822e10d4b7-fullsize.webp",
+   "subs": 37,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": null,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "glink",
+   "name": "Glink",
+   "followers": 3975,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/4686261/profile_image/conversion/f08d0fdb-0960-4aa9-9a0f-95da38709cd4-fullsize.webp",
+   "subs": 37,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": null,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "ryanheinz",
+   "name": "ryanheinz",
+   "followers": 12833,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/29238701/profile_image/conversion/cd9fde4e-79df-416f-9ce6-9d4cee6b0d94-fullsize.webp",
+   "subs": 27,
+   "subsSource": "kicklogz",
+   "kicks": 5000,
+   "msgs": 45,
+   "lastGift": "2026-10-06T02:12:29.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "berry-blackberry",
+   "name": "berry-blackberry",
+   "followers": null,
+   "verified": false,
+   "pic": null,
+   "subs": 26,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": null,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "nedx",
+   "name": "nedx",
+   "followers": 14272,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/166115/profile_image/conversion/753976af-df07-4e05-8f44-ca19ec3c8088-fullsize.webp",
+   "subs": 18,
+   "subsSource": "count",
+   "kicks": 0,
+   "msgs": 30,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "binxbasilisk",
+   "name": "BinxBasilisk",
+   "followers": 9498,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/11434985/profile_image/conversion/4380f719-98f5-48ab-bfee-fc751912e65c-fullsize.webp",
+   "subs": 17,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": 0,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "briewylde",
+   "name": "BrieWylde",
+   "followers": 13968,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/1294403/profile_image/conversion/fc52bd58-aae3-42ec-a082-95c79e53d9ae-fullsize.webp",
+   "subs": 14,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": null,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "therealshookon3",
+   "name": "theRealShooKon3",
+   "followers": 8510,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/151158/profile_image/conversion/f58fc43f-16d9-406a-a378-ccdaf5812ba7-fullsize.webp",
+   "subs": 4,
+   "subsSource": "leaderboard",
+   "kicks": 52541,
+   "msgs": 0,
+   "lastGift": null,
+   "bannedAt": "2026-10-09T20:54:59.000Z",
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "moises",
+   "name": "Moises",
+   "followers": 103998,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/58408/profile_image/conversion/f5644a60-51e5-47a3-a584-5d7bcacbc1dc-fullsize.webp",
+   "subs": 3,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": 8,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "ojxi",
+   "name": "OJXI",
+   "followers": 1223,
+   "verified": false,
+   "pic": "https://files.kick.com/images/user/106423227/profile_image/conversion/769d9d45-7f43-4899-aa37-b11bfb5584b1-fullsize.webp",
+   "subs": 2,
+   "subsSource": "kicklogz",
+   "kicks": 1500,
+   "msgs": null,
+   "lastGift": "2026-09-18T21:01:50.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "harmoniousyuriy",
+   "name": "HarmoniousYuriy",
+   "followers": 12952,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/4334432/profile_image/conversion/7c435ed0-2b20-4e62-9921-512f390a80f5-fullsize.webp",
+   "subs": 1,
+   "subsSource": "kicklogz",
+   "kicks": 5000,
+   "msgs": null,
+   "lastGift": "2026-09-24T04:24:53.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "sheismarcel",
+   "name": "sheismarcel",
+   "followers": 11291,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/30835647/profile_image/conversion/a2532d19-a60b-458b-a434-2aaac9839261-fullsize.webp",
+   "subs": 1,
+   "subsSource": "kicklogz",
+   "kicks": 3500,
+   "msgs": null,
+   "lastGift": "2026-09-27T21:24:01.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "xenathewitch",
+   "name": "Xenathewitch",
+   "followers": 50234,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/1821679/profile_image/conversion/26fd3460-d185-4f0c-90ea-69a163b2d4ba-fullsize.webp",
+   "subs": 1,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": 0,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "mando",
+   "name": "Mando",
+   "followers": 35137,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/278343/profile_image/conversion/a9aa9706-948f-4d31-8ac1-16e2da24437e-fullsize.webp",
+   "subs": 1,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": 0,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "delontewest",
+   "name": "DelonteWest",
+   "followers": 13313,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/125579234/profile_image/conversion/dc63e013-989a-433d-b017-90dc823e8010-fullsize.webp",
+   "subs": 1,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": 14,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "nicklee",
+   "name": "NickLee",
+   "followers": 49514,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/58371235/profile_image/conversion/ce5c4a72-52d9-42f9-839a-1b972c60a840-fullsize.webp",
+   "subs": 1,
+   "subsSource": "kicklogz",
+   "kicks": 0,
+   "msgs": 406,
+   "lastGift": "2026-10-04T20:07:26.000Z",
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "madxzero",
+   "name": "MadxZero",
+   "followers": 194,
+   "verified": false,
+   "pic": "https://files.kick.com/images/user/8730329/profile_image/conversion/e5d57bb6-ee10-4cd3-a920-a98aab8df9cf-fullsize.webp",
+   "subs": 1,
+   "subsSource": "leaderboard",
+   "kicks": 0,
+   "msgs": null,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "onesonicirl",
+   "name": "OneSonicIRL",
+   "followers": 8885,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/1287794/profile_image/conversion/b63463e8-c947-42c2-9e98-02f9dd5476ab-fullsize.webp",
+   "subs": 0,
+   "subsSource": null,
+   "kicks": 7360,
+   "msgs": null,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "kikikrazy",
+   "name": "kikikrazy",
+   "followers": 8667,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/57216218/profile_image/conversion/921048d4-7205-4fbe-93be-f9a4d0a0f326-fullsize.webp",
+   "subs": 0,
+   "subsSource": null,
+   "kicks": 4310,
+   "msgs": null,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "sainttenn",
+   "name": "sainttenn",
+   "followers": null,
+   "verified": false,
+   "pic": null,
+   "subs": 0,
+   "subsSource": null,
+   "kicks": 1004,
+   "msgs": null,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "chelsealeeart",
+   "name": "ChelseaLeeart",
+   "followers": 47784,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/78389503/profile_image/conversion/27e2e4ce-142a-4cdf-bdef-f37163efc8e9-fullsize.webp",
+   "subs": 0,
+   "subsSource": null,
+   "kicks": 510,
+   "msgs": 34,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  },
+  {
+   "slug": "reganxjeanne",
+   "name": "reganxjeanne",
+   "followers": 34107,
+   "verified": true,
+   "pic": "https://files.kick.com/images/user/889134/profile_image/conversion/9fe8a5c0-b78e-4667-9e48-6991606330a1-fullsize.webp",
+   "subs": 0,
+   "subsSource": null,
+   "kicks": 510,
+   "msgs": 0,
+   "lastGift": null,
+   "bannedAt": null,
+   "banActive": false,
+   "nights": []
+  }
+ ],
+ "bans": [
+  {
+   "channel": "furacao_embrasado",
+   "by": "Furacao_Embrasado",
+   "at": "2026-08-21T07:58:14.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "liftedsenses",
+   "by": "Daskillz",
+   "at": "2026-09-19T11:31:32.000Z",
+   "permanent": 0,
+   "unbanned_at": null
+  },
+  {
+   "channel": "zuesirl",
+   "by": "DepressionSocks",
+   "at": "2026-10-09T16:12:10.000Z",
+   "permanent": 1,
+   "unbanned_at": "2026-10-09T16:12:13.000Z"
+  },
+  {
+   "channel": "mexicanandy",
+   "by": "MexicanAndy",
+   "at": "2026-10-09T16:41:34.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "sonjavd",
+   "by": "sonjavd",
+   "at": "2026-10-09T18:28:28.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "razorredd",
+   "by": "Nikione0one",
+   "at": "2026-10-09T19:56:01.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "missmoarta",
+   "by": "Taedrun",
+   "at": "2026-10-09T20:02:58.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "kreationx",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:04:20.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "yourbudde",
+   "by": "Taedrun",
+   "at": "2026-10-09T20:04:47.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "pinkyuwu",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:04:49.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "zakiman",
+   "by": "Taedrun",
+   "at": "2026-10-09T20:05:01.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "hillszeee",
+   "by": "Taedrun",
+   "at": "2026-10-09T20:05:12.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "mavomusic",
+   "by": "Taedrun",
+   "at": "2026-10-09T20:05:20.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "emeraldhoney",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:05:28.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "newyorklegend",
+   "by": "Taedrun",
+   "at": "2026-10-09T20:05:34.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "theleaway",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:06:32.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "flexiefae",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:06:53.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "professorstalke",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:08:10.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "yourbudde",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:08:54.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "fluff",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:09:12.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "lexipi",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:09:26.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "slashley",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:09:39.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "destrox88x",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:09:51.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "littlestryker",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:11:27.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "ladysirene",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:15:17.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "leatherneck223",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:16:31.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "robbiecrow",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:16:45.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "sergeantgpa",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:16:57.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "cosmote06",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:17:09.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "kaptainkoolwhip",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:17:40.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "mskatastrophic",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:20:52.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "zbourne",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:21:20.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "sagibearius",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:21:36.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "katrespawns",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:21:53.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "acmeoilpainting",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:22:10.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "pardonthedistraction",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:22:22.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "mrsacmedecor",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:22:40.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "delizious",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:22:47.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "kaypikefashion",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:22:58.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "n0rway",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:23:12.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "teatimewithtarryn",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:24:45.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "andromeda-creates",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:24:57.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "naomybiz",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:25:45.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "misboo",
+   "by": "Misboo",
+   "at": "2026-10-09T20:25:58.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "amylyng",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:26:17.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "therealshookon3",
+   "by": "Nikione0one",
+   "at": "2026-10-09T20:54:59.000Z",
+   "permanent": 1,
+   "unbanned_at": "2026-10-09T20:55:20.000Z"
+  },
+  {
+   "channel": "cryptexious",
+   "by": "Cryptexious",
+   "at": "2026-10-09T22:09:33.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "trogan2000",
+   "by": "Trogan2000",
+   "at": "2026-10-10T00:45:46.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "gewn",
+   "by": "Burner2030",
+   "at": "2026-10-10T01:33:37.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
+  {
+   "channel": "tiedyez",
+   "by": "MikeTheFatman",
+   "at": "2026-10-10T04:18:40.000Z",
+   "permanent": 1,
+   "unbanned_at": "2026-10-10T04:42:59.000Z"
+  },
+  {
+   "channel": "kayladelancey",
+   "by": "SassyMissLexy",
+   "at": "2026-10-10T06:27:17.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  }
+ ],
+ "tweets": [
+  {
+   "url": "https://x.com/antislave1/status/2108616920689770959",
+   "handle": "@antislave1",
+   "who": "wvagabond (Kick streamer)",
+   "time": "2026-10-09T17:53:44Z",
+   "kind": "first-hand",
+   "text": "Hey kick fix your gifted sub system. @KICKEthan $1583.60 in charge backs WTF. Your site is cooked. AND my stream from yesterday was wiped so about $1700 total.",
+   "views": 62560,
+   "likes": 134
+  },
+  {
+   "url": "https://x.com/antislave1/status/2108620644732883269",
+   "handle": "@antislave1",
+   "who": "wvagabond (Kick streamer)",
+   "time": "2026-10-09T18:08:32Z",
+   "kind": "first-hand",
+   "text": "as far as i'm concerned kick stole the $. They need to drop me 500 subs IMMEDIATLY",
+   "views": 1373,
+   "likes": 4
+  },
+  {
+   "url": "https://x.com/LoulzHQ/status/2108628895020847169",
+   "handle": "@LoulzHQ",
+   "who": "Loulz (Kick streamer)",
+   "time": "2026-10-09T18:41:19Z",
+   "kind": "named",
+   "text": "MastuhSplinter went on a gift spree during and right after the #SeeEx event, sending thousands of subs to several Kick streamers. Now he has charged it all back. I'll be fine, but this type of thing absolutely destroys some creators. The unfortunate part is because it's subs, paid through Stripe Express, we have no recourse. The refunds show minimal information and no way to fight it. I hope Kick at least tries to fight these on our behalf.",
+   "views": 10618,
+   "likes": 73
+  },
+  {
+   "url": "https://x.com/ZuesIRLClips/status/2108633968937664990",
+   "handle": "@ZuesIRLClips",
+   "who": "ZuesIRL clips account",
+   "time": "2026-10-09T19:01:29Z",
+   "kind": "claim",
+   "text": "Kick user MASTUHSPLINTER has charged back over $10,000 in Gifted Subs and Kicks to various Streamers, forcing the fraudulent money to be owed back by the Streamer in future Kick payouts. The user also remains as the Top Lifetime Gifter and Kick Donator on all channels.",
+   "views": 67,
+   "likes": 0,
+   "note": "The $10,000+ figure is this account's claim. It is not confirmed by Kick or by the affected streamers' own numbers."
+  },
+  {
+   "url": "https://x.com/FFBEResonance/status/2108635053752484279",
+   "handle": "@FFBEResonance",
+   "who": "viewer",
+   "time": "2026-10-09T19:05:48Z",
+   "kind": "reaction",
+   "text": "i guarantee you it was MASTUHSPLINTER.",
+   "views": 238,
+   "likes": 2
+  },
+  {
+   "url": "https://x.com/ftpchris420/status/2108642201164988723",
+   "handle": "@ftpchris420",
+   "who": "viewer",
+   "time": "2026-10-09T19:34:12Z",
+   "kind": "allegation",
+   "text": "mastuhsplinter stole credit cards and gifted subs to a bunch of streamers, all of these streamers have had the same thing happen its all chargebacks.",
+   "views": 160,
+   "likes": 1,
+   "note": "Unverified. Nobody has published evidence of stolen cards. Loulz's own wording is that the gifter charged it back himself."
+  },
+  {
+   "url": "https://x.com/antislave1/status/2108821772611031496",
+   "handle": "@antislave1",
+   "who": "wvagabond (Kick streamer)",
+   "time": "2026-10-10T06:27:00Z",
+   "kind": "first-hand",
+   "text": "You have been running ads for months now. They fire it only takes 1 test to see that. Stop stealing from creators. It says in the dashboard we would be paid and no one has.",
+   "views": null,
+   "likes": null,
+   "note": "Reply to @KICKEthan. Separate complaint about unpaid ad revenue, folded into the same thread."
+  },
+  {
+   "url": "https://x.com/TikiNedX/status/2108866214995091948",
+   "handle": "@TikiNedX",
+   "who": "viewer",
+   "time": "2026-10-10T10:24:21Z",
+   "kind": "reaction",
+   "text": "Hahaha! MastuhSplinter just paid for the gambling loss! Hilarious! So you upset you got scammed but not upset about choosing to gamble and then losing moneys?",
+   "views": 120,
+   "likes": 3
+  },
+  {
+   "url": "https://x.com/antislave1/status/2108926835719590363",
+   "handle": "@antislave1",
+   "who": "wvagabond (Kick streamer)",
+   "time": "2026-10-10T13:25:00Z",
+   "kind": "first-hand",
+   "text": "Yea we are contacting the cyber crimes division on Monday",
+   "views": null,
+   "likes": null
+  },
+  {
+   "url": "https://x.com/antislave1/status/2108965564958011795",
+   "handle": "@antislave1",
+   "who": "wvagabond (Kick streamer)",
+   "time": "2026-10-10T15:59:00Z",
+   "kind": "first-hand",
+   "text": "wvagabond is over $1500 in debt to the platform",
+   "views": null,
+   "likes": null
+  }
+ ],
+ "quotes": [
+  {
+   "text": "We got paid out, Master Splinter charged it back after the payout.",
+   "who": "zuesirl",
+   "when": "2026-10-09T20:37:00Z",
+   "context": "on a stream titled \"MASTUHSPLINTER shopping spree! 0% interest loan\"",
+   "href": "zuesirl-2026-10-10.html#t202610092037"
+  },
+  {
+   "text": "You cannot spend money. You have to keep the money for two months, because if the person credit card stolen, then they're going to take all of the money back.",
+   "who": "suspendas",
+   "when": "2026-09-24T15:59:00Z",
+   "context": "about an hour after 400 subs",
+   "href": "suspendas-2026-09-24.html#t202609241559"
+  },
+  {
+   "text": "This dude has gifted over 300 subs in the last hour with over 20,000 kicks.",
+   "who": "suspendas",
+   "when": "2026-09-24T14:32:00Z",
+   "context": "mid-spree",
+   "href": "suspendas-2026-09-24.html#t202609241432"
+  },
+  {
+   "text": "He was in Sam's chat for 20 minutes and dropped 240 subs.",
+   "who": "suspendas",
+   "when": "2026-09-24T17:22:00Z",
+   "context": "after the gifter moved on to Sam",
+   "href": "suspendas-2026-09-24.html#t202609241722"
+  },
+  {
+   "text": "if he charges back you're not taking my credit",
+   "who": "Sam",
+   "when": "2026-09-24T16:05:00Z",
+   "context": "joking with chat while the subs were landing",
+   "href": "sam-2026-09-24.html#t202609241605"
+  },
+  {
+   "text": "I don't know if you're a real person or whatever",
+   "who": "Sam",
+   "when": "2026-09-24T15:57:00Z",
+   "context": "to the gifter, on stream",
+   "href": "sam-2026-09-24.html#t202609241557"
+  }
+ ],
+ "chat": [
+  {
+   "time": "2026-09-19",
+   "channel": "alexisplaying",
+   "text": "CAN I GIFT SUB VIEWERS FOR YOU TO CHANGE THIS IMMEDIATELY"
+  },
+  {
+   "time": "2026-09-23T22:25:00Z",
+   "channel": "irishmuldogz",
+   "text": "I GAVE VAGABOND ALMOST 500 SUBS ALSO"
+  },
+  {
+   "time": "2026-09-28",
+   "channel": "wvagabond",
+   "text": "Redeemed the channel-point reward \"PERMA Unban\""
+  },
+  {
+   "time": "2026-10-09T18:19:00Z",
+   "channel": "wvagabond, carldo, nicklee, dtanmanb, billybetz, ac7ionman, bam",
+   "text": "Last archived messages: the same emote spammed across seven chats, nothing else"
+  }
+ ],
+ "evidence": [
+  {
+   "file": "evidence/support-email.jpg",
+   "title": "Kick Support confirms the deductions were chargebacks",
+   "caption": "Email from Kick Support read on wvagabond's stream, 10 Oct 2026. It confirms the deductions were chargebacks, says Kick cannot disclose the other user's details, and that Kick Support cannot reverse them or restore the earnings.",
+   "alt": "Email from Kick Support: deductions to creator earnings were the result of chargebacks; Kick cannot reverse them."
+  },
+  {
+   "file": "evidence/refunds.jpg",
+   "title": "The refunds, one sub at a time",
+   "caption": "wvagabond's Stripe Express ledger filtered to payment refunds: a column of \"Refund on Kick Streaming, Ltd\" rows at -$4.74 each, which is $4.99 less Kick's 5%.",
+   "alt": "Stripe ledger showing many Payment Refund rows of -$4.74 labelled Refund on Kick Streaming, Ltd."
+  },
+  {
+   "file": "evidence/gifts.jpg",
+   "title": "The gifts, as Kick logged them",
+   "caption": "The same dashboard's subscription log for 28 Sept 2026: MASTUHSPLINTER gifting one subscription at a time, via Google billing, minutes apart.",
+   "alt": "Kick creator dashboard rows: Sep 28, 2026, Google, MASTUHSPLINTER, Gifted 1 subscription, repeated."
+  }
+ ],
+ "nights": [
+  {
+   "file": "wvagabond-2026-09-19.html",
+   "slug": "wvagabond",
+   "date": "2026-09-19",
+   "title": "Wvagabond, 19 Sept: the Splinter night",
+   "h1": "wvagabond, 19 September: the first alerts",
+   "lede": "The earliest <b>mastuhsplinter</b> gifting we can hear in wvagabond's VODs: a run of single-sub alerts on a 6th Street Austin IRL stream. \"Master Splinter is the goat.\" The gifts were later charged back. Below, minute by minute, is what wvagabond said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "11:18–11:25",
+     "single-sub alerts, JST"
+    ],
+    [
+     "6+",
+     "alerts in seven minutes"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-19 02:18",
+     "Alert: \"Master Splinter just gifted one subscription on KICK\""
+    ],
+    [
+     "2026-09-19 02:22",
+     "\"Master Splinter is the goat\""
+    ],
+    [
+     "2026-09-19 02:24",
+     "Three more alerts in ten seconds"
+    ]
+   ],
+   "speaker": "wvagabond",
+   "window": "10:50 to 12:00 on 19 Sept JST, from \"6th St Austin IRL\"",
+   "chatSource": "live",
+   "desc": "What wvagabond said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "wvagabond, 19 September: the first alerts",
+   "speech": 417,
+   "chat": 2278
+  },
+  {
+   "file": "wvagabond-2026-09-22.html",
+   "slug": "wvagabond",
+   "date": "2026-09-22",
+   "title": "Wvagabond, 22 Sept: the Splinter night",
+   "h1": "wvagabond, 22 September: \"you gifted 41 fucking subs today\"",
+   "lede": "Co-streaming Nick's SeeEx event, wvagabond got a full day of <b>mastuhsplinter</b>: subs, then KICKs in 2,000 blocks. By 09:40 JST he counts 41 subs for the day; the next day he calls it \"like 50 subs yesterday\". The gifts were later charged back. Below, minute by minute, is what wvagabond said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "06:27–09:47",
+     "Splinter on stream, JST"
+    ],
+    [
+     "41",
+     "subs &quot;today&quot;, at 09:40"
+    ],
+    [
+     "2,000 ×2",
+     "KICKs at 09:19 and 09:43"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-22 00:18",
+     "\"like ten Kicks already, Master Splinter, thank you\""
+    ],
+    [
+     "2026-09-22 00:19",
+     "\"Another 2,000 from Master Splinter\""
+    ],
+    [
+     "2026-09-22 00:22",
+     "\"one of the grifters that got a free sub… thank your daddy, Master Splinter\""
+    ],
+    [
+     "2026-09-22 00:40",
+     "\"you gifted 41 fucking subs today, Master Splinter\""
+    ],
+    [
+     "2026-09-22 00:43",
+     "\"Holy shit, Master Splinter, another 2,000 Kicks\""
+    ]
+   ],
+   "speaker": "wvagabond",
+   "window": "06:15 to 10:00 on 22 Sept JST, from \"Anytime Anyplace Right NICK SeeEx\"",
+   "chatSource": "live",
+   "desc": "What wvagabond said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "wvagabond, 22 September: \"you gifted 41 fucking subs today\"",
+   "speech": 2957,
+   "chat": 6012
+  },
+  {
+   "file": "ozemi-2026-09-23.html",
+   "slug": "ozemi",
+   "date": "2026-09-23",
+   "title": "Ozemi, 23 Sept: the Splinter night",
+   "h1": "ozemi, 23 September: \"Thank you for joining the regime\"",
+   "lede": "At the SeeEx afterparty, <b>mastuhsplinter</b> gifted ozemi's chat: botrix thanked him 41 times in an hour, one \"Thank you for joining the regime\" per gift, and kickbot logged single subs after. The VOD of this stream was later set to private, so this night is chat only. The gifts were later charged back. Below, minute by minute, is what ozemi said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "15:00–16:00",
+     "botrix thank-yous, JST"
+    ],
+    [
+     "41",
+     "&quot;joining the regime&quot; lines"
+    ],
+    [
+     "private",
+     "VOD, set after the stream"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-23 06:00",
+     "botrix: \"Thank you for joining the regime @MASTUHSPLINTER\" begins"
+    ],
+    [
+     "2026-09-23 07:00",
+     "kickbot: \"@MASTUHSPLINTER just gifted 1 sub!\""
+    ]
+   ],
+   "speaker": "ozemi",
+   "window": "14:30 to 17:00 on 23 Sept JST, from \"SeeEx AFTERPARTY\"",
+   "chatSource": "live",
+   "desc": "What ozemi said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "ozemi, 23 September: \"Thank you for joining the regime\"",
+   "speech": 0,
+   "chat": 13395
+  },
+  {
+   "file": "wvagabond-2026-09-23.html",
+   "slug": "wvagabond",
+   "date": "2026-09-23",
+   "title": "Wvagabond, 23 Sept: the Splinter night",
+   "h1": "wvagabond, 23 September: \"the 90th sub of the day\"",
+   "lede": "The biggest of <b>mastuhsplinter</b>'s nights in wvagabond's chat: gifts in ones and fives every few minutes for three hours on an Austin IRL stream, plus KICKs, with wvagabond thanking him on almost every minute. \"Master Splinter gifted like 50 subs yesterday,\" he says early on; by 13:13 it is \"the 90th sub of the day\". The gifts were later charged back. Below, minute by minute, is what wvagabond said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "11:47–14:37",
+     "near-constant gifting, JST"
+    ],
+    [
+     "90+",
+     "subs that day, per wvagabond"
+    ],
+    [
+     "2,000",
+     "KICKs at 13:30"
+    ],
+    [
+     "50",
+     "subs &quot;yesterday&quot;, 22 Sept"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-23 02:48",
+     "\"Master Splinter gifted like 50 subs yesterday\""
+    ],
+    [
+     "2026-09-23 02:49",
+     "\"single-handedly carrying fucking kick donations\""
+    ],
+    [
+     "2026-09-23 03:09",
+     "\"I let Master Splinter spam my chat with subs\""
+    ],
+    [
+     "2026-09-23 03:26",
+     "\"Holy shit, another five-pack for mastuhsplinter\""
+    ],
+    [
+     "2026-09-23 03:36",
+     "\"Thank you to Master Splinter for sponsoring this street fighting event\""
+    ],
+    [
+     "2026-09-23 04:13",
+     "\"the 90th fucking sub of the day\""
+    ],
+    [
+     "2026-09-23 04:30",
+     "\"2,000 KICKs from Master fucking Splinter\""
+    ],
+    [
+     "2026-09-23 05:31",
+     "\"Master Splinter just paid for the fucking gambling loss\""
+    ],
+    [
+     "2026-09-23 05:36",
+     "\"This stream is sponsored by mastuhsplinter\""
+    ]
+   ],
+   "speaker": "wvagabond",
+   "window": "11:22 to 15:53 on 23 Sept JST, the whole \"IRL AUSTIN\" stream",
+   "chatSource": "live",
+   "desc": "What wvagabond said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "wvagabond, 23 September: \"the 90th sub of the day\"",
+   "speech": 3653,
+   "chat": 13031
+  },
+  {
+   "file": "sam-2026-09-24.html",
+   "slug": "sam",
+   "date": "2026-09-24",
+   "title": "Sam, 24 Sept: the Splinter night",
+   "h1": "Sam, 24 September: 240 subs in twenty minutes",
+   "lede": "Sam was riding an electric unicycle to Ukraine (day 5, Sejny to Augustów) when <b>mastuhsplinter</b> arrived, fresh from 400 subs in suspendas' chat, and dropped 240 gifted subs on him. Sam thanked him over and over, wondered aloud whether he was a real person, and joked about chargebacks. The gifts were later charged back. Below, minute by minute, is what sam said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "23:49–01:30",
+     "Splinter on stream, JST"
+    ],
+    [
+     "240",
+     "subs, per Sam&#x27;s leaderboard"
+    ],
+    [
+     "01:05",
+     "&quot;if he charges back…&quot;"
+    ],
+    [
+     "23:57",
+     "&quot;refund vibes&quot; read out"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-24 14:49",
+     "\"Oh, Master Splinter. I saw Master Splinter also\""
+    ],
+    [
+     "2026-09-24 14:57",
+     "Read out: \"The Splinter guy gives you refund vibes\""
+    ],
+    [
+     "2026-09-24 15:47",
+     "\"a massive shout out to Master Splinter, the best gifter\""
+    ],
+    [
+     "2026-09-24 15:53",
+     "\"123, 128, there's no way\""
+    ],
+    [
+     "2026-09-24 15:57",
+     "\"I don't know if you're a real person or whatever\""
+    ],
+    [
+     "2026-09-24 16:05",
+     "\"if he charges back you're not taking my credit\""
+    ],
+    [
+     "2026-09-24 16:16",
+     "\"Splinter has 122k credits\""
+    ]
+   ],
+   "speaker": "Sam",
+   "window": "23:30 on 24 Sept to 01:45 on 25 Sept JST, from \"Riding an Electric Unicycle to Ukraine | Day 5\"",
+   "chatSource": "live",
+   "desc": "What sam said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "Sam, 24 September: 240 subs in twenty minutes",
+   "speech": 727,
+   "chat": 22722
+  },
+  {
+   "file": "suspendas-2026-09-24.html",
+   "slug": "suspendas",
+   "date": "2026-09-24",
+   "title": "Suspendas, 24 Sept: the Splinter night",
+   "h1": "Suspendas, 24 September: the night mastuhsplinter gifted 400 subs",
+   "lede": "Suspendas was golfing in Thailand when one viewer, <b>mastuhsplinter</b>, began gifting subs and sending KICKs. Over about three and a half hours he reached 402 gifted subs. The gifts were later charged back. Below, minute by minute, is what suspendas said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "21:01–00:23",
+     "gifting, JST"
+    ],
+    [
+     "402",
+     "subs, read out on stream"
+    ],
+    [
+     "20,000+",
+     "KICKs, per suspendas"
+    ],
+    [
+     "00:59",
+     "\"credit card stolen\" warning"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-24 12:01",
+     "First thanks: \"5 gifted… Really, mastuhsplinter?\""
+    ],
+    [
+     "2026-09-24 12:05",
+     "\"Splinter with 60 subs\" and 2,000 then 4,000 KICKs"
+    ],
+    [
+     "2026-09-24 12:19",
+     "\"a hundred subs is fucking crazy\""
+    ],
+    [
+     "2026-09-24 12:30",
+     "\"number two all-time gifter in two weeks, then vanished\""
+    ],
+    [
+     "2026-09-24 12:52",
+     "\"157\""
+    ],
+    [
+     "2026-09-24 13:39",
+     "\"201 subs is insane\""
+    ],
+    [
+     "2026-09-24 14:32",
+     "\"over 300 subs in the last hour with over 20,000 kicks\""
+    ],
+    [
+     "2026-09-24 15:11",
+     "\"400 subs bro\""
+    ],
+    [
+     "2026-09-24 15:23",
+     "\"mastuhsplinter with a 402\""
+    ],
+    [
+     "2026-09-24 15:59",
+     "\"if the person credit card stolen, they take all the money back\""
+    ],
+    [
+     "2026-09-24 16:14",
+     "\"I had an oiler who gifted over 2,000 subs, over $10,000\""
+    ],
+    [
+     "2026-09-24 16:52",
+     "\"$2,000 worth of fucking subs\""
+    ],
+    [
+     "2026-09-24 17:08",
+     "\"the fucker took 240 of my subs\" (Sam)"
+    ],
+    [
+     "2026-09-24 17:35",
+     "Chargeback stories: \"charged back $5,000 on me\""
+    ]
+   ],
+   "speaker": "Suspendas",
+   "window": "20:50 on 24 Sept to 02:45 on 25 Sept JST, from the \"Golfing with Friends\" stream and the start of \"The Aftershow\"",
+   "chatSource": "live",
+   "desc": "What suspendas said and what chat said, minute by minute, on the night mastuhsplinter gifted him 400+ subs.",
+   "ogTitle": "Suspendas, 24 Sept: the night mastuhsplinter gifted 400 subs",
+   "speech": 2400,
+   "chat": 4502
+  },
+  {
+   "file": "wvagabond-2026-09-25.html",
+   "slug": "wvagabond",
+   "date": "2026-09-25",
+   "title": "Wvagabond, 25 Sept: the Splinter night",
+   "h1": "wvagabond, 25 September: \"I got 400 subs… and I'm still begging\"",
+   "lede": "The night of suspendas' 400. wvagabond talks about it on air: <b>mastuhsplinter</b> \"single-handedly carrying\" Kick, \"600 gifted\" to him, a joke that Splinter is Eddie's alt account, and by the end, boat plans. The gifts were later charged back. Below, minute by minute, is what wvagabond said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "03:28",
+     "&quot;400 subs from Master Splinter today&quot;"
+    ],
+    [
+     "04:03",
+     "&quot;thank you for the 600 gifted&quot;"
+    ],
+    [
+     "04:54",
+     "&quot;Splinter truly is Eddie&#x27;s alt&quot;"
+    ],
+    [
+     "09:50",
+     "boat plans"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-24 18:28",
+     "\"I got 400 subs from Master Splinter today, and I'm still begging for subs\""
+    ],
+    [
+     "2026-09-24 19:03",
+     "\"Thank you, Master Splinter, for the 600 gifted, by the way\""
+    ],
+    [
+     "2026-09-24 19:52",
+     "\"Master Splinter gifted sus 400 subs today\""
+    ],
+    [
+     "2026-09-24 19:54",
+     "\"Splinter truly is Eddie's alt account\""
+    ],
+    [
+     "2026-09-25 00:50",
+     "\"Master Splinter gifted me over 400 subs… I'm going to buy a boat\""
+    ]
+   ],
+   "speaker": "wvagabond",
+   "window": "03:23 to 09:55 on 25 Sept JST, the whole \"marcel drunk AUSTIN\" stream",
+   "chatSource": "live",
+   "desc": "What wvagabond said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "wvagabond, 25 September: \"I got 400 subs… and I'm still begging\"",
+   "speech": 4498,
+   "chat": 18355
+  },
+  {
+   "file": "twigggs-2026-09-26.html",
+   "slug": "twigggs",
+   "date": "2026-09-26",
+   "title": "Twigggs, 26 Sept: the Splinter night",
+   "h1": "twigggs, 26 September: 367 subs in five hours",
+   "lede": "On a 6th Street group stream with briewylde, ozemi and wvagabond, <b>mastuhsplinter</b> gifted twigggs 367 subs between 12:00 and 17:00 JST, 166 of them in the first hour, mostly in packs of five, plus KICKs. It made him twigggs' biggest gifter of all time. The gifts were later charged back, and by 10 October twigggs was streaming a \"DEBTATHOON\". Below, minute by minute, is what twigggs said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "12:00–17:00",
+     "gifting, JST"
+    ],
+    [
+     "367",
+     "subs, per kickbot"
+    ],
+    [
+     "166",
+     "in the first hour"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-26 03:28",
+     "kickbot: \"@MASTUHSPLINTER just gifted 1 sub!\", the first of many"
+    ],
+    [
+     "2026-09-26 03:36",
+     "Packs of five begin"
+    ],
+    [
+     "2026-09-26 05:54",
+     "\"Master Splinter with the 5 subs\""
+    ],
+    [
+     "2026-09-26 06:16",
+     "\"thank you for the 5 subs, thank you for the 2k\""
+    ]
+   ],
+   "speaker": "twigggs",
+   "window": "12:11 to 17:25 on 26 Sept JST, from \"6th st w @briewylde @ozemi @wvagabond\"",
+   "chatSource": "kicklogz",
+   "desc": "What twigggs said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "twigggs, 26 September: 367 subs in five hours",
+   "speech": 2001,
+   "chat": 1952
+  },
+  {
+   "file": "wvagabond-2026-09-26.html",
+   "slug": "wvagabond",
+   "date": "2026-09-26",
+   "title": "Wvagabond, 26 Sept: the Splinter night",
+   "h1": "wvagabond, 26 September: \"35 subs, 36\"",
+   "lede": "Four hours of <b>mastuhsplinter</b> on wvagabond's Austin stream: $4 tips, single subs, then fives and tens and 500 KICKs. \"Master Splinter just dropped me 35 subs, 36.\" The gifts were later charged back. Below, minute by minute, is what wvagabond said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "11:40–15:32",
+     "Splinter on stream, JST"
+    ],
+    [
+     "36",
+     "subs at 13:05"
+    ],
+    [
+     "500",
+     "KICKs at 13:55"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-26 02:52",
+     "\"Splinter sent $4, it's not for me, it's for Chad\""
+    ],
+    [
+     "2026-09-26 03:27",
+     "\"Thank you, Master Splinter, for the one gifted sub\""
+    ],
+    [
+     "2026-09-26 04:05",
+     "\"Master Splinter just dropped me 35 subs, 36\""
+    ],
+    [
+     "2026-09-26 04:51",
+     "\"Holy shit, 10 fucking gifted for Master Splinter\""
+    ],
+    [
+     "2026-09-26 04:55",
+     "\"Thank you for the 500 KICKs, Master Splinter\""
+    ]
+   ],
+   "speaker": "wvagabond",
+   "window": "11:30 to 15:35 on 26 Sept JST, from \"AUSTIN, kpp nuked eddie and ethan r liars\"",
+   "chatSource": "live",
+   "desc": "What wvagabond said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "wvagabond, 26 September: \"35 subs, 36\"",
+   "speech": 1364,
+   "chat": 6347
+  },
+  {
+   "file": "wvagabond-2026-09-27.html",
+   "slug": "wvagabond",
+   "date": "2026-09-27",
+   "title": "Wvagabond, 27 Sept: the Splinter night",
+   "h1": "wvagabond, 27 September: \"perma unbanned\"",
+   "lede": "A quieter day: <b>mastuhsplinter</b> spends channel points to unban someone, then a short run of thank-yous around noon. The gifts were later charged back. Below, minute by minute, is what wvagabond said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "10:26",
+     "&quot;perma unbanned&quot; redeem, JST"
+    ],
+    [
+     "11:47–11:57",
+     "thank-yous"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-27 01:26",
+     "\"Master Splinter redeemed, perma unbanned\""
+    ],
+    [
+     "2026-09-27 02:47",
+     "\"Thank you, Master Splinter\""
+    ],
+    [
+     "2026-09-27 04:55",
+     "\"Master Splinter sent four dollars\""
+    ]
+   ],
+   "speaker": "wvagabond",
+   "window": "10:10 to 14:07 on 27 Sept JST, the whole \"AUSTIN 6th st IRL\" stream",
+   "chatSource": "live",
+   "desc": "What wvagabond said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "wvagabond, 27 September: \"perma unbanned\"",
+   "speech": 1161,
+   "chat": 5034
+  },
+  {
+   "file": "wvagabond-2026-09-29.html",
+   "slug": "wvagabond",
+   "date": "2026-09-29",
+   "title": "Wvagabond, 29 Sept: the Splinter night",
+   "h1": "wvagabond, 29 September: one sub at a time",
+   "lede": "wvagabond's 399 gifted subs from <b>mastuhsplinter</b> were not one night: he was in that chat on and off for three weeks, the most of any channel we log. This is the last gift day on the leaderboard, a BBQ mukbang in Austin, where the alerts read out \"Master Splinter just gifted one subscription on KICK\" again and again, and chat riffed on it for half an hour. The gifts were later charged back. Below, minute by minute, is what wvagabond said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "08:07–08:36",
+     "single-sub alerts, JST"
+    ],
+    [
+     "399",
+     "subs over three weeks"
+    ],
+    [
+     "343",
+     "his messages in this chat"
+    ],
+    [
+     "09:49",
+     "&quot;Splinter redeemed unban&quot;"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-28 23:07",
+     "Alert: \"Master Splinter just gifted one subscription on KICK\""
+    ],
+    [
+     "2026-09-28 23:11",
+     "\"hacked the money tree down with an adamantium axe\""
+    ],
+    [
+     "2026-09-28 23:18",
+     "\"Thank you, Mastuh! Thank you, Master Splinter!\""
+    ],
+    [
+     "2026-09-28 23:35",
+     "\"everyone in chat has to have a sub at this point\""
+    ],
+    [
+     "2026-09-29 00:30",
+     "\"If Master Splinter donated 100 subs, you will unban everyone\""
+    ],
+    [
+     "2026-09-29 00:49",
+     "\"Splinter really did redeem unbanned, but for who?\""
+    ]
+   ],
+   "speaker": "wvagabond",
+   "window": "07:35 to 10:36 on 29 Sept JST, the whole \"BBQ muckbang Austin\" stream",
+   "chatSource": "live",
+   "desc": "What wvagabond said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "wvagabond, 29 September: one sub at a time",
+   "speech": 1482,
+   "chat": 7340
+  },
+  {
+   "file": "zuesirl-2026-09-29.html",
+   "slug": "zuesirl",
+   "date": "2026-09-29",
+   "title": "Zuesirl, 29 Sept: the Splinter night",
+   "h1": "zuesirl, 29 September: \"13 in total… 14 total\"",
+   "lede": "<b>mastuhsplinter</b>'s first run at zuesirl: single subs one after another while zuesirl counts them aloud. Chat: \"master splinter donated like 200 subs the other night\". The gifts were later charged back. Below, minute by minute, is what zuesirl said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "08:45–08:51",
+     "the run, JST"
+    ],
+    [
+     "14",
+     "subs, counted on air"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-09-28 23:46",
+     "Chat: \"master splinter donated like 200 subs the other night\""
+    ],
+    [
+     "2026-09-28 23:47",
+     "\"Thank you brother, total of ten… a total of 11\""
+    ],
+    [
+     "2026-09-28 23:49",
+     "\"Master Splinter is popping the fuck off, 13 in total\""
+    ],
+    [
+     "2026-09-28 23:50",
+     "\"14 total, another sub\""
+    ]
+   ],
+   "speaker": "zuesirl",
+   "window": "08:20 to 10:00 on 29 Sept JST",
+   "chatSource": "kicklogz",
+   "desc": "What zuesirl said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "zuesirl, 29 September: \"13 in total… 14 total\"",
+   "speech": 459,
+   "chat": 466
+  },
+  {
+   "file": "zuesirl-2026-10-04.html",
+   "slug": "zuesirl",
+   "date": "2026-10-04",
+   "title": "Zuesirl, 4 Oct: the Splinter night",
+   "h1": "zuesirl, 4 October: \"Who is Master Splinter?\"",
+   "lede": "Two waves in one night: around 05:10 JST and again at 09:12, when the alerts read \"just gifted 5 subscriptions\" three times in a minute and chat asks who he is. By 09:13 zuesirl puts the total at 79. The gifts were later charged back. Below, minute by minute, is what zuesirl said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "05:10, 09:12",
+     "two waves, JST"
+    ],
+    [
+     "79",
+     "subs total by 09:13"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-10-03 20:11",
+     "\"Thank you for the subbies, 43, Master Splinter is on one\""
+    ],
+    [
+     "2026-10-04 00:12",
+     "Alerts: \"just gifted 5 subscriptions\" ×3"
+    ],
+    [
+     "2026-10-04 00:13",
+     "\"Who the fuck is Master Splinter?\""
+    ],
+    [
+     "2026-10-04 00:13",
+     "\"Master Splinter has gifted total, um, 79 subs\""
+    ]
+   ],
+   "speaker": "zuesirl",
+   "window": "04:30 to 10:00 on 4 Oct JST, from \"I AM ON SITE, AND IT's ON SIGHT\"",
+   "chatSource": "kicklogz",
+   "desc": "What zuesirl said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "zuesirl, 4 October: \"Who is Master Splinter?\"",
+   "speech": 4594,
+   "chat": 3785
+  },
+  {
+   "file": "zuesirl-2026-10-05.html",
+   "slug": "zuesirl",
+   "date": "2026-10-05",
+   "title": "Zuesirl, 5 Oct: the Splinter night",
+   "h1": "zuesirl, 5 October: 11,500 KICKs",
+   "lede": "KICKs in 2,000 blocks, $3 and $4 tips, then more subs: \"thank you for the 2, total 93\". kickbot logs 11,500 KICKs from <b>mastuhsplinter</b> in two hours. The gifts were later charged back. Below, minute by minute, is what zuesirl said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "13:00–15:00",
+     "KICKs, JST"
+    ],
+    [
+     "11,500",
+     "KICKs, per kickbot"
+    ],
+    [
+     "93",
+     "subs total by 13:07"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-10-05 04:07",
+     "\"thank you for the 2, total 93… a very giving soul\""
+    ],
+    [
+     "2026-10-05 04:57",
+     "\"Thank you for the 2,000 Kicks twice\""
+    ],
+    [
+     "2026-10-05 05:08",
+     "\"just gifted 1,000 Kicks\""
+    ],
+    [
+     "2026-10-05 05:26",
+     "\"just gifted 5 subscriptions on KICK\""
+    ]
+   ],
+   "speaker": "zuesirl",
+   "window": "12:45 to 18:00 on 5 Oct JST, from \"Training for the Event\"",
+   "chatSource": "kicklogz",
+   "desc": "What zuesirl said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "zuesirl, 5 October: 11,500 KICKs",
+   "speech": 1351,
+   "chat": 1016
+  },
+  {
+   "file": "monkeykingcobra-2026-10-06.html",
+   "slug": "monkeykingcobra",
+   "date": "2026-10-06",
+   "title": "Monkeykingcobra, 6 Oct: the Splinter night",
+   "h1": "monkeykingcobra, 6 October: \"172 in total… 187 in total\"",
+   "lede": "monkeykingcobra was camping with other streamers when <b>mastuhsplinter</b> came back for another round. The alerts read his running total aloud, 172 at 13:55 and 187 by 14:40, exactly the leaderboard figure, and monkeykingcobra thanked him \"for the last night\", so this was not the first visit. The gifts were later charged back. Below, minute by minute, is what monkeykingcobra said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "13:54",
+     "first burst, JST"
+    ],
+    [
+     "14:38–14:41",
+     "second burst"
+    ],
+    [
+     "172 → 187",
+     "running total, read by the alerts"
+    ],
+    [
+     "187",
+     "subs, per the leaderboard"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-10-06 04:54",
+     "\"Master fucking Splinter… that was very kind for the last night\""
+    ],
+    [
+     "2026-10-06 04:55",
+     "Alert: \"gifted 172 in total\""
+    ],
+    [
+     "2026-10-06 05:38",
+     "Alert: \"Master Splinter just gifted one subscription\""
+    ],
+    [
+     "2026-10-06 05:40",
+     "Alerts: \"181… 182… 187 in total\"; chat floods with thanks"
+    ],
+    [
+     "2026-10-06 06:24",
+     "\"Where's Master Splinter now?\""
+    ]
+   ],
+   "speaker": "monkeykingcobra",
+   "window": "13:46 to 15:40 on 6 Oct JST, from \"camping stuff with streamers\"",
+   "chatSource": "kicklogz",
+   "desc": "What monkeykingcobra said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "monkeykingcobra, 6 October: \"172 in total… 187 in total\"",
+   "speech": 2066,
+   "chat": 3414
+  },
+  {
+   "file": "zuesirl-2026-10-06.html",
+   "slug": "zuesirl",
+   "date": "2026-10-06",
+   "title": "Zuesirl, 6 Oct: the Splinter night",
+   "h1": "zuesirl, 6 October: \"the 200 gifted subs\"",
+   "lede": "Camping, and <b>mastuhsplinter</b> takes zuesirl past 200: fives in a row at 19:53 JST, \"thank you for the 200 gifted subs\" at 19:55, then 5,500 KICKs before 21:00. Earlier that day chat had joked he would either \"rob the bank or is rich\". The gifts were later charged back. Below, minute by minute, is what zuesirl said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "19:53–21:00",
+     "the push, JST"
+    ],
+    [
+     "200+",
+     "subs total"
+    ],
+    [
+     "5,500",
+     "KICKs, per kickbot"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-10-06 10:53",
+     "\"another one, 5, holy shit, thank you Master Splinter\""
+    ],
+    [
+     "2026-10-06 10:55",
+     "\"thank you for the 200 gifted subs and the additional one\""
+    ],
+    [
+     "2026-10-06 11:01",
+     "\"I don't think Master Splinter has ever gotten a gift back\""
+    ],
+    [
+     "2026-10-06 11:35",
+     "\"thank you for the 2000 Kicks\""
+    ],
+    [
+     "2026-10-06 11:59",
+     "\"just gifted 500 KICKs\""
+    ]
+   ],
+   "speaker": "zuesirl",
+   "window": "18:45 to 22:15 on 6 Oct JST, from \"I AM CAMPING YAY | SUB TTS\"",
+   "chatSource": "kicklogz",
+   "desc": "What zuesirl said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "zuesirl, 6 October: \"the 200 gifted subs\"",
+   "speech": 2328,
+   "chat": 3353
+  },
+  {
+   "file": "wvagabond-2026-10-09.html",
+   "slug": "wvagabond",
+   "date": "2026-10-09",
+   "title": "Wvagabond, 9 Oct: the Splinter night",
+   "h1": "wvagabond, 9 October: \"that river rat\"",
+   "lede": "After the gifting stopped, <b>mastuhsplinter</b> became a bit. On a boat in Aruba, chat buys TTS in wvagabond's voice: \"master splinter raided my fucking boat while we were on shore!\" and \"if that river rat master splinter comes on my boat again\", while one viewer spams zuesirl's MastuhSplinter emote. Below, minute by minute, is what wvagabond said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "04:02",
+     "&quot;raided my boat&quot; TTS, JST"
+    ],
+    [
+     "04:15",
+     "&quot;that river rat&quot; TTS"
+    ],
+    [
+     "zuesirl",
+     "has a MastuhSplinter emote"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-10-08 19:02",
+     "TTS: \"master splinter raided my fucking boat while we were on shore!\""
+    ],
+    [
+     "2026-10-08 19:15",
+     "TTS: \"If that river rat master splinter comes on my boat again\""
+    ],
+    [
+     "2026-10-08 19:16",
+     "zuesirl's MastuhSplinter emote spammed"
+    ]
+   ],
+   "speaker": "wvagabond",
+   "window": "03:45 to 04:30 on 9 Oct JST, from \"Boat Work Aruba\"",
+   "chatSource": "live",
+   "desc": "What wvagabond said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "wvagabond, 9 October: \"that river rat\"",
+   "speech": 449,
+   "chat": 3742
+  },
+  {
+   "file": "zuesirl-2026-10-10.html",
+   "slug": "zuesirl",
+   "date": "2026-10-10",
+   "title": "Zuesirl, 10 Oct: the Splinter night",
+   "h1": "zuesirl, 10 October: \"Master Splinter did the charge back\"",
+   "lede": "The morning after. zuesirl titles the stream \"MASTUHSPLINTER shopping spree! 0% interest loan\" and explains on air what happened: the streamers were paid out, then the charge-backs landed, leaving each of them with a balance. He names who else was hit. Below, minute by minute, is what zuesirl said on stream (left) beside what chat said (right).",
+   "facts": [
+    [
+     "05:04",
+     "&quot;did the charge back&quot;, JST"
+    ],
+    [
+     "$1,800",
+     "&quot;worth of a loan&quot;, his figure"
+    ],
+    [
+     "05:37",
+     "&quot;charged it back after the payout&quot;"
+    ]
+   ],
+   "keys": [
+    [
+     "2026-10-09 20:04",
+     "\"Master Splinter did the charge back. He has all of his money back\""
+    ],
+    [
+     "2026-10-09 20:04",
+     "\"basically gave me, you know, like, $1,800 worth of a loan\""
+    ],
+    [
+     "2026-10-09 20:13",
+     "\"all the streamers that got the money from Master Splinter got paid out\""
+    ],
+    [
+     "2026-10-09 20:18",
+     "\"So who else got charged back? Suspendas, me, Vagabond…\""
+    ],
+    [
+     "2026-10-09 20:37",
+     "\"We got paid out, Master Splinter charged it back after the payout\""
+    ]
+   ],
+   "speaker": "zuesirl",
+   "window": "05:00 to 06:05 on 10 Oct JST, the whole \"MASTUHSPLINTER shopping spree\" stream",
+   "chatSource": "kicklogz",
+   "desc": "What zuesirl said and what chat said, minute by minute, on the night mastuhsplinter gifted.",
+   "ogTitle": "zuesirl, 10 October: \"Master Splinter did the charge back\"",
+   "speech": 352,
+   "chat": 590
+  }
+ ]
+}
