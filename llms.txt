@@ -10,6 +10,7 @@ Everything is client-side — no backend, no upload of user content.
 
 - [BookHockeys home](https://bookhockeys.com/): landing page with the brand video and links to Book Hockeys' Kick and Twitch streams.
 - [Green Line Theory — auto test](https://bookhockeys.com/greenline/): the meat. Drop a staged couple photo into the page and it (1) detects every person, (2) draws a vertical green line through each subject's body axis (shoulder midpoint → hip midpoint, extended head-to-toe), and (3) labels the straightest line `MOST CONFIDENT` and the most-leaning line `LESS DOMINANT`. The lean is the meme.
+- [Clip Yoink — Kick clip downloader](https://bookhockeys.com/clipyoink/): paste a Kick clip link and get the MP4. The browser asks Kick's public API for the clip, saves Kick's own ready-made MP4 when one exists, and otherwise fetches the clip's HLS byte-range segments and joins them into an MP4 with an ffmpeg.wasm stream copy (no re-encode). Nothing is uploaded or stored; not affiliated with Kick. [Terms of use](https://bookhockeys.com/clipyoink/terms.html).
 
 ## How the Green Line Theory tool works
 

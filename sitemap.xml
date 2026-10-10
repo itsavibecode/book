@@ -84,4 +84,21 @@
       <image:caption>Share card for the GIF Clipper add-on for Kick</image:caption>
     </image:image>
   </url>
+  <url>
+    <loc>https://bookhockeys.com/clipyoink/</loc>
+    <lastmod>2026-10-10T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://bookhockeys.com/clipyoink/og-card.png</image:loc>
+      <image:title>Clip Yoink - Kick clip downloader</image:title>
+      <image:caption>Share card for Clip Yoink, the in-browser Kick clip downloader</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://bookhockeys.com/clipyoink/terms.html</loc>
+    <lastmod>2026-10-10T00:00:00Z</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
 </urlset>

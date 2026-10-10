@@ -12,6 +12,7 @@ Personal site of streamer Book Hockeys. Live at **[bookhockeys.com](https://book
 | `/troll/` | Baited — troll video maker. Bait + a sound or clip preset rendered to an MP4 in the browser with ffmpeg.wasm, nothing uploaded | [`troll/README.md`](troll/README.md) |
 | `/stacked/` | Stacked — multi-stream viewer for Kick. Up to 8 embeds as a grid, row, stack or focus layout with drag-to-resize gutters and drag-to-swap tiles, one audible at a time; channels and layout live in the `#` so the URL is the share link | [`stacked/README.md`](stacked/README.md) |
 | `/gifclipper/` | GIF Clipper — install page for the Kick GIF Clipper Tampermonkey add-on (record / rewind a live Kick stream, trim, crop, caption, export GIF or WebM). Hosts the `.user.js` that installs and updates come from; it is a byte-for-byte copy of the source in the userscripts repo, re-copied on every release | [`gifclipper/README.md`](gifclipper/README.md) |
+| `/clipyoink/` | Clip Yoink — Kick clip downloader. Paste a clip link, get the MP4: Kick's own file when it has one, otherwise the clip's stream segments stitched back together in the browser with an ffmpeg.wasm stream copy (no re-encode). Nothing uploaded; plain-language terms page at `/clipyoink/terms.html` | [`clipyoink/README.md`](clipyoink/README.md) |
 | `/shoovlator/` | Toy translator that re-writes English with stacked comparatives and redundant fillers | inline `<meta name="version">` on the page |
 | `/fish/` | Protest-style landing page: LET US !FISH — donut let Lake Shoovy dry up. Poster, demands, copyable chants, share button. Static, no analytics | inline `<meta name="version">` on the page |
 | `/hantavirus/` | War-monitor-style global hantavirus surveillance dashboard — Leaflet world map + severity-color pins + curated public-health social feed | [`hantavirus/README.md`](hantavirus/README.md) |
@@ -62,6 +63,9 @@ To force a specific order in slots 4+, edit `clips/playlist.json` directly — t
 - First release. Protest-style landing page around the LET US !FISH poster: chant ticker, poster on a picket stick, cardboard story and demands, copyable chants, share button. Static, no analytics.
 
 ## Changelog — home page
+
+### v0.1.19 — 2026-10-10
+- Added a **Clip Yoink** button to the small links row, right after GIF Clipper, so people who land on the home page can find the new Kick clip downloader. Its icon (`links/clipyoink.svg`) is the Clip Yoink "Y" mark in the page's orange on black. Also listed the new page in `sitemap.xml` (with its share card) and `llms.txt`.
 
 ### v0.1.18 — 2026-10-02
 - Added a **GIF Clipper** button to the small links row, right after Baited, so people who land on the home page can find the clip-to-GIF add-on for Kick. Its icon (`links/gifclipper.svg`) is the same lime GIF badge as the GIF Clipper page's favicon.
