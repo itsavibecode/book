@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="version" content="0.1.0" />
+<title>Terms of use - Clip Yoink v0.1.0 | BookHockeys</title>
+
+<meta name="description" content="Terms of use for Clip Yoink, the Kick clip downloader on bookhockeys.com. Not affiliated with Kick. We own no clips and host nothing; your browser fetches clips from Kick directly." />
+<meta name="theme-color" content="#000000" />
+<meta name="color-scheme" content="dark" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="https://bookhockeys.com/clipyoink/terms.html" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="Clip Yoink - Terms of use" />
+<meta property="og:description" content="Not affiliated with Kick. We own no clips and host nothing; your browser fetches clips from Kick directly." />
+<meta property="og:url" content="https://bookhockeys.com/clipyoink/terms.html" />
+<meta property="og:image" content="https://bookhockeys.com/clipyoink/og-card.png" />
+<meta property="og:image:secure_url" content="https://bookhockeys.com/clipyoink/og-card.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content="Clip Yoink - YOINK THAT CLIP. in heavy white type with an orange bar on black." />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Clip Yoink - Terms of use" />
+<meta name="twitter:description" content="Not affiliated with Kick. We own no clips and host nothing." />
+<meta name="twitter:image" content="https://bookhockeys.com/clipyoink/og-card.png" />
+<meta name="twitter:image:alt" content="Clip Yoink - Kick clip downloader" />
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Clip Yoink" />
+<meta name="application-name" content="Clip Yoink" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<!-- Analytics: same block as index.html (opt-out, Consent Mode v2, GA4,
+     shared `greenline-consent` key). -->
+<script>
+(function () {
+  var GA_ID = 'G-DYME377V2S';
+  var OPT_KEY = 'bookhockeys_ga_optout';
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.get('ga') === 'off') localStorage.setItem(OPT_KEY, '1');
+    if (p.get('ga') === 'on') localStorage.removeItem(OPT_KEY);
+  } catch (e) {}
+  var optedOut = false;
+  try { optedOut = localStorage.getItem(OPT_KEY) === '1'; } catch (e) {}
+  window['ga-disable-' + GA_ID] = optedOut;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  if (optedOut) return;
+
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  // EU/EEA/UK/CH by browser timezone: no IP lookup, errs toward asking.
+  var tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  var euExtras = ['Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+    'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'];
+  var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+  var saved = null;
+  try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+  if (saved === 'granted' || (saved !== 'denied' && !likelyEU)) {
+    gtag('consent', 'update', { 'analytics_storage': 'granted' });
+  } else if (saved !== 'denied') {
+    window.__needsConsent = true;
+  }
+
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  document.head.appendChild(s);
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+})();
+</script>
+
+<style>
+/* Design direction C "Poster" - same tokens and shell as index.html */
+:root{
+  --bg:#000;--card:#0d0d0f;--card-border:#202024;--card-r:4px;
+  --text:#e8e6e3;--h:#fff;--muted:#8b8884;--line:#202024;
+  --btn:#ff5e3a;--btn-hover:#ff7a5c;--btn-ink:#000;--accent:#ff5e3a;--input-border:#fff;
+  --col:760px;--font:"Segoe UI",system-ui,Arial,sans-serif;--wm-w:900;--wm-case:uppercase;
+}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;overflow-x:hidden}
+a{color:inherit}
+button{font:inherit;cursor:pointer}
+[hidden]{display:none !important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.wrap{max-width:var(--col);margin:0 auto;padding:40px 16px 40px}
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.wm{font-weight:var(--wm-w);font-size:22px;color:var(--h);text-transform:var(--wm-case);letter-spacing:.01em;display:flex;align-items:center;gap:8px;text-decoration:none}
+.wm .ico{width:26px;height:26px;border-radius:0;background:var(--accent);color:var(--btn-ink);display:grid;place-items:center;font-size:15px;font-weight:900}
+.wm small{font-size:11px;color:var(--muted);font-weight:400;text-transform:none}
+.top .tag{color:var(--muted);font-size:13px}
+.top .right{margin-left:auto;font-size:13px;color:var(--muted);display:flex;gap:14px}
+.top .right a{text-decoration:none;border-bottom:1px solid var(--line)}
+.top .right a:hover{color:var(--text)}
+
+.terms h1{font-size:26px;font-weight:900;color:var(--h);margin:0 0 4px;line-height:1.1;text-transform:none}
+.terms .date{color:var(--muted);font-size:13px;margin-bottom:20px}
+.terms h2{font-size:16px;color:var(--h);margin:20px 0 6px;font-weight:700}
+.terms p{margin:0 0 8px;font-size:14px;color:var(--text)}
+.terms p a{color:var(--h);text-decoration:none;border-bottom:1px solid var(--accent)}
+.terms .warn{font-size:12px;color:var(--muted);border:1px dashed var(--line);padding:8px 10px;margin-top:20px}
+
+.foot{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+.foot .r{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap}
+.foot a,.foot .linkish{color:inherit;text-decoration:underline;background:none;border:0;padding:0;font:inherit}
+.foot a:hover,.foot .linkish:hover{color:var(--text)}
+
+.btn{height:40px;background:var(--btn);color:var(--btn-ink);border:0;border-radius:0;padding:0 18px;font:inherit;font-weight:700;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+.btn:hover{background:var(--btn-hover)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--input-border)}
+.consent{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--card);border-top:2px solid var(--accent);padding:14px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
+.consent-text{max-width:640px;font-size:13px;color:var(--muted)}
+.consent-text strong{display:block;color:var(--text);font-size:14px}
+.consent-text p{margin:0}
+.consent-btns{display:flex;gap:8px}
+
+@media (max-width:600px){
+  .wrap{padding:16px 16px 32px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="wm" href="./" title="Back to the Clip Yoink downloader"><span class="ico" aria-hidden="true">Y</span>Clip Yoink <small>v0.1.0</small></a>
+    <span class="tag">Kick clip downloader</span>
+    <nav class="right" aria-label="Site"><a href="./" title="Back to the downloader">Downloader</a></nav>
+  </header>
+
+  <main class="terms">
+    <h1>Terms of use</h1>
+    <div class="date">Version dated October 10, 2026</div>
+
+    <h2>1. What this is</h2>
+    <p>Clip Yoink is a convenience tool that lets you save a copy of a public Kick clip to your own device. It is not affiliated with, endorsed by or connected to Kick or any streamer.</p>
+
+    <h2>2. We do not own the clips</h2>
+    <p>Every clip belongs to the streamer who broadcast it, the person who clipped it and/or Kick under their terms. We claim no rights in any clip, title, thumbnail or channel artwork. Nothing passes through or is stored on our servers: the page runs in your browser and fetches from Kick's own public servers.</p>
+
+    <h2>3. Your responsibility</h2>
+    <p>Only download content you have the right to download. Respect Kick's Terms of Service and Community Guidelines, the rights of creators, and copyright law where you live. Do not re-upload, monetise or redistribute clips without permission from the rights holder. You are solely responsible for what you do with a saved file.</p>
+
+    <h2>4. No endorsement</h2>
+    <p>The tool does not review, curate, host or condone any clip. A clip appearing here means only that Kick served it publicly at that moment.</p>
+
+    <h2>5. Takedowns</h2>
+    <p>We host nothing, so there is nothing here to remove; rights holders should use Kick's own reporting and DMCA process. If you believe the tool itself infringes something, contact the site owner via the <a href="https://kick.com/bookhockeys" target="_blank" rel="noopener" title="The BookHockeys channel on kick.com">BookHockeys Kick channel</a>.</p>
+
+    <h2>6. No warranty</h2>
+    <p>Provided as-is. It may stop working whenever Kick changes something. No guarantee of availability or fitness for any purpose.</p>
+
+    <h2>7. Privacy</h2>
+    <p>No accounts, no uploads, no server-side logs of clip links. Google Analytics records page views and three events (resolve, download, error) with a method label only - never a clip link, id, title or channel. Visitors in Europe are asked first; the Cookies link below changes your choice.</p>
+
+    <h2>8. Changes</h2>
+    <p>These terms may change; the date above is the version.</p>
+
+    <div class="warn">Written in plain language on purpose. If anything here is unclear, ask on the <a href="https://kick.com/bookhockeys" target="_blank" rel="noopener" title="The BookHockeys channel on kick.com">BookHockeys Kick channel</a>.</div>
+  </main>
+
+  <footer class="foot">
+    <span>Nothing is uploaded or stored. Your browser talks to Kick directly.</span>
+    <span class="r">
+      <a href="./" title="Back to the downloader">Downloader</a>
+      <button type="button" id="cookieReset" class="linkish" title="Change your analytics cookie choice">Cookies</button>
+      <span>Clip Yoink v0.1.0</span>
+    </span>
+  </footer>
+</div>
+
+<div class="consent" id="consentBanner" hidden role="dialog" aria-labelledby="consentTitle" aria-describedby="consentDesc">
+  <div class="consent-text">
+    <strong id="consentTitle">Cookies for analytics</strong>
+    <p id="consentDesc">Clip Yoink uses Google Analytics to count anonymous visits. No ads, no personal data sold, never a clip link. The page works either way.</p>
+  </div>
+  <div class="consent-btns">
+    <button class="btn ghost" id="consentReject" type="button" title="No analytics cookies">Reject</button>
+    <button class="btn" id="consentAccept" type="button" title="Allow anonymous analytics">Accept</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var banner = $('consentBanner');
+  function record(state) {
+    try { if (window.gtag) window.gtag('consent', 'update', { 'analytics_storage': state }); } catch (e) {}
+    try { localStorage.setItem('greenline-consent', state); } catch (e) {}
+    banner.hidden = true;
+  }
+  $('consentAccept').addEventListener('click', function () { record('granted'); });
+  $('consentReject').addEventListener('click', function () { record('denied'); });
+  $('cookieReset').addEventListener('click', function () {
+    try { localStorage.removeItem('greenline-consent'); } catch (e) {}
+    try { if (window.gtag) window.gtag('consent', 'update', { 'analytics_storage': 'denied' }); } catch (e) {}
+    banner.hidden = false;
+  });
+  if (window.__needsConsent) banner.hidden = false;
+})();
+</script>
+</body>
+</html>

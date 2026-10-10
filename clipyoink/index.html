@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="version" content="0.1.0" />
+<title>Clip Yoink v0.1.0 - Kick clip downloader | BookHockeys</title>
+
+<meta name="description" content="Download any public Kick clip as an MP4. Paste the clip link and Clip Yoink saves Kick's own MP4 when there is one, or rebuilds it from the clip's stream segments right in your browser with no re-encode. Nothing is uploaded, no sign-in, not affiliated with Kick." />
+<meta name="theme-color" content="#000000" />
+<meta name="color-scheme" content="dark" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="https://bookhockeys.com/clipyoink/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="Clip Yoink - Kick clip downloader" />
+<meta property="og:description" content="Paste a Kick clip link, get the MP4. Nothing is uploaded - your browser talks to Kick directly." />
+<meta property="og:url" content="https://bookhockeys.com/clipyoink/" />
+<meta property="og:image" content="https://bookhockeys.com/clipyoink/og-card.png" />
+<meta property="og:image:secure_url" content="https://bookhockeys.com/clipyoink/og-card.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content="Clip Yoink - YOINK THAT CLIP. in heavy white type with an orange bar on black." />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Clip Yoink - Kick clip downloader" />
+<meta name="twitter:description" content="Paste a Kick clip link, get the MP4. Nothing is uploaded - your browser talks to Kick directly." />
+<meta name="twitter:image" content="https://bookhockeys.com/clipyoink/og-card.png" />
+<meta name="twitter:image:alt" content="Clip Yoink - Kick clip downloader" />
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Clip Yoink" />
+<meta name="application-name" content="Clip Yoink" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<link rel="preconnect" href="https://kick.com" crossorigin />
+<link rel="preconnect" href="https://clips.kick.com" crossorigin />
+
+<!-- Analytics: per-device opt-out first (?ga=off / ?ga=on, remembered in
+     localStorage), then Google Consent Mode v2 defaults, then GA4. The
+     consent decision shares the site-wide `greenline-consent` key, so a
+     choice made on any bookhockeys.com page applies here too. -->
+<script>
+(function () {
+  var GA_ID = 'G-DYME377V2S';
+  var OPT_KEY = 'bookhockeys_ga_optout';
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.get('ga') === 'off') localStorage.setItem(OPT_KEY, '1');
+    if (p.get('ga') === 'on') localStorage.removeItem(OPT_KEY);
+  } catch (e) {}
+  var optedOut = false;
+  try { optedOut = localStorage.getItem(OPT_KEY) === '1'; } catch (e) {}
+  window['ga-disable-' + GA_ID] = optedOut;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  if (optedOut) return;
+
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  // EU/EEA/UK/CH by browser timezone: no IP lookup, errs toward asking.
+  var tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  var euExtras = ['Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+    'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'];
+  var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+  var saved = null;
+  try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+  if (saved === 'granted' || (saved !== 'denied' && !likelyEU)) {
+    gtag('consent', 'update', { 'analytics_storage': 'granted' });
+  } else if (saved !== 'denied') {
+    window.__needsConsent = true;
+  }
+
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  document.head.appendChild(s);
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+})();
+</script>
+
+<style>
+/* Design direction C "Poster" - tokens copied from the design switcher's .mock.dir-c */
+:root{
+  --bg:#000;--card:#0d0d0f;--card-border:#202024;--card-r:4px;--card-pad:24px;
+  --text:#e8e6e3;--h:#fff;--muted:#8b8884;--line:#202024;
+  --input-bg:transparent;--input-ink:#fff;--input-border:#fff;--input-r:0;--input-h:56px;
+  --btn:#ff5e3a;--btn-hover:#ff7a5c;--btn-ink:#000;--btn-r:0;--btn-h:56px;--accent:#ff5e3a;
+  --col:760px;--font:"Segoe UI",system-ui,Arial,sans-serif;
+  --h1:56px;--h1-w:900;--sub:16px;--sub-w:400;--wm-w:900;--wm-case:uppercase;
+  --ok-bg:rgba(255,94,58,.12);--ok-bd:rgba(255,94,58,.45);
+  --err-bg:rgba(255,94,58,.12);--err-bd:rgba(255,94,58,.55);--err-tx:#ffb3a3;--chip:#141416;
+}
+
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;overflow-x:hidden}
+a{color:inherit}
+button{font:inherit;cursor:pointer}
+[hidden]{display:none !important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+.wrap{max-width:var(--col);margin:0 auto;padding:40px 16px 40px}
+
+/* header row */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.wm{font-weight:var(--wm-w);font-size:22px;color:var(--h);text-transform:var(--wm-case);letter-spacing:.01em;display:flex;align-items:center;gap:8px;text-decoration:none}
+.wm .ico{width:26px;height:26px;border-radius:0;background:var(--accent);color:var(--btn-ink);display:grid;place-items:center;font-size:15px;font-weight:900}
+.wm small{font-size:11px;color:var(--muted);font-weight:400;text-transform:none}
+.top .tag{color:var(--muted);font-size:13px}
+.top .right{margin-left:auto;font-size:13px;color:var(--muted);display:flex;gap:14px}
+.top .right a{text-decoration:none;border-bottom:1px solid var(--line)}
+.top .right a:hover{color:var(--text)}
+
+h1{font-size:var(--h1);font-weight:var(--h1-w);color:var(--h);margin:0 0 4px;line-height:1.1;text-transform:var(--wm-case)}
+.sub{font-size:var(--sub);font-weight:var(--sub-w);color:var(--muted);margin:0 0 20px}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent);border-radius:var(--card-r);padding:var(--card-pad);margin:0 0 16px}
+.lbl{display:block;font-size:14px;color:var(--muted);margin-bottom:8px}
+.group{display:flex;gap:12px}
+.inp{flex:1 1 auto;width:100%;height:var(--input-h);background:var(--input-bg);color:var(--input-ink);border:solid var(--input-border);border-width:0 0 2px 0;border-radius:var(--input-r);padding:0 14px 0 0;font:inherit;font-size:20px;outline:none;text-overflow:ellipsis}
+.inp::placeholder{color:#8a8f95}
+.inp:focus{border-bottom-color:var(--accent)}
+.inp:focus-visible{outline:none}
+.btn{height:var(--btn-h);background:var(--btn);color:var(--btn-ink);border:0;border-radius:var(--btn-r);padding:0 22px;font:inherit;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;cursor:pointer;text-decoration:none;flex:0 0 auto}
+.btn:hover{background:var(--btn-hover)}
+.btn svg{width:18px;height:18px;flex:0 0 auto}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--input-border)}
+.btn.ghost:hover{background:rgba(255,255,255,.06)}
+.help{font-size:12px;color:var(--muted);margin-top:8px}
+.help code{color:var(--text);font-family:Consolas,ui-monospace,monospace;font-size:12px;overflow-wrap:anywhere}
+.disc{font-size:12px;color:var(--muted);margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.disc a{color:var(--text);text-decoration:none;border-bottom:1px solid var(--muted)}
+
+/* status strip */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:4px}
+.step{font-size:12px;color:var(--muted);padding:10px 10px;border:1px solid var(--line);border-radius:calc(var(--card-r) / 2);background:var(--chip);overflow-wrap:anywhere}
+.step b{display:block;color:var(--text);font-size:13px;margin-bottom:2px}
+.step.done{border-color:var(--ok-bd)}
+.step.done b::before{content:"\2713  ";color:var(--accent)}
+.step.on{border-color:var(--accent);background:var(--ok-bg)}
+.step.on b::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:7px;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.bar{height:6px;background:var(--chip);border:1px solid var(--line);border-radius:3px;margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s ease}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--muted)}
+.row .sp{margin-left:auto}
+
+/* result */
+.res{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.res.two{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+.vid{aspect-ratio:16 / 9;background:radial-gradient(ellipse at 30% 30%,#2a3240 0%,#0d1015 65%);border-radius:0;border:1px solid var(--line);position:relative;overflow:hidden;align-self:start}
+.vid video{position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain;display:block}
+.vid .pill{position:absolute;left:10px;top:10px;display:flex;gap:6px;pointer-events:none;transition:opacity .15s}
+.vid .pill span{background:rgba(0,0,0,.65);color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;border:1px solid rgba(255,255,255,.15)}
+.vid .pill span.m{background:#b3261e;border-color:#b3261e;font-weight:700}
+.vid .dur{position:absolute;right:10px;top:10px;background:rgba(0,0,0,.75);color:#fff;font-size:12px;padding:2px 7px;border-radius:3px;font-family:Consolas,ui-monospace,monospace;pointer-events:none;transition:opacity .15s}
+.vid:hover .pill,.vid:hover .dur,.vid.playing .pill,.vid.playing .dur{opacity:0}
+.info .who{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.info .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#5b7cff,#9b5bff);flex:0 0 auto;overflow:hidden}
+.info .av img{width:100%;height:100%;object-fit:cover;display:block}
+.info .who b{color:var(--h);font-size:16px;display:block;overflow-wrap:anywhere}
+.info .who b a{text-decoration:none}
+.info .who b a:hover{text-decoration:underline}
+.info .who span{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.info .who span a{color:var(--text);text-decoration:none}
+.info .who span a:hover{text-decoration:underline}
+.info h2{font-size:18px;margin:0 0 10px;color:var(--h);font-weight:600;overflow-wrap:anywhere}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px 12px;font-size:13px}
+.facts div{color:var(--muted)}
+.facts div b{display:block;color:var(--text);font-weight:600}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.acts .btn{flex:1 1 160px}
+.made{font-size:12px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
+.made i{font-style:normal;color:var(--accent)}
+
+/* notice + error */
+.notice{display:flex;gap:12px;align-items:center;background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:calc(var(--card-r) / 1.5);padding:10px 14px;font-size:13px;margin-bottom:16px}
+.notice a{color:var(--text)}
+.notice .x{margin-left:auto;color:var(--muted);cursor:pointer;background:none;border:0;padding:0 2px;font-size:18px;line-height:1}
+.notice .x:hover{color:var(--text)}
+.err{background:var(--err-bg);border:1px solid var(--err-bd);color:var(--err-tx);border-radius:calc(var(--card-r) / 1.5);padding:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.err > div{flex:1 1 240px}
+.err b{color:#fff;display:block;margin-bottom:2px}
+.err .btn{margin-left:auto;height:36px;padding:0 14px}
+
+/* guide */
+.guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.g{background:var(--card);border:1px solid var(--card-border);border-radius:var(--card-r);padding:18px}
+.g .n{width:30px;height:30px;border-radius:0;background:var(--accent);color:var(--btn-ink);display:grid;place-items:center;font-weight:800;margin-bottom:10px}
+.g b{color:var(--h);display:block;margin-bottom:4px}
+.g p{margin:0;font-size:13px;color:var(--muted)}
+.g .share{display:inline-flex;align-items:center;gap:6px;margin-top:10px;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--text);background:var(--chip)}
+.g .share svg{width:13px;height:13px}
+
+/* footer */
+.foot{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+.foot .r{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap}
+.foot a,.foot .linkish{color:inherit;text-decoration:underline;background:none;border:0;padding:0;font:inherit}
+.foot a:hover,.foot .linkish:hover{color:var(--text)}
+
+/* consent banner (site-wide `greenline-consent` key) */
+.consent{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--card);border-top:2px solid var(--accent);padding:14px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
+.consent-text{max-width:640px;font-size:13px;color:var(--muted)}
+.consent-text strong{display:block;color:var(--text);font-size:14px}
+.consent-text p{margin:0}
+.consent-btns{display:flex;gap:8px}
+.consent-btns .btn{height:40px;padding:0 18px}
+
+/* phone: input group stacks, steps 2-up, guide 1-up, result one column */
+@media (max-width:600px){
+  .wrap{padding:16px 16px 32px}
+  h1{font-size:calc(var(--h1) * .8)}
+  .group{flex-direction:column;gap:8px}
+  .inp,.btn{border-radius:calc(var(--card-r) / 1.5)}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .res.two{grid-template-columns:minmax(0,1fr)}
+  .guide{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){
+  .step.on b::before{animation:none}
+  .bar i{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="wm"><span class="ico" aria-hidden="true">Y</span>Clip Yoink <small>v0.1.0</small></div>
+    <span class="tag">Kick clip downloader</span>
+    <nav class="right" aria-label="Site"><a href="terms.html" title="What you agree to when you use Clip Yoink, in plain language">Terms</a></nav>
+  </header>
+
+  <main>
+    <h1>Yoink that clip.</h1>
+    <p class="sub">Paste a Kick clip link, get the MP4. Nothing is uploaded - your browser talks to Kick directly.</p>
+
+    <form class="card" id="form" autocomplete="off" novalidate>
+      <label class="lbl" for="url">Paste a Kick clip link</label>
+      <div class="group">
+        <input class="inp" id="url" type="text" inputmode="url" spellcheck="false" autocapitalize="off" autocorrect="off"
+          placeholder="https://kick.com/streamer_one/clips/clip_01A2BCD3EF4GHI5JKMNLOP67QR"
+          title="A link to one Kick clip. Pasting starts the download straight away; if you type it, press Enter. Press / anywhere to jump here." />
+        <button class="btn" id="go" type="submit" title="Fetch the clip from Kick and turn it into an MP4 on this device">
+          <svg id="goIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
+          <span id="goTxt">Download</span>
+        </button>
+      </div>
+      <div class="help">Works with <code>kick.com/&lt;channel&gt;/clips/clip_...</code> and <code>kick.com/&lt;channel&gt;?clip=clip_...</code>. Pasting runs it right away.</div>
+      <div class="disc">Clips belong to their creators and to Kick. This tool only saves a copy to your device. By using it you agree to the <a href="terms.html" title="Read the terms of use">Terms</a>.</div>
+    </form>
+
+    <section class="card" id="work" hidden aria-live="polite" aria-label="Progress">
+      <div class="steps">
+        <div class="step" id="s1"><b>Reading clip</b><span></span></div>
+        <div class="step" id="s2"><b>Fetching video</b><span></span></div>
+        <div class="step" id="s3"><b>Building MP4</b><span></span></div>
+        <div class="step" id="s4"><b>Ready</b><span></span></div>
+      </div>
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="row"><span id="expect"></span><span class="sp" title="Esc stops the download and frees the memory it was using">Esc to cancel</span></div>
+    </section>
+
+    <div class="notice" id="notice" hidden role="note">
+      <span>Clips belong to their creators. Please respect Kick's rules and the streamer's rights. <a href="terms.html" title="Read the terms of use">Terms</a></span>
+      <button class="x" id="noticeX" type="button" title="Hide this note - it only shows once" aria-label="Hide this note">&times;</button>
+    </div>
+
+    <section class="card" id="result" hidden aria-label="Your clip">
+      <div class="res two">
+        <div class="vid" id="vid">
+          <video id="video" controls playsinline preload="metadata"></video>
+          <div class="pill"><span id="resPill" hidden></span><span class="m" id="maturePill" hidden title="Kick marks this clip as mature (18+)">18+</span></div>
+          <div class="dur" id="durPill"></div>
+        </div>
+        <div class="info">
+          <div class="who">
+            <div class="av" id="avatar"></div>
+            <div><b><a id="chLink" href="#" target="_blank" rel="noopener" title="Open this channel on kick.com"></a></b><span id="whoLine"></span></div>
+          </div>
+          <h2 id="title"></h2>
+          <div class="facts">
+            <div>Duration<b id="fDur"></b></div>
+            <div>Views<b id="fViews"></b></div>
+            <div>Likes<b id="fLikes"></b></div>
+            <div>Clipped<b id="fDate"></b></div>
+            <div>File<b id="fFile"></b></div>
+            <div>Video<b id="fVideo">-</b></div>
+          </div>
+          <div class="acts">
+            <button class="btn" id="saveBtn" type="button" title="Save the MP4 to this device. On iPhone, Safari opens the share sheet - pick Save Video.">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>Save MP4
+            </button>
+            <button class="btn ghost" id="copyBtn" type="button" title="Copy the clip's kick.com link (not a link to this page), for sharing">Copy clip link</button>
+            <a class="btn ghost" id="openBtn" href="#" target="_blank" rel="noopener" title="Open the clip on kick.com in a new tab">Open on Kick</a>
+          </div>
+          <div class="made" id="made"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="error" hidden role="alert">
+      <div class="err">
+        <div><b id="errTitle"></b><span id="errText"></span></div>
+        <button class="btn" id="errBtn" type="button"></button>
+      </div>
+    </section>
+
+    <section class="guide" id="guide" aria-label="How it works">
+      <div class="g"><div class="n">1</div><b>Get the link</b><p>On kick.com open the clip and press Share, then Copy link.</p>
+        <span class="share" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>Share &middot; Copy link</span></div>
+      <div class="g"><div class="n">2</div><b>Paste it here</b><p>Paste the link above. It starts on its own; press Download if you typed it.</p></div>
+      <div class="g"><div class="n">3</div><b>Save the MP4</b><p>Press Save MP4. On iPhone, Safari shows the share sheet - pick Save Video.</p></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>Nothing is uploaded or stored. Your browser talks to Kick directly.</span>
+    <span class="r">
+      <a href="terms.html" title="Read the terms of use">Terms</a>
+      <button type="button" id="cookieReset" class="linkish" title="Change your analytics cookie choice">Cookies</button>
+      <span>Clip Yoink v0.1.0</span>
+    </span>
+  </footer>
+</div>
+
+<div class="consent" id="consentBanner" hidden role="dialog" aria-labelledby="consentTitle" aria-describedby="consentDesc">
+  <div class="consent-text">
+    <strong id="consentTitle">Cookies for analytics</strong>
+    <p id="consentDesc">Clip Yoink uses Google Analytics to count anonymous visits. No ads, no personal data sold, never a clip link. The page works either way.</p>
+  </div>
+  <div class="consent-btns">
+    <button class="btn ghost" id="consentReject" type="button" title="No analytics cookies">Reject</button>
+    <button class="btn" id="consentAccept" type="button" title="Allow anonymous analytics">Accept</button>
+  </div>
+</div>
+
+<script src="kick.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var APP = { name: 'Clip Yoink', version: '0.1.0' };
+  var NOTICE_KEY = 'clipyoink.notice.v1';
+  var K = window.ClipKick;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var el = {
+    form: $('form'), url: $('url'), go: $('go'), goIco: $('goIco'), goTxt: $('goTxt'),
+    work: $('work'), s: [$('s1'), $('s2'), $('s3'), $('s4')], bar: $('barFill'), expect: $('expect'),
+    notice: $('notice'), noticeX: $('noticeX'),
+    result: $('result'), vid: $('vid'), video: $('video'), resPill: $('resPill'), maturePill: $('maturePill'), durPill: $('durPill'),
+    avatar: $('avatar'), chLink: $('chLink'), whoLine: $('whoLine'), title: $('title'),
+    fDur: $('fDur'), fViews: $('fViews'), fLikes: $('fLikes'), fDate: $('fDate'), fFile: $('fFile'), fVideo: $('fVideo'),
+    saveBtn: $('saveBtn'), copyBtn: $('copyBtn'), openBtn: $('openBtn'), made: $('made'),
+    error: $('error'), errTitle: $('errTitle'), errText: $('errText'), errBtn: $('errBtn'),
+    guide: $('guide')
+  };
+
+  var ICON_DL = '<path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/>';
+  var ICON_X = '<path d="M6 6l12 12M18 6L6 18"/>';
+  var DOT = ' \u00b7 ';
+
+  var run = null;        // { ctl } for the run in flight, or null
+  var out = null;        // { url, name, method, clip } for the current result
+  var errAction = null;  // what the error card's button does
+
+  /* ---------- small helpers ---------- */
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  function track(name, params) {
+    // Method / stage labels only. Never a clip URL, id, title or channel.
+    try { if (window.gtag) window.gtag('event', name, params || {}); } catch (e) {}
+  }
+  function durBucket(s) {
+    return s <= 30 ? '0-30s' : s <= 60 ? '31-60s' : s <= 120 ? '61-120s' : '121s+';
+  }
+  function mb(n, dp) { return (n / 1e6).toFixed(dp || 0); }
+  function clock(s) {
+    s = Math.max(0, Math.round(s || 0));
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+  function durText(s) { s = Math.round(s || 0); return s < 60 ? s + ' s' : clock(s); }
+  function num(n) { return Number(n || 0).toLocaleString('en-US'); }
+  function dateText(iso) {
+    var d = new Date(iso);
+    if (isNaN(d)) return '-';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function link(href, text, title) {
+    var a = document.createElement('a');
+    a.href = href; a.target = '_blank'; a.rel = 'noopener'; a.textContent = text;
+    if (title) a.title = title;
+    return a;
+  }
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { reject(new Error('Could not load ' + src)); };
+      document.head.appendChild(s);
+    });
+  }
+  var remuxReady = null;
+  function loadRemux() {
+    if (window.ClipRemux) return Promise.resolve(window.ClipRemux);
+    if (!remuxReady) {
+      remuxReady = loadScript('remux.js').then(function () { return window.ClipRemux; });
+      remuxReady.catch(function () { remuxReady = null; });
+    }
+    return remuxReady;
+  }
+  function saveBlobUrl(url, name) {
+    var a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  /* ---------- views ---------- */
+  function setView(v) {
+    el.work.hidden = v !== 'working';
+    el.result.hidden = v !== 'done';
+    el.error.hidden = v !== 'error';
+    el.guide.hidden = !(v === 'idle' || v === 'error');
+    if (v !== 'done') el.notice.hidden = true;
+    var busy = v === 'working';
+    el.goIco.innerHTML = busy ? ICON_X : ICON_DL;
+    el.goTxt.textContent = busy ? 'Cancel' : 'Download';
+    el.go.title = busy ? 'Stop this download (Esc)' : 'Fetch the clip from Kick and turn it into an MP4 on this device';
+  }
+
+  function step(i, state, sub) {
+    var s = el.s[i];
+    s.className = 'step' + (state ? ' ' + state : '');
+    if (sub != null) s.querySelector('span').textContent = sub;
+  }
+  function bar(pct) { el.bar.style.width = Math.max(0, Math.min(100, pct)) + '%'; }
+
+  var ERRORS = {
+    bad_url: {
+      title: 'That doesn\'t look like a Kick clip link',
+      text: 'It should look like kick.com/<channel>/clips/clip_... - copy it from the clip\'s Share button.',
+      btn: 'Retry', tip: 'Put the cursor back in the link box'
+    },
+    not_found: {
+      title: 'Kick says this clip doesn\'t exist (or it\'s private)',
+      text: 'Check the link on kick.com - the clip may have been deleted or set to private.',
+      btn: 'Retry', tip: 'Ask Kick about this clip again'
+    },
+    network: {
+      title: 'Couldn\'t reach Kick - try again in a moment',
+      text: 'If it keeps happening, open kick.com once in a new tab (it may want to check your browser), then come back and retry.',
+      btn: 'Retry', tip: 'Ask Kick about this clip again'
+    },
+    build: {
+      title: 'Couldn\'t build the MP4 in this browser - download the raw .ts instead',
+      text: 'VLC and most video players open .ts files. It is the same video and sound, just not wrapped as an MP4.',
+      btn: 'Download .ts', tip: 'Save the clip as the raw MPEG-TS stream Kick serves'
+    }
+  };
+
+  function showError(kind, action) {
+    var e = ERRORS[kind];
+    el.errTitle.textContent = e.title;
+    el.errText.textContent = e.text;
+    el.errBtn.textContent = e.btn;
+    el.errBtn.title = e.tip;
+    errAction = action || (kind === 'bad_url' ? focusInput : start);
+    setView('error');
+  }
+
+  function focusInput() { el.url.focus(); el.url.select(); }
+
+  /* ---------- result ---------- */
+  function clearResult() {
+    if (out && out.url) URL.revokeObjectURL(out.url);
+    out = null;
+    el.video.pause();
+    el.video.removeAttribute('src');
+    el.video.removeAttribute('poster');
+    try { el.video.load(); } catch (e) {}
+    el.vid.classList.remove('playing');
+  }
+
+  function showResult(clip, blob, method, extra) {
+    clearResult();
+    var url = URL.createObjectURL(blob);
+    var name = K.fileName(clip, 'mp4');
+    out = { url: url, name: name, method: method, clip: clip, info: extra.info || null };
+
+    if (clip.thumbnail) el.video.poster = clip.thumbnail;
+    el.video.src = url;
+    el.resPill.hidden = true;
+    el.maturePill.hidden = !clip.mature;
+    el.durPill.textContent = clock(clip.duration);
+
+    el.avatar.textContent = '';
+    if (clip.channel.avatar) {
+      var img = document.createElement('img');
+      img.alt = ''; img.src = clip.channel.avatar; img.referrerPolicy = 'no-referrer';
+      img.onerror = function () { img.remove(); };
+      el.avatar.appendChild(img);
+    }
+    el.chLink.textContent = clip.channel.name || clip.channel.slug;
+    el.chLink.href = K.channelPageUrl(clip.channel.slug);
+    el.whoLine.textContent = '';
+    if (clip.category) el.whoLine.appendChild(document.createTextNode(clip.category));
+    if (clip.creator.slug) {
+      el.whoLine.appendChild(document.createTextNode((clip.category ? DOT : '') + 'clipped by '));
+      el.whoLine.appendChild(link(K.channelPageUrl(clip.creator.slug), clip.creator.name || clip.creator.slug, 'Open the clipper\'s channel on kick.com'));
+    }
+    el.title.textContent = clip.title || 'Untitled clip';
+
+    el.fDur.textContent = durText(clip.duration);
+    el.fViews.textContent = num(clip.views);
+    el.fLikes.textContent = num(clip.likes);
+    el.fDate.textContent = dateText(clip.createdAt);
+    el.fFile.textContent = mb(blob.size, 1) + ' MB MP4';
+    el.fVideo.textContent = '-';
+
+    el.openBtn.href = K.clipPageUrl(clip.channel.slug, clip.id);
+    el.copyBtn.textContent = 'Copy clip link';
+
+    el.made.textContent = '';
+    el.made.appendChild(document.createTextNode(method === 'direct' ? 'Saved Kick\'s own MP4 directly.' : 'Rebuilt from '));
+    if (method !== 'direct') {
+      var n = document.createElement('i'); n.textContent = String(extra.segments);
+      el.made.appendChild(n);
+      el.made.appendChild(document.createTextNode(' stream segments, no re-encode.'));
+    }
+    el.made.appendChild(document.createTextNode(' Filename '));
+    var f = document.createElement('i'); f.textContent = name;
+    el.made.appendChild(f);
+
+    setView('done');
+    if (!lsGet(NOTICE_KEY)) {
+      el.notice.hidden = false;
+      lsSet(NOTICE_KEY, '1');   // one time per browser
+    }
+  }
+
+  el.video.addEventListener('loadedmetadata', function () {
+    var h = el.video.videoHeight;
+    if (!h || !out) return;
+    var info = out.info || {};
+    var res = h + 'p' + (info.fps ? info.fps : '');
+    el.resPill.textContent = res;
+    el.resPill.hidden = false;
+    var codec = info.codec === 'h264' ? 'H.264 ' : info.codec ? info.codec.toUpperCase() + ' ' : '';
+    el.fVideo.textContent = codec + res;
+  });
+  el.video.addEventListener('play', function () { el.vid.classList.add('playing'); });
+  el.video.addEventListener('pause', function () { el.vid.classList.remove('playing'); });
+  el.video.addEventListener('ended', function () { el.vid.classList.remove('playing'); });
+
+  el.saveBtn.addEventListener('click', function () {
+    if (!out) return;
+    saveBlobUrl(out.url, out.name);
+    track('clipyoink_download', { method: out.method, duration_bucket: durBucket(out.clip.duration) });
+  });
+
+  el.copyBtn.addEventListener('click', function () {
+    if (!out) return;
+    var text = K.clipPageUrl(out.clip.channel.slug, out.clip.id);
+    function done(ok) {
+      el.copyBtn.textContent = ok ? 'Copied' : 'Copy failed';
+      setTimeout(function () { el.copyBtn.textContent = 'Copy clip link'; }, 1600);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+    } else {
+      done(false);
+    }
+  });
+
+  el.noticeX.addEventListener('click', function () { el.notice.hidden = true; });
+  el.errBtn.addEventListener('click', function () { if (errAction) errAction(); });
+
+  /* ---------- the pipeline ---------- */
+  function cancel() {
+    if (!run) return;
+    var r = run;
+    run = null;
+    r.ctl.abort();
+    if (r.remuxing && window.ClipRemux) window.ClipRemux.abort();
+    setView('idle');
+  }
+
+  async function start() {
+    var parsed = K.parseClipInput(el.url.value);
+    if (run) cancel();
+    if (!parsed) {
+      track('clipyoink_resolve', { result: 'bad_url' });
+      showError('bad_url');
+      return;
+    }
+    clearResult();
+    var token = { ctl: new AbortController(), remuxing: false };
+    var signal = token.ctl.signal;
+    run = token;
+    function alive() { return run === token && !signal.aborted; }
+
+    setView('working');
+    step(0, 'on', 'Asking Kick...');
+    step(1, '', '');
+    step(2, '', '');
+    step(3, '', '');
+    bar(3);
+    el.expect.textContent = '';
+
+    try {
+      /* 1. metadata */
+      var meta = await K.fetchClip(parsed.id, signal);
+      if (!alive()) return;
+      if (meta.status === 'missing') {
+        track('clipyoink_resolve', { result: 'not_found' });
+        run = null; showError('not_found'); return;
+      }
+      if (meta.status !== 'ok') {
+        track('clipyoink_resolve', { result: 'network' });
+        run = null; showError('network'); return;
+      }
+      track('clipyoink_resolve', { result: 'ok' });
+      var clip = meta.clip;
+      step(0, 'done', (clip.channel.name || clip.channel.slug) + DOT + clock(clip.duration));
+      step(1, 'on', 'Checking for Kick\'s own MP4...');
+      bar(5);
+
+      /* 2a. fast path: Kick's ready-made MP4 */
+      var head = await K.checkTmpMp4(clip.id, signal);
+      if (!alive()) return;
+      if (head.hit) {
+        if (head.bytes) el.expect.textContent = 'Expected size about ' + mb(head.bytes) + ' MB';
+        step(2, '', 'not needed');
+        try {
+          var direct = await K.fetchBytes(K.tmpMp4Url(clip.id), {
+            signal: signal, expected: head.bytes,
+            onProgress: function (got, total) {
+              if (!alive()) return;
+              step(1, 'on', 'Kick has an MP4 ready' + DOT + mb(got) + (total ? ' of ' + mb(total) : '') + ' MB');
+              if (total) bar(5 + 90 * got / total);
+            }
+          });
+          if (!alive()) return;
+          step(1, 'done', 'Kick had an MP4 ready');
+          step(2, 'done', 'skipped');
+          step(3, 'on', 'saving...');
+          bar(96);
+          var blob = new Blob([direct.bytes], { type: 'video/mp4' });
+          direct = null;
+          run = null;
+          showResult(clip, blob, 'direct', {});
+          return;
+        } catch (err) {
+          if (!alive()) return;
+          console.warn('[' + APP.name + '] Kick\'s MP4 failed, rebuilding from segments instead:', err);
+        }
+      }
+
+      /* 2b. remux path: byte-range segments -> ffmpeg.wasm stream copy */
+      step(1, 'on', 'Reading the playlist...');
+      step(2, '', '');
+      var segs;
+      try {
+        segs = await K.fetchPlaylist(clip.playlist, signal);
+      } catch (err) {
+        if (!alive()) return;
+        console.error(err);
+        track('clipyoink_error', { stage: 'playlist' });
+        run = null; showError('network'); return;
+      }
+      if (!alive()) return;
+      var expected = K.expectedBytes(segs);
+      if (expected) el.expect.textContent = 'Expected size about ' + mb(expected) + ' MB';
+      step(1, 'on', '0 of ' + segs.length + ' segments' + (expected ? DOT + '0 of ' + mb(expected) + ' MB' : ''));
+
+      // Start the converter download alongside the segments. It is fetched only
+      // on this path, verified, and cached by the browser after the first time.
+      var coreErr = null;
+      var coreDone = loadRemux().then(function (R) {
+        return R.load(function (p) {
+          if (alive() && !token.remuxing) step(2, '', 'Loading the converter (one-time, ~32 MB) ' + Math.round(p * 100) + '%');
+        });
+      }).then(function () {
+        if (alive() && !token.remuxing) step(2, '', 'Converter ready');
+      }, function (err) { coreErr = err; });
+
+      var ts;
+      try {
+        ts = await K.fetchSegments(segs, {
+          signal: signal, concurrency: 4, retries: 3,
+          onProgress: function (d, t, b) {
+            if (!alive()) return;
+            step(1, 'on', d + ' of ' + t + ' segments' + DOT + mb(b) + (expected ? ' of ' + mb(expected) : '') + ' MB');
+            bar(5 + 75 * d / t);
+          }
+        });
+      } catch (err) {
+        if (!alive()) return;
+        console.error(err);
+        track('clipyoink_error', { stage: 'segments' });
+        run = null; showError('network'); return;
+      }
+      if (!alive()) return;
+      step(1, 'done', segs.length + ' segments' + DOT + mb(ts.length) + ' MB');
+      step(2, 'on', 'Loading the converter...');
+      bar(80);
+
+      await coreDone;
+      if (!alive()) return;
+      var tsName = K.fileName(clip, 'ts');
+      if (coreErr) {
+        console.error(coreErr);
+        track('clipyoink_error', { stage: 'core' });
+        var tsBytes = ts;
+        ts = null;
+        run = null;
+        showError('build', function () { saveTs(tsBytes, tsName, clip); });
+        return;
+      }
+
+      step(2, 'on', 'stream copy, no re-encode');
+      token.remuxing = true;
+      var made;
+      try {
+        made = await window.ClipRemux.remux(ts, function (p) {
+          if (!alive()) return;
+          step(2, 'on', 'stream copy, no re-encode' + DOT + Math.round(p * 100) + '%');
+          bar(80 + 16 * p);
+        });
+      } catch (err) {
+        if (!alive()) return;
+        console.error(err);
+        track('clipyoink_error', { stage: 'remux' });
+        var back = err && err.ts;
+        run = null;
+        showError('build', function () {
+          if (back) { saveTs(back, tsName, clip); return; }
+          // The worker died with the bytes inside it: fetch them again (mostly from cache).
+          el.errBtn.disabled = true; el.errBtn.textContent = 'Fetching...';
+          K.fetchSegments(segs, {}).then(function (b) { back = b; saveTs(b, tsName, clip); }, function () {
+            showError('network');
+          }).finally(function () { el.errBtn.disabled = false; el.errBtn.textContent = ERRORS.build.btn; });
+        });
+        return;
+      } finally {
+        ts = null;
+        token.remuxing = false;
+      }
+      if (!alive()) return;
+      step(2, 'done', 'stream copy, no re-encode');
+      step(3, 'on', 'saving...');
+      bar(98);
+      var mp4 = new Blob([made.mp4], { type: 'video/mp4' });
+      made.mp4 = null;
+      run = null;
+      showResult(clip, mp4, 'remux', { segments: segs.length, info: made.info });
+    } catch (err) {
+      if (!alive()) return;
+      console.error(err);
+      track('clipyoink_error', { stage: 'unexpected' });
+      run = null;
+      showError('network');
+    }
+  }
+
+  function saveTs(bytes, name, clip) {
+    var url = URL.createObjectURL(new Blob([bytes], { type: 'video/mp2t' }));
+    saveBlobUrl(url, name);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+    track('clipyoink_download', { method: 'ts', duration_bucket: durBucket(clip.duration) });
+  }
+
+  /* ---------- input ---------- */
+  el.form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (run) cancel(); else start();
+  });
+
+  // D6: a pasted clip link runs immediately; typed text still needs Enter.
+  el.url.addEventListener('paste', function (e) {
+    var text = (e.clipboardData || window.clipboardData).getData('text');
+    if (!K.parseClipInput(text)) return;
+    e.preventDefault();
+    el.url.value = text.trim();
+    start();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && run) { e.preventDefault(); cancel(); return; }
+    if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      var t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      e.preventDefault();
+      focusInput();
+    }
+  });
+
+  window.addEventListener('pagehide', function () { if (out && out.url) URL.revokeObjectURL(out.url); });
+
+  /* ---------- consent banner (site-wide `greenline-consent` key) ---------- */
+  (function () {
+    var banner = $('consentBanner');
+    function record(state) {
+      try { if (window.gtag) window.gtag('consent', 'update', { 'analytics_storage': state }); } catch (e) {}
+      lsSet('greenline-consent', state);
+      banner.hidden = true;
+    }
+    $('consentAccept').addEventListener('click', function () { record('granted'); });
+    $('consentReject').addEventListener('click', function () { record('denied'); });
+    $('cookieReset').addEventListener('click', function () {
+      try { localStorage.removeItem('greenline-consent'); } catch (e) {}
+      try { if (window.gtag) window.gtag('consent', 'update', { 'analytics_storage': 'denied' }); } catch (e) {}
+      banner.hidden = false;
+    });
+    if (window.__needsConsent) banner.hidden = false;
+  })();
+
+  setView('idle');
+})();
+</script>
+</body>
+</html>
