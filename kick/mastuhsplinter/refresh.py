@@ -190,23 +190,69 @@ def step_nights(D, rows):
     try:
         raw = fetch(SOURCE + 'emotes.json')
         json.loads(raw.decode('utf-8'))
-        (NIGHTS_DIR / 'emotes.json').write_bytes(raw)
+        ef = NIGHTS_DIR / 'emotes.json'
+        if not ef.exists() or ef.read_bytes() != raw:
+            ef.write_bytes(raw)
     except Exception as e:
         problems.append('emotes.json: %s (kept previous)' % why(e))
     return added
 
 
+def _ts(iso):
+    try:
+        return datetime.datetime.strptime(iso[:19], '%Y-%m-%dT%H:%M:%S').timestamp()
+    except (TypeError, ValueError):
+        return None
+
+
+def merge_bans(stored, recs):
+    """Merge kicklogz ban records into the stored list, by kicklogz `id`.
+
+    kicklogz can list one ban twice with timestamps a second apart, so the id is
+    the identity. A stored entry keeps its time; permanent/unbanned_at follow the
+    live record. Stored entries without an id are matched on channel + moderator
+    + time within 5 s and get the id written onto them; leftovers that still
+    match an id'd entry that way are duplicates and are dropped. Entries that
+    kicklogz stops listing are kept (the record only grows)."""
+    def same(a, b):
+        ta, tb = _ts(a['at']), _ts(b['at'])
+        return a['channel'] == b['channel'] and a['by'] == b['by'] and ta is not None and tb is not None and abs(ta - tb) <= 5
+
+    by_id, legacy = {}, []
+    for b in stored:
+        if b.get('id'):
+            by_id.setdefault(b['id'], dict(b))
+        else:
+            legacy.append(dict(b))
+    for r in recs:
+        rid, at = r.get('id'), r.get('created_at')
+        if not rid or not at:
+            continue
+        live = {'id': rid, 'channel': (r.get('channel_name') or '').lower(), 'by': r.get('banned_by_username'), 'at': at,
+                'permanent': r.get('permanent'), 'unbanned_at': r.get('unbanned_at')}
+        if rid not in by_id:
+            hit = next((b for b in legacy if same(b, live)), None)
+            if hit:
+                legacy.remove(hit)
+            by_id[rid] = hit or dict(live)
+        cur = by_id[rid]
+        cur['permanent'], cur['unbanned_at'] = live['permanent'], live['unbanned_at']
+    legacy = [b for b in legacy if not any(same(b, x) for x in by_id.values())]
+    keys = ('id', 'channel', 'by', 'at', 'permanent', 'unbanned_at')
+    out = [{k: b.get(k) for k in keys} for b in by_id.values()] + [{k: b.get(k) for k in keys[1:]} for b in legacy]
+    for i, b in zip(by_id, out):
+        b['id'] = i
+    out.sort(key=lambda b: (b['at'], b['channel']))
+    return out
+
+
 def step_bans(D):
-    """(c1) kicklogz ban records."""
+    """(c1) kicklogz ban records, merged by id."""
     try:
         recs = kicklogz_pages('kick-profile/%s/bans' % SUBJECT_SLUG)
-        bans = [{'channel': (b.get('channel_name') or '').lower(), 'by': b.get('banned_by_username'),
-                 'at': b.get('created_at'), 'permanent': b.get('permanent'), 'unbanned_at': b.get('unbanned_at')}
-                for b in recs if b.get('created_at')]
-        if not bans and D['bans']:
+        if not recs and D['bans']:
             raise ValueError('kicklogz returned no bans, previously %d' % len(D['bans']))
-        bans.sort(key=lambda b: (b['at'], b['channel']))
-        D['bans'] = bans
+        D['bans'] = merge_bans(D['bans'], recs)
     except Exception as e:
         problems.append('kicklogz bans: %s (kept previous)' % why(e))
 
@@ -362,7 +408,6 @@ def main():
     ch = D['channels']
     D['totals'] = {'subs': sum(r['subs'] for r in ch), 'kicks': sum(r['kicks'] for r in ch), 'channels': len(ch),
                    'subChannels': sum(1 for r in ch if r['subs']), 'kickChannels': sum(1 for r in ch if r['kicks'])}
-    D['generated'] = TODAY
 
     # same top-level key order as before; new keys go after "chat"
     order = list(old.keys())
@@ -371,8 +416,16 @@ def main():
             order.insert(order.index('chat') + 1 if 'chat' in order else len(order), k)
     out = {k: D[k] for k in order if k in D}
     out.update({k: v for k, v in D.items() if k not in out})
-    with open(DATA, 'w', encoding='utf-8', newline='\n') as f:
-        f.write(json.dumps(out, indent=1, ensure_ascii=False))
+
+    # Write only when something other than the date moved, so the daily job
+    # commits only on real changes.
+    def body(d):
+        return json.dumps({k: v for k, v in d.items() if k != 'generated'}, indent=1, ensure_ascii=False)
+    changed = body(out) != body(old)
+    if changed:
+        out['generated'] = TODAY
+        with open(DATA, 'w', encoding='utf-8', newline='\n') as f:
+            f.write(json.dumps(out, indent=1, ensure_ascii=False))
 
     try:
         r = subprocess.run([sys.executable, '-I', str(HERE / 'build-nights.py')], cwd=str(HERE),
@@ -389,6 +442,8 @@ def main():
 
     for p in problems:
         log('WARN ' + p)
+    if not changed:
+        log('no change')
     t = D['totals']
     log('refresh %s: subs %d->%d, kicks %d->%d, channels %d->%d, bans %d->%d, nights %d->%d (+%s), hisChat %d->%d (+%d new), followers %s, %d warning(s)' % (
         TODAY, before['subs'], t['subs'], before['kicks'], t['kicks'], before['channels'], t['channels'],

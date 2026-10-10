@@ -9,7 +9,7 @@ import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 D = json.load(open(os.path.join(HERE, 'data.json'), encoding='utf-8'))
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 BASE = 'https://bookhockeys.com/kick/mastuhsplinter/'
 MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 

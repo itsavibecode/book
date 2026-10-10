@@ -24,7 +24,7 @@ In about a month (18 Sept to 7 Oct 2026) one Kick account gifted 2,830 subs and 
 
 ## Daily refresh
 
-`refresh.py` re-reads the public sources once a day so the page keeps up while the story is still moving. Each source is fetched on its own; if one refuses, the run logs it and keeps yesterday's data for that part.
+`refresh.py` re-reads the public sources once a day so the page keeps up while the story is still moving. Each source is fetched on its own; if one refuses, the run logs it and keeps yesterday's data for that part. If nothing but the date would change, `data.json` is left untouched and the run prints "no change", so the workflow only commits when something actually moved; the "Data as of" date is the last day something changed. Ban records are merged by their kicklogz id, so a ban that kicklogz lists twice counts once.
 
 - **The source site** (`mastuhsplinter.nedbot.site/data.json`): which channels are in the table, their message counts and night links. Any night page the source adds is parsed, its transcript saved to `nights/`, its page generated here, and its URL added to the sitemap.
 - **kicklogz**: ban records, KICKs per channel, and each channel's top-gifters row for gifted subs and the last gift date. Twigggs, ZuesIRL and nedx keep the source site's leaderboard or own-count figure.
@@ -60,6 +60,9 @@ What stays manual: the X posts, the on-stream quotes, the timeline in "What happ
 - A link from the home links row, if the page is meant to be found from the home page.
 
 ## Changelog
+
+### v0.2.1 - 2026-10-10
+Housekeeping on the daily refresh. kicklogz listed one old ban twice, a second apart, which made the count read 53; bans are now matched by their kicklogz id, so it reads 52 and stays there. The refresh also no longer rewrites the data file when nothing but the date moved, so the site only gets a new commit when something really changed. The "chat bans in a day" figure no longer flickers from 51 to 48 while the page loads.
 
 ### v0.2.0 - 2026-10-10
 The story is still moving: new bans are still being logged and the source site may add more nights. Rather than rebuild the page by hand each time, a small script now re-reads kicklogz, Kick and the source site every morning and updates the numbers, the ban chart, the follower counts and any new night pages on its own. The date it last ran shows under the headline numbers. Also new is "In his own chat": what people have been posting in the account's own Kick channel since the chargebacks came out, which is mostly praise ("you are my hero", "absolute cinema") and requests to gift their friends. Kick only shows the latest 25 messages, so the list grows a little every day. Bans logged after the main wave now show in an "after" column on the chart instead of dropping off it.

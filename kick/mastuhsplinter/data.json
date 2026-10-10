@@ -45,7 +45,7 @@
   {
    "slug": "wvagabond",
    "name": "wvagabond",
-   "followers": 44676,
+   "followers": 44675,
    "verified": true,
    "pic": "https://files.kick.com/images/user/23111830/profile_image/conversion/2cd7ae86-ab46-4b54-a8e0-8f0668b33faa-fullsize.webp",
    "subs": 399,
@@ -113,7 +113,7 @@
   {
    "slug": "sam",
    "name": "Sam",
-   "followers": 117490,
+   "followers": 117491,
    "verified": true,
    "pic": "https://files.kick.com/images/user/336946/profile_image/conversion/3bcd1076-84a3-4f3c-97fc-dd22366d2aaa-fullsize.webp",
    "subs": 240,
@@ -584,7 +584,7 @@
   {
    "slug": "nicklee",
    "name": "NickLee",
-   "followers": 49516,
+   "followers": 49515,
    "verified": true,
    "pic": "https://files.kick.com/images/user/58371235/profile_image/conversion/ce5c4a72-52d9-42f9-839a-1b972c60a840-fullsize.webp",
    "subs": 1,
@@ -659,7 +659,7 @@
   {
    "slug": "chelsealeeart",
    "name": "ChelseaLeeart",
-   "followers": 47784,
+   "followers": 47783,
    "verified": true,
    "pic": "https://files.kick.com/images/user/78389503/profile_image/conversion/27e2e4ce-142a-4cdf-bdef-f37163efc8e9-fullsize.webp",
    "subs": 0,
@@ -689,6 +689,7 @@
  ],
  "bans": [
   {
+   "id": "897aff0d-d816-42b9-89a5-171ca9744c96",
    "channel": "furacao_embrasado",
    "by": "Furacao_Embrasado",
    "at": "2026-08-21T07:58:13.000Z",
@@ -696,13 +697,7 @@
    "unbanned_at": null
   },
   {
-   "channel": "furacao_embrasado",
-   "by": "Furacao_Embrasado",
-   "at": "2026-08-21T07:58:14.000Z",
-   "permanent": 1,
-   "unbanned_at": null
-  },
-  {
+   "id": "16ba8784-da00-44b3-ad88-c2046f03410e",
    "channel": "liftedsenses",
    "by": "Daskillz",
    "at": "2026-09-19T11:31:32.000Z",
@@ -710,6 +705,7 @@
    "unbanned_at": null
   },
   {
+   "id": "3120ff80-45fa-40be-93ec-1a73b8c39b64",
    "channel": "zuesirl",
    "by": "DepressionSocks",
    "at": "2026-10-09T16:12:10.000Z",
@@ -717,6 +713,7 @@
    "unbanned_at": "2026-10-09T16:12:13.000Z"
   },
   {
+   "id": "b41d24ff-e212-4664-9f1f-d83ce60320a4",
    "channel": "mexicanandy",
    "by": "MexicanAndy",
    "at": "2026-10-09T16:41:34.000Z",
@@ -724,6 +721,7 @@
    "unbanned_at": null
   },
   {
+   "id": "b2152674-c10c-4ecb-a14d-6551cf04878b",
    "channel": "sonjavd",
    "by": "sonjavd",
    "at": "2026-10-09T18:28:28.000Z",
@@ -731,6 +729,7 @@
    "unbanned_at": null
   },
   {
+   "id": "3a49561f-a1b3-42e6-8a25-de67a1b27cae",
    "channel": "razorredd",
    "by": "Nikione0one",
    "at": "2026-10-09T19:56:01.000Z",
@@ -738,6 +737,7 @@
    "unbanned_at": null
   },
   {
+   "id": "62030ed9-5b0a-4559-ae72-4e598df817ab",
    "channel": "missmoarta",
    "by": "Taedrun",
    "at": "2026-10-09T20:02:58.000Z",
@@ -745,6 +745,7 @@
    "unbanned_at": null
   },
   {
+   "id": "5d498305-7520-4f0f-bf66-0b361f3b9d16",
    "channel": "kreationx",
    "by": "Nikione0one",
    "at": "2026-10-09T20:04:20.000Z",
@@ -752,6 +753,7 @@
    "unbanned_at": null
   },
   {
+   "id": "2d87d2ad-a043-4432-b08d-14d2963be838",
    "channel": "yourbudde",
    "by": "Taedrun",
    "at": "2026-10-09T20:04:47.000Z",
@@ -759,6 +761,7 @@
    "unbanned_at": null
   },
   {
+   "id": "04b2bf34-f089-446f-87aa-94868c29a610",
    "channel": "pinkyuwu",
    "by": "Nikione0one",
    "at": "2026-10-09T20:04:49.000Z",
@@ -766,6 +769,7 @@
    "unbanned_at": null
   },
   {
+   "id": "836ad142-474b-4f4b-99eb-4753cb664d78",
    "channel": "zakiman",
    "by": "Taedrun",
    "at": "2026-10-09T20:05:01.000Z",
@@ -773,6 +777,7 @@
    "unbanned_at": null
   },
   {
+   "id": "733df3b5-bea5-402a-958a-13306fccb596",
    "channel": "hillszeee",
    "by": "Taedrun",
    "at": "2026-10-09T20:05:12.000Z",
@@ -780,6 +785,7 @@
    "unbanned_at": null
   },
   {
+   "id": "33dcaeea-3ed3-4b30-9253-91f785187c46",
    "channel": "mavomusic",
    "by": "Taedrun",
    "at": "2026-10-09T20:05:20.000Z",
@@ -787,6 +793,7 @@
    "unbanned_at": null
   },
   {
+   "id": "3bb1c782-e11d-4bb8-8ce5-380559a9eb13",
    "channel": "emeraldhoney",
    "by": "Nikione0one",
    "at": "2026-10-09T20:05:28.000Z",
@@ -794,6 +801,7 @@
    "unbanned_at": null
   },
   {
+   "id": "e82d1e42-327d-4ddd-a18a-908a4762dbf0",
    "channel": "newyorklegend",
    "by": "Taedrun",
    "at": "2026-10-09T20:05:34.000Z",
@@ -801,6 +809,7 @@
    "unbanned_at": null
   },
   {
+   "id": "a3f1f309-1e00-48ee-999b-1c1812fbc34e",
    "channel": "theleaway",
    "by": "Nikione0one",
    "at": "2026-10-09T20:06:32.000Z",
@@ -808,6 +817,7 @@
    "unbanned_at": null
   },
   {
+   "id": "a00c5a5c-8d28-4151-842d-3f67523b580e",
    "channel": "flexiefae",
    "by": "Nikione0one",
    "at": "2026-10-09T20:06:53.000Z",
@@ -815,6 +825,7 @@
    "unbanned_at": null
   },
   {
+   "id": "18b1aa15-e4b1-4b04-8cc4-812b06c1b096",
    "channel": "professorstalke",
    "by": "Nikione0one",
    "at": "2026-10-09T20:08:10.000Z",
@@ -822,6 +833,7 @@
    "unbanned_at": null
   },
   {
+   "id": "eb1cfbb5-9472-44ee-bd83-90053e698723",
    "channel": "yourbudde",
    "by": "Nikione0one",
    "at": "2026-10-09T20:08:54.000Z",
@@ -829,6 +841,7 @@
    "unbanned_at": null
   },
   {
+   "id": "08113553-87bb-49dd-9875-f815eea9de0c",
    "channel": "fluff",
    "by": "Nikione0one",
    "at": "2026-10-09T20:09:12.000Z",
@@ -836,6 +849,7 @@
    "unbanned_at": null
   },
   {
+   "id": "d0f496ce-852b-4f89-aa53-d29d2739f150",
    "channel": "lexipi",
    "by": "Nikione0one",
    "at": "2026-10-09T20:09:26.000Z",
@@ -843,6 +857,7 @@
    "unbanned_at": null
   },
   {
+   "id": "bf3d9243-b7d1-4c1a-a2fd-984cc42800b1",
    "channel": "slashley",
    "by": "Nikione0one",
    "at": "2026-10-09T20:09:39.000Z",
@@ -850,6 +865,7 @@
    "unbanned_at": null
   },
   {
+   "id": "0d3fc19c-a03c-44e8-bb92-d5c01327ae6f",
    "channel": "destrox88x",
    "by": "Nikione0one",
    "at": "2026-10-09T20:09:51.000Z",
@@ -857,6 +873,7 @@
    "unbanned_at": null
   },
   {
+   "id": "ae9faa48-7e41-4872-9b42-86a3f980b0b1",
    "channel": "littlestryker",
    "by": "Nikione0one",
    "at": "2026-10-09T20:11:27.000Z",
@@ -864,6 +881,7 @@
    "unbanned_at": null
   },
   {
+   "id": "9371da61-fec1-4d34-854b-f730763bac5b",
    "channel": "ladysirene",
    "by": "Nikione0one",
    "at": "2026-10-09T20:15:17.000Z",
@@ -871,6 +889,7 @@
    "unbanned_at": null
   },
   {
+   "id": "2c5d38b5-8980-4a4b-8f1d-73735af0d7a6",
    "channel": "leatherneck223",
    "by": "Nikione0one",
    "at": "2026-10-09T20:16:31.000Z",
@@ -878,6 +897,7 @@
    "unbanned_at": null
   },
   {
+   "id": "e05d86b4-5612-4387-9105-f5b03e58d4fc",
    "channel": "robbiecrow",
    "by": "Nikione0one",
    "at": "2026-10-09T20:16:45.000Z",
@@ -885,6 +905,7 @@
    "unbanned_at": null
   },
   {
+   "id": "882fec0b-aa1c-47c3-8784-7940a2208838",
    "channel": "sergeantgpa",
    "by": "Nikione0one",
    "at": "2026-10-09T20:16:57.000Z",
@@ -892,6 +913,7 @@
    "unbanned_at": null
   },
   {
+   "id": "99c763fd-534b-44e4-a994-f872942dd4df",
    "channel": "cosmote06",
    "by": "Nikione0one",
    "at": "2026-10-09T20:17:09.000Z",
@@ -899,6 +921,7 @@
    "unbanned_at": null
   },
   {
+   "id": "eb519986-29fc-4b44-a563-94a32dcf3963",
    "channel": "kaptainkoolwhip",
    "by": "Nikione0one",
    "at": "2026-10-09T20:17:40.000Z",
@@ -906,6 +929,7 @@
    "unbanned_at": null
   },
   {
+   "id": "0abc2033-b35f-4f60-880c-85e647fdac31",
    "channel": "mskatastrophic",
    "by": "Nikione0one",
    "at": "2026-10-09T20:20:52.000Z",
@@ -913,6 +937,7 @@
    "unbanned_at": null
   },
   {
+   "id": "2dab5d0e-f9b3-454b-950c-ba0f6955ae8a",
    "channel": "zbourne",
    "by": "Nikione0one",
    "at": "2026-10-09T20:21:20.000Z",
@@ -920,6 +945,7 @@
    "unbanned_at": null
   },
   {
+   "id": "4c4bdfc3-d18f-4c47-bc89-71a18043cac0",
    "channel": "sagibearius",
    "by": "Nikione0one",
    "at": "2026-10-09T20:21:36.000Z",
@@ -927,6 +953,7 @@
    "unbanned_at": null
   },
   {
+   "id": "d6654c56-4f4d-42e4-92e4-22e357cac087",
    "channel": "katrespawns",
    "by": "Nikione0one",
    "at": "2026-10-09T20:21:53.000Z",
@@ -934,6 +961,7 @@
    "unbanned_at": null
   },
   {
+   "id": "0d0c74b3-41db-4066-8a8d-67f45dccccf6",
    "channel": "acmeoilpainting",
    "by": "Nikione0one",
    "at": "2026-10-09T20:22:10.000Z",
@@ -941,6 +969,7 @@
    "unbanned_at": null
   },
   {
+   "id": "4c08c0ad-4075-4132-bee8-bcd070154701",
    "channel": "pardonthedistraction",
    "by": "Nikione0one",
    "at": "2026-10-09T20:22:22.000Z",
@@ -948,6 +977,7 @@
    "unbanned_at": null
   },
   {
+   "id": "a7917cba-8fc4-4974-a520-0c8da59d7e5b",
    "channel": "mrsacmedecor",
    "by": "Nikione0one",
    "at": "2026-10-09T20:22:40.000Z",
@@ -955,6 +985,7 @@
    "unbanned_at": null
   },
   {
+   "id": "280805e4-8148-41b1-931f-e334e4f6cb23",
    "channel": "delizious",
    "by": "Nikione0one",
    "at": "2026-10-09T20:22:47.000Z",
@@ -962,6 +993,7 @@
    "unbanned_at": null
   },
   {
+   "id": "50c060f1-dd2f-4469-8b2f-4d77bf595d6b",
    "channel": "kaypikefashion",
    "by": "Nikione0one",
    "at": "2026-10-09T20:22:58.000Z",
@@ -969,6 +1001,7 @@
    "unbanned_at": null
   },
   {
+   "id": "3b38688b-c83b-4f58-99b6-b33b8f44f265",
    "channel": "n0rway",
    "by": "Nikione0one",
    "at": "2026-10-09T20:23:12.000Z",
@@ -976,6 +1009,7 @@
    "unbanned_at": null
   },
   {
+   "id": "0391d8d1-ae4d-4a91-b5d0-928d3ff8b223",
    "channel": "teatimewithtarryn",
    "by": "Nikione0one",
    "at": "2026-10-09T20:24:45.000Z",
@@ -983,6 +1017,7 @@
    "unbanned_at": null
   },
   {
+   "id": "e8deef20-e461-4673-9d11-bc9b162e6989",
    "channel": "andromeda-creates",
    "by": "Nikione0one",
    "at": "2026-10-09T20:24:57.000Z",
@@ -990,6 +1025,7 @@
    "unbanned_at": null
   },
   {
+   "id": "37155972-3db5-4418-80c2-239d8cae8cbb",
    "channel": "naomybiz",
    "by": "Nikione0one",
    "at": "2026-10-09T20:25:45.000Z",
@@ -997,6 +1033,7 @@
    "unbanned_at": null
   },
   {
+   "id": "c84d8eea-2150-4747-bb34-0e55f41a2ef9",
    "channel": "misboo",
    "by": "Misboo",
    "at": "2026-10-09T20:25:58.000Z",
@@ -1004,6 +1041,7 @@
    "unbanned_at": null
   },
   {
+   "id": "543566f1-b299-4c1a-a710-b78c7c412c76",
    "channel": "amylyng",
    "by": "Nikione0one",
    "at": "2026-10-09T20:26:17.000Z",
@@ -1011,6 +1049,7 @@
    "unbanned_at": null
   },
   {
+   "id": "865a984f-c3a6-4e52-9677-511ff7c9d995",
    "channel": "therealshookon3",
    "by": "Nikione0one",
    "at": "2026-10-09T20:54:59.000Z",
@@ -1018,6 +1057,7 @@
    "unbanned_at": "2026-10-09T20:55:20.000Z"
   },
   {
+   "id": "dded3f39-e90f-487a-9b26-9df7e67d62c8",
    "channel": "cryptexious",
    "by": "Cryptexious",
    "at": "2026-10-09T22:09:33.000Z",
@@ -1025,6 +1065,7 @@
    "unbanned_at": null
   },
   {
+   "id": "d188913b-5402-4b00-9ab1-e4f23fd34a1d",
    "channel": "trogan2000",
    "by": "Trogan2000",
    "at": "2026-10-10T00:45:46.000Z",
@@ -1032,6 +1073,7 @@
    "unbanned_at": null
   },
   {
+   "id": "944705d0-15ac-49b3-8037-fc8ac824373d",
    "channel": "gewn",
    "by": "Burner2030",
    "at": "2026-10-10T01:33:37.000Z",
@@ -1039,6 +1081,7 @@
    "unbanned_at": null
   },
   {
+   "id": "fcf75244-73f4-4ea0-82e1-5c770c22294b",
    "channel": "tiedyez",
    "by": "MikeTheFatman",
    "at": "2026-10-10T04:18:40.000Z",
@@ -1046,6 +1089,7 @@
    "unbanned_at": "2026-10-10T04:42:59.000Z"
   },
   {
+   "id": "4d4807e4-de71-4f16-bee0-2257cdf7e2a0",
    "channel": "kayladelancey",
    "by": "SassyMissLexy",
    "at": "2026-10-10T06:27:17.000Z",
@@ -1053,6 +1097,7 @@
    "unbanned_at": null
   },
   {
+   "id": "35b11a9a-515c-4594-9a23-5832d34a5e2d",
    "channel": "burgerplanet",
    "by": "BurgerPlanet",
    "at": "2026-10-10T16:05:31.000Z",
