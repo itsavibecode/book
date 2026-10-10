@@ -117,6 +117,23 @@ it. Only ship clips you have the rights to redistribute.
   is capped at 60 s and long renders warn on iOS.
 - **First load is ~32 MB.** Cached immutably after that.
 
+## Analytics
+
+GA4 `G-DYME377V2S`, the same property as the rest of bookhockeys.com. Two things are
+measured: the page view, and a `baited_render` event when a render **finishes** — with
+the preset id, bait kind, mode, duration, watermark flag and version. Page views say
+people arrived; the render event says they actually made something.
+
+No bait, no filename and no rendered video is ever sent anywhere. That part of the page
+is unchanged: ffmpeg runs in the browser and your media never leaves it.
+
+- **Per-device opt-out:** `?ga=off` once on this device, remembered in localStorage;
+  `?ga=on` to undo. Used because the house IP is dynamic, so an IP filter cannot work.
+- **Consent Mode v2:** storage defaults to denied. Visitors whose browser timezone looks
+  EU/EEA/UK/CH get a banner and must opt in; everyone else is granted without one. The
+  decision is stored under the site-wide `greenline-consent` key, so a choice made on any
+  bookhockeys.com page carries over here. "Cookie settings" in the footer reopens it.
+
 ## What this is not
 
 A clean-room rebuild of a page layout and an ffmpeg recipe. None of the original site's
@@ -126,6 +143,17 @@ art and all the code are ours.
 ---
 
 ## Changelog
+
+### v0.1.4 — 2026-10-10
+
+Added analytics, because there was no way to tell whether anyone was using the thing.
+
+- GA4 on the shared bookhockeys property, with the standard per-device `?ga=off` opt-out
+  and Consent Mode v2 defaults copied from the newer pages on the site.
+- A `baited_render` event on a **completed** render, carrying preset, bait kind, mode,
+  duration, watermark and version. A page view only proves someone looked.
+- Footer "Cookie settings" link reopens the consent banner.
+- Media still never leaves the browser; only the counters are new.
 
 ### v0.1.3 — 2026-09-20
 
