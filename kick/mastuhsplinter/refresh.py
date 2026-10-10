@@ -9,11 +9,15 @@ Pulls, each step on its own so one failing source never aborts the run:
   c. kicklogz: ban records, KICKs sent, and each channel's top-gifters row
   d. Kick's channel API: the subject's followers and ban flag, every channel's profile
   e. the subject's own Kick channel chat (latest 25 messages), merged into hisChat
+  f. kicklogz's cross-channel chat search for the username, merged into mentions
+     (guests get 25 searches a day and a 6-month window; on any refusal the
+     stored mentions are kept)
 Everything hand-written (X posts, quotes, timeline, evidence, assumptions) is left alone.
 Then rewrites data.json, regenerates the night pages and, when nights were added, the sitemap.
 """
 import datetime
 import html
+import http.cookiejar
 import json
 import re
 import subprocess
@@ -325,6 +329,143 @@ def step_his_chat(D):
     return new
 
 
+MENTIONS_FROM = '2026-09-01T00:00:00Z'
+MENTION_PAGES = 12          # 50 hits a page; each page may count as one guest search
+
+
+def _mention_key(m):
+    return (m['at'], m['channel'], m['user'], m['text'])
+
+
+def _first(d, *names):
+    for n in names:
+        v = d
+        for part in n.split('.'):
+            v = v.get(part) if isinstance(v, dict) else None
+        if v not in (None, ''):
+            return v
+    return None
+
+
+def _iso_z(v):
+    """kicklogz times ('2026-10-10T19:06:51.000Z' or '2026-10-10 19:06:51') -> '2026-10-10T19:06:51Z'."""
+    m = re.match(r'(\d{4}-\d\d-\d\d)[T ](\d\d:\d\d:\d\d)', str(v or ''))
+    return '%sT%sZ' % (m.group(1), m.group(2)) if m else None
+
+
+def step_mentions(D):
+    """(f) kicklogz chat search for the username across all channels, merged into mentions.
+
+    GET /search for the _csrf value and cookie, POST /api/search for a jobId, poll
+    /api/search/status/<id> until completed, follow data.cursor for more pages.
+    Gives up quietly (stored mentions kept) on any non-200, a Turnstile demand,
+    or a response shape it does not recognise. Returns the number of new rows."""
+    jar = http.cookiejar.CookieJar()
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+
+    def call(url, data=None, headers=None):
+        h = {'User-Agent': UA, 'Accept-Language': 'en-US,en;q=0.9', 'Accept': 'application/json'}
+        h.update(headers or {})
+        with opener.open(urllib.request.Request(url, data=data, headers=h), timeout=40) as r:
+            if r.status != 200:
+                raise ValueError('HTTP %d' % r.status)
+            return r.read().decode('utf-8', 'replace')
+
+    def refused(e):
+        if isinstance(e, urllib.error.HTTPError):
+            if e.code == 429:   # kicklogz answers in Turkish: daily search limit reached
+                return 'HTTP 429 (daily guest search limit reached)'
+            try:
+                body = e.read().decode('utf-8', 'replace')[:160]
+                body = body.encode('ascii', 'replace').decode('ascii')
+            except Exception:
+                body = ''
+            return 'HTTP %d%s' % (e.code, (' ' + body) if body else '')
+        return why(e)
+
+    stored = D.get('mentions') or []
+    now = datetime.datetime.now(datetime.timezone.utc)
+    floor = (now - datetime.timedelta(days=180)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    date_from = max(MENTIONS_FROM, floor)
+    # Once the stored list reaches back to the window start, a page with nothing
+    # new means the rest is already on file.
+    oldest = min((m['at'] for m in stored), default='9999')
+    start = datetime.datetime.strptime(date_from[:10], '%Y-%m-%d')
+    backfilled = oldest[:10] <= (start + datetime.timedelta(days=3)).strftime('%Y-%m-%d')
+    try:
+        page = call('https://kicklogz.com/search', headers={'Accept': 'text/html'})
+        m = re.search(r'name=["\']?_csrf["\']?[^>]*value=["\']([^"\']+)', page) or \
+            re.search(r'value=["\']([^"\']+)["\'][^>]*name=["\']?_csrf', page)
+        if not m:
+            raise ValueError('no _csrf on the search page')
+        token = m.group(1)
+    except Exception as e:
+        problems.append('kicklogz search page: %s (kept %d stored mentions)' % (refused(e), len(stored)))
+        return 0
+
+    found, cursor, pages, note = [], None, 0, ''
+    try:
+        while pages < MENTION_PAGES:
+            body = {'query': GIFTER, 'username': '', 'channelName': '',
+                    'dateFrom': date_from.replace('Z', '.000Z'), 'dateTo': now.strftime('%Y-%m-%dT%H:%M:%S.000Z'),
+                    'oldUsernames': [], 'excludeEmoteOnly': True, 'cursor': cursor, 'listIds': [], 'turnstileToken': ''}
+            time.sleep(0.4)
+            txt = call('https://kicklogz.com/api/search', data=json.dumps(body).encode('utf-8'), headers={
+                'Content-Type': 'application/json', 'CSRF-Token': token,
+                'Origin': 'https://kicklogz.com', 'Referer': 'https://kicklogz.com/search'})
+            if 'turnstile' in txt.lower():
+                raise ValueError('kicklogz asked for a Turnstile check')
+            job = (json.loads(txt) or {}).get('jobId')
+            if not job:
+                raise ValueError('no jobId in %s' % txt[:120])
+            st = {}
+            for _ in range(40):
+                time.sleep(1.5)
+                st = json.loads(call('https://kicklogz.com/api/search/status/%s' % job))
+                if st.get('status') in ('completed', 'failed', 'error'):
+                    break
+            if st.get('status') != 'completed':
+                raise ValueError('search job ended as %r' % st.get('status'))
+            data = st.get('data') or {}
+            hits = data.get('hits')
+            if not isinstance(hits, list):
+                raise ValueError('no hits list (keys: %s)' % ', '.join(sorted(data)))
+            pages += 1
+            fresh = 0
+            have = {_mention_key(x) for x in stored} | {_mention_key(x) for x in found}
+            for h in hits:
+                at = _iso_z(_first(h, 'created_at', 'createdAt', 'timestamp'))
+                ch = _first(h, 'channel_slug', 'channel_name', 'channelName', 'channel.slug', 'channel')
+                user = _first(h, 'sender_username', 'username', 'sender.username', 'user.username', 'sender_slug')
+                text = _first(h, 'content', 'message', 'text')
+                if not at or not isinstance(ch, str) or not isinstance(user, str) or not isinstance(text, str):
+                    raise ValueError('unrecognised hit shape (keys: %s)' % ', '.join(sorted(h)))
+                row = {'at': at, 'channel': ch.lower(), 'user': user, 'text': text.strip(),
+                       'self': user.lower() == SUBJECT_SLUG}
+                if _mention_key(row) not in have:
+                    have.add(_mention_key(row))
+                    found.append(row)
+                    fresh += 1
+            cursor = data.get('cursor')
+            if not cursor or not hits or (backfilled and not fresh):
+                break
+    except Exception as e:
+        note = refused(e)
+    if note and not found:
+        problems.append('kicklogz chat search: %s (kept %d stored mentions)' % (note, len(stored)))
+        return 0
+    if note:
+        problems.append('kicklogz chat search stopped after %d page(s): %s (merged what came back)' % (pages, note))
+    merged = {_mention_key(x): x for x in stored}
+    for r in found:
+        merged.setdefault(_mention_key(r), r)
+    D['mentions'] = sorted(merged.values(), key=lambda x: (x['at'], x['channel'], x['user']), reverse=True)
+    D.setdefault('mentionsSince', date_from[:10])
+    D['mentionsSource'] = 'kicklogz chat search'
+    log('kicklogz chat search: %d page(s), %d new' % (pages, len(found)))
+    return len(found)
+
+
 def build_channels(prev_channels, bans, rows, kicks, gifters, kick):
     prev = {r['slug']: r for r in prev_channels}
     out = []
@@ -381,7 +522,8 @@ def main():
     old = json.loads(DATA.read_text(encoding='utf-8'))
     D = json.loads(DATA.read_text(encoding='utf-8'))
     before = {'subs': old['totals']['subs'], 'kicks': old['totals']['kicks'], 'channels': old['totals']['channels'],
-              'bans': len(old['bans']), 'nights': len(old['nights']), 'hisChat': len(old.get('hisChat') or [])}
+              'bans': len(old['bans']), 'nights': len(old['nights']), 'hisChat': len(old.get('hisChat') or []),
+              'mentions': len(old.get('mentions') or [])}
 
     rows = step_source(old)
     try:
@@ -404,6 +546,11 @@ def main():
     except Exception as e:
         problems.append('channels: %s (kept previous)' % why(e))
     new_chat = step_his_chat(D)
+    try:
+        new_mentions = step_mentions(D)
+    except Exception as e:      # belt and braces: this step must never end the run
+        problems.append('mentions: %s (kept previous)' % why(e))
+        new_mentions = 0
 
     ch = D['channels']
     D['totals'] = {'subs': sum(r['subs'] for r in ch), 'kicks': sum(r['kicks'] for r in ch), 'channels': len(ch),
@@ -445,10 +592,11 @@ def main():
     if not changed:
         log('no change')
     t = D['totals']
-    log('refresh %s: subs %d->%d, kicks %d->%d, channels %d->%d, bans %d->%d, nights %d->%d (+%s), hisChat %d->%d (+%d new), followers %s, %d warning(s)' % (
+    log('refresh %s: subs %d->%d, kicks %d->%d, channels %d->%d, bans %d->%d, nights %d->%d (+%s), hisChat %d->%d (+%d new), mentions %d->%d (+%d new), followers %s, %d warning(s)' % (
         TODAY, before['subs'], t['subs'], before['kicks'], t['kicks'], before['channels'], t['channels'],
         before['bans'], len(D['bans']), before['nights'], len(D['nights']), ', '.join(added) or '0',
-        before['hisChat'], len(D.get('hisChat') or []), new_chat, D['subject'].get('followers'), len(problems)))
+        before['hisChat'], len(D.get('hisChat') or []), new_chat,
+        before['mentions'], len(D.get('mentions') or []), new_mentions, D['subject'].get('followers'), len(problems)))
     return 0
 
 

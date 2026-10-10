@@ -13,7 +13,7 @@ In about a month (18 Sept to 7 Oct 2026) one Kick account gifted 2,830 subs and 
 | File | Role |
 | --- | --- |
 | `index.html`, `styles.css`, `app.js` | The overview. Everything is rendered from `data.json`. |
-| `data.json` | Single source of truth: subject, assumptions, channel rows, ban records, X posts, on-stream quotes, his own channel chat (`hisChat`), evidence captions, nights manifest. |
+| `data.json` | Single source of truth: subject, assumptions, channel rows, ban records, X posts, on-stream quotes, his own channel chat (`hisChat`), messages naming him in other channels (`mentions`), evidence captions, nights manifest. |
 | `refresh.py` | The daily refresh (see below). Standard-library Python; run `python -I refresh.py` from this folder. |
 | `../../.github/workflows/kickpocketed-refresh.yml` | Runs `refresh.py` every day at 11:20 UTC (and on demand from the Actions tab), then commits and pushes if anything changed. |
 | `night.css`, `night.js`, `build-nights.py` | Night template and generator. Run `python build-nights.py` from this folder after editing the `nights` list in `data.json`; it rewrites one `<slug>-<date>.html` page per night. `refresh.py` runs it for you. |
@@ -29,6 +29,7 @@ In about a month (18 Sept to 7 Oct 2026) one Kick account gifted 2,830 subs and 
 - **The source site** (`mastuhsplinter.nedbot.site/data.json`): which channels are in the table, their message counts and night links. Any night page the source adds is parsed, its transcript saved to `nights/`, its page generated here, and its URL added to the sitemap.
 - **kicklogz**: ban records, KICKs per channel, and each channel's top-gifters row for gifted subs and the last gift date. Twigggs, ZuesIRL and nedx keep the source site's leaderboard or own-count figure.
 - **Kick**: follower counts, profile pictures and verified marks for every channel; the account's followers and platform-ban flag; and the latest 25 messages in his own channel chat, merged into `hisChat` so the list only grows.
+- **Across Kick chats** (kicklogz chat search): messages in any channel kicklogz logs that contain the username, from 1 Sept 2026 on. New rows are merged into `mentions`; nothing already on the page is dropped. kicklogz lets a guest run about 25 searches a day and asks some visitors for a Turnstile check, so this step often gets turned away; when it does, the run logs why and keeps what is already there. The starting set came from a saved kicklogz search on 10 Oct 2026 (427 messages, 6 to 10 Oct; the saved page only loaded that far back).
 
 What stays manual: the X posts, the on-stream quotes, the timeline in "What happened", the evidence frames, the assumptions ($4.99, 95%) and the page copy. Edit those in `data.json` or `index.html` by hand.
 
@@ -39,6 +40,7 @@ What stays manual: the X posts, the on-stream quotes, the timeline in "What happ
 - **Bans**: kicklogz `GET /api/kick-profile/mastuhsplinter/bans?page=N&limit=100`.
 - **Profile and follower counts**: `https://kick.com/api/v2/channels/<slug>`, refreshed daily.
 - **His own chat**: `https://kick.com/api/v2/channels/20492407/messages`, the latest 25 messages, collected daily from 10 Oct 2026. The praise, chargeback-talk and asks-for-gifts tags are keyword matches.
+- **Across Kick chats**: kicklogz `POST /api/search` (query = the username, all channels), polled through `/api/search/status/<jobId>`. kicklogz shows times in the viewer's local zone; the saved search was read in US Central (UTC-5), and each row's hidden UTC timestamp matched the night transcripts to the second, so the page stores and shows UTC. The same keyword tags as his own chat apply, plus "ban notice" for bot messages announcing a ban (bot lines get no keyword tags).
 - **Share at risk**: subs x $4.74. That is $4.99 less Kick's 5%, and it is the exact per-refund amount on wvagabond's Stripe ledger. It is labelled an estimate because only wvagabond has published a first-hand total.
 - **X posts**: read directly on X while signed in, 2026-10-10. Each carries a kind tag (first-hand number, names the gifter, claim, allegation, reaction). The stolen-card claim is labelled unverified; the $10,000+ figure is labelled a claim.
 
@@ -60,6 +62,9 @@ What stays manual: the X posts, the on-stream quotes, the timeline in "What happ
 - A link from the home links row, if the page is meant to be found from the home page.
 
 ## Changelog
+
+### v0.3.0 - 2026-10-10
+The reaction in other streamers' chats is part of the record, so the page now shows it. A new "Across Kick chats" section lists 427 messages from 52 channels that named the account between 6 and 10 Oct, found with kicklogz's chat search across all of Kick. You can narrow it to one channel or search the text, and each message carries the same simple keyword tags as his own chat, plus a "ban notice" tag when a bot announces a ban. None of the 427 are his own; if he ever posts one it is tagged. The daily refresh tries to add new ones, but kicklogz limits guest searches, so on days it is turned away the list simply stays as it was. The profile box also notes that the same handle has existed on Twitch since 2014.
 
 ### v0.2.1 - 2026-10-10
 Housekeeping on the daily refresh. kicklogz listed one old ban twice, a second apart, which made the count read 53; bans are now matched by their kicklogz id, so it reads 52 and stays there. The refresh also no longer rewrites the data file when nothing but the date moved, so the site only gets a new commit when something really changed. The "chat bans in a day" figure no longer flickers from 51 to 48 while the page loads.

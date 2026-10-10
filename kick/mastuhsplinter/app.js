@@ -77,6 +77,7 @@
     renderBans(D);
     renderQuotes(D);
     renderHisChat(D);
+    renderMentions(D);
     renderEvidence(D);
     renderNights(D);
   }
@@ -275,6 +276,16 @@
     [/charge ?back|refund|scam|fraud|stole|thief|recon|authorit/i, 'tag-amber', 'chargeback talk'],
     [/gift|sub\b|subs\b/i, 'tag-muted', 'asks for gifts'],
   ];
+  /* message text with [emote:id:name] tokens shown as Kick emote images */
+  function chatBody(text) {
+    return esc(text).replace(EMOTE_RX, function (all, id, name) {
+      return '<img class="emi" src="https://files.kick.com/emotes/' + id + '/fullsize" alt="' + name + '" title="' + name + '" loading="lazy">';
+    });
+  }
+  function keywordTags(text) {
+    var plain = String(text || '').replace(EMOTE_RX, ' ');
+    return TAGS.filter(function (t) { return t[0].test(plain); }).map(function (t) { return ' <span class="tag ' + t[1] + '">' + t[2] + '</span>'; }).join('');
+  }
   function niceDate(day) {
     var p = String(day || '').split('-');
     return p.length === 3 ? +p[2] + ' ' + MON3[+p[1] - 1] + ' ' + p[0] : esc(day);
@@ -288,16 +299,56 @@
     shown.sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; });
     $('hischatCount').textContent = num(all.length) + ' message' + (all.length === 1 ? '' : 's') + ' collected since ' + niceDate(D.hisChatSince) + '.';
     $('hischatList').innerHTML = shown.map(function (m) {
-      var plain = m.text.replace(EMOTE_RX, ' ');
-      var body = esc(m.text).replace(EMOTE_RX, function (all, id, name) {
-        return '<img class="emi" src="https://files.kick.com/emotes/' + id + '/fullsize" alt="' + name + '" title="' + name + '" loading="lazy">';
-      });
-      var tags = TAGS.filter(function (t) { return t[0].test(plain); }).map(function (t) { return ' <span class="tag ' + t[1] + '">' + t[2] + '</span>'; }).join('');
       var who = m.slug || m.user;
-      return '<li><time title="' + esc(utc(m.at)) + ' UTC">' + shortUtc(m.at) + '</time><div><a class="u" href="https://kick.com/' + encodeURIComponent(who) + '" rel="noopener" target="_blank" title="Open ' + esc(m.user) + ' on Kick">' + esc(m.user) + '</a>' + body + tags + '</div></li>';
+      return '<li><time title="' + esc(utc(m.at)) + ' UTC">' + shortUtc(m.at) + '</time><div><a class="u" href="https://kick.com/' + encodeURIComponent(who) + '" rel="noopener" target="_blank" title="Open ' + esc(m.user) + ' on Kick">' + esc(m.user) + '</a>' + chatBody(m.text) + keywordTags(m.text) + '</div></li>';
     }).join('') || '<li><div class="pend">Nothing collected yet.</div></li>';
     var em = $('hischatEmotes');
     if (emoteOnly) { em.textContent = 'plus ' + num(emoteOnly) + ' emote-only message' + (emoteOnly === 1 ? '' : 's'); em.hidden = false; }
+  }
+
+  /* ---------- mentions in other channels (kicklogz chat search) ---------- */
+  var MENTION_CAP = 60;
+  function isBot(u) { u = String(u || '').toLowerCase(); return u === 'nedbot' || u === 'kickbot' || u === 'botrix' || /bot$/.test(u); }
+  function renderMentions(D) {
+    var all = (D.mentions || []).slice().sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; });
+    var sel = $('mentionChannel'), q = $('mentionQ'), list = $('mentionsList'), more = $('mentionsMore'), count = $('mentionsCount');
+    var byCh = {};
+    all.forEach(function (m) { byCh[m.channel] = (byCh[m.channel] || 0) + 1; });
+    var chans = Object.keys(byCh).sort(function (a, b) { return byCh[b] - byCh[a] || (a < b ? -1 : 1); });
+    sel.innerHTML = '<option value="">All channels (' + num(all.length) + ')</option>' + chans.map(function (c) {
+      return '<option value="' + esc(c) + '">' + esc(c) + ' (' + num(byCh[c]) + ')</option>';
+    }).join('');
+    var span = all.length ? niceDate(all[all.length - 1].at.slice(0, 10)) + ' to ' + niceDate(all[0].at.slice(0, 10)) : '';
+    var showAll = false;
+
+    function row(m) {
+      var bot = isBot(m.user);
+      var tags = bot ? '' : keywordTags(m.text);
+      if (bot && /\bban(ned|s)?\b/i.test(m.text)) tags += ' <span class="tag tag-amber">ban notice</span>';
+      if (m.self) tags += ' <span class="tag tag-him">his own message</span>';
+      return '<li' + (m.self ? ' class="self"' : '') + '><time title="' + esc(utc(m.at)) + ' UTC">' + shortUtc(m.at) + '</time><div>' +
+        '<a class="chip mch" href="https://kick.com/' + encodeURIComponent(m.channel) + '" rel="noopener" target="_blank" title="Open ' + esc(m.channel) + '\'s channel on Kick">' + esc(m.channel) + '</a>' +
+        '<a class="u" href="https://kick.com/' + encodeURIComponent(String(m.user).toLowerCase()) + '" rel="noopener" target="_blank" title="Open ' + esc(m.user) + ' on Kick">' + esc(m.user) + '</a>' +
+        chatBody(m.text) + tags + '</div></li>';
+    }
+    function draw() {
+      var ch = sel.value, needle = q.value.trim().toLowerCase();
+      var hits = all.filter(function (m) {
+        if (ch && m.channel !== ch) return false;
+        if (!needle) return true;
+        return (m.text + ' ' + m.user + ' ' + m.channel).toLowerCase().indexOf(needle) >= 0;
+      });
+      var shown = showAll ? hits : hits.slice(0, MENTION_CAP);
+      list.innerHTML = shown.map(row).join('') || '<li><div class="pend">' + (all.length ? 'No message matches.' : 'Nothing collected yet.') + '</div></li>';
+      more.hidden = hits.length <= shown.length;
+      more.textContent = 'Show all ' + num(hits.length);
+      var base = num(all.length) + ' message' + (all.length === 1 ? '' : 's') + ' in ' + num(chans.length) + ' channel' + (chans.length === 1 ? '' : 's') + (span ? ', ' + span : '') + '.';
+      count.textContent = (ch || needle) ? num(hits.length) + ' of ' + base : base;
+    }
+    sel.addEventListener('change', draw);
+    q.addEventListener('input', draw);
+    more.addEventListener('click', function () { showAll = true; draw(); });
+    draw();
   }
 
   function renderEvidence(D) {

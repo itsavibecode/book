@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.2.1" />
-<title>KickPocketed v0.2.1 - The MastuhSplinter chargeback, on the record | BookHockeys</title>
+<meta name="version" content="0.3.0" />
+<title>KickPocketed v0.3.0 - The MastuhSplinter chargeback, on the record | BookHockeys</title>
 
 <meta name="description" content="One Kick account gifted 2,830 subs and 269,555 KICKs to 39 channels in a month, then the payments were charged back. Who got hit, how much, the ban wave, every night transcribed beside the chat, and the public record." />
 <meta name="theme-color" content="#0b0e0b" />
@@ -117,7 +117,7 @@
       <img class="subject-pic" src="avatar.webp" width="56" height="56" alt="" decoding="async" />
       <div class="subject-meta">
         <div class="subject-name">MASTUHSPLINTER <span class="tag tag-muted" title="Kick's platform-level ban flag on the account was false when captured. Channel moderators have banned him; Kick itself has not.">not platform-banned</span></div>
-        <div class="subject-sub"><span id="subjectFollowers">149</span> followers &middot; account created <span id="subjectCreated">2023-10-23</span> &middot; no bio, no socials, never streamed</div>
+        <div class="subject-sub"><span id="subjectFollowers">149</span> followers &middot; account created <span id="subjectCreated">2023-10-23</span> &middot; no bio, no socials, never streamed &middot; <a id="twitchLink" href="https://twitchtracker.com/mastuhsplinter" rel="noopener" target="_blank" title="TwitchTracker lists a Twitch account with this username created 2014-07-25">same handle on Twitch since 2014</a></div>
       </div>
     </div>
 
@@ -224,6 +224,18 @@
   <p class="chat-count" id="hischatEmotes" hidden></p>
 </section>
 
+<section id="mentions" class="card">
+  <h2>Across Kick chats</h2>
+  <p class="lede">Messages in other streamers' chats that name the account, from kicklogz's cross-channel chat search. They show how the story spread from chat to chat and what viewers make of it. The keyword tags are simple flags, not judgments.</p>
+  <div class="mention-tools">
+    <select id="mentionChannel" aria-label="Filter by channel" title="Show only the messages from one streamer's chat. The number is how many messages there named the account."><option value="">All channels</option></select>
+    <input type="search" id="mentionQ" placeholder="Search messages" aria-label="Search messages" title="Keep only messages whose text, sender or channel contains this text" />
+  </div>
+  <p class="chat-count" id="mentionsCount" title="Times are UTC. Collected from kicklogz's chat search for the username across every Kick channel it logs; channels it does not log are missing.">Loading&hellip;</p>
+  <ul class="chatlog" id="mentionsList"></ul>
+  <p class="more-row"><button type="button" class="btn-ol" id="mentionsMore" hidden title="The list starts with the 60 newest messages. Show every match instead.">Show all</button></p>
+</section>
+
 <section id="lookup" class="card">
   <h2>Look it up yourself</h2>
   <p class="lede">Public tools that index Kick chat, gifts, and bans. None of them need a login for a basic lookup. These are where the numbers on this page come from.</p>
@@ -259,7 +271,7 @@
 <footer>
   <div class="wrap">
     <p>Not affiliated with Kick. A public-record summary, not legal advice or an accusation of a crime.</p>
-    <p><a href="https://bookhockeys.com/">bookhockeys.com</a> <span class="ver">&middot; v0.2.1</span> <span class="ver">&middot;</span> <button type="button" id="cookieReset" class="linkish" title="Change your analytics cookie choice">Cookies</button></p>
+    <p><a href="https://bookhockeys.com/">bookhockeys.com</a> <span class="ver">&middot; v0.3.0</span> <span class="ver">&middot;</span> <button type="button" id="cookieReset" class="linkish" title="Change your analytics cookie choice">Cookies</button></p>
   </div>
 </footer>
 
