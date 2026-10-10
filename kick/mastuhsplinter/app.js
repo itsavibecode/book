@@ -12,6 +12,13 @@
     return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()) + ' ' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes());
   }
   function dayOnly(iso) { return iso ? utc(iso).slice(0, 10) : ''; }
+  var MON3 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  /* "Oct 9, 16:12" in UTC, no year: short enough to stay on one line in the table */
+  function shortUtc(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    return MON3[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes());
+  }
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
@@ -114,7 +121,7 @@
       }
       head.innerHTML = cols.map(function (c) {
         var dir = state.sortId === c.id ? (state.dir === 'asc' ? '▲' : '▼') : '';
-        return '<th class="sortable' + (c.n ? ' n' : '') + '" data-col="' + c.id + '" title="' + esc(c.tip) + ' Click to sort; click again to flip; a third click resets."><span class="dir">' + dir + '</span>' + esc(c.label) + '</th>';
+        return '<th class="sortable c-' + c.id + (c.n ? ' n' : '') + '" data-col="' + c.id + '" title="' + esc(c.tip) + ' Click to sort; click again to flip; a third click resets."><span class="dir">' + dir + '</span>' + esc(c.label) + '</th>';
       }).join('');
       body.innerHTML = rows.map(function (r) {
         return '<tr>' + cols.map(function (c) { return cell(c, r); }).join('') + '</tr>';
@@ -128,34 +135,43 @@
         else if (c.id === 'share') v = money(tSubs * perSub);
         else if (c.id === 'banned') v = num(rows.filter(function (r) { return r.bannedAt; }).length) + ' channels';
         else if (c.id === 'nights') v = num(rows.reduce(function (s, r) { return s + r.nights.length; }, 0)) + ' nights';
-        return '<td class="' + (c.n ? 'n' : '') + (c.id === 'share' ? ' money' : '') + '" data-label="Total ' + esc(c.label.toLowerCase()) + '">' + v + '</td>';
+        return '<td class="c-' + c.id + (c.n ? ' n' : '') + (c.id === 'share' ? ' money' : '') + '" data-label="Total ' + esc(c.label.toLowerCase()) + '">' + v + '</td>';
       }).join('');
+    }
+
+    /* number on one line, thin full-width track under it; zero shows a dash and no track */
+    function meter(v, max, kind, mark) {
+      if (!v) return '<span class="pend">&mdash;</span>';
+      return '<div class="meter' + (kind ? ' ' + kind : '') + '"><span class="val">' + num(v) + (mark || '') + '</span>' +
+        '<span class="track"><i style="width:max(2px, ' + (100 * v / max).toFixed(2) + '%)"></i></span></div>';
     }
 
     function cell(c, r) {
       var lab = ' data-label="' + esc(c.label) + '"';
+      var cls = function (extra) { return ' class="c-' + c.id + (extra ? ' ' + extra : '') + '"'; };
       switch (c.id) {
         case 'channel':
-          return '<td class="chan-cell"' + lab + '><div class="chan">' +
-            (r.pic ? '<img src="' + esc(r.pic) + '" alt="" loading="lazy" decoding="async" width="30" height="30">' : '<span class="dot mut" style="width:30px;height:30px"></span>') +
+          return '<td' + cls('chan-cell') + lab + '><div class="chan">' +
+            (r.pic ? '<img src="' + esc(r.pic) + '" alt="" loading="lazy" decoding="async" width="32" height="32">' : '<span class="dot mut" style="width:32px;height:32px"></span>') +
             '<div><a class="nm" href="https://kick.com/' + esc(r.slug) + '" target="_blank" rel="noopener" title="Open ' + esc(r.name) + ' on Kick">' + esc(r.name) + '</a>' +
             (r.verified ? '<span class="vf" title="Verified on Kick">&#10004;</span>' : '') +
             (r.name.toLowerCase() !== r.slug ? '<span class="sl">' + esc(r.slug) + '</span>' : '') + '</div></div></td>';
-        case 'followers': return '<td class="n"' + lab + '>' + (r.followers == null ? '<span class="pend">&mdash;</span>' : num(r.followers)) + '</td>';
+        case 'followers': return '<td' + cls('n') + lab + '>' + (r.followers == null ? '<span class="pend">&mdash;</span>' : num(r.followers)) + '</td>';
         case 'subs':
-          return '<td class="n"' + lab + '><div class="cellbar">' + (r.subs ? num(r.subs) + (r.subsSource && r.subsSource !== 'kicklogz' ? ' <span class="src" title="' + (r.subsSource === 'leaderboard' ? 'From Kick\'s all-time gifting leaderboard for this channel' : 'The streamer\'s own count') + '">' + (r.subsSource === 'leaderboard' ? 'board' : 'own') + '</span>' : '') + '<span class="bar" style="width:' + Math.max(2, 100 * r.subs / maxSubs) + '%"></span>' : '<span class="pend">&mdash;</span>') + '</div></td>';
+          var mark = (r.subsSource && r.subsSource !== 'kicklogz') ? '<sup class="srcmark" title="' + (r.subsSource === 'leaderboard' ? 'From Kick\'s all-time gifting leaderboard for this channel' : 'The streamer\'s own count') + '">*</sup>' : '';
+          return '<td' + cls('n') + lab + '>' + meter(r.subs, maxSubs, '', mark) + '</td>';
         case 'kicks':
-          return '<td class="n"' + lab + '><div class="cellbar">' + (r.kicks ? num(r.kicks) + '<span class="bar kicks" style="width:' + Math.max(2, 100 * r.kicks / maxKicks) + '%"></span>' : '<span class="pend">&mdash;</span>') + '</div></td>';
-        case 'share': return '<td class="money"' + lab + '>' + (r.subs ? '&minus;' + money(r.subs * perSub) : '') + '</td>';
-        case 'msgs': return '<td class="n"' + lab + '>' + (r.msgs == null ? '<span class="pend">not logged</span>' : num(r.msgs)) + '</td>';
-        case 'lastGift': return '<td' + lab + '>' + (r.lastGift ? dayOnly(r.lastGift) : '<span class="pend">&mdash;</span>') + '</td>';
+          return '<td' + cls('n') + lab + '>' + meter(r.kicks, maxKicks, 'kicks') + '</td>';
+        case 'share': return '<td' + cls('money') + lab + '>' + (r.subs ? '&minus;' + money(r.subs * perSub) : '') + '</td>';
+        case 'msgs': return '<td' + cls('n') + lab + '>' + (r.msgs == null ? '<span class="pend">not logged</span>' : num(r.msgs)) + '</td>';
+        case 'lastGift': return '<td' + cls() + lab + '>' + (r.lastGift ? dayOnly(r.lastGift) : '<span class="pend">&mdash;</span>') + '</td>';
         case 'banned':
-          if (!r.bannedAt) return '<td' + lab + '><span class="pend">no</span></td>';
-          return '<td' + lab + ' title="' + (r.banActive ? 'Permanent ban still in place' : 'Banned, later lifted') + '"><span class="dot ' + (r.banActive ? 'red' : 'amber') + '"></span>' + utc(r.bannedAt) + '</td>';
+          if (!r.bannedAt) return '<td' + cls() + lab + '><span class="pend">no</span></td>';
+          return '<td' + cls() + lab + ' title="' + (r.banActive ? 'Permanent ban still in place' : 'Banned, later lifted') + ' (' + utc(r.bannedAt) + ' UTC)"><span class="dot ' + (r.banActive ? 'red' : 'amber') + '"></span>' + shortUtc(r.bannedAt) + '</td>';
         case 'nights':
-          return '<td class="nights-links"' + lab + '>' + (r.nights.length ? r.nights.map(function (n) { return '<a href="' + esc(n.href) + '" title="Transcript: ' + esc(n.label) + '">' + esc(n.label) + '</a>'; }).join('') : '<span class="pend">&mdash;</span>') + '</td>';
+          return '<td' + cls('nights-links') + lab + '>' + (r.nights.length ? r.nights.map(function (n) { return '<a class="chip" href="' + esc(n.href) + '" title="Transcript: ' + esc(n.label) + '">' + esc(n.label) + '</a>'; }).join('') : '<span class="pend">&mdash;</span>') + '</td>';
       }
-      return '<td></td>';
+      return '<td' + cls() + '></td>';
     }
 
     head.addEventListener('click', function (e) {

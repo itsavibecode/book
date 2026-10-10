@@ -27,7 +27,7 @@ body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); ov
 a { color: var(--key); text-decoration: none; }
 a:hover, a:focus-visible { text-decoration: underline; outline: none; }
 img { max-width: 100%; height: auto; }
-.wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
 
 /* hero */
 .hero { padding: 28px 0 24px; border-bottom: 1px solid var(--line); background:
@@ -93,27 +93,42 @@ h3 { font-size: 16px; margin: 22px 0 8px; color: var(--sec); text-transform: upp
 /* table */
 .table-wrap { min-width: 0; }
 table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; table-layout: auto; }
-.grid th, .grid td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; min-width: 0; }
+.grid th, .grid td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; min-width: 0; }
 .grid th { color: var(--mut); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; user-select: none; }
+.grid thead th { position: sticky; top: 0; background: var(--panel); z-index: 2; }
 .grid th.sortable { cursor: pointer; }
 .grid th.sortable:hover { color: var(--ink); }
 .grid th .dir { display: inline-block; width: 1em; color: var(--key); }
 .grid td.n, .grid th.n { text-align: right; }
 .grid td.money { color: var(--red); text-align: right; white-space: nowrap; }
 .grid tfoot td { color: var(--sec); font-weight: 600; border-top: 2px solid var(--line2); border-bottom: 0; }
+.grid tbody td { vertical-align: middle; }
+.grid tbody tr:nth-child(even) td { background: rgba(255,255,255,.015); }
 .grid tbody tr:hover td { background: rgba(255,255,255,.02); }
 .grid.small th, .grid.small td { font-size: 13.5px; padding: 6px 8px; }
 .chan { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.chan img { width: 30px; height: 30px; border-radius: 50%; flex: 0 0 auto; background: var(--panel2); }
-.chan .nm { font-weight: 600; overflow-wrap: anywhere; }
+.chan img { width: 32px; height: 32px; border-radius: 50%; flex: 0 0 auto; background: var(--panel2); }
+.chan > div { min-width: 0; }
+.chan .nm { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; display: inline-block; vertical-align: middle; line-height: 1.35; }
 .chan .vf { color: var(--key); font-size: 11px; margin-left: 3px; vertical-align: 1px; }
 .chan .sl { color: var(--mut); font-size: 12px; display: block; }
-.bar { position: relative; display: block; height: 10px; border-radius: 0 4px 4px 0; background: var(--key); min-width: 2px; margin-top: 4px; }
-.bar.kicks { background: var(--key-dim); }
-.cellbar { min-width: 90px; }
+/* column sizing */
+.grid .c-channel { min-width: 230px; }
+.grid .c-subs, .grid .c-kicks { min-width: 150px; }
+.grid .c-share, .grid .c-msgs, .grid .c-followers, .grid .c-lastGift { white-space: nowrap; }
+.grid .c-banned { white-space: nowrap; }
+.grid .c-nights { width: auto; }
+/* subs / KICKs meters: number on top, thin full-width track under it */
+.meter { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+.meter .val { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.meter .track { display: block; width: 100%; height: 6px; border-radius: 3px; background: var(--line); }
+.meter .track i { display: block; height: 100%; border-radius: 3px; background: var(--key); }
+.meter.kicks .track i { background: var(--key-dim); }
+.srcmark { color: var(--mut); font-size: 11px; margin-left: 2px; cursor: help; }
 .pend { color: var(--mut); }
-.nights-links a { white-space: nowrap; }
-.nights-links a + a::before { content: " · "; color: var(--mut); }
+/* night links as chips */
+.chip { display: inline-block; border: 1px solid var(--line2); border-radius: 999px; padding: 1px 9px; margin: 2px 4px 2px 0; font-size: 12.5px; white-space: nowrap; }
+.chip:hover, .chip:focus-visible { border-color: var(--key-dim); text-decoration: none; }
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
 .dot.red { background: var(--red); } .dot.amber { background: var(--amber); } .dot.mut { background: var(--mut); }
 
@@ -132,11 +147,16 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
   .grid td::before { content: attr(data-label); color: var(--mut); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; flex: 0 0 auto; padding-top: 2px; }
   .grid td.chan-cell { display: block; }
   .grid td.chan-cell::before { display: none; }
-  .grid td > .cellbar { flex: 1 1 auto; text-align: right; }
+  .grid td > .meter { flex: 1 1 auto; flex-direction: row; justify-content: flex-end; align-items: center; }
+  .meter .track { display: none; }
+  .chan .nm { max-width: none; white-space: normal; overflow-wrap: anywhere; }
+  .grid .c-channel, .grid .c-subs, .grid .c-kicks { min-width: 0; }
+  .grid .c-share, .grid .c-msgs, .grid .c-followers, .grid .c-lastGift, .grid .c-banned { white-space: normal; }
   .grid tfoot tr { background: transparent; border: 0; }
   .grid tfoot td { padding: 3px 0; }
-  .nights-links a { white-space: normal; overflow-wrap: anywhere; }
-  .grid td.nights-links { flex-wrap: wrap; }
+  .grid td.nights-links { flex-wrap: wrap; justify-content: flex-end; }
+  .grid td.nights-links::before { margin-right: auto; }
+  .chip { white-space: normal; overflow-wrap: anywhere; }
   .grid td.money { white-space: normal; }
   .src { white-space: normal; }
 }

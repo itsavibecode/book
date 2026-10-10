@@ -22,7 +22,7 @@ In about a month (18 Sept to 7 Oct 2026) one Kick account gifted 2,830 subs and 
 
 ## Where the numbers come from
 
-- **Gifted subs per channel**: kicklogz `GET /api/streamer/<slug>/subscriptions/top-gifters?page=1&limit=100`, the gifter's row. Twigggs and ZuesIRL come from Kick's all-time gifting leaderboards and nedx from the streamer's own count, as the source site did; those rows carry a small "board" or "own" pill.
+- **Gifted subs per channel**: kicklogz `GET /api/streamer/<slug>/subscriptions/top-gifters?page=1&limit=100`, the gifter's row. Twigggs and ZuesIRL come from Kick's all-time gifting leaderboards and nedx from the streamer's own count, as the source site did; those rows carry a small asterisk after the number; hover it to see which source.
 - **KICKs per channel**: kicklogz `GET /api/kick-profile/mastuhsplinter/sent-kicks?page=N&limit=100`.
 - **Bans**: kicklogz `GET /api/kick-profile/mastuhsplinter/bans?page=N&limit=100`.
 - **Profile and follower counts**: `https://kick.com/api/v2/channels/<slug>`, captured 2026-10-10.
@@ -48,6 +48,9 @@ In about a month (18 Sept to 7 Oct 2026) one Kick account gifted 2,830 subs and 
 - A link from the home links row, if the page is meant to be found from the home page.
 
 ## Changelog
+
+### v0.1.1 - 2026-10-10
+The channel table felt cramped. Names like IrishMuldogz broke in the middle onto two or three lines, each sub and KICK count was stacked on top of a pill and a bar, and ban times wrapped. The page is now a bit wider and the table uses the room: names stay on one line, each count sits above a thin bar, ban times read like "Oct 9, 16:12", night transcripts show as small chips, and the column headings stay in view while you scroll. The "board" and "own" pills became a small asterisk you can hover.
 
 ### v0.1.0 - 2026-10-10
 First build. Copied the structure and transcripts of mastuhsplinter.nedbot.site, then redesigned it as KickPocketed: an overview driven by one data file, a sortable and customizable channel table with avatars and ban times, the hourly ban-wave chart, the on-stream evidence from wvagabond's 10 Oct stream, tagged X posts, on-stream quotes linked to their minute, a lookup-tools section, and a method section that says what is confirmed and what is not. The 18 night pages are generated from a template and gained a local/UTC/JST clock, mention jumping, his-messages-only, minute permalinks, and night-to-night navigation.
