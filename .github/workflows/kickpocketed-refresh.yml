@@ -1,0 +1,51 @@
+name: KickPocketed daily refresh
+
+# Runs once a day and on demand from the Actions tab.
+# 11:20 UTC is early morning in the US, after the night's streams have ended.
+# refresh.py is idempotent: each source is fetched on its own, a failing
+# source keeps yesterday's data, and nothing is committed unless a file changed.
+on:
+  schedule:
+    - cron: "20 11 * * *"
+  workflow_dispatch:
+
+# Per-workflow override; the default GITHUB_TOKEN is read-only.
+permissions:
+  contents: write
+
+# Don't pile up runs if the previous one is still going.
+concurrency:
+  group: kickpocketed-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run refresh script
+        working-directory: kick/mastuhsplinter
+        run: python -I refresh.py
+
+      - name: Commit and push if changed
+        run: |
+          set -e
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "::notice::No changes - nothing to commit."
+            exit 0
+          fi
+          git config user.name "kickpocketed-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add kick/mastuhsplinter sitemap.xml
+          DATE_UTC=$(date -u +%Y-%m-%d)
+          git commit -m "kick/mastuhsplinter: daily refresh ${DATE_UTC}" \
+            -m "Refreshed by .github/workflows/kickpocketed-refresh.yml" \
+            -m "$(git diff --cached --stat)"
+          git push
+          echo "::notice::Committed and pushed daily refresh for ${DATE_UTC}"

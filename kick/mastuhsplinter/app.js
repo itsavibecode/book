@@ -71,10 +71,12 @@
     $('banCount').textContent = num(D.bans.length);
     $('nSubCh').textContent = num(D.totals.subChannels);
     $('nKickCh').textContent = num(D.totals.kickChannels);
+    if (D.generated) $('asOf').textContent = D.generated;
 
     renderTable(D, perSub);
     renderBans(D);
     renderQuotes(D);
+    renderHisChat(D);
     renderEvidence(D);
     renderNights(D);
   }
@@ -215,21 +217,24 @@
   function renderBans(D) {
     var chart = $('banChart');
     var start = Date.parse('2026-10-09T16:00:00Z'), end = Date.parse('2026-10-10T08:00:00Z');
-    var buckets = [], earlier = [];
+    var buckets = [], earlier = [], later = [];
     for (var t = start; t < end; t += 3600e3) buckets.push({ t: t, items: [] });
     D.bans.forEach(function (b) {
       var t = Date.parse(b.at);
       if (t < start) { earlier.push(b); return; }
+      if (t >= end) { later.push(b); return; }
       var i = Math.floor((t - start) / 3600e3); if (buckets[i]) buckets[i].items.push(b);
     });
     var all = [{ label: 'earlier', items: earlier, earlier: true }].concat(buckets.map(function (b) {
       var d = new Date(b.t); return { label: pad(d.getUTCHours()) + ':00', items: b.items, day: d.getUTCDate() };
     }));
+    /* bans logged after the wave (the daily refresh keeps adding them) share one "after" column */
+    if (later.length) all.push({ label: 'later', items: later, later: true });
     var max = Math.max.apply(null, all.map(function (b) { return b.items.length; }));
     chart.innerHTML = all.map(function (b, i) {
       var h = b.items.length ? Math.max(3, 100 * b.items.length / max) : 0;
-      var lbl = b.earlier ? 'before' : (b.label === '00:00' ? 'Oct 10' : (i === 1 ? 'Oct 9 ' + b.label : b.label));
-      return '<div class="col' + (b.earlier ? ' earlier' : '') + '" data-i="' + i + '" style="--h:' + h + '%"><i style="height:' + h + '%"></i>' + (b.items.length ? '<span class="v">' + b.items.length + '</span>' : '') + '<span class="x">' + lbl + '</span></div>';
+      var lbl = b.earlier ? 'before' : b.later ? 'after' : (b.label === '00:00' ? 'Oct 10' : (i === 1 ? 'Oct 9 ' + b.label : b.label));
+      return '<div class="col' + (b.earlier || b.later ? ' earlier' : '') + '" data-i="' + i + '" style="--h:' + h + '%"><i style="height:' + h + '%"></i>' + (b.items.length ? '<span class="v">' + b.items.length + '</span>' : '') + '<span class="x">' + lbl + '</span></div>';
     }).join('');
     chart.addEventListener('mousemove', function (e) {
       var col = e.target.closest('.col'); if (!col) { hideTip(); return; }
@@ -238,7 +243,7 @@
       var by = {}; b.items.forEach(function (x) { by[x.by] = (by[x.by] || 0) + 1; });
       var byTxt = Object.keys(by).sort(function (a, c) { return by[c] - by[a]; }).slice(0, 3).map(function (k) { return esc(k) + ' (' + by[k] + ')'; }).join(', ');
       var chans = b.items.map(function (x) { return x.channel; });
-      showTip('<b>' + (b.earlier ? 'Before Oct 9, 16:00 UTC' : (b.label + ' UTC hour')) + ': ' + b.items.length + ' ban' + (b.items.length === 1 ? '' : 's') + '</b><span class="l">By: ' + byTxt + '</span><br>' + esc(chans.slice(0, 14).join(', ')) + (chans.length > 14 ? ' and ' + (chans.length - 14) + ' more' : ''), e.clientX, e.clientY);
+      showTip('<b>' + (b.earlier ? 'Before Oct 9, 16:00 UTC' : b.later ? 'After Oct 10, 08:00 UTC' : (b.label + ' UTC hour')) + ': ' + b.items.length + ' ban' + (b.items.length === 1 ? '' : 's') + '</b><span class="l">By: ' + byTxt + '</span><br>' + esc(chans.slice(0, 14).join(', ')) + (chans.length > 14 ? ' and ' + (chans.length - 14) + ' more' : ''), e.clientX, e.clientY);
     });
     chart.addEventListener('mouseleave', hideTip);
     var tb = $('banTable').querySelector('tbody');
@@ -261,6 +266,38 @@
     $('chatlog').innerHTML = D.chat.map(function (c) {
       return '<li><time>' + esc(c.time.replace('T', ' ').replace(/:00Z$/, '')) + '</time><div><span class="ch">#' + esc(c.channel) + '</span>' + esc(c.text) + '</div></li>';
     }).join('');
+  }
+
+  /* ---------- his own channel chat ---------- */
+  var EMOTE_RX = /\[emote:(\d+):([^\]]+)\]/g;
+  var TAGS = [
+    [/legend|hero|cinema|goat\b|gigachad|king\b|based|absolute|\bW\b|thank/i, 'tag-key', 'praise'],
+    [/charge ?back|refund|scam|fraud|stole|thief|recon|authorit/i, 'tag-amber', 'chargeback talk'],
+    [/gift|sub\b|subs\b/i, 'tag-muted', 'asks for gifts'],
+  ];
+  function niceDate(day) {
+    var p = String(day || '').split('-');
+    return p.length === 3 ? +p[2] + ' ' + MON3[+p[1] - 1] + ' ' + p[0] : esc(day);
+  }
+  function renderHisChat(D) {
+    var all = D.hisChat || [], shown = [], emoteOnly = 0;
+    all.forEach(function (m) {
+      if (!String(m.text || '').replace(EMOTE_RX, '').trim()) emoteOnly++;
+      else shown.push(m);
+    });
+    shown.sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; });
+    $('hischatCount').textContent = num(all.length) + ' message' + (all.length === 1 ? '' : 's') + ' collected since ' + niceDate(D.hisChatSince) + '.';
+    $('hischatList').innerHTML = shown.map(function (m) {
+      var plain = m.text.replace(EMOTE_RX, ' ');
+      var body = esc(m.text).replace(EMOTE_RX, function (all, id, name) {
+        return '<img class="emi" src="https://files.kick.com/emotes/' + id + '/fullsize" alt="' + name + '" title="' + name + '" loading="lazy">';
+      });
+      var tags = TAGS.filter(function (t) { return t[0].test(plain); }).map(function (t) { return ' <span class="tag ' + t[1] + '">' + t[2] + '</span>'; }).join('');
+      var who = m.slug || m.user;
+      return '<li><time title="' + esc(utc(m.at)) + ' UTC">' + shortUtc(m.at) + '</time><div><a class="u" href="https://kick.com/' + encodeURIComponent(who) + '" rel="noopener" target="_blank" title="Open ' + esc(m.user) + ' on Kick">' + esc(m.user) + '</a>' + body + tags + '</div></li>';
+    }).join('') || '<li><div class="pend">Nothing collected yet.</div></li>';
+    var em = $('hischatEmotes');
+    if (emoteOnly) { em.textContent = 'plus ' + num(emoteOnly) + ' emote-only message' + (emoteOnly === 1 ? '' : 's'); em.hidden = false; }
   }
 
   function renderEvidence(D) {

@@ -13,19 +13,32 @@ In about a month (18 Sept to 7 Oct 2026) one Kick account gifted 2,830 subs and 
 | File | Role |
 | --- | --- |
 | `index.html`, `styles.css`, `app.js` | The overview. Everything is rendered from `data.json`. |
-| `data.json` | Single source of truth: subject, assumptions, channel rows, ban records, X posts, on-stream quotes, evidence captions, nights manifest. |
-| `night.css`, `night.js`, `build-nights.py` | Night template and generator. Run `python build-nights.py` from this folder after editing the `nights` list in `data.json`; it rewrites the 18 `<slug>-<date>.html` pages. |
+| `data.json` | Single source of truth: subject, assumptions, channel rows, ban records, X posts, on-stream quotes, his own channel chat (`hisChat`), evidence captions, nights manifest. |
+| `refresh.py` | The daily refresh (see below). Standard-library Python; run `python -I refresh.py` from this folder. |
+| `../../.github/workflows/kickpocketed-refresh.yml` | Runs `refresh.py` every day at 11:20 UTC (and on demand from the Actions tab), then commits and pushes if anything changed. |
+| `night.css`, `night.js`, `build-nights.py` | Night template and generator. Run `python build-nights.py` from this folder after editing the `nights` list in `data.json`; it rewrites one `<slug>-<date>.html` page per night. `refresh.py` runs it for you. |
 | `nights/*.json`, `nights/emotes.json` | Transcript data per night (`speech: [[utc, text]]`, `chat: [[utc, user, text]]`) and the Kick emote map. About 10 MB. |
 | `evidence/*.jpg` | Frames from wvagabond's 10 Oct stream: the Kick Support email, the Stripe refund ledger, the gift log. |
 | `og-card.png`, favicons, `avatar.webp` | Share card and icons. The avatar is the account's public Kick profile picture. |
 | `_source/` | Gitignored. The SingleFile saves and screenshots the page was built from. |
+
+## Daily refresh
+
+`refresh.py` re-reads the public sources once a day so the page keeps up while the story is still moving. Each source is fetched on its own; if one refuses, the run logs it and keeps yesterday's data for that part.
+
+- **The source site** (`mastuhsplinter.nedbot.site/data.json`): which channels are in the table, their message counts and night links. Any night page the source adds is parsed, its transcript saved to `nights/`, its page generated here, and its URL added to the sitemap.
+- **kicklogz**: ban records, KICKs per channel, and each channel's top-gifters row for gifted subs and the last gift date. Twigggs, ZuesIRL and nedx keep the source site's leaderboard or own-count figure.
+- **Kick**: follower counts, profile pictures and verified marks for every channel; the account's followers and platform-ban flag; and the latest 25 messages in his own channel chat, merged into `hisChat` so the list only grows.
+
+What stays manual: the X posts, the on-stream quotes, the timeline in "What happened", the evidence frames, the assumptions ($4.99, 95%) and the page copy. Edit those in `data.json` or `index.html` by hand.
 
 ## Where the numbers come from
 
 - **Gifted subs per channel**: kicklogz `GET /api/streamer/<slug>/subscriptions/top-gifters?page=1&limit=100`, the gifter's row. Twigggs and ZuesIRL come from Kick's all-time gifting leaderboards and nedx from the streamer's own count, as the source site did; those rows carry a small asterisk after the number; hover it to see which source.
 - **KICKs per channel**: kicklogz `GET /api/kick-profile/mastuhsplinter/sent-kicks?page=N&limit=100`.
 - **Bans**: kicklogz `GET /api/kick-profile/mastuhsplinter/bans?page=N&limit=100`.
-- **Profile and follower counts**: `https://kick.com/api/v2/channels/<slug>`, captured 2026-10-10.
+- **Profile and follower counts**: `https://kick.com/api/v2/channels/<slug>`, refreshed daily.
+- **His own chat**: `https://kick.com/api/v2/channels/20492407/messages`, the latest 25 messages, collected daily from 10 Oct 2026. The praise, chargeback-talk and asks-for-gifts tags are keyword matches.
 - **Share at risk**: subs x $4.74. That is $4.99 less Kick's 5%, and it is the exact per-refund amount on wvagabond's Stripe ledger. It is labelled an estimate because only wvagabond has published a first-hand total.
 - **X posts**: read directly on X while signed in, 2026-10-10. Each carries a kind tag (first-hand number, names the gifter, claim, allegation, reaction). The stolen-card claim is labelled unverified; the $10,000+ figure is labelled a claim.
 
@@ -43,11 +56,13 @@ In about a month (18 Sept to 7 Oct 2026) one Kick account gifted 2,830 subs and 
 
 - A per-day gifts chart. Needs the per-recipient gift events for each channel (kicklogz `subscriptions/gifted`, paginated), which is a few hundred requests. Worth it once the story settles.
 - The six channels that only received KICKs were not scanned for gifted subs on kicklogz. Rerun the top-gifters endpoint for them.
-- More nights as the source site adds them: copy the JSON into `nights/`, add a manifest entry, rebuild.
 - A corrections log section if streamers send first-hand numbers.
 - A link from the home links row, if the page is meant to be found from the home page.
 
 ## Changelog
+
+### v0.2.0 - 2026-10-10
+The story is still moving: new bans are still being logged and the source site may add more nights. Rather than rebuild the page by hand each time, a small script now re-reads kicklogz, Kick and the source site every morning and updates the numbers, the ban chart, the follower counts and any new night pages on its own. The date it last ran shows under the headline numbers. Also new is "In his own chat": what people have been posting in the account's own Kick channel since the chargebacks came out, which is mostly praise ("you are my hero", "absolute cinema") and requests to gift their friends. Kick only shows the latest 25 messages, so the list grows a little every day. Bans logged after the main wave now show in an "after" column on the chart instead of dropping off it.
 
 ### v0.1.1 - 2026-10-10
 The channel table felt cramped. Names like IrishMuldogz broke in the middle onto two or three lines, each sub and KICK count was stacked on top of a pill and a bar, and ban times wrapped. The page is now a bit wider and the table uses the room: names stay on one line, each count sits above a thin bar, ban times read like "Oct 9, 16:12", night transcripts show as small chips, and the column headings stay in view while you scroll. The "board" and "own" pills became a small asterisk you can hover.

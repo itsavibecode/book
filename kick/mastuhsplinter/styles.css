@@ -196,6 +196,13 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
 .chatlog time { color: var(--mut); font-size: 13px; font-variant-numeric: tabular-nums; }
 .chatlog .ch { color: var(--him); font-size: 12px; display: block; letter-spacing: .04em; }
 @media (max-width: 560px) { .chatlog li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+.chatlog li > div { overflow-wrap: anywhere; min-width: 0; }
+.chatlog .u { color: var(--sec); font-weight: 600; font-size: 13.5px; margin-right: 8px; }
+.chatlog .tag { margin-left: 4px; vertical-align: 1px; }
+.emi { height: 24px; width: auto; vertical-align: middle; margin: 0 1px; }
+.chat-count { color: var(--mut); font-size: 13.5px; margin: 0 0 8px; }
+#hischatEmotes { margin: 8px 0 0; }
+.asof { color: var(--mut); font-size: 13px; margin: 12px 0 0; }
 
 /* nights list */
 .nights { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }

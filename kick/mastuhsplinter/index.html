@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.1.1" />
-<title>KickPocketed v0.1.1 - The MastuhSplinter chargeback, on the record | BookHockeys</title>
+<meta name="version" content="0.2.0" />
+<title>KickPocketed v0.2.0 - The MastuhSplinter chargeback, on the record | BookHockeys</title>
 
 <meta name="description" content="One Kick account gifted 2,830 subs and 269,555 KICKs to 39 channels in a month, then the payments were charged back. Who got hit, how much, the ban wave, every night transcribed beside the chat, and the public record." />
 <meta name="theme-color" content="#0b0e0b" />
@@ -138,6 +138,7 @@
         <div class="stat-v" id="sValue">$13,415.63</div><div class="stat-l">streamer share at risk <span class="est">estimate</span></div>
       </div>
     </div>
+    <p class="asof" title="A script re-reads the public sources once a day. The X posts, on-stream quotes, timeline and evidence are written by hand and change only when the page is edited.">Data as of <span id="asOf">2026-10-10</span>, refreshed daily from kicklogz, Kick and the source site.</p>
   </div>
 </header>
 
@@ -196,7 +197,7 @@
 <section id="bans" class="card">
   <h2>The ban wave</h2>
   <p class="lede">Chat bans logged against the account, by hour. Before Oct 9 there were two in the account's whole history. Hover a column for the channels and who banned him.</p>
-  <div class="chart" id="banChart" role="img" aria-label="Column chart of chat bans per hour. Forty of the fifty-one bans fall in the 20:00 UTC hour on October 9, 2026."></div>
+  <div class="chart" id="banChart" role="img" aria-label="Column chart of chat bans per hour. Forty of the bans fall in the 20:00 UTC hour on October 9, 2026."></div>
   <details class="disclosure">
     <summary title="The full list of ban records">All <span id="banCount">51</span> ban records</summary>
     <div class="table-wrap"><table class="grid small" id="banTable"><thead><tr><th>Time (UTC)</th><th>Channel</th><th>Banned by</th><th>Type</th></tr></thead><tbody></tbody></table></div>
@@ -213,6 +214,14 @@
   <div class="quotes" id="quotes"></div>
   <h3>From his own chat history</h3>
   <ul class="chatlog" id="chatlog"></ul>
+</section>
+
+<section id="hischat" class="card">
+  <h2>In his own chat</h2>
+  <p class="lede">Messages posted in the account's own Kick channel chat since the chargebacks became public. He has never streamed, so this is viewers talking to him, not to an audience. Kick only shows the latest 25 messages at a time, so the list grows with each daily refresh. The praise and chargeback tags are simple keyword flags, not judgments.</p>
+  <p class="chat-count" id="hischatCount" title="Counted from the first public post on 9 Oct 2026, 17:53 UTC. Older messages had already scrolled out of Kick's window when collection started.">Loading&hellip;</p>
+  <ul class="chatlog" id="hischatList"></ul>
+  <p class="chat-count" id="hischatEmotes" hidden></p>
 </section>
 
 <section id="lookup" class="card">
@@ -250,7 +259,7 @@
 <footer>
   <div class="wrap">
     <p>Not affiliated with Kick. A public-record summary, not legal advice or an accusation of a crime.</p>
-    <p><a href="https://bookhockeys.com/">bookhockeys.com</a> <span class="ver">&middot; v0.1.1</span> <span class="ver">&middot;</span> <button type="button" id="cookieReset" class="linkish" title="Change your analytics cookie choice">Cookies</button></p>
+    <p><a href="https://bookhockeys.com/">bookhockeys.com</a> <span class="ver">&middot; v0.2.0</span> <span class="ver">&middot;</span> <button type="button" id="cookieReset" class="linkish" title="Change your analytics cookie choice">Cookies</button></p>
   </div>
 </footer>
 

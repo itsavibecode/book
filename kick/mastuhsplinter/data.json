@@ -6,7 +6,7 @@
   "userId": 21478801,
   "channelId": 20492407,
   "created": "2023-10-23",
-  "followers": 149,
+  "followers": 150,
   "platformBanned": false
  },
  "assumptions": {
@@ -25,7 +25,7 @@
   {
    "slug": "suspendas",
    "name": "Suspendas",
-   "followers": 50237,
+   "followers": 50239,
    "verified": true,
    "pic": "https://files.kick.com/images/user/78345/profile_image/conversion/7182cab4-9b58-4a50-a65f-95a8590bb728-fullsize.webp",
    "subs": 408,
@@ -45,7 +45,7 @@
   {
    "slug": "wvagabond",
    "name": "wvagabond",
-   "followers": 44673,
+   "followers": 44676,
    "verified": true,
    "pic": "https://files.kick.com/images/user/23111830/profile_image/conversion/2cd7ae86-ab46-4b54-a8e0-8f0668b33faa-fullsize.webp",
    "subs": 399,
@@ -93,7 +93,7 @@
   {
    "slug": "twigggs",
    "name": "Twigggs",
-   "followers": 5334,
+   "followers": 5333,
    "verified": true,
    "pic": "https://files.kick.com/images/user/63674387/profile_image/conversion/0013679a-326d-4950-9113-84eebb8c9859-fullsize.webp",
    "subs": 367,
@@ -113,7 +113,7 @@
   {
    "slug": "sam",
    "name": "Sam",
-   "followers": 117485,
+   "followers": 117490,
    "verified": true,
    "pic": "https://files.kick.com/images/user/336946/profile_image/conversion/3bcd1076-84a3-4f3c-97fc-dd22366d2aaa-fullsize.webp",
    "subs": 240,
@@ -133,7 +133,7 @@
   {
    "slug": "zuesirl",
    "name": "ZuesIRL",
-   "followers": 7967,
+   "followers": 7966,
    "verified": true,
    "pic": "https://files.kick.com/images/user/53556044/profile_image/conversion/3173bfb2-b810-4562-bb6a-b0b3011e6a57-fullsize.webp",
    "subs": 212,
@@ -173,10 +173,10 @@
    "verified": true,
    "pic": "https://files.kick.com/images/user/49428396/profile_image/conversion/ca212d95-bfab-456e-a31a-44a277ec46aa-fullsize.webp",
    "subs": 187,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": 50,
-   "lastGift": null,
+   "lastGift": "2026-10-06T05:40:41.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": [
@@ -204,14 +204,14 @@
   {
    "slug": "ozemi",
    "name": "ozemi",
-   "followers": 17640,
+   "followers": 17641,
    "verified": true,
    "pic": "https://files.kick.com/images/user/5595522/profile_image/conversion/c55628eb-e2bb-4e8c-95b1-aa4b1e3e631f-fullsize.webp",
    "subs": 108,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": 1,
-   "lastGift": null,
+   "lastGift": "2026-09-23T23:02:50.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": [
@@ -258,10 +258,10 @@
    "verified": true,
    "pic": "https://files.kick.com/images/user/3261056/profile_image/conversion/dcd6f8fa-b2d1-4030-b04d-a9777eaf74b3-fullsize.webp",
    "subs": 80,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": 11,
-   "lastGift": null,
+   "lastGift": "2026-09-24T04:10:12.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -329,7 +329,7 @@
   {
    "slug": "iceposeidon",
    "name": "Ice Poseidon",
-   "followers": 262232,
+   "followers": 262231,
    "verified": true,
    "pic": "https://files.kick.com/images/user/146923/profile_image/conversion/f13387ea-e14f-477f-8d59-742250aac30a-fullsize.webp",
    "subs": 40,
@@ -363,10 +363,10 @@
    "verified": true,
    "pic": "https://files.kick.com/images/user/278950/profile_image/conversion/6bb86bb2-4e10-47ab-9103-66822e10d4b7-fullsize.webp",
    "subs": 37,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": null,
-   "lastGift": null,
+   "lastGift": "2026-10-03T23:20:37.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -378,10 +378,10 @@
    "verified": true,
    "pic": "https://files.kick.com/images/user/4686261/profile_image/conversion/f08d0fdb-0960-4aa9-9a0f-95da38709cd4-fullsize.webp",
    "subs": 37,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": null,
-   "lastGift": null,
+   "lastGift": "2026-10-05T23:54:25.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -389,7 +389,7 @@
   {
    "slug": "ryanheinz",
    "name": "ryanheinz",
-   "followers": 12833,
+   "followers": 12835,
    "verified": true,
    "pic": "https://files.kick.com/images/user/29238701/profile_image/conversion/cd9fde4e-79df-416f-9ce6-9d4cee6b0d94-fullsize.webp",
    "subs": 27,
@@ -408,10 +408,10 @@
    "verified": false,
    "pic": null,
    "subs": 26,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": null,
-   "lastGift": null,
+   "lastGift": "2026-10-04T22:38:12.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -426,7 +426,7 @@
    "subsSource": "count",
    "kicks": 0,
    "msgs": 30,
-   "lastGift": null,
+   "lastGift": "2026-09-18T22:35:54.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -434,14 +434,14 @@
   {
    "slug": "binxbasilisk",
    "name": "BinxBasilisk",
-   "followers": 9498,
+   "followers": 9497,
    "verified": true,
    "pic": "https://files.kick.com/images/user/11434985/profile_image/conversion/4380f719-98f5-48ab-bfee-fc751912e65c-fullsize.webp",
    "subs": 17,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": 0,
-   "lastGift": null,
+   "lastGift": "2026-09-26T06:18:34.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -453,10 +453,10 @@
    "verified": true,
    "pic": "https://files.kick.com/images/user/1294403/profile_image/conversion/fc52bd58-aae3-42ec-a082-95c79e53d9ae-fullsize.webp",
    "subs": 14,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": null,
-   "lastGift": null,
+   "lastGift": "2026-09-24T04:56:16.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -483,10 +483,10 @@
    "verified": true,
    "pic": "https://files.kick.com/images/user/58408/profile_image/conversion/f5644a60-51e5-47a3-a584-5d7bcacbc1dc-fullsize.webp",
    "subs": 3,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": 8,
-   "lastGift": null,
+   "lastGift": "2026-09-24T05:02:00.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -539,14 +539,14 @@
   {
    "slug": "xenathewitch",
    "name": "Xenathewitch",
-   "followers": 50234,
+   "followers": 50233,
    "verified": true,
    "pic": "https://files.kick.com/images/user/1821679/profile_image/conversion/26fd3460-d185-4f0c-90ea-69a163b2d4ba-fullsize.webp",
    "subs": 1,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": 0,
-   "lastGift": null,
+   "lastGift": "2026-10-03T03:19:36.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -554,14 +554,14 @@
   {
    "slug": "mando",
    "name": "Mando",
-   "followers": 35137,
+   "followers": 35139,
    "verified": true,
    "pic": "https://files.kick.com/images/user/278343/profile_image/conversion/a9aa9706-948f-4d31-8ac1-16e2da24437e-fullsize.webp",
    "subs": 1,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": 0,
-   "lastGift": null,
+   "lastGift": "2026-09-28T00:57:21.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -573,10 +573,10 @@
    "verified": true,
    "pic": "https://files.kick.com/images/user/125579234/profile_image/conversion/dc63e013-989a-433d-b017-90dc823e8010-fullsize.webp",
    "subs": 1,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": 14,
-   "lastGift": null,
+   "lastGift": "2026-09-27T21:06:38.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -584,7 +584,7 @@
   {
    "slug": "nicklee",
    "name": "NickLee",
-   "followers": 49514,
+   "followers": 49516,
    "verified": true,
    "pic": "https://files.kick.com/images/user/58371235/profile_image/conversion/ce5c4a72-52d9-42f9-839a-1b972c60a840-fullsize.webp",
    "subs": 1,
@@ -603,10 +603,10 @@
    "verified": false,
    "pic": "https://files.kick.com/images/user/8730329/profile_image/conversion/e5d57bb6-ee10-4cd3-a920-a98aab8df9cf-fullsize.webp",
    "subs": 1,
-   "subsSource": "leaderboard",
+   "subsSource": "kicklogz",
    "kicks": 0,
    "msgs": null,
-   "lastGift": null,
+   "lastGift": "2026-09-18T15:34:58.000Z",
    "bannedAt": null,
    "banActive": false,
    "nights": []
@@ -674,7 +674,7 @@
   {
    "slug": "reganxjeanne",
    "name": "reganxjeanne",
-   "followers": 34107,
+   "followers": 34108,
    "verified": true,
    "pic": "https://files.kick.com/images/user/889134/profile_image/conversion/9fe8a5c0-b78e-4667-9e48-6991606330a1-fullsize.webp",
    "subs": 0,
@@ -688,6 +688,13 @@
   }
  ],
  "bans": [
+  {
+   "channel": "furacao_embrasado",
+   "by": "Furacao_Embrasado",
+   "at": "2026-08-21T07:58:13.000Z",
+   "permanent": 1,
+   "unbanned_at": null
+  },
   {
    "channel": "furacao_embrasado",
    "by": "Furacao_Embrasado",
@@ -1044,6 +1051,13 @@
    "at": "2026-10-10T06:27:17.000Z",
    "permanent": 1,
    "unbanned_at": null
+  },
+  {
+   "channel": "burgerplanet",
+   "by": "BurgerPlanet",
+   "at": "2026-10-10T16:05:31.000Z",
+   "permanent": 1,
+   "unbanned_at": null
   }
  ],
  "tweets": [
@@ -1215,6 +1229,184 @@
    "time": "2026-10-09T18:19:00Z",
    "channel": "wvagabond, carldo, nicklee, dtanmanb, billybetz, ac7ionman, bam",
    "text": "Last archived messages: the same emote spammed across seven chats, nothing else"
+  }
+ ],
+ "hisChatSince": "2026-10-10",
+ "hisChat": [
+  {
+   "id": "cbac2d9d-2183-4ef2-b466-e3371c6071b2",
+   "at": "2026-10-10T18:30:54Z",
+   "user": "Togei",
+   "slug": "togei",
+   "text": "do Burger weekly [emote:5748097:collectiblesTROLL]"
+  },
+  {
+   "id": "17f6c4c2-7229-4787-becf-68b411df6d19",
+   "at": "2026-10-10T17:40:10Z",
+   "user": "StinkWrinkles",
+   "slug": "stinkwrinkles",
+   "text": "@takkeover is attempting to do recon and locate you. I would highly recommend you notify authorities"
+  },
+  {
+   "id": "97b59716-7751-4fb5-a685-357da3187ff6",
+   "at": "2026-10-10T17:39:38Z",
+   "user": "StinkWrinkles",
+   "slug": "stinkwrinkles",
+   "text": "you're an absolute legend"
+  },
+  {
+   "id": "148bfc34-e55e-40bb-aeb4-acc7c572c5a7",
+   "at": "2026-10-10T16:53:43Z",
+   "user": "yehudafinkelstein",
+   "slug": "yehudafinkelstein",
+   "text": "Charge back more dood"
+  },
+  {
+   "id": "27d225f4-7957-4d68-b8bd-00c0f3acfcab",
+   "at": "2026-10-10T13:04:53Z",
+   "user": "takkeover",
+   "slug": "takkeover",
+   "text": "i wonder who mastuh is"
+  },
+  {
+   "id": "59074220-5927-419a-ad89-a1f44c5a91f6",
+   "at": "2026-10-10T13:04:47Z",
+   "user": "takkeover",
+   "slug": "takkeover",
+   "text": ":("
+  },
+  {
+   "id": "55e63406-b3b0-4b32-ad4a-b5dd808796de",
+   "at": "2026-10-10T12:43:18Z",
+   "user": "littlewhitemike",
+   "slug": "littlewhitemike",
+   "text": "absolute cinema [emote:37218:Clap]"
+  },
+  {
+   "id": "365d4770-693c-490b-837a-e4e594710a8c",
+   "at": "2026-10-10T12:41:03Z",
+   "user": "littlewhitemike",
+   "slug": "littlewhitemike",
+   "text": "you are my hero"
+  },
+  {
+   "id": "b2205aff-1bc8-4827-94a5-48096885fb42",
+   "at": "2026-10-10T12:25:08Z",
+   "user": "QuartaOunce",
+   "slug": "quartaounce",
+   "text": "[emote:5756671:GIGACHAD]"
+  },
+  {
+   "id": "9fc0a63b-60bf-4ba9-99e6-6630883ef49d",
+   "at": "2026-10-10T12:25:08Z",
+   "user": "QuartaOunce",
+   "slug": "quartaounce",
+   "text": "[emote:5756671:GIGACHAD]"
+  },
+  {
+   "id": "4e71af8b-0ef6-41a9-a694-2b03c002bcb6",
+   "at": "2026-10-10T12:25:08Z",
+   "user": "QuartaOunce",
+   "slug": "quartaounce",
+   "text": "[emote:5756671:GIGACHAD]"
+  },
+  {
+   "id": "ca5fb1ff-26f1-41ab-a1f1-9f68d12ed461",
+   "at": "2026-10-10T12:25:07Z",
+   "user": "QuartaOunce",
+   "slug": "quartaounce",
+   "text": "[emote:5756671:GIGACHAD]"
+  },
+  {
+   "id": "d4b2678a-a73b-4c8d-b9fa-1adda284a09b",
+   "at": "2026-10-10T12:16:36Z",
+   "user": "stolenwifi",
+   "slug": "stolenwifi",
+   "text": "u are a legend"
+  },
+  {
+   "id": "591f70d9-1d56-4d2b-b8d3-8b3726f494b4",
+   "at": "2026-10-10T10:28:40Z",
+   "user": "KiwiDanja",
+   "slug": "kiwidanja",
+   "text": "[emote:5710272:kiwidanjaEDDIEE][emote:5710186:kiwidanjaEDDIE]"
+  },
+  {
+   "id": "873dc6b9-0636-47e1-932e-05e9287a8348",
+   "at": "2026-10-10T10:02:24Z",
+   "user": "PrestoMagic",
+   "slug": "prestomagic",
+   "text": "two contents for the same price... free [emote:37233:PogU]"
+  },
+  {
+   "id": "4cdb8e69-0dd5-4257-80f2-b7ca214f0947",
+   "at": "2026-10-10T09:25:26Z",
+   "user": "loveattackkk",
+   "slug": "loveattackkk",
+   "text": "no gift my friend bluesclues and deenthegreat"
+  },
+  {
+   "id": "6d57b936-843d-4bd0-b171-d451c77c7e82",
+   "at": "2026-10-10T09:25:24Z",
+   "user": "loveattackkk",
+   "slug": "loveattackkk",
+   "text": "[emote:1730754:emojiAwake]"
+  },
+  {
+   "id": "a0b69cca-ebbc-4723-afdb-6326d4eb1d9a",
+   "at": "2026-10-10T09:24:51Z",
+   "user": "loveattackkk",
+   "slug": "loveattackkk",
+   "text": "im jk"
+  },
+  {
+   "id": "dabba5d4-f8a8-4512-94fe-695923814153",
+   "at": "2026-10-10T09:24:36Z",
+   "user": "loveattackkk",
+   "slug": "loveattackkk",
+   "text": "sub up"
+  },
+  {
+   "id": "5fffcc25-5fca-43fd-b72a-ee4c19ff24f8",
+   "at": "2026-10-10T09:24:35Z",
+   "user": "loveattackkk",
+   "slug": "loveattackkk",
+   "text": "[emote:5756504:NODDERS]"
+  },
+  {
+   "id": "86c70a34-db39-4de0-8427-1378037b06bb",
+   "at": "2026-10-10T09:24:34Z",
+   "user": "loveattackkk",
+   "slug": "loveattackkk",
+   "text": "[emote:1730752:emojiAngel]"
+  },
+  {
+   "id": "4a84e4ef-5e0b-4214-bb08-c2aaa7ae41ff",
+   "at": "2026-10-10T05:10:24Z",
+   "user": "lingus",
+   "slug": "lingus",
+   "text": "[emote:5747934:collectiblesTrollDespair]"
+  },
+  {
+   "id": "f5797d8a-05f6-4ac0-aeaf-b803e6338192",
+   "at": "2026-10-10T04:58:00Z",
+   "user": "sayge",
+   "slug": "sayge",
+   "text": "[emote:4148128:mericCat]"
+  },
+  {
+   "id": "ba454808-6adf-43e0-b5d5-d455d6c04146",
+   "at": "2026-10-10T03:37:47Z",
+   "user": "Htu11herbaIDrugs",
+   "slug": "htu11herbaidrugs",
+   "text": "gift @dobbin please"
+  },
+  {
+   "id": "109091ec-d6e1-4678-b90c-4581e94bfae0",
+   "at": "2026-10-10T03:33:55Z",
+   "user": "Htu11herbaIDrugs",
+   "slug": "htu11herbaidrugs",
+   "text": "Gift @dobbin please"
   }
  ],
  "evidence": [
