@@ -7,7 +7,9 @@ Pulls, each step on its own so one failing source never aborts the run:
   a. the source site's channel rows (mastuhsplinter.nedbot.site/data.json)
   b. any night page the source site has that we do not, plus emotes.json
   c. kicklogz: ban records, KICKs sent, and each channel's top-gifters row
-  d. Kick's channel API: the subject's followers and ban flag, every channel's profile
+  d. Kick's channel API: the subject's followers and ban flag, every channel's profile.
+     A channel that used to resolve and now returns 404 keeps its last values and
+     gets channelGone = the first day it was missing; a 200 removes the flag.
   e. the subject's own Kick channel chat (latest 25 messages), merged into hisChat
   f. kicklogz's cross-channel chat search for the username, merged into mentions
      (guests get 25 searches a day and a 6-month window; on any refusal the
@@ -288,8 +290,9 @@ def step_top_gifters(slugs):
 
 
 def step_kick_channels(slugs):
-    """(d) Kick channel API; slugs whose request failed are absent."""
-    out, failed = {}, []
+    """(d) Kick channel API. Returns ({slug: info}, {slugs that returned 404});
+    slugs whose request failed are absent from the first."""
+    out, failed, gone = {}, [], set()
     for s in slugs:
         try:
             d = fetch_json(KICK + s, pause=0.25)
@@ -299,9 +302,22 @@ def step_kick_channels(slugs):
                       'is_banned': d.get('is_banned')}
         except Exception as e:
             failed.append('%s (%s)' % (s, why(e)))
+            if isinstance(e, urllib.error.HTTPError) and e.code == 404:
+                gone.add(s)
     if failed:
         problems.append('Kick channel API failed for %d: %s (kept previous)' % (len(failed), ', '.join(failed)))
-    return out
+    return out, gone
+
+
+def gone_since(prev, resolved, missing):
+    """channelGone for one row: the first day Kick's channel API returned 404 for a
+    channel that used to resolve. Rows that never resolved (no pic, no followers)
+    never get it; a successful fetch clears it; any other failure keeps what was there."""
+    if resolved:
+        return None
+    if missing and (prev.get('pic') or prev.get('followers') is not None):
+        return prev.get('channelGone') or TODAY
+    return prev.get('channelGone')
 
 
 def step_his_chat(D):
@@ -466,7 +482,7 @@ def step_mentions(D):
     return len(found)
 
 
-def build_channels(prev_channels, bans, rows, kicks, gifters, kick):
+def build_channels(prev_channels, bans, rows, kicks, gifters, kick, gone=frozenset()):
     prev = {r['slug']: r for r in prev_channels}
     out = []
     for r in rows:
@@ -503,6 +519,9 @@ def build_channels(prev_channels, bans, rows, kicks, gifters, kick):
             'bannedAt': (active[-1]['at'] if active else (b[-1]['at'] if b else None)), 'banActive': bool(active),
             'nights': [{'label': l, 'href': h} for l, h in (r.get('p') or [])],
         })
+        g = gone_since(p, info is not None, s in gone)
+        if g:
+            out[-1]['channelGone'] = g
     out.sort(key=lambda r: (-r['subs'], -r['kicks']))
     return out
 
@@ -535,14 +554,19 @@ def main():
     kicks = step_kicks()
     slugs = [r['c'] for r in rows]
     gifters = step_top_gifters(slugs)
-    kick = step_kick_channels([SUBJECT_SLUG] + slugs)
+    kick, gone = step_kick_channels([SUBJECT_SLUG] + slugs)
     subj = kick.pop(SUBJECT_SLUG, None)
     if subj:
         if subj['followers'] is not None:
             D['subject']['followers'] = subj['followers']
         D['subject']['platformBanned'] = bool(subj['is_banned'])
+    g = gone_since(old['subject'], subj is not None, SUBJECT_SLUG in gone)
+    if g:
+        D['subject']['channelGone'] = g
+    else:
+        D['subject'].pop('channelGone', None)
     try:
-        D['channels'] = build_channels(old['channels'], D['bans'], rows, kicks, gifters, kick)
+        D['channels'] = build_channels(old['channels'], D['bans'], rows, kicks, gifters, kick, gone)
     except Exception as e:
         problems.append('channels: %s (kept previous)' % why(e))
     new_chat = step_his_chat(D)

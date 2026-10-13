@@ -13,6 +13,12 @@
   }
   function dayOnly(iso) { return iso ? utc(iso).slice(0, 10) : ''; }
   var MON3 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  /* red "channel gone Oct 13" tag for a channel Kick's channel API stopped returning (day = 'YYYY-MM-DD') */
+  function goneTag(day, who) {
+    var p = String(day).split('-'), md = p.length === 3 ? MON3[+p[1] - 1] + ' ' + +p[2] : esc(day);
+    var full = p.length === 3 ? md + ', ' + p[0] : md;
+    return '<span class="tag tag-red gone" title="Kick\'s channel API has returned no channel for ' + who + ' since ' + full + '; his user account still exists. Last known values are shown.">channel gone ' + md + '</span>';
+  }
   /* "Oct 9, 16:12" in UTC, no year: short enough to stay on one line in the table */
   function shortUtc(iso) {
     if (!iso) return '';
@@ -68,6 +74,7 @@
     $('aKicks').textContent = money(A.kicksPer1000);
     $('subjectFollowers').textContent = num(D.subject.followers);
     $('subjectCreated').textContent = D.subject.created;
+    if (D.subject.channelGone) $('subjectName').insertAdjacentHTML('beforeend', ' ' + goneTag(D.subject.channelGone, 'this account'));
     $('banCount').textContent = num(D.bans.length);
     $('nSubCh').textContent = num(D.totals.subChannels);
     $('nKickCh').textContent = num(D.totals.kickChannels);
@@ -158,6 +165,7 @@
             (r.pic ? '<img src="' + esc(r.pic) + '" alt="" loading="lazy" decoding="async" width="32" height="32">' : '<span class="dot mut" style="width:32px;height:32px"></span>') +
             '<div><a class="nm" href="https://kick.com/' + esc(r.slug) + '" target="_blank" rel="noopener" title="Open ' + esc(r.name) + ' on Kick">' + esc(r.name) + '</a>' +
             (r.verified ? '<span class="vf" title="Verified on Kick">&#10004;</span>' : '') +
+            (r.channelGone ? goneTag(r.channelGone, 'this streamer') : '') +
             (r.name.toLowerCase() !== r.slug ? '<span class="sl">' + esc(r.slug) + '</span>' : '') + '</div></div></td>';
         case 'followers': return '<td' + cls('n') + lab + '>' + (r.followers == null ? '<span class="pend">&mdash;</span>' : num(r.followers)) + '</td>';
         case 'subs':

@@ -112,6 +112,7 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
 .chan .nm { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; display: inline-block; vertical-align: middle; line-height: 1.35; }
 .chan .vf { color: var(--key); font-size: 11px; margin-left: 3px; vertical-align: 1px; }
 .chan .sl { color: var(--mut); font-size: 12px; display: block; }
+.chan .gone, .subject-name .gone { margin-left: 6px; vertical-align: middle; }
 /* column sizing */
 .grid .c-channel { min-width: 230px; }
 .grid .c-subs, .grid .c-kicks { min-width: 150px; }

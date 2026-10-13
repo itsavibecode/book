@@ -28,7 +28,7 @@ In about a month (18 Sept to 7 Oct 2026) one Kick account gifted 2,830 subs and 
 
 - **The source site** (`mastuhsplinter.nedbot.site/data.json`): which channels are in the table, their message counts and night links. Any night page the source adds is parsed, its transcript saved to `nights/`, its page generated here, and its URL added to the sitemap.
 - **kicklogz**: ban records, KICKs per channel, and each channel's top-gifters row for gifted subs and the last gift date. Twigggs, ZuesIRL and nedx keep the source site's leaderboard or own-count figure.
-- **Kick**: follower counts, profile pictures and verified marks for every channel; the account's followers and platform-ban flag; and the latest 25 messages in his own channel chat, merged into `hisChat` so the list only grows.
+- **Kick**: follower counts, profile pictures and verified marks for every channel; the account's followers and platform-ban flag; and the latest 25 messages in his own channel chat, merged into `hisChat` so the list only grows. When a channel that used to resolve starts returning 404 from Kick's channel API, its row keeps the last known name, picture and followers and gets `channelGone` set to the first day it went missing; the table shows a red "channel gone" tag. A later successful fetch removes the flag. Channels that never resolved (berry-blackberry, sainttenn) never get it. The account itself gets `subject.channelGone` the same way.
 - **Across Kick chats** (kicklogz chat search): messages in any channel kicklogz logs that contain the username, from 1 Sept 2026 on. New rows are merged into `mentions`; nothing already on the page is dropped. kicklogz lets a guest run about 25 searches a day and asks some visitors for a Turnstile check, so this step often gets turned away; when it does, the run logs why and keeps what is already there. The starting set came from a saved kicklogz search on 10 Oct 2026 (427 messages, 6 to 10 Oct; the saved page only loaded that far back).
 
 What stays manual: the X posts, the on-stream quotes, the timeline in "What happened", the evidence frames, the assumptions ($4.99, 95%) and the page copy. Edit those in `data.json` or `index.html` by hand.
@@ -42,7 +42,7 @@ What stays manual: the X posts, the on-stream quotes, the timeline in "What happ
 - **His own chat**: `https://kick.com/api/v2/channels/20492407/messages`, the latest 25 messages, collected daily from 10 Oct 2026. The praise, chargeback-talk and asks-for-gifts tags are keyword matches.
 - **Across Kick chats**: kicklogz `POST /api/search` (query = the username, all channels), polled through `/api/search/status/<jobId>`. kicklogz shows times in the viewer's local zone; the saved search was read in US Central (UTC-5), and each row's hidden UTC timestamp matched the night transcripts to the second, so the page stores and shows UTC. The same keyword tags as his own chat apply, plus "ban notice" for bot messages announcing a ban (bot lines get no keyword tags).
 - **Share at risk**: subs x $4.74. That is $4.99 less Kick's 5%, and it is the exact per-refund amount on wvagabond's Stripe ledger. It is labelled an estimate because only wvagabond has published a first-hand total.
-- **X posts**: read directly on X while signed in, 2026-10-10. Each carries a kind tag (first-hand number, names the gifter, claim, allegation, reaction). The stolen-card claim is labelled unverified; the $10,000+ figure is labelled a claim.
+- **X posts**: read directly on X while signed in, 2026-10-10 and 2026-10-13. Each carries a kind tag (first-hand number, names the gifter, claim, allegation, reaction). The stolen-card claim is labelled unverified; the $10,000+ figure is labelled a claim.
 
 ## What was improved over the source site
 
@@ -51,7 +51,7 @@ What stays manual: the X posts, the on-stream quotes, the timeline in "What happ
 - **The ban wave, charted.** 51 ban records bucketed by hour with a hover listing the channels and the moderators. The full list sits in a disclosure.
 - **Evidence on the page.** The Kick Support email and the Stripe refund rows are the two facts that settle "was it really a chargeback" and "how much per sub". The source site had neither.
 - **Night pages.** Added "His messages only", previous/next mention buttons, copy-a-link-to-this-minute on the time column, previous/next night navigation, and a breadcrumb back to the overview. Kept the source's search, mention filter, silent-minute filter, show-every-message toggle, and key moments.
-- **Every public post, tagged.** Ten X posts with a kind tag each, plus six on-stream quotes that link to the exact minute in the transcript.
+- **Every public post, tagged.** Fifteen X posts with a kind tag each, plus six on-stream quotes that link to the exact minute in the transcript.
 - **Site standards.** Favicon set, Open Graph card, semver in the title and footer, sitemap entries for all 19 pages, GA4 with the site-wide consent key and the `?ga=off` opt-out, tooltips on every non-obvious control.
 
 ## Roadmap
@@ -62,6 +62,9 @@ What stays manual: the X posts, the on-stream quotes, the timeline in "What happ
 - A link from the home links row, if the page is meant to be found from the home page.
 
 ## Changelog
+
+### v0.3.1 - 2026-10-13
+The loudest affected streamer lost his channel. On 13 Oct wvagabond posted "they took the $ out then banned me", and the same day Kick's channel API stopped returning his channel while his user account stayed. The page now notices when Kick stops returning a channel it used to show: the row keeps its last known picture and follower count and gets a red "channel gone" tag with the date, so a missing channel reads as news rather than a glitch. His five posts from 11 to 13 Oct are added, each labelled for what it is; the bank-withdrawal and card-removal posts are tagged as unverified allegations because no record has been published. Two timeline entries cover 11 and 13 Oct.
 
 ### v0.3.0 - 2026-10-10
 The reaction in other streamers' chats is part of the record, so the page now shows it. A new "Across Kick chats" section lists 427 messages from 52 channels that named the account between 6 and 10 Oct, found with kicklogz's chat search across all of Kick. You can narrow it to one channel or search the text, and each message carries the same simple keyword tags as his own chat, plus a "ban notice" tag when a bot announces a ban. None of the 427 are his own; if he ever posts one it is tagged. The daily refresh tries to add new ones, but kicklogz limits guest searches, so on days it is turned away the list simply stays as it was. The profile box also notes that the same handle has existed on Twitch since 2014.
