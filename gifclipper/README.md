@@ -37,6 +37,9 @@ Install button also sends a `gifclipper_install_click` event.
 
 ## Changelog
 
+### 0.6.0
+- Serves add-on v0.6.0 (runs inside Kick's embed player too, so it works on bookhockeys.com/stumble).
+
 ### 0.5.1
 - Serves add-on v0.5.1 (steady launcher width while recording).
 
