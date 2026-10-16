@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ink">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="version" content="0.1.0" />
+<title>Stumble v0.1.0 - Roll a random live Kick streamer | BookHockeys</title>
+
+<meta name="description" content="Hit Roll and land on a random live Kick stream, with a countdown you can see, pause, stretch or lock. Filter by viewers, language, category, uptime and title, lean the roll toward small streams, keep your own notes and tags on every streamer, and save or hide them. Free, works without an account; Sign in with Kick keeps it all on every device. Not affiliated with Kick." />
+<meta name="theme-color" content="#0b0d12" />
+<meta name="color-scheme" content="dark" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="https://bookhockeys.com/stumble/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="Stumble - Roll a random live Kick streamer" />
+<meta property="og:description" content="One button, one random live Kick stream, a countdown you control. Lean it toward the small streams nobody else finds." />
+<meta property="og:url" content="https://bookhockeys.com/stumble/" />
+<meta property="og:image" content="https://bookhockeys.com/stumble/og-card.png" />
+<meta property="og:image:secure_url" content="https://bookhockeys.com/stumble/og-card.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content="Stumble - the cyan roll ring beside the wordmark and the tagline Roll a random live Kick streamer." />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Stumble - Roll a random live Kick streamer" />
+<meta name="twitter:description" content="One button, one random live Kick stream, a countdown you control." />
+<meta name="twitter:image" content="https://bookhockeys.com/stumble/og-card.png" />
+<meta name="twitter:image:alt" content="Stumble - random live Kick stream roller" />
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Stumble" />
+<meta name="application-name" content="Stumble" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<link rel="preconnect" href="https://kick.com" crossorigin />
+<link rel="preconnect" href="https://player.kick.com" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" />
+
+<!-- Analytics: per-device opt-out first (?ga=off / ?ga=on, remembered in
+     localStorage), then Google Consent Mode v2 defaults (the greenline
+     logic), then GA4. The opt-out is written under the site-wide key that
+     every other bookhockeys.com page reads, and under `ga-optout` too, so
+     one visit to ?ga=off silences this device everywhere. The consent
+     decision shares the site-wide `greenline-consent` key. -->
+<script>
+(function () {
+  var GA_ID = 'G-DYME377V2S';
+  var OPT_KEYS = ['bookhockeys_ga_optout', 'ga-optout'];
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.get('ga') === 'off') OPT_KEYS.forEach(function (k) { localStorage.setItem(k, '1'); });
+    if (p.get('ga') === 'on') OPT_KEYS.forEach(function (k) { localStorage.removeItem(k); });
+  } catch (e) {}
+  var optedOut = false;
+  try {
+    optedOut = OPT_KEYS.some(function (k) { return localStorage.getItem(k) === '1'; });
+  } catch (e) {}
+  window['ga-disable-' + GA_ID] = optedOut;
+  window.__gaOptedOut = optedOut;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  if (optedOut) return;
+
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  // EU/EEA/UK/CH by browser timezone: no IP lookup, errs toward asking.
+  var tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  var euExtras = ['Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+    'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'];
+  var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+  var saved = null;
+  try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+  if (saved === 'granted' || (saved !== 'denied' && !likelyEU)) {
+    gtag('consent', 'update', { 'analytics_storage': 'granted' });
+  } else if (saved !== 'denied') {
+    window.__needsConsent = true;
+  }
+
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  document.head.appendChild(s);
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+})();
+</script>
+
+<script>
+/* Paint the saved theme before the stylesheet applies, so there is no flash. */
+(function () {
+  try {
+    var p = JSON.parse(localStorage.getItem('stumble.prefs') || 'null');
+    if (p && /^(ink|kick|ember)$/.test(p.theme)) document.documentElement.setAttribute('data-theme', p.theme);
+  } catch (e) {}
+})();
+</script>
+
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- Icon sprite: every icon on the page is one of these symbols. -->
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+  <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-7 0-10-8-10-8a18.4 18.4 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c7 0 10 8 10 8a18.5 18.5 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2M2 2l20 20"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+  <symbol id="i-vol" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></symbol>
+  <symbol id="i-mute" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M23 9l-6 6M17 9l6 6"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-verified" viewBox="0 0 24 24"><path d="M12 2l2.4 1.8 3-.2.9 2.9 2.5 1.7-1 2.8 1 2.8-2.5 1.7-.9 2.9-3-.2L12 22l-2.4-1.8-3 .2-.9-2.9-2.5-1.7 1-2.8-1-2.8 2.5-1.7.9-2.9 3 .2z"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></symbol>
+  <symbol id="i-caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-columns" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></symbol>
+  <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.2"/><circle cx="15" cy="6" r="1.2"/><circle cx="9" cy="12" r="1.2"/><circle cx="15" cy="12" r="1.2"/><circle cx="9" cy="18" r="1.2"/><circle cx="15" cy="18" r="1.2"/></symbol>
+  <symbol id="i-dice" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3"/><circle cx="15.5" cy="15.5" r="1.3"/><circle cx="12" cy="12" r="1.3"/></symbol>
+  <symbol id="i-retry" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15.4-6.4L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.4 6.4L3 16M3 21v-5h5"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-kick" viewBox="0 0 24 24"><path d="M5 3h5v5h2V6h2V3h5v6h-2v2h-2v2h2v2h2v6h-5v-3h-2v-2h-2v5H5z"/></symbol>
+</svg>
+
+<div class="app" id="app">
+
+  <header class="hd">
+    <div class="wm" title="Stumble - roll a random live Kick streamer">
+      <svg class="wm-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="62 7.1" stroke-dashoffset="-3.55" transform="rotate(-90 16 16)"/><circle cx="16" cy="5" r="2.2" fill="#fff"/></svg>
+      <span class="wm-name">Stumble</span><small class="wm-ver" id="verLabel">v0.1.0</small>
+    </div>
+    <div class="counters" id="counters" aria-live="polite">
+      <span id="cLive" title="Live streams Kick listed during the last scan. A plus sign means the scan stopped at your minimum-viewers floor, so there are more below it.">- live</span>
+      <span class="sep" aria-hidden="true"></span>
+      <span id="cMatch" title="Streams in the scanned pool that pass your filters and are not hidden">0 match</span>
+      <span class="sep" aria-hidden="true"></span>
+      <span id="cScan" title="How much of Kick's live list has been read so far. Rolls start as soon as one stream matches.">starting</span>
+    </div>
+    <div class="hd-msg" id="hdMsg" role="status" hidden></div>
+    <div class="sp"></div>
+    <button class="sync" id="syncDot" type="button" hidden title="Sync status"><span class="sync-dot"></span><span class="sr">Sync status</span></button>
+    <button class="btn-kick" id="signInBtn" type="button" title="Keeps your saved streamers, notes, tags, filters and history on every device. Nothing on this page needs it.">
+      <svg class="ic" aria-hidden="true"><use href="#i-kick"/></svg><span>Sign in with Kick</span>
+    </button>
+    <button class="acct" id="acctBtn" type="button" hidden title="Your account, in the More tab">
+      <img id="acctAvatar" alt="" width="24" height="24" /><span id="acctName"></span>
+    </button>
+  </header>
+  <div class="progress" id="progress" aria-hidden="true"><i id="progressBar"></i></div>
+
+  <div class="bd">
+    <main class="stage" id="stage">
+      <div class="player-wrap">
+        <div class="player" id="player">
+          <div class="player-empty" id="playerEmpty">
+            <svg class="pe-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="62 7.1" stroke-dashoffset="-3.55" transform="rotate(-90 16 16)"/></svg>
+            <p class="pe-main">Press <kbd>Space</kbd> or hit Roll to get a random live stream.</p>
+            <p class="pe-sub" id="emptyScan">Scanning Kick...</p>
+          </div>
+        </div>
+      </div>
+
+      <section class="card" id="card" aria-label="Stream on screen">
+        <div class="card-in" id="cardIn">
+          <a class="card-av" id="cardAvLink" href="https://kick.com/" target="_blank" rel="noopener" title="Open this channel on kick.com">
+            <img id="cardAv" alt="" width="48" height="48" />
+          </a>
+          <div class="card-main">
+            <div class="card-row1">
+              <a class="card-name" id="cardName" href="https://kick.com/" target="_blank" rel="noopener" title="Open this channel on kick.com">-</a>
+              <svg class="ic ic-ver" id="cardVerified" hidden aria-label="Verified on Kick" role="img"><title>Verified on Kick</title><use href="#i-verified"/></svg>
+              <svg class="ic ic-aff" id="cardAffiliate" hidden aria-label="Kick affiliate" role="img"><title>Kick affiliate</title><use href="#i-star"/></svg>
+              <span class="pill live" id="cardLive" title="How long this stream has been live">LIVE</span>
+              <span class="card-viewers" id="cardViewers" title="Viewers right now (refreshed every minute while the stream is on screen)"></span>
+              <button class="ib mute" id="muteBtn" type="button" aria-pressed="false" title="Mute or unmute the player (M). The embed has no volume control, so this reloads it.">
+                <svg class="ic" aria-hidden="true"><use href="#i-vol"/></svg><span class="sr">Mute</span>
+              </button>
+            </div>
+            <div class="card-chips" id="cardChips"></div>
+            <p class="card-title" id="cardTitle"></p>
+            <div class="card-mine" id="cardMine" hidden></div>
+          </div>
+        </div>
+        <div class="card-empty" id="cardEmpty" hidden>
+          <p id="cardEmptyMsg"></p>
+          <div class="card-empty-btns">
+            <button class="btn-ol" id="lowerRepeatBtn" type="button" title="Opens Filters with the don't-repeat field ready to change">Lower don't-repeat</button>
+            <button class="btn-ol" id="emptyClearBtn" type="button" title="Forget which streams you have seen, so they can come up again">Clear history</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="actions" id="actions">
+        <div class="roll-wrap" id="rollWrap">
+          <svg class="ring" id="ring" aria-hidden="true"><path class="ring-track" id="ringTrack" pathLength="100" /><path class="ring-arc" id="ringArc" pathLength="100" /></svg>
+          <button class="roll" id="rollBtn" type="button" title="Roll a new random live stream (Space)"><span>Roll</span></button>
+        </div>
+        <div class="act-btns">
+          <button class="act save" id="saveBtn" type="button" aria-pressed="false" title="Keep this streamer in your Saved list (S)">
+            <svg class="ic" aria-hidden="true"><use href="#i-heart"/></svg><span>Save</span>
+          </button>
+          <button class="act hide" id="hideBtn" type="button" title="Never roll this streamer again; undo from More > Hidden (B)">
+            <svg class="ic" aria-hidden="true"><use href="#i-eyeoff"/></svg><span>Hide</span>
+          </button>
+          <button class="act" id="noteBtn" type="button" title="Write a note or add tags, shown the next time this streamer comes up (N)">
+            <svg class="ic" aria-hidden="true"><use href="#i-note"/></svg><span>Note</span>
+          </button>
+          <button class="act" id="openBtn" type="button" title="Open this channel on kick.com in a new tab (O)">
+            <svg class="ic" aria-hidden="true"><use href="#i-open"/></svg><span>Open</span>
+          </button>
+          <button class="act" id="shareBtn" type="button" title="Copy a link that opens Stumble on this streamer">
+            <svg class="ic" aria-hidden="true"><use href="#i-share"/></svg><span>Share</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="timer" id="timerStrip">
+        <div class="t-read">
+          <span class="t-clock" id="tClock">-:--</span>
+          <span class="t-label" id="tLabel">Timer starts with your first roll.</span>
+        </div>
+        <div class="t-ctrls">
+          <button class="tb" id="tPause" type="button" aria-pressed="false" title="Pause or resume the countdown (T)">
+            <svg class="ic" aria-hidden="true"><use href="#i-pause"/></svg><span id="tPauseLbl">Pause</span>
+          </button>
+          <button class="tb" id="tMinus" type="button" title="Take 30 seconds off this stream ([). Never goes below 5 s.">-30s</button>
+          <button class="tb" id="tPlus" type="button" title="Give this stream 30 more seconds (])">+30s</button>
+          <form class="t-set" id="tSetForm" title="Only this roll. Change the default under Filters > Timer.">
+            <label class="sr" for="tSet">Seconds for this stream</label>
+            <input id="tSet" type="number" min="5" max="3600" step="5" inputmode="numeric" placeholder="sec" />
+            <button class="tb" type="submit">Set</button>
+          </form>
+          <button class="tb" id="tLock" type="button" aria-pressed="false" title="Stop the countdown for this stream until you unlock or roll by hand (L)">
+            <svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg><span>Lock</span>
+          </button>
+          <button class="tb tb-accent" id="tMakeDefault" type="button" hidden title="Use this stream's length for every roll from now on">Make this the default</button>
+        </div>
+        <span class="t-why" id="tWhy" aria-live="polite"></span>
+      </div>
+
+      <p class="legend" id="legend" title="Keyboard shortcuts. Press ? for the full list.">
+        <kbd>Space</kbd> roll <kbd>S</kbd> save <kbd>B</kbd> hide <kbd>N</kbd> note <kbd>O</kbd> open <kbd>T</kbd> pause <kbd>[</kbd><kbd>]</kbd> -30/+30 s <kbd>L</kbd> lock <kbd>M</kbd> mute <kbd>?</kbd> all keys
+      </p>
+    </main>
+
+    <aside class="rail" id="rail" aria-label="Panels">
+      <div class="tabs" role="tablist" aria-label="Panels" id="tabs">
+        <button class="tab" role="tab" type="button" id="tab-chat" aria-controls="panel-chat" aria-selected="true" data-tab="chat" title="The streamer's Kick chat (C)">Chat</button>
+        <button class="tab" role="tab" type="button" id="tab-notes" aria-controls="panel-notes" aria-selected="false" data-tab="notes" tabindex="-1" title="Your note and tags for the streamer on screen (N)">Notes</button>
+        <button class="tab" role="tab" type="button" id="tab-filters" aria-controls="panel-filters" aria-selected="false" data-tab="filters" tabindex="-1" title="What the roll may land on, and the timer (F)">Filters</button>
+        <button class="tab" role="tab" type="button" id="tab-saved" aria-controls="panel-saved" aria-selected="false" data-tab="saved" tabindex="-1" title="Streamers you saved">Saved</button>
+        <button class="tab" role="tab" type="button" id="tab-history" aria-controls="panel-history" aria-selected="false" data-tab="history" tabindex="-1" title="Everything you rolled, newest first">History</button>
+        <button class="tab" role="tab" type="button" id="tab-more" aria-controls="panel-more" aria-selected="false" data-tab="more" tabindex="-1" title="Hidden streamers, theme, account and about">More</button>
+        <button class="ib sheet-close" id="sheetClose" type="button" title="Close the panel">
+          <svg class="ic" aria-hidden="true"><use href="#i-down"/></svg><span class="sr">Close panel</span>
+        </button>
+      </div>
+
+      <div class="rail-body">
+        <!-- Chat -->
+        <section class="panel panel-chat" role="tabpanel" id="panel-chat" aria-labelledby="tab-chat">
+          <div class="chat-sec" id="chatSecStreamer">
+            <div class="chat-hd">
+              <button class="caret" id="chatCaretStreamer" type="button" aria-expanded="true" aria-controls="chatBodyStreamer" title="Collapse or expand this chat; the other one takes the space">
+                <svg class="ic" aria-hidden="true"><use href="#i-caret"/></svg><span class="sr">Toggle streamer chat</span>
+              </button>
+              <span class="chat-name" id="chatNameStreamer">Streamer chat</span>
+              <a class="chat-open" id="chatOpenStreamer" href="https://kick.com/" target="_blank" rel="noopener" title="Open this chat in its own window on kick.com" hidden>Open on Kick <svg class="ic" aria-hidden="true"><use href="#i-open"/></svg></a>
+            </div>
+            <div class="chat-body" id="chatBodyStreamer">
+              <p class="chat-empty" id="chatEmptyStreamer">Roll a stream to see its chat here.</p>
+            </div>
+          </div>
+          <div class="chat-sec" id="chatSecMine" hidden>
+            <div class="chat-hd">
+              <button class="caret" id="chatCaretMine" type="button" aria-expanded="true" aria-controls="chatBodyMine" title="Collapse or expand your own chat; the other one takes the space">
+                <svg class="ic" aria-hidden="true"><use href="#i-caret"/></svg><span class="sr">Toggle my chat</span>
+              </button>
+              <span class="chat-name" id="chatNameMine">My chat</span>
+              <a class="chat-open" id="chatOpenMine" href="https://kick.com/" target="_blank" rel="noopener" title="Open your own chat in its own window on kick.com">Open on Kick <svg class="ic" aria-hidden="true"><use href="#i-open"/></svg></a>
+            </div>
+            <div class="chat-body" id="chatBodyMine"></div>
+          </div>
+        </section>
+
+        <!-- Notes -->
+        <section class="panel panel-notes" role="tabpanel" id="panel-notes" aria-labelledby="tab-notes" hidden>
+          <div class="notes-empty" id="notesEmpty">Roll a stream first. Notes and tags belong to the streamer on screen.</div>
+          <div class="notes" id="notes" hidden>
+            <div class="notes-hd">
+              <img id="notesAv" alt="" width="36" height="36" />
+              <div class="notes-who">
+                <strong id="notesName"></strong>
+                <span class="muted" id="notesSeen"></span>
+              </div>
+            </div>
+            <label class="fld-lbl" for="noteText" title="Private to you. Shown on the card the next time this streamer comes up.">Note</label>
+            <textarea id="noteText" rows="4" maxlength="65536" placeholder="Why you'd come back, what they do, anything"></textarea>
+            <div class="notes-saved muted" id="noteSaved" aria-live="polite"></div>
+            <label class="fld-lbl" for="tagInput" title="Your own labels. Tags also work as filters: only roll, or never roll, streamers with a tag.">Tags</label>
+            <div class="tag-box" id="tagBox">
+              <div class="tag-chips" id="tagChips"></div>
+              <input id="tagInput" type="text" autocomplete="off" spellcheck="false" maxlength="40" placeholder="Add a tag, Enter or comma" aria-describedby="tagHint" aria-autocomplete="list" aria-controls="tagSuggest" />
+            </div>
+            <ul class="tag-suggest" id="tagSuggest" role="listbox" hidden></ul>
+            <p class="hint muted" id="tagHint">Backspace on an empty box removes the last tag.</p>
+          </div>
+        </section>
+
+        <!-- Filters -->
+        <section class="panel panel-filters" role="tabpanel" id="panel-filters" aria-labelledby="tab-filters" hidden>
+          <div class="f-count" id="fCount" aria-live="polite">0 streams match</div>
+
+          <fieldset class="fs">
+            <legend>Viewers</legend>
+            <div class="row2">
+              <label class="fld" title="Skips streams with fewer viewers than this. Also where the scan stops reading Kick's list, so a lower number means a longer scan.">
+                <span>Min</span><input id="fMin" type="number" min="0" max="10000000" step="1" inputmode="numeric" />
+              </label>
+              <label class="fld" title="Max keeps the roll away from the top 50 you already know about.">
+                <span>Max</span><input id="fMax" type="number" min="0" max="10000000" step="1" inputmode="numeric" placeholder="no limit" />
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="row2">
+            <label class="fld" title="Skips streams that just started and may still be a starting-soon screen.">
+              <span>Live for at least (min)</span><input id="fLive" type="number" min="0" max="1440" step="1" inputmode="numeric" />
+            </label>
+            <label class="fld" title="A streamer you've already seen stays out of the roll this long.">
+              <span>Don't repeat for (hours)</span><input id="fRepeat" type="number" min="0" max="720" step="0.5" inputmode="decimal" />
+            </label>
+          </div>
+
+          <label class="chk" title="Mature streams are marked 18+ by the streamer. Off keeps them out of the roll.">
+            <input id="fMature" type="checkbox" /><span>Include 18+ / mature</span>
+          </label>
+
+          <fieldset class="fs">
+            <legend>Streamer tier</legend>
+            <div class="seg" role="group" aria-label="Streamer tier" id="fTier">
+              <button type="button" data-v="any" aria-pressed="true" title="Everyone">Any</button>
+              <button type="button" data-v="affiliate" aria-pressed="false" title="Only Kick affiliates: streamers who met Kick's bar to earn from subs">Affiliate</button>
+              <button type="button" data-v="nonaffiliate" aria-pressed="false" title="Only streamers who are not affiliates yet, the smallest of the small">Non-affiliate</button>
+            </div>
+            <label class="chk" title="Kick does not expose 'partner'; the verified check is the closest thing. Each roll costs one extra lookup.">
+              <input id="fVerified" type="checkbox" /><span>Verified only</span>
+            </label>
+          </fieldset>
+
+          <fieldset class="fs">
+            <legend>Languages</legend>
+            <input class="f-search" id="fLangSearch" type="search" placeholder="Find a language" hidden title="Narrow the language list" />
+            <div class="chips" id="fLangs" title="None picked means any language. Counts are live streams in the scanned pool."></div>
+          </fieldset>
+
+          <fieldset class="fs">
+            <legend>Categories</legend>
+            <input class="f-search" id="fCatSearch" type="search" placeholder="Search categories" autocomplete="off" title="Find a category to include or exclude. Matches Kick's 160 busiest categories plus anything in the pool." />
+            <div class="chips" id="fCats" title="Click a category to include it, again to exclude it, again to clear. Included categories are scanned directly; excluded ones are filtered out."></div>
+            <p class="hint muted">Click: include, exclude, off.</p>
+          </fieldset>
+
+          <div class="row2">
+            <label class="fld" title="Only streams whose title has any of these words. Separate with commas.">
+              <span>Title contains</span><input id="fHas" type="text" spellcheck="false" placeholder="e.g. chill, irl" />
+            </label>
+            <label class="fld" title="Never streams whose title has any of these words. Separate with commas.">
+              <span>Title excludes</span><input id="fNot" type="text" spellcheck="false" placeholder="e.g. giveaway, 24/7" />
+            </label>
+          </div>
+
+          <fieldset class="fs">
+            <legend>Your tags</legend>
+            <div class="tagf-lbl" title="Only roll streamers you gave at least one of these tags">Only streamers tagged</div>
+            <div class="chips" id="fTagsAny"></div>
+            <div class="tagf-lbl" title="Never roll streamers you gave any of these tags">Never roll streamers tagged</div>
+            <div class="chips" id="fTagsNever"></div>
+          </fieldset>
+
+          <fieldset class="fs">
+            <legend>Bias</legend>
+            <div class="seg" role="group" aria-label="Roll bias" id="fBias">
+              <button type="button" data-v="fair" aria-pressed="false" title="Every matching stream has the same chance">Fair</button>
+              <button type="button" data-v="underdogs" aria-pressed="true" title="Smaller streams come up more often, so you find people nobody else is finding">Underdogs</button>
+              <button type="button" data-v="popular" aria-pressed="false" title="Bigger streams come up more often, for a busier chat">Popular</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="fs">
+            <legend>Timer</legend>
+            <div class="seg seg-wrap" role="group" aria-label="Default timer length" id="fTimer">
+              <button type="button" data-v="0" aria-pressed="false" title="No countdown: a stream stays until you roll">Off</button>
+              <button type="button" data-v="15" aria-pressed="false">15 s</button>
+              <button type="button" data-v="30" aria-pressed="false">30 s</button>
+              <button type="button" data-v="60" aria-pressed="true">1 m</button>
+              <button type="button" data-v="120" aria-pressed="false">2 m</button>
+              <button type="button" data-v="300" aria-pressed="false">5 m</button>
+              <button type="button" data-v="600" aria-pressed="false">10 m</button>
+            </div>
+            <label class="fld fld-inline" title="Any length from 10 seconds to an hour, for every roll">
+              <span>Custom (seconds)</span><input id="fTimerCustom" type="number" min="10" max="3600" step="1" inputmode="numeric" />
+            </label>
+            <label class="chk" title="A soft tick each second in the last 5 seconds, so you know a roll is coming without looking">
+              <input id="fTick" type="checkbox" /><span>Tick in the last 5 s</span>
+            </label>
+            <div class="tagf-lbl">Pause the countdown while</div>
+            <label class="chk" title="So the stream does not change while you write a note or filter">
+              <input id="fPauseTyping" type="checkbox" /><span>Typing (any box, or the chat)</span>
+            </label>
+            <label class="chk" title="So you do not miss streams while you are in another tab">
+              <input id="fPauseHidden" type="checkbox" /><span>This tab is hidden</span>
+            </label>
+            <label class="chk" title="So a button does not vanish from under the pointer">
+              <input id="fPauseHover" type="checkbox" /><span>The pointer is on the buttons</span>
+            </label>
+            <label class="chk" title="A 2-second grace after Mute, because changing the sound usually means you are listening">
+              <input id="fPauseMute" type="checkbox" /><span>Right after mute / unmute</span>
+            </label>
+          </fieldset>
+
+          <button class="linkish f-reset" id="fReset" type="button" title="Back to the defaults: 10 to 2,000 viewers, any language, Underdogs, 1 minute. Timer settings stay.">Reset filters</button>
+        </section>
+
+        <!-- Saved -->
+        <section class="panel panel-saved" role="tabpanel" id="panel-saved" aria-labelledby="tab-saved" hidden>
+          <div class="saved-bar">
+            <span class="muted" id="savedCount"></span>
+            <button class="btn-ol btn-sm" id="savedRefresh" type="button" title="Check who is live now (up to 20 at a time)">
+              <svg class="ic" aria-hidden="true"><use href="#i-retry"/></svg><span>Check live</span>
+            </button>
+            <div class="col-mgr-wrap">
+              <button class="btn-ol btn-sm" id="colBtn" type="button" aria-expanded="false" aria-controls="colMenu" title="Show, hide and reorder the table's columns">
+                <svg class="ic" aria-hidden="true"><use href="#i-columns"/></svg><span>Columns</span>
+              </button>
+              <div class="col-menu" id="colMenu" hidden>
+                <p class="muted">Drag to reorder. Untick to hide.</p>
+                <ul id="colList"></ul>
+                <button class="linkish" id="colReset" type="button" title="Default columns, order and widths">Reset layout</button>
+              </div>
+            </div>
+          </div>
+          <div class="saved-wrap" id="savedWrap">
+            <table class="saved" id="savedTable">
+              <colgroup id="savedCols"></colgroup>
+              <thead><tr id="savedHead"></tr></thead>
+              <tbody id="savedBody"></tbody>
+            </table>
+          </div>
+          <p class="empty" id="savedEmpty" hidden>Press <kbd>S</kbd> on a stream to keep it here.</p>
+        </section>
+
+        <!-- History -->
+        <section class="panel panel-history" role="tabpanel" id="panel-history" aria-labelledby="tab-history" hidden>
+          <div class="saved-bar">
+            <span class="muted" id="histCount"></span>
+            <button class="btn-ol btn-sm danger" id="histClear" type="button" title="Forget every roll, including the don't-repeat memory. Saved, hidden, notes and tags stay.">Clear history</button>
+          </div>
+          <div id="histList"></div>
+          <p class="empty" id="histEmpty" hidden>Nothing yet. Every roll lands here.</p>
+        </section>
+
+        <!-- More -->
+        <section class="panel panel-more" role="tabpanel" id="panel-more" aria-labelledby="tab-more" hidden>
+          <h3 class="m-h">Account</h3>
+          <div id="acctBox"></div>
+
+          <h3 class="m-h">Hidden streamers</h3>
+          <div id="blockedList"></div>
+
+          <h3 class="m-h">Theme</h3>
+          <div class="themes" role="group" aria-label="Theme" id="themes">
+            <button class="theme-sw" type="button" data-theme-pick="ink" aria-pressed="true" title="Neon Ink: near-black with a cyan roll"><span class="sw sw-ink"></span>Neon Ink</button>
+            <button class="theme-sw" type="button" data-theme-pick="kick" aria-pressed="false" title="Kick Green: Kick's own black and green"><span class="sw sw-kick"></span>Kick Green</button>
+            <button class="theme-sw" type="button" data-theme-pick="ember" aria-pressed="false" title="Ember: warm dark brown with an orange roll"><span class="sw sw-ember"></span>Ember</button>
+          </div>
+
+          <h3 class="m-h">Panels</h3>
+          <label class="chk" id="myChatRow" title="Splits the Chat tab so your own Kick chat sits under the streamer's. Signed in only, because we need to know your channel.">
+            <input id="pMyChat" type="checkbox" /><span>Show my chat</span>
+          </label>
+          <label class="chk" title="The one-line list of keys under the timer">
+            <input id="pLegend" type="checkbox" /><span>Show key legend</span>
+          </label>
+
+          <h3 class="m-h">About</h3>
+          <div class="about">
+            <p>Stumble rolls a random live Kick stream. Set the filters, hit Roll, and a countdown moves you on unless you stop it. Lean it toward small streams with Underdogs and you will meet people nobody else is finding.</p>
+            <p>Not affiliated with Kick. Video and chat are Kick's own embeds; the live list comes from Kick's public pages, fetched straight from your browser.</p>
+            <p><strong>What is stored.</strong> Your filters, timer and theme, the streamers you saved or hid, your notes and tags, and your last 500 rolls. Signed out, that lives only in this browser. Signed in with Kick, a copy is kept by our small sync server under your Kick user id, with your Kick name and picture; we ask Kick for nothing beyond reading your public profile, and you can sign out at any time.</p>
+            <p><strong>Analytics.</strong> Google Analytics counts anonymous visits and rolls, shared with the rest of bookhockeys.com. Visit <code>bookhockeys.com/stumble/?ga=off</code> once to switch it off on this device for good (<code>?ga=on</code> undoes it). <span id="gaState"></span> <button class="linkish" id="cookieReset" type="button" title="Change your analytics cookie choice">Cookie choice</button></p>
+            <p class="muted">Stumble <span id="aboutVer">v0.1.0</span>. <a href="/" title="BookHockeys home">BookHockeys</a></p>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<div class="consent" id="consentBanner" hidden role="dialog" aria-labelledby="consentTitle" aria-describedby="consentDesc">
+  <div class="consent-text">
+    <strong id="consentTitle">Cookies for analytics</strong>
+    <p id="consentDesc">Stumble uses Google Analytics to count anonymous visits. No ads, no personal data sold. The page works either way.</p>
+  </div>
+  <div class="consent-btns">
+    <button class="btn-ol" id="consentReject" type="button" title="No analytics cookies">Reject</button>
+    <button class="btn" id="consentAccept" type="button" title="Allow anonymous analytics">Accept</button>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
