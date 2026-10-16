@@ -65,6 +65,12 @@ the small `stumble-worker` next to this repo.
   notes and tags stay.
 - **More**: account, hidden streamers, theme (Neon Ink, Kick Green, Ember), panels (show
   my chat, show the key legend), about.
+- **N chatting** next to the viewer count is how many different people sent a chat
+  message in the last five minutes (counted from the moment the stream came up, so give
+  it a minute), with messages per minute in brackets once there is enough to say. Kick
+  never shows this number; the page reads the public chat feed through `stumble-worker`,
+  which relays it (Kick's chat socket refuses any browser origin but its own) and only
+  counts, it never posts. Viewers is everyone watching; this is who talks.
 - **Chat** shows the streamer's Kick chat (you can sign in to Kick inside it and type).
   Signed in to Stumble, "Show my chat" adds your own channel's chat underneath. Each
   section has a caret to collapse it (the other takes the space) and Open on Kick.

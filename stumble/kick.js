@@ -190,6 +190,7 @@ export function normalizeChannel(d, slug) {
     affiliate: !!d.is_affiliate,
     userId: d.user_id || user.id || null,
     channelId: d.id || null,
+    chatroomId: d.chatroom ? d.chatroom.id : null,
     streamId: ls ? ls.id : null
   };
 }
@@ -216,6 +217,87 @@ export function streamFromChannel(c) {
     categories: c.category ? [c.category] : [],
     affiliate: c.affiliate,
     live: c.live
+  };
+}
+
+/* ---------- chatters: unique people talking, from Kick's public chat ---------- */
+
+/* Kick's chat rides on a Centrifugo websocket (checked 2026-10-16; the old
+   Pusher keys are dead) that only accepts kick.com origins, so the page reads
+   it through stumble-worker's /chat-ws relay, which forwards every
+   publication frame untouched. Read-only: nothing is ever sent. Counting
+   distinct sender ids over a sliding window gives "N chatting", a number Kick
+   itself never shows. */
+export const CHATTER_WINDOW_MS = 5 * 60 * 1000;
+
+/* Starts counting from relay socket `wsUrl`. `onUpdate({chatters, msgsPerMin,
+   status})` fires on every message and every 10 s (so the window can shrink);
+   status is 'connecting' | 'live' | 'reconnecting' | 'failed'. Returns {stop}. */
+export function chatCounter(wsUrl, onUpdate) {
+  const seen = new Map();          // sender id -> last message time
+  const times = [];                // message times inside the window
+  let ws = null, ready = false, stopped = false, tickTimer = 0, pingTimer = 0, status = 'connecting', attempts = 0;
+
+  function prune(now) {
+    const cut = now - CHATTER_WINDOW_MS;
+    seen.forEach(function (t, id) { if (t < cut) seen.delete(id); });
+    while (times.length && times[0] < cut) times.shift();
+  }
+  function emit() {
+    const now = Date.now();
+    prune(now);
+    const span = Math.min(CHATTER_WINDOW_MS, Math.max(now - (times[0] || now), 15000));
+    onUpdate({ chatters: seen.size, msgsPerMin: times.length / (span / 60000), status: status });
+  }
+  function setStatus(s) { status = s; emit(); }
+
+  function noteMessage(pub) {
+    // pub.data = { event: 'App\\Events\\ChatMessageEvent', data: '<json string>' }
+    const d = pub && pub.data;
+    if (!d || !/ChatMessage(Sent)?Event$/.test(String(d.event || ''))) return;
+    let m = d.data;
+    if (typeof m === 'string') { try { m = JSON.parse(m); } catch (e) { return; } }
+    const sender = (m && (m.sender || m.user)) || {};
+    const id = sender.id || sender.user_id || sender.username || sender.slug;
+    if (!id) return;
+    const now = Date.now();
+    seen.set(String(id), now);
+    times.push(now);
+    emit();
+  }
+
+  function open() {
+    if (stopped) return;
+    try { ws = new WebSocket(wsUrl); } catch (e) { setStatus('failed'); return; }
+    const sock = ws;
+    ready = false;
+    const to = setTimeout(function () { if (!ready && sock === ws) { try { sock.close(); } catch (e) { /* ignore */ } } }, 12000);
+    sock.onmessage = function (raw) {
+      const text = String(raw.data);
+      if (text === '{}') return;                                   // our keep-alive echoed back
+      let m; try { m = JSON.parse(text); } catch (e) { return; }
+      if (m.ready) { clearTimeout(to); ready = true; attempts = 0; setStatus('live'); return; }
+      if (m.push && m.push.pub) noteMessage(m.push.pub);
+    };
+    sock.onclose = function () {
+      clearTimeout(to);
+      if (sock !== ws || stopped) return;
+      if (++attempts > 4) { setStatus('failed'); return; }
+      setStatus('reconnecting');
+      setTimeout(open, 1500 * attempts);
+    };
+  }
+
+  open();
+  tickTimer = setInterval(emit, 10000);
+  pingTimer = setInterval(function () { if (ws && ws.readyState === 1) ws.send('{}'); }, 25000);
+  return {
+    stop: function () {
+      stopped = true;
+      clearInterval(tickTimer); clearInterval(pingTimer);
+      try { if (ws) ws.close(); } catch (e) { /* ignore */ }
+      ws = null;
+    }
   };
 }
 

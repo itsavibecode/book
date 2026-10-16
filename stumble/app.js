@@ -69,6 +69,7 @@ const S = {
   sheetOpen: false,
   matchCount: 0,
   liveCache: {},          // slug -> {live, viewers, t}
+  chat: null,             // {slug, counter, chatters, msgsPerMin, status} for the stream on screen
   ownSlug: '',
   refreshTimer: 0,
   noteTimer: 0,
@@ -544,6 +545,7 @@ function showStream(s, opts) {
   renderTimer(timer.state());
 
   // keep viewers fresh while on screen; first lookup also learns "verified"
+  stopChatCounter();
   clearInterval(S.refreshTimer);
   clearTimeout(S.refreshSoon);
   S.refreshSoon = setTimeout(refreshCurrent, 1500);
@@ -556,12 +558,49 @@ function showStream(s, opts) {
   track('stumble_roll', { source: opts.source || 'manual' });
 }
 
+/* "N chatting": unique senders in Kick's public chat feed over the last five
+   minutes, counted from the moment the stream came up (section 3.4 of the
+   plan did not have it; the user asked for it on 2026-10-16). */
+function startChatCounter(slug, channelId, roomId) {
+  stopChatCounter();
+  const entry = { slug: slug, counter: null, chatters: 0, msgsPerMin: 0, status: 'connecting', since: Date.now() };
+  S.chat = entry;
+  // The relay lives on the Worker; no Worker (offline, or not deployed yet)
+  // just means the number stays off the card.
+  const wsUrl = WORKER.replace(/^http/, 'ws') + '/chat-ws?channel=' + encodeURIComponent(channelId) + '&room=' + encodeURIComponent(roomId);
+  entry.counter = K.chatCounter(wsUrl, function (u) {
+    if (S.chat !== entry) return;
+    entry.chatters = u.chatters; entry.msgsPerMin = u.msgsPerMin; entry.status = u.status;
+    renderChatters();
+  });
+  renderChatters();
+}
+function stopChatCounter() {
+  if (S.chat && S.chat.counter) S.chat.counter.stop();
+  S.chat = null;
+  renderChatters();
+}
+function renderChatters() {
+  const el = $('cardChatters');
+  const c = S.chat, s = S.current;
+  if (!el) return;
+  if (!c || !s || c.slug !== s.slug || s.live === false || c.status === 'failed') { el.textContent = ''; el.hidden = true; return; }
+  el.hidden = false;
+  const mins = Math.min(5, Math.max(1, Math.round((Date.now() - c.since) / 60000)));
+  if (c.status !== 'live' && !c.chatters) { el.textContent = 'chat: connecting'; el.classList.add('dim'); return; }
+  el.classList.remove('dim');
+  el.textContent = plural(c.chatters, 'chatting', 'chatting') + (c.msgsPerMin >= 1 ? ' (' + Math.round(c.msgsPerMin) + '/min)' : '');
+  el.title = 'People who sent a chat message in the last ' + (mins < 5 ? mins + ' min (counting since this stream came up)' : '5 minutes') +
+    ', read from Kick\'s public chat feed. Viewers includes everyone watching; this is only who talks.';
+}
+
 async function refreshCurrent() {
   const s = S.current;
   if (!s) return;
   const c = await K.fetchChannel(s.slug);
   if (S.current !== s || c.status !== 'ok') return;
   verifiedSet(s.slug, c.verified);
+  if (c.live && c.chatroomId && c.channelId && !(S.chat && S.chat.slug === s.slug)) startChatCounter(s.slug, c.channelId, c.chatroomId);
   s.live = c.live;
   if (c.live) {
     s.viewers = c.viewers;

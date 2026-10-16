@@ -175,6 +175,9 @@ kbd {
 .pill.live { background: var(--pos); color: #0b0d12; }
 .pill.live.off { background: var(--panel-2); color: var(--muted); }
 .card-viewers { color: var(--muted); font-variant-numeric: tabular-nums; }
+.card-chatters { color: var(--muted); font-variant-numeric: tabular-nums; }
+.card-chatters::before { content: '\00b7'; margin-right: 6px; }
+.card-chatters.dim { opacity: .6; }
 .card-row1 .mute { margin-left: auto; }
 .mute[aria-pressed="true"] { color: var(--warn); border-color: var(--warn); }
 .card-chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
