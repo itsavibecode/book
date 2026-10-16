@@ -1,4 +1,4 @@
-# Stumble v0.1.0 - roll a random live Kick streamer
+# Stumble v0.1.0 - Kick Discovery: roll a random live streamer
 
 Hit Roll and land on a random live Kick stream. A countdown ring around the button moves
 you on unless you pause, stretch or lock it. Filters decide what the roll may land on, an

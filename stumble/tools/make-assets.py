@@ -107,6 +107,8 @@ def og_card():
     im.alpha_composite(layer)
     d = ImageDraw.Draw(im)
     spaced(d, (S(70), S(262)), NAME, wm, TEXT, S(8))
+    # small accent caption above the wordmark
+    spaced(d, (S(74), S(170)), "KICK DISCOVERY", font(FONT_B, S(26)), ACCENT, S(6))
 
     d.text((S(74), S(330)), "Roll a random live", font=font(FONT_B, S(40)), fill=TEXT, anchor="lm")
     d.text((S(74), S(380)), "Kick streamer.", font=font(FONT_B, S(40)), fill=TEXT, anchor="lm")

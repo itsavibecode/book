@@ -121,6 +121,7 @@ kbd {
 .wm-mark { width: 22px; height: 22px; align-self: center; }
 .wm-name { font: 700 20px/1 var(--font-d); letter-spacing: .14em; text-transform: uppercase; color: var(--text); }
 .wm-ver { font: 500 12px/1 var(--font-d); color: var(--muted); }
+.wm-tag { font: 500 11px/1 var(--font-d); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); padding-left: 10px; border-left: 1px solid var(--border); white-space: nowrap; }
 .counters {
   display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0;
   font: 500 13px/1.3 var(--font-d); color: var(--muted); font-variant-numeric: tabular-nums;
@@ -478,6 +479,7 @@ table.saved { width: 100%; table-layout: fixed; border-collapse: collapse; font-
 }
 @media (max-width: 360px) {
   .wm-name { font-size: 17px; }
+  .wm-tag { display: none; }
   .tab { font-size: 11px; letter-spacing: -.01em; }
   .card-av img { width: 40px; height: 40px; }
 }
