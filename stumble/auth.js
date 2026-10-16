@@ -1,10 +1,17 @@
 /* Stumble - Sign in with Kick (OAuth 2.1 authorization code + PKCE S256).
    The page only ever holds the public client id. The code is exchanged by
    stumble-worker, which keeps the client secret and hands back our own
-   HMAC-signed session token (no cookies). */
+   HMAC-signed session token (no cookies).
+
+   Stumble shares the "Moddeck" Kick app (Kick allows two apps per account and
+   one redirect URL per app; both slots are used). So Kick always redirects to
+   ModDeck's callback, https://moddeck.bookhockeys.com/auth/kick, which hands
+   logins whose state starts with "stumble." straight back here, code and
+   state untouched. The PKCE verifier never leaves this tab. */
 'use strict';
 
 const AUTHORIZE_URL = 'https://id.kick.com/oauth/authorize';
+export const KICK_REDIRECT = 'https://moddeck.bookhockeys.com/auth/kick';
 const SS_VERIFIER = 'stumble.pkce.verifier';
 const SS_STATE = 'stumble.pkce.state';
 const SS_RETURN = 'stumble.pkce.hash';
@@ -21,9 +28,9 @@ export function isLocalHost(hostname) {
   return h === '127.0.0.1' || h === 'localhost' || h === '[::1]';
 }
 
-/* The registered redirect URL: this page's folder, no file name, no query. */
+/* The registered redirect URL is ModDeck's callback, not this page (see top). */
 export function redirectUri() {
-  return location.origin + location.pathname.replace(/index\.html$/, '');
+  return KICK_REDIRECT;
 }
 
 function b64url(bytes) {
@@ -46,7 +53,9 @@ export async function challengeFor(verifier) {
 /* Step 1: remember verifier + state for this tab, then go to Kick. */
 export async function beginLogin(clientId) {
   const verifier = randomString(48); // 64 chars, inside the 43-128 range
-  const state = randomString(16);
+  // "stumble.<L|P>.<random>": the prefix tells ModDeck's callback to hand the
+  // login back, L/P picks the local dev server or the live page as the target.
+  const state = 'stumble.' + (isLocalHost() ? 'L' : 'P') + '.' + randomString(16);
   const challenge = await challengeFor(verifier);
   sessionStorage.setItem(SS_VERIFIER, verifier);
   sessionStorage.setItem(SS_STATE, state);

@@ -138,18 +138,20 @@ node tools/selftest.mjs      # from this folder; needs network
 - **Player**: `https://player.kick.com/<slug>?autoplay=true&muted=false`; mute re-creates
   the iframe. **Chat**: `https://kick.com/popout/<slug>/chat`.
 
-## Setting up sign-in (one-time, for the owner)
+## How sign-in is wired (for the owner)
 
-1. kick.com > Settings > Developer (needs 2FA): create an app with redirect URLs
-   `https://bookhockeys.com/stumble/` and `http://127.0.0.1:3460/stumble/`, scope
-   `user:read`.
-2. Paste the **Client ID** (public) into `KICK_CLIENT_ID` at the top of `app.js`.
-3. Put the secrets into the Worker (see `stumble-worker/README.md`):
-   `wrangler secret put KICK_CLIENT_ID`, `KICK_CLIENT_SECRET`, `SESSION_SECRET`, then
-   deploy it.
+Kick allows two developer apps per account and one redirect URL per app, and both slots
+were already taken. So Stumble shares the **Moddeck** app: its Client ID is in `app.js`,
+Kick always redirects to `https://moddeck.bookhockeys.com/auth/kick`, and that page hands
+any login whose state starts with `stumble.` straight back to this page (live, or the
+`127.0.0.1:3460` dev server), code and state untouched. The PKCE verifier never leaves
+this tab, and stumble-worker exchanges the code with the Moddeck app's secret. The Kick
+consent screen therefore says "Moddeck" with only the `user:read` scope ticked. Rotating
+that secret means updating both Workers.
 
-Until then the Sign in button says "Sign-in not set up yet" and everything works signed
-out. On `127.0.0.1` the More tab also shows "Dev sign-in (local Worker)", which signs in a
+The Worker needs `KICK_CLIENT_SECRET` (the Moddeck app's) and `SESSION_SECRET` via
+`wrangler secret put` (see `stumble-worker/README.md`), then a deploy. Until the Worker is
+up, Sign in fails with a plain message and everything works signed out. On `127.0.0.1` the More tab also shows "Dev sign-in (local Worker)", which signs in a
 fake user through `wrangler dev` with `DEV_FAKE_LOGIN=1`, for testing sync.
 
 The first sign-in on a device that already has data asks "Keep what's on this device?":
@@ -188,8 +190,9 @@ once switches analytics off on that device for good (the script is not even load
   on the page first.
 - "Show my chat" needs your channel name, which comes from looking up your Kick username;
   accounts whose channel name differs from the username will not get it.
-- Sign in with Kick and the Worker's official-API helpers cannot be tested until the
-  Kick app exists.
+- Sign in with Kick needs the live ModDeck callback page, so it only works once the
+  ModDeck site and stumble-worker are deployed; the local dev server can still complete a
+  login because that callback knows the dev address.
 
 ---
 

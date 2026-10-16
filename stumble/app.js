@@ -20,7 +20,9 @@ const VERSION = '0.1.0';
    until the app exists: Sign in then just says so, and everything else
    works signed out from localStorage. The secret never goes here; it lives
    in stumble-worker (wrangler secret put KICK_CLIENT_SECRET). */
-const KICK_CLIENT_ID = '';
+// The shared "Moddeck" Kick app (public id; the secret lives in stumble-worker).
+// Kick's consent screen therefore says Moddeck, with only user:read ticked.
+const KICK_CLIENT_ID = '01KTFN1XEM335BE7QAKXD15G0H';
 const RESCAN_MS = 10 * 60 * 1000;
 const VIEWER_REFRESH_MS = 60 * 1000;
 const VERIFY_TRIES = 12;
