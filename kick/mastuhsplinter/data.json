@@ -1356,6 +1356,17 @@
    "note": "Second-hand: his account of what Kick co-founder Eddie said on the Kick Talk show. The gifter's account was indeed not platform-banned as of this page's last check."
   },
   {
+   "url": "https://x.com/LoulzHQ/status/2109886708674121859",
+   "handle": "@LoulzHQ",
+   "who": "Loulz (Kick streamer)",
+   "time": "2026-10-13T05:59:25Z",
+   "kind": "first-hand",
+   "text": "An update for those affected by the MastuhSplinter chargebacks, you may notice your Kick dashboard no longer reflects the negative balance. Before you celebrate, know that the remaining balance was pulled from your bank account.",
+   "views": 7859,
+   "likes": null,
+   "note": "Second streamer to report the same mechanism, 14 hours before wvagabond's post about his own bank account. Still the streamers' word; no bank record has been published."
+  },
+  {
    "url": "https://x.com/antislave1/status/2110034552089645505",
    "handle": "@antislave1",
    "who": "wvagabond (Kick streamer)",
@@ -1385,7 +1396,7 @@
    "text": "Massive scandal at kick streaming! Kicks attempted to withdrawal over $1200 from wvagabonds personal savings account via a reverse ach biz to biz \"purchase\". People are trying to disconnect their cards to protect against being robbed but kick is blocking it. I purchased nothing",
    "views": 2351,
    "likes": null,
-   "note": "Unverified. No bank record has been published. A negative creator balance being collected from a linked payout account would look like this from the account holder's side; whether that is what happened is not established."
+   "note": "Unverified as to the amount, but Loulz reported the same thing hours earlier: cleared dashboard balances with the remainder taken from the linked bank account. No bank record has been published by either."
   },
   {
    "url": "https://x.com/antislave1/status/2110111291612320100",
@@ -1397,6 +1408,17 @@
    "views": 423,
    "likes": null,
    "note": "Unverified; no independent confirmation."
+  },
+  {
+   "url": "https://x.com/TikiNedX/status/2110263729304846509",
+   "handle": "@TikiNedX",
+   "who": "viewer",
+   "time": "2026-10-14T06:57:34Z",
+   "kind": "claim",
+   "text": "Damn. That dude only got 2 subs outside of the 111 from MastuhSplinter and got 7979 bits clawed back from him too. He'll never be able to get out of that debt at this rate!",
+   "views": 271,
+   "likes": null,
+   "note": "Points at IrishMuldogz (106 subs and 7,979 KICKs on this page). If accurate, KICKs were reversed as well as subs. Not confirmed by the streamer himself."
   }
  ],
  "quotes": [

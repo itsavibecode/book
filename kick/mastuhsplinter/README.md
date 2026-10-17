@@ -63,6 +63,9 @@ What stays manual: the X posts, the on-stream quotes, the timeline in "What happ
 
 ## Changelog
 
+### v0.3.2 - 2026-10-17
+A second streamer backs up the bank pull. On 13 Oct, about 14 hours before wvagabond's post about his own bank account, Loulz wrote that affected streamers' negative balances had vanished from their Kick dashboards because the rest had been taken from their linked bank accounts. Both posts are added, and wvagabond's $1,200 post now notes that Loulz said the same thing first; neither has shown a bank record, so the amount is still unverified. A viewer's post also says IrishMuldogz had 7,979 KICKs clawed back, which matches his KICKs total here, so KICKs appear to have been reversed as well as subs. The 13 Oct timeline entry now opens with Loulz, and the caveats say the share-at-risk figure is a floor, not a ceiling, because it only counts subs.
+
 ### v0.3.1 - 2026-10-13
 The loudest affected streamer lost his channel. On 13 Oct wvagabond posted "they took the $ out then banned me", and the same day Kick's channel API stopped returning his channel while his user account stayed. The page now notices when Kick stops returning a channel it used to show: the row keeps its last known picture and follower count and gets a red "channel gone" tag with the date, so a missing channel reads as news rather than a glitch. His five posts from 11 to 13 Oct are added, each labelled for what it is; the bank-withdrawal and card-removal posts are tagged as unverified allegations because no record has been published. Two timeline entries cover 11 and 13 Oct.
 
