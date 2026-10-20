@@ -7,6 +7,8 @@ Pulls, each step on its own so one failing source never aborts the run:
   a. the source site's channel rows (mastuhsplinter.nedbot.site/data.json)
   b. any night page the source site has that we do not, plus emotes.json
   c. kicklogz: ban records, KICKs sent, and each channel's top-gifters row
+     (subs and KICKs per channel are high-water marks: the stored value only
+     goes up, because kicklogz's top-gifters counts cover a rolling ~30 days)
   d. Kick's channel API: the subject's followers and ban flag, every channel's profile.
      A channel that used to resolve and now returns 404 keeps its last values and
      gets channelGone = the first day it was missing; a 200 removes the flag.
@@ -48,6 +50,7 @@ LEADER = {'twigggs': 'leaderboard', 'zuesirl': 'leaderboard', 'nedx': 'count'}
 
 TODAY = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
 problems = []   # human-readable notes on sources that refused or failed
+windowed = []   # channels whose kicklogz count came in below the stored high-water mark
 
 
 def log(msg):
@@ -492,21 +495,31 @@ def build_channels(prev_channels, bans, rows, kicks, gifters, kick, gone=frozens
         b = sorted([x for x in bans if x['channel'] == s], key=lambda x: x['at'])
         active = [x for x in b if x['permanent'] == 1 and not x['unbanned_at']]
         src_subs = r.get('s') or 0
+        prev_subs = p.get('subs') or 0
         if s in gifters:
             g = gifters[s]
             subs = src_subs if (s in LEADER or not g) else (g.get('total_gifts') or 0)
             source = LEADER.get(s, 'kicklogz' if g else ('leaderboard' if src_subs else None))
             last = g.get('last_gift_date') if g else None
+            read = (g.get('total_gifts') or 0) if g else 0
+            if s not in LEADER and p.get('subsSource') == 'kicklogz' and read < prev_subs:
+                windowed.append((s, 'subs %d<%d' % (read, prev_subs)))
         elif p:
             subs, source, last = p.get('subs', src_subs), p.get('subsSource'), p.get('lastGift')
         else:
             subs, source, last = src_subs, LEADER.get(s, 'leaderboard' if src_subs else None), None
-        if kicks is not None and s in kicks:
-            k = kicks[s]
-        elif kicks is None and p:
-            k = p.get('kicks', 0)
-        else:
-            k = r.get('k') or 0
+        # kicklogz's top-gifters list only counts roughly the last 30 days, so a
+        # channel's count falls as old gifts age out; keep the highest ever seen.
+        subs = max(prev_subs, subs or 0, src_subs)
+        if s not in LEADER and p.get('subsSource') == 'kicklogz' and subs == prev_subs:
+            source = 'kicklogz'
+        if p.get('lastGift') and (not last or p['lastGift'] > last):
+            last = p['lastGift']
+        prev_k, src_k = p.get('kicks') or 0, r.get('k') or 0
+        read_k = kicks[s] if kicks is not None and s in kicks else 0
+        if kicks is not None and s in kicks and read_k < prev_k:
+            windowed.append((s, 'kicks %d<%d' % (read_k, prev_k)))
+        k = max(prev_k, read_k, src_k)
         out.append({
             'slug': s,
             'name': (info or {}).get('name') or p.get('name') or s,
@@ -615,12 +628,16 @@ def main():
         log('WARN ' + p)
     if not changed:
         log('no change')
+    if windowed:
+        log('windowed detail: ' + ', '.join('%s %s' % w for w in windowed))
+    n_win = len({w[0] for w in windowed})
+    win_note = (', windowed: %d channel%s lower than stored, kept high-water' % (n_win, '' if n_win == 1 else 's')) if n_win else ''
     t = D['totals']
     log('refresh %s: subs %d->%d, kicks %d->%d, channels %d->%d, bans %d->%d, nights %d->%d (+%s), hisChat %d->%d (+%d new), mentions %d->%d (+%d new), followers %s, %d warning(s)' % (
         TODAY, before['subs'], t['subs'], before['kicks'], t['kicks'], before['channels'], t['channels'],
         before['bans'], len(D['bans']), before['nights'], len(D['nights']), ', '.join(added) or '0',
         before['hisChat'], len(D.get('hisChat') or []), new_chat,
-        before['mentions'], len(D.get('mentions') or []), new_mentions, D['subject'].get('followers'), len(problems)))
+        before['mentions'], len(D.get('mentions') or []), new_mentions, D['subject'].get('followers'), len(problems)) + win_note)
     return 0
 
 
