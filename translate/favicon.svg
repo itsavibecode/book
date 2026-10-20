@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Kick Translate">
+  <rect width="32" height="32" rx="5" fill="#050506"/>
+  <rect x="3" y="4" width="17" height="12" rx="3" fill="none" stroke="#ff2fd6" stroke-width="2"/>
+  <path d="M6 16v3.5L10 16" fill="none" stroke="#ff2fd6" stroke-width="2" stroke-linejoin="round"/>
+  <rect x="11" y="12" width="18" height="13" rx="3" fill="#39ff14"/>
+  <path d="M22 24.5h4v4z" fill="#39ff14"/>
+  <rect x="15" y="16" width="10" height="2" rx="1" fill="#050506"/>
+  <rect x="15" y="20" width="6" height="2" rx="1" fill="#050506"/>
+</svg>

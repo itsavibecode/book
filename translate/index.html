@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="version" content="0.1.0" />
+<title>Kick Translate v0.1.0 - Read any Kick chat in your language | BookHockeys</title>
+
+<meta name="description" content="Kick Translate shows a Kick channel's live chat with a translation under every line that is not in your language. Type a channel, pick the language you read, and keep it open beside the stream. On desktop Chrome and Edge the translating can happen on your own device. Free, no sign-in, not affiliated with Kick." />
+<meta name="theme-color" content="#050506" />
+<meta name="color-scheme" content="dark" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="https://bookhockeys.com/translate/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="Kick Translate - Read any Kick chat in your language" />
+<meta property="og:description" content="A Kick channel's live chat with a translation under every foreign line. On-device where your browser allows it." />
+<meta property="og:url" content="https://bookhockeys.com/translate/" />
+<meta property="og:image" content="https://bookhockeys.com/translate/og-card.png" />
+<meta property="og:image:secure_url" content="https://bookhockeys.com/translate/og-card.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content="Kick Translate - the neon wordmark beside chat lines with their translations underneath." />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Kick Translate - Read any Kick chat in your language" />
+<meta name="twitter:description" content="A Kick channel's live chat with a translation under every foreign line." />
+<meta name="twitter:image" content="https://bookhockeys.com/translate/og-card.png" />
+<meta name="twitter:image:alt" content="Kick Translate - live Kick chat, translated" />
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Kick Translate" />
+<meta name="application-name" content="Kick Translate" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<link rel="preconnect" href="https://kick.com" crossorigin />
+<link rel="preconnect" href="https://stumble-worker.sevendwarfs.workers.dev" crossorigin />
+
+<!-- Analytics: per-device opt-out first (?ga=off / ?ga=on, remembered in
+     localStorage), then Google Consent Mode v2 defaults, then GA4. The
+     consent decision shares the site-wide `greenline-consent` key, so a
+     choice made on any bookhockeys.com page applies here too. -->
+<script>
+(function () {
+  var GA_ID = 'G-DYME377V2S';
+  var OPT_KEY = 'bookhockeys_ga_optout';
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.get('ga') === 'off') localStorage.setItem(OPT_KEY, '1');
+    if (p.get('ga') === 'on') localStorage.removeItem(OPT_KEY);
+  } catch (e) {}
+  var optedOut = false;
+  try { optedOut = localStorage.getItem(OPT_KEY) === '1'; } catch (e) {}
+  window['ga-disable-' + GA_ID] = optedOut;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  if (optedOut) return;
+
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  // EU/EEA/UK/CH by browser timezone: no IP lookup, errs toward asking.
+  var tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  var euExtras = ['Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+    'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'];
+  var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+  var saved = null;
+  try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+  if (saved === 'granted' || (saved !== 'denied' && !likelyEU)) {
+    gtag('consent', 'update', { 'analytics_storage': 'granted' });
+  } else if (saved !== 'denied') {
+    window.__needsConsent = true;
+  }
+
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  document.head.appendChild(s);
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+})();
+</script>
+
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app" id="app">
+
+  <header class="hdr">
+    <div class="wm" title="Kick Translate - read any Kick chat in your language">Kick Translate<small>v0.1.0</small></div>
+    <form class="chan" id="chanForm" autocomplete="off" novalidate>
+      <span class="pre" aria-hidden="true">kick.com/</span>
+      <label class="sr" for="chanIn">Kick channel name or link</label>
+      <input id="chanIn" type="text" spellcheck="false" autocapitalize="off" placeholder="channel" title="The channel name as it appears in kick.com/name. Pasting a full kick.com link works too. Press Enter or Go." />
+      <button class="go" type="submit" id="goBtn" title="Connect to this channel's chat. Read-only: nothing is ever posted.">Go</button>
+    </form>
+    <div class="hright">
+      <label class="sr" for="lang">The language you read</label>
+      <select id="lang" class="sel unset" title="The language you read. Lines already in it are left alone; everything else gets a translation underneath."></select>
+      <button class="pill off" id="pill" type="button" title="Translation arrives in v0.3.0. For now this shows the chat as Kick sends it.">
+        <span class="dot" aria-hidden="true"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>
+        <span id="pillTx">Not translating</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="strip" id="strip" hidden>
+    <img class="av" id="chAv" alt="" width="28" height="28" />
+    <b id="chName" class="cn"></b>
+    <span class="tag" id="chLive">OFFLINE</span>
+    <span class="tag hp" id="chViewers" title="Viewers right now, refreshed every minute"></span>
+    <span class="tag hp" id="chLang" title="Kick's declared stream language. It is the first guess for lines whose language is unclear."></span>
+    <span class="sp"></span>
+    <a id="chOpen" class="open" href="#" target="_blank" rel="noopener noreferrer" title="Open this channel on kick.com in a new tab, to watch the stream or chat yourself">Open on Kick</a>
+    <div class="tools" id="tools"></div>
+  </div>
+
+  <main class="chat" id="chat">
+    <div class="lines" id="lines" role="log" aria-label="Chat" aria-live="off"></div>
+
+    <section class="card idle" id="idle">
+      <h1>Read any Kick chat in your language</h1>
+      <p>Type a channel above, pick the language you read, and every foreign line gets its translation underneath. Keep it open beside the stream.</p>
+      <p class="note">This first version shows the chat exactly as Kick sends it. Translation lands in v0.3.0.</p>
+      <footer class="ft">
+        <span>Not affiliated with Kick.</span>
+        <a href="/" title="BookHockeys home">BookHockeys</a>
+        <button type="button" id="cookieReset" class="linkish" title="Change your analytics cookie choice">Cookies</button>
+      </footer>
+    </section>
+
+    <section class="card err" id="errCard" hidden role="alert">
+      <h2 id="errTitle">Lost the chat</h2>
+      <p id="errText"></p>
+      <button class="btn" type="button" id="errRetry" title="Try connecting again now">Retry now</button>
+    </section>
+  </main>
+
+  <footer class="sb" id="sb">
+    <span class="conn bad" id="conn" title="State of the read-only chat connection">not connected</span>
+    <button class="tb" type="button" id="retryBtn" hidden title="Connect to the chat again now">Retry</button>
+    <span class="hp" id="lpmWrap" hidden title="Chat lines per minute, over the last minute"><b id="lpm">0</b>/min</span>
+    <span class="sp"></span>
+    <span id="provSb" title="Who translates the chat">not translating</span>
+  </footer>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<div class="consent" id="consentBanner" hidden role="dialog" aria-labelledby="consentTitle" aria-describedby="consentDesc">
+  <div class="consent-text">
+    <strong id="consentTitle">Cookies for analytics</strong>
+    <p id="consentDesc">Kick Translate uses Google Analytics to count anonymous visits. It never sees chat text, names or channels. No ads, no personal data sold. The page works either way.</p>
+  </div>
+  <div class="consent-btns">
+    <button class="btn-ol" id="consentReject" type="button" title="No analytics cookies">Reject</button>
+    <button class="btn" id="consentAccept" type="button" title="Allow anonymous analytics">Accept</button>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
