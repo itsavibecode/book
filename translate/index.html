@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.1.0" />
-<title>Kick Translate v0.1.0 - Read any Kick chat in your language | BookHockeys</title>
+<meta name="version" content="0.2.0" />
+<title>Kick Translate v0.2.0 - Read any Kick chat in your language | BookHockeys</title>
 
 <meta name="description" content="Kick Translate shows a Kick channel's live chat with a translation under every line that is not in your language. Type a channel, pick the language you read, and keep it open beside the stream. On desktop Chrome and Edge the translating can happen on your own device. Free, no sign-in, not affiliated with Kick." />
 <meta name="theme-color" content="#050506" />
@@ -101,7 +101,7 @@
 <div class="app" id="app">
 
   <header class="hdr">
-    <div class="wm" title="Kick Translate - read any Kick chat in your language">Kick Translate<small>v0.1.0</small></div>
+    <div class="wm" title="Kick Translate - read any Kick chat in your language">Kick Translate<small>v0.2.0</small></div>
     <form class="chan" id="chanForm" autocomplete="off" novalidate>
       <span class="pre" aria-hidden="true">kick.com/</span>
       <label class="sr" for="chanIn">Kick channel name or link</label>
@@ -127,11 +127,16 @@
     <span class="tag hp" id="chLang" title="Kick's declared stream language. It is the first guess for lines whose language is unclear."></span>
     <span class="sp"></span>
     <a id="chOpen" class="open" href="#" target="_blank" rel="noopener noreferrer" title="Open this channel on kick.com in a new tab, to watch the stream or chat yourself">Open on Kick</a>
-    <div class="tools" id="tools"></div>
+    <div class="tools" id="tools">
+      <button class="tb" type="button" id="pauseBtn" aria-pressed="false" title="Freeze the view so you can read. Lines keep arriving underneath and are counted; Resume jumps back to live.">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg><span class="lbl">Pause</span>
+      </button>
+    </div>
   </div>
 
   <main class="chat" id="chat">
     <div class="lines" id="lines" role="log" aria-label="Chat" aria-live="off"></div>
+    <button class="jump" id="jump" type="button" hidden title="Go back to the newest lines and follow the chat again"></button>
 
     <section class="card idle" id="idle">
       <h1>Read any Kick chat in your language</h1>

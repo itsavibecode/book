@@ -1,4 +1,4 @@
-# Kick Translate v0.1.0 - read any Kick chat in your language
+# Kick Translate v0.2.0 - read any Kick chat in your language
 
 A single page that shows a Kick channel's live chat with a translation under every line
 that is not in your language. Type a channel, pick the language you read, and keep it
@@ -11,8 +11,8 @@ Not affiliated with Kick. Channel info comes from Kick's public channel API, fet
 straight from your browser; the chat itself arrives through a small read-only relay
 (see "How it talks to Kick").
 
-This version is the shell: channel entry, the live chat as Kick sends it, the status
-bar and the phone layout. Translation arrives in v0.3.0.
+This version renders the chat properly (badges, name colours, emotes, replies,
+moderation) and lets you pause it. Translation arrives in v0.3.0.
 
 ---
 
@@ -25,6 +25,16 @@ bar and the phone layout. Translation arrives in v0.3.0.
 - **Channel strip** - avatar, name, LIVE or OFFLINE, viewers (refreshed every minute),
   the language Kick says the stream is in, and a link to open the channel on Kick.
   Offline channels still connect: their chat works, it is just quieter.
+- **Chat lines** - badges as Kick draws them, the name in the colour its owner picked
+  (lifted toward white when it would be unreadable on black), Kick emotes as images,
+  links you can open, @mentions in bold, and "Replying to @name: ..." above replies.
+  Lines a moderator deletes, and every line from someone banned or timed out, stay on
+  screen struck through, so the conversation around them still reads. The last 400 lines
+  are kept.
+- **Following live** - the chat sticks to the newest line until you scroll up; then new
+  lines are counted in a "N new, jump to live" pill instead of yanking the view away.
+- **Pause** - freezes the view so you can read. Lines keep arriving underneath and are
+  counted; Resume (or the pill) jumps back to live.
 - **Status bar** - the chat connection (connecting / live / reconnecting / failed, with
   Retry) and lines per minute.
 - **Phones** - the header folds into rows (name, channel field, language), every row
@@ -82,8 +92,6 @@ Analytics events never carry chat text, user names or the channel.
 
 ## Roadmap
 
-- v0.2.0 - the real chat renderer: badges, name colours, Kick emotes, replies, deleted
-  lines, 400-line buffer, jump to live, pause.
 - v0.3.0 - translation: on-device first (desktop Chrome and Edge), Google as the cloud
   fallback after a one-time question, skip rules, cache.
 - v0.4.0 - more providers (our own Worker, MyMemory, Lingva), the Providers sheet,
@@ -94,6 +102,22 @@ Analytics events never carry chat text, user names or the channel.
 ---
 
 ## Changelog
+
+### v0.2.0 - 2026-10-20
+
+The chat now looks like a chat. A translation is only useful if you can tell who said
+what, what they were answering and what a moderator removed, so the lines needed to be
+right before anything gets added under them.
+
+- Badges, name colours and Kick emotes, as on kick.com. Names picked in near-black are
+  lifted so they stay readable on the dark page.
+- Replies show the line they answer; links open in a new tab; @mentions stand out.
+- Deleted lines and lines from banned or timed-out users are struck through, not
+  removed, so the replies around them still make sense.
+- Scrolling up to read no longer gets interrupted: new lines are counted in a "jump to
+  live" pill instead.
+- Pause freezes the view while the chat keeps arriving underneath.
+- The page keeps the newest 400 lines, so a busy chat left open for hours stays light.
 
 ### v0.1.0 - 2026-10-20
 

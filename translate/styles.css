@@ -78,6 +78,25 @@ svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-lin
 .row .ts{color:var(--muted);font-size:11px;padding-top:3px;white-space:nowrap}
 .row .nm{font-weight:700;margin-right:4px;color:var(--text)}
 .row .nm::after{content:":";color:var(--muted);font-weight:400}
+.row .bd{display:inline-block;width:18px;height:18px;border-radius:3px;vertical-align:-4px;margin-right:3px;object-fit:contain}
+.row span.bd{width:14px;height:14px;vertical-align:-2px;background:var(--panel2);border:1px solid var(--border)}
+.row .bd.t-moderator{background:#2ecc71;border-color:#2ecc71}
+.row .bd.t-subscriber{background:linear-gradient(135deg,#f5b942,#ff2fd6);border:0}
+.row .bd.t-vip{background:#f5b942;border-color:#f5b942}
+.row .bd.t-og{background:#a855f7;border-color:#a855f7}
+.row .bd.t-founder{background:#ff2fd6;border-color:#ff2fd6}
+.row .bd.t-broadcaster{background:#ff4d6d;border-color:#ff4d6d}
+.row .bd.t-verified{background:var(--accent);border-color:var(--accent)}
+.row .em{display:inline-block;height:24px;width:auto;max-width:72px;vertical-align:-7px;margin:0 1px;object-fit:contain}
+.row .lk{color:var(--accent);text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+.row .mn{font-weight:700}
+.row .reply{grid-column:1/-1;color:var(--muted);font-size:11px;margin-bottom:-2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.row .reply b{color:var(--text);font-weight:600}
+.row.del .orig{text-decoration:line-through;opacity:.45}
+.row.del .orig .em,.row.del .orig .bd{filter:grayscale(1)}
+.row.sys .orig{color:var(--muted);font-style:italic;font-size:12px}
+.jump{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:var(--accent);color:var(--accent-ink);padding:6px 14px;border-radius:999px;font-weight:700;font-size:12px;box-shadow:0 6px 20px rgba(0,0,0,.5);z-index:3;max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jump:hover{background:var(--accent-hover)}
 
 /* ===== cards ===== */
 .card{margin:auto;max-width:520px;width:calc(100% - 32px);text-align:center;padding:28px 20px;color:var(--muted)}

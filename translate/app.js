@@ -4,9 +4,10 @@
 'use strict';
 
 import * as K from './kick.js';
-import { chatFeed, renderRow } from './chat.js';
+import { chatFeed, renderRow, renderSystem } from './chat.js';
 import { TARGETS, langName, browserLang, codeFromName } from './translate.js';
 
+const VERSION = '0.2.0';
 const $ = function (id) { return document.getElementById(id); };
 const LS = { target: 'kt:target' };
 const VIEWER_REFRESH_MS = 60 * 1000;
@@ -27,7 +28,11 @@ const S = {
   status: 'idle',
   times: [],            // arrival times inside the last minute
   refreshTimer: 0,
-  connectGen: 0
+  connectGen: 0,
+  rows: new Map(),      // message id -> {msg, row}, same 400 as the DOM
+  pinned: true,         // view is at the bottom, following live
+  paused: false,
+  newCount: 0           // lines that arrived below the view
 };
 
 /* ---------- toasts (top-center, passive) ---------- */
@@ -81,8 +86,9 @@ function setConn(status) {
   const c = $('conn');
   const label = { idle: 'not connected', lookup: 'looking up channel', connecting: 'connecting', live: 'live',
     reconnecting: 'reconnecting', failed: 'failed after 4 tries' }[status] || status;
-  c.textContent = label;
-  c.className = 'conn' + (status === 'live' ? '' : (status === 'failed' || status === 'idle') ? ' bad' : ' wait');
+  const paused = S.paused && status === 'live';
+  c.textContent = paused ? 'live, paused' : label;
+  c.className = 'conn' + (status === 'live' && !paused ? '' : (status === 'failed' || status === 'idle') ? ' bad' : ' wait');
   $('retryBtn').hidden = status !== 'failed';
   $('lpmWrap').hidden = status !== 'live';
   if (status === 'failed') {
@@ -129,7 +135,11 @@ async function connect(slug) {
   S.channel = c;
   $('idle').hidden = true;
   $('lines').innerHTML = '';
+  S.rows.clear();
   S.times = [];
+  S.newCount = 0;
+  S.pinned = true;
+  if (S.paused) setPaused(false);
   renderStrip();
   openFeed();
   S.refreshTimer = setInterval(refreshChannel, VIEWER_REFRESH_MS);
@@ -174,19 +184,95 @@ function renderStrip() {
   $('chLang').textContent = c.language ? c.language + ' chat' : 'language not declared';
   $('chLang').dataset.code = code;
   $('chOpen').href = K.channelPage(c.slug);
-  document.title = c.name + ' chat - Kick Translate v0.1.0';
+  document.title = c.name + ' chat - Kick Translate v' + VERSION;
 }
 
 /* ---------- lines ---------- */
-function onEvent(ev) {
-  if (ev.kind !== 'message') return;
-  const now = Date.now();
-  S.times.push(now);
+/* The chat is pinned to the bottom until the viewer scrolls up (or pauses);
+   then new lines count into the "N new, jump to live" pill instead of
+   pulling the view down. */
+function addRow(row) {
   const box = $('lines');
-  const pinned = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
-  box.appendChild(renderRow(ev));
-  while (box.children.length > MAX_ROWS) box.removeChild(box.firstChild);
-  if (pinned) box.scrollTop = box.scrollHeight;
+  // Read the position now rather than trusting the last scroll event:
+  // background tabs deliver scroll events late or not at all.
+  S.pinned = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+  box.appendChild(row);
+  // Ring buffer: drop the oldest rows. When the viewer is reading back,
+  // shift the scroll by what was removed so the text under their eyes stays put.
+  let removed = 0;
+  while (box.children.length > MAX_ROWS) {
+    const first = box.firstChild;
+    if (!S.pinned || S.paused) removed += first.offsetHeight;
+    S.rows.delete(first.dataset.id);
+    box.removeChild(first);
+  }
+  if (removed) box.scrollTop -= removed;
+  if (S.pinned && !S.paused) scrollToLive();
+  else { S.newCount++; renderJump(); }
+}
+
+function scrollToLive() {
+  const box = $('lines');
+  box.scrollTop = box.scrollHeight;
+  S.pinned = true;
+  S.newCount = 0;
+  renderJump();
+}
+
+function onScroll() {
+  const box = $('lines');
+  const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+  S.pinned = atBottom;
+  if (atBottom && !S.paused) { S.newCount = 0; renderJump(); }
+}
+
+function renderJump() {
+  const j = $('jump');
+  const show = S.paused || (!S.pinned && S.newCount > 0);
+  j.hidden = !show;
+  if (!show) return;
+  if (S.paused) j.textContent = (S.newCount ? S.newCount + ' new, ' : '') + 'paused - resume';
+  else j.textContent = S.newCount + ' new, jump to live';
+}
+
+function setPaused(p) {
+  S.paused = p;
+  const b = $('pauseBtn');
+  b.classList.toggle('on', p);
+  b.setAttribute('aria-pressed', p ? 'true' : 'false');
+  b.querySelector('.lbl').textContent = p ? 'Resume' : 'Pause';
+  b.querySelector('svg').innerHTML = p ? '<path d="M7 5l12 7-12 7z"/>' : '<path d="M8 5v14M16 5v14"/>';
+  if (!p) scrollToLive();
+  renderJump();
+  setConn(S.status);
+}
+
+function onEvent(ev) {
+  if (ev.kind === 'message') {
+    S.times.push(Date.now());
+    const row = renderRow(ev);
+    S.rows.set(ev.id, { msg: ev, row: row });
+    addRow(row);
+    return;
+  }
+  // Moderation: strike the line and keep it, so the conversation around it
+  // still makes sense.
+  if (ev.kind === 'deleted') {
+    const r = S.rows.get(ev.id);
+    if (r) strike(r.row, 'Deleted by a moderator');
+  } else if (ev.kind === 'banned') {
+    S.rows.forEach(function (r) {
+      if ((ev.userId && r.msg.user.id === ev.userId) || (ev.name && r.msg.user.slug === ev.name)) strike(r.row, 'This user was banned or timed out');
+    });
+  } else if (ev.kind === 'cleared') {
+    S.rows.forEach(function (r) { strike(r.row, 'Chat cleared by a moderator'); });
+    addRow(renderSystem('A moderator cleared the chat.'));
+  }
+}
+
+function strike(row, why) {
+  row.classList.add('del');
+  row.title = why;
 }
 
 function tickRate() {
@@ -223,6 +309,9 @@ $('chanForm').addEventListener('submit', function (e) {
   connect(slug);
 });
 $('retryBtn').addEventListener('click', retry);
+$('lines').addEventListener('scroll', onScroll, { passive: true });
+$('jump').addEventListener('click', function () { if (S.paused) setPaused(false); else scrollToLive(); });
+$('pauseBtn').addEventListener('click', function () { setPaused(!S.paused); });
 $('errRetry').addEventListener('click', retry);
 setInterval(tickRate, 2000);
 buildLangSelect();
