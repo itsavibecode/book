@@ -1,0 +1,62 @@
+/* Compact layout (under 820 px or a coarse pointer): floating bottom dock, context pill, bottom
+   sheet for Layers + Inspector, no status bar. Same tokens, direction C's floating geometry. */
+.editor.compact {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 52px minmax(0, 1fr);
+  grid-template-areas: "top" "stage";
+  --tool-size: 44px;
+  --row-h: 44px;
+}
+.editor.compact .topbar { height: 52px; padding: 0 8px; gap: 6px; }
+.editor.compact .logo-name { display: none; }
+.docswitch {
+  display: inline-flex; align-items: center; gap: 4px; min-width: 0; flex: 1 1 auto; height: 36px; padding: 0 8px; border: 0; border-radius: var(--r-sm);
+  background: transparent; color: var(--fg); font-weight: 600;
+}
+.docswitch .doctab-name { max-width: none; flex: 0 1 auto; min-width: 0; }
+.editor.compact .acts { gap: 2px; }
+.editor.compact .acts .btn.primary { width: 40px; height: 36px; padding: 0; }
+.editor.compact .ib { width: 40px; height: 40px; }
+
+/* Context bar becomes a floating pill above the sheet */
+.editor.compact .ctxbar {
+  position: fixed; left: 10px; right: 10px; bottom: calc(76px + var(--sheet-h, 56px) + 8px); height: 44px; padding: 0 14px; z-index: 30;
+  border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--shadow); grid-area: auto;
+  transition: bottom var(--t-panel);
+}
+.editor.compact .stage { grid-area: stage; }
+
+/* Dock */
+.dock {
+  position: fixed; left: 10px; right: 10px; bottom: 10px; height: 60px; z-index: 40; display: flex; align-items: center; gap: 4px; padding: 0 8px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--shadow);
+  overflow-x: auto; overflow-y: hidden; padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.dock-tools { display: flex; align-items: center; gap: 4px; flex: none; }
+.dock .tool { width: 44px; height: 44px; border-radius: 50%; }
+.dock .rail-gap { width: 4px; height: 4px; }
+.dock .swatches { margin: 0 4px 0 8px; height: 40px; width: 40px; }
+
+/* Bottom sheet */
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 76px; z-index: 20; display: flex; flex-direction: column; min-height: 56px;
+  background: var(--panel); border-top: 1px solid var(--line); border-radius: var(--r) var(--r) 0 0; box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+  transition: height var(--t-panel); overflow: hidden;
+}
+.sheet.dragging { transition: none; }
+.sheet-handle { flex: none; height: 56px; padding: 6px 16px 0; touch-action: none; cursor: grab; display: flex; flex-direction: column; gap: 6px; }
+.sheet-handle .grip { width: 36px; height: 4px; border-radius: 2px; background: var(--line-strong); margin: 0 auto; flex: none; }
+.sheet-row { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--fg); }
+.sheet-layer { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sheet-row .save-state { font-size: var(--fs-sm); white-space: nowrap; }
+.sheet-body { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+.sheet .ph .ib { width: 40px; height: 40px; }
+.sheet .row-ib { width: 36px; height: 36px; }
+
+/* Colour popover sits above the dock in compact */
+.colour-pop.compact { left: 50%; transform: translateX(-50%); bottom: 84px; }
+
+@media (max-width: 420px) {
+  .editor.compact .ctxbar { left: 6px; right: 6px; }
+  .dock { left: 6px; right: 6px; }
+}

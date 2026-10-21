@@ -1,0 +1,69 @@
+/* Design tokens: direction B "Graphite" (dark) plus its light twin. The canvas surround is
+   painted by the viewport from its own setting and never follows the theme. */
+:root {
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace;
+  --fs: 13px;
+  --fs-sm: 12px;
+  --fs-lg: 15px;
+  --r: 6px;
+  --r-sm: 5px;
+  --tool-size: 36px;
+  --top-h: 48px;
+  --ctx-h: 44px;
+  --status-h: 28px;
+  --panel-w: 300px;
+  --row-h: 32px;
+  --t-fast: 120ms;
+  --t-panel: 180ms;
+  --ok: #35c26f;
+  --warn: #e0a43a;
+  --danger: #e5484d;
+  --acc: #4c8dff;
+  --acc-strong: #2f6fe4;
+  --acc-fg: #ffffff;
+}
+
+:root,
+:root[data-theme="dark"] {
+  --bg: #19191c;
+  --panel: #202024;
+  --panel2: #26262b;
+  --panel3: #2d2d33;
+  --line: #313137;
+  --line-strong: #44444c;
+  --fg: #ececf0;
+  --muted: #9b9ba6;
+  --faint: #5f5f6b;
+  --acc-soft: #1c2b47;
+  --acc-ink: #7aa9ff;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.55);
+  --scrim: rgba(8, 8, 10, 0.6);
+  --tip-bg: #ececf0;
+  --tip-fg: #19191c;
+}
+
+:root[data-theme="light"] {
+  --bg: #e7e7ea;
+  --panel: #f7f7f9;
+  --panel2: #eeeef1;
+  --panel3: #e4e4e8;
+  --line: #d6d6dc;
+  --line-strong: #bdbdc5;
+  --fg: #1b1b1f;
+  --muted: #565660;
+  --faint: #6b6b75;
+  --acc-soft: #dde8ff;
+  --acc-ink: #1f5fd6;
+  --shadow: 0 1px 2px rgba(20, 20, 30, 0.06), 0 8px 24px rgba(20, 20, 30, 0.1);
+  --shadow-lg: 0 24px 64px rgba(20, 20, 30, 0.22);
+  --scrim: rgba(30, 30, 40, 0.35);
+  --tip-bg: #1b1b1f;
+  --tip-fg: #f7f7f9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --t-fast: 0ms; --t-panel: 0ms; }
+  *, *::before, *::after { transition-duration: 0ms !important; animation-duration: 0ms !important; }
+}

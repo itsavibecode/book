@@ -4,8 +4,23 @@ import { viteSingleFile } from 'vite-plugin-singlefile';
 import { playwright } from '@vitest/browser-playwright';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import fs from 'node:fs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
+
+// Read APP_NAME / APP_VERSION from the one constants file so the static HTML carries the
+// semver title and app-version meta for crawlers (src/app/head.ts sets the same at runtime).
+const constants = fs.readFileSync(path.join(root, 'src', 'app', 'constants.ts'), 'utf8');
+const APP_NAME = /APP_NAME\s*=\s*'([^']+)'/.exec(constants)?.[1] ?? 'Strata';
+const APP_VERSION = /APP_VERSION\s*=\s*'([^']+)'/.exec(constants)?.[1] ?? '0.0.0';
+const versionHtml = () => ({
+  name: 'strata-version-html',
+  transformIndexHtml(html: string) {
+    return html
+      .replace(/<title>[^<]*<\/title>/, `<title>${APP_NAME} v${APP_VERSION}</title>`)
+      .replace(/<meta name="app-version" content="[^"]*">/, `<meta name="app-version" content="${APP_VERSION}">`);
+  },
+});
 
 // Two builds share this file:
 //   vite build                -> ../ (book/strata/ itself; GitHub Pages serves it at /strata/)
@@ -17,7 +32,7 @@ export default defineConfig(({ mode }) => {
   const single = mode === 'single';
   return {
     base: '/strata/',
-    plugins: [preact(), ...(single ? [viteSingleFile()] : [])],
+    plugins: [preact(), versionHtml(), ...(single ? [viteSingleFile()] : [])],
     resolve: { alias: { '@': path.resolve(root, 'src') } },
     publicDir: single ? false : 'public',
     build: single
