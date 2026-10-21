@@ -1,4 +1,4 @@
-# Kick Translate v0.3.0 - read any Kick chat in your language
+# Kick Translate v0.4.0 - read any Kick chat in your language
 
 A single page that shows a Kick channel's live chat with a translation under every line
 that is not in your language. Type a channel, pick the language you read, and keep it
@@ -24,13 +24,26 @@ and the default keeps it on the machine wherever the browser allows.
   you pick one, with your browser's language listed first. The choice is remembered.
   Changing it re-translates the last 30 lines.
 - **Provider pill** - the most important control on the page. Green "On this device":
-  nothing leaves the browser. Amber "Cloud: Google": the text of chat lines (never names,
-  badges or the channel) is being sent to Google, and an amber banner says so under the
-  header. Grey: not translating (no language picked, paused, or nothing allowed). Click
-  it to change your cloud answer.
+  nothing leaves the browser. Amber "Cloud: Google" (or whichever service answered): the
+  text of chat lines (never names, badges or the channel) is being sent there, and an
+  amber banner says so under the header. Grey: not translating (no language picked,
+  paused, or nothing allowed). Click it to open **Who translates**.
+- **Who translates** (the Providers sheet; from the bottom on phones) - the order: *On
+  this device first* (default), *Cloud first*, or *On this device only* (nothing is ever
+  sent). The cloud list - Google, our server, MyMemory, Lingva - with an on/off box each and
+  up/down buttons to change the order, plus what each one is resting from right now. The
+  on-device status with its download button, your own Lingva instance, and Clear cache
+  (asks first). Closes with Done or Esc.
 - **The one-time question** - the first time a line needs the cloud, a dialog asks
-  "Translate through Google?" with "Use Google" or "Keep it on this device only". It only
-  closes through those buttons, and the answer is remembered.
+  "Translate through Google?" (the first service in your list) with "Use Google" or "Keep
+  it on this device only". It only closes through those buttons, and the answer is
+  remembered; the sheet has the same switch.
+- **On demand** - nothing is translated by itself; foreign lines get a **Translate** chip
+  (on phones the whole line is the tap target) and the status bar offers "Translate the
+  last 20". It switches itself on, with a note at the top, when more than 200 lines a
+  minute are going to the cloud, when a phone sits in a chat busier than 40 lines a
+  minute, or when no translator is answering. Turning it off yourself keeps it off for
+  five minutes.
 - **Translations** - under each foreign line, with a two-letter tag for the language it
   came from (hover for the full name) and a small dot: green = translated on this device,
   amber = sent to a cloud service, grey = from the cache (seen before, nothing sent).
@@ -117,11 +130,23 @@ queue it.
   against a 3-second timeout, because in some Chromium shells it never answers; a hang
   falls through to the cloud instead of freezing the chat. A language pair is never
   downloaded without your click.
+- **Batching:** lines that arrive within 120 ms of each other go out together (up to 40),
+  with at most four batches in flight.
 - **Google** (cloud): the unofficial `translate.googleapis.com/translate_a/t` endpoint,
-  straight from your browser, so it spends your own connection's allowance. Lines that
-  arrive within 120 ms of each other go out as one request (up to 40 lines), with at most
-  four requests in flight. Google also names the language it saw, which corrects the
-  tag; a line it says is already in your language is dropped.
+  straight from your browser, so it spends your own connection's allowance. One request
+  per batch. Google also names the language it saw, which corrects the tag; a line it
+  says is already in your language is dropped.
+- **Our server** (cloud): `POST /translate` on `stumble-worker` (Workers AI m2m100). It
+  needs the source language, so lines the detector could not place skip it. Capped at
+  the free daily allowance for everyone together; when it is used up it says so and the
+  next service takes over.
+- **MyMemory** and **Lingva** (cloud, last resort): one request per line, slow, and weaker
+  on chat, there so a line is never left blank. Lingva rotates through public instances
+  (yours first if you set one) and ignores answers that just repeat the input.
+- **Cooldowns:** a service that fails rests for 10 seconds, doubling up to 5 minutes (a
+  used-up budget rests 5 minutes at once). A language a service does not support is not
+  a failure; it just skips that line. The last service that answered goes first until it
+  fails, so a batch does not keep knocking on a door that is closed.
 - **Cache:** 2,000 entries for 24 hours, in memory and in IndexedDB, keyed by the cleaned
   text and your language. Chat repeats itself a lot, so this saves real requests.
 
@@ -132,6 +157,9 @@ queue it.
 | `kt:target` | the language you read |
 | `kt:cloud` | your answer to the cloud question (`yes` / `no`) |
 | `kt:originals` | whether original lines are shown |
+| `kt:mode` | on this device first / cloud first / on this device only |
+| `kt:order`, `kt:enabled` | your cloud list: order and which are on |
+| `kt:lingva` | your own Lingva instance, if any |
 | IndexedDB `kct-cache` | recent translations (24 h, 2,000 at most) |
 | `greenline-consent` | the site-wide analytics consent choice (shared with other bookhockeys.com pages) |
 | `bookhockeys_ga_optout` | set by visiting `?ga=off` once; `?ga=on` clears it |
@@ -146,14 +174,30 @@ Analytics events never carry chat text, user names or the channel.
 
 ## Roadmap
 
-- v0.4.0 - more providers (our own Worker, MyMemory, Lingva) with cooldowns, the
-  Providers sheet, translate-on-demand.
 - v0.5.0 - language and user filters, glossary, settings, keyboard, recent channels,
   shareable `#channel` links, a self-test.
 
 ---
 
 ## Changelog
+
+### v0.4.0 - 2026-10-20
+
+One cloud service is a single point of failure: Google's endpoint is unofficial and
+rate-limits busy connections, and phones have nothing else. This version makes the page
+keep working, worse but never blank, whatever fails, and puts you in charge of who sees
+the text.
+
+- Three more translators behind Google: our own server (capped at a free daily budget so
+  it never runs up a bill), then MyMemory and Lingva as a last resort.
+- A service that fails rests and the next one takes over; the one that answered last goes
+  first, so lines do not wait on a service that is down.
+- **Who translates** (click the pill): on-device first, cloud first or on-device only;
+  turn each cloud service on or off and change their order; download a language pack;
+  point Lingva at your own instance; clear the cache (it asks first).
+- **On demand**: translate only the lines you tap, with "Translate the last 20". It turns
+  itself on when the cloud would be flooded (over 200 lines a minute, a busy chat on a
+  phone, or no service answering) and says so.
 
 ### v0.3.0 - 2026-10-20
 

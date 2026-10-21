@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.3.0" />
-<title>Kick Translate v0.3.0 - Read any Kick chat in your language | BookHockeys</title>
+<meta name="version" content="0.4.0" />
+<title>Kick Translate v0.4.0 - Read any Kick chat in your language | BookHockeys</title>
 
 <meta name="description" content="Kick Translate shows a Kick channel's live chat with a translation under every line that is not in your language. Type a channel, pick the language you read, and keep it open beside the stream. On desktop Chrome and Edge the translating can happen on your own device. Free, no sign-in, not affiliated with Kick." />
 <meta name="theme-color" content="#050506" />
@@ -101,7 +101,7 @@
 <div class="app" id="app">
 
   <header class="hdr">
-    <div class="wm" title="Kick Translate - read any Kick chat in your language">Kick Translate<small>v0.3.0</small></div>
+    <div class="wm" title="Kick Translate - read any Kick chat in your language">Kick Translate<small>v0.4.0</small></div>
     <form class="chan" id="chanForm" autocomplete="off" novalidate>
       <span class="pre" aria-hidden="true">kick.com/</span>
       <label class="sr" for="chanIn">Kick channel name or link</label>
@@ -144,6 +144,9 @@
       <button class="tb on" type="button" id="origBtn" aria-pressed="true" title="Show the original line above each translation. Off = translations only, with the original on hover; lines that need no translation always show.">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h12M3 18h18"/></svg><span class="lbl">Originals</span>
       </button>
+      <button class="tb" type="button" id="demandBtn" aria-pressed="false" title="Translate only the lines you tap. Saves the cloud budget in a busy chat; turns itself on above 200 lines a minute.">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5a2 2 0 0 1 4 0v6M13 10a2 2 0 0 1 4 0v2M17 11a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6h-2a6 6 0 0 1-5-2.7L4.6 14a2 2 0 0 1 3.3-2.3L9 13"/></svg><span class="lbl">On demand</span>
+      </button>
       <button class="tb" type="button" id="pauseBtn" aria-pressed="false" title="Freeze the view so you can read. Lines keep arriving underneath and are counted; Resume jumps back to live.">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg><span class="lbl">Pause</span>
       </button>
@@ -178,6 +181,7 @@
     <span class="hp" id="lpmWrap" hidden title="Chat lines per minute, over the last minute"><b id="lpm">0</b>/min</span>
     <span id="stats" hidden>translated <b id="nT">0</b> &middot; skipped <b id="nS">0</b> &middot; cache <b id="nC">0</b></span>
     <span class="sp"></span>
+    <button class="tb" type="button" id="lastBtn" hidden title="Translate the 20 newest lines that are waiting for a tap">Translate the last 20</button>
     <span class="prog" id="prog" hidden><span id="progTx"></span> <i><b id="progBar"></b></i> <span id="progPct">0%</span></span>
     <span id="provSb" title="Who translates the chat">not translating</span>
   </footer>
@@ -193,6 +197,54 @@
     <div class="acts">
       <button class="b2" type="button" id="cloudNo" title="Nothing leaves this browser. Lines the device cannot translate stay untranslated.">Keep it on this device only</button>
       <button class="b1" type="button" id="cloudYes" title="Send the text of chat lines to Google to translate them">Use Google</button>
+    </div>
+  </div>
+</div>
+
+<!-- Providers sheet. Has form fields, so it closes only via Done or Esc. -->
+<div class="backdrop sheetwrap" id="provSheet" hidden>
+  <div class="modal sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sh-hd">
+      <h3 id="sheetTitle">Who translates</h3>
+      <button class="btn" type="button" id="sheetDone" title="Save and close">Done</button>
+    </div>
+
+    <fieldset class="modes">
+      <legend>Order</legend>
+      <label title="Lines this browser can translate never leave it; the rest go to the cloud list below (if you allowed it)."><input type="radio" name="pmode" value="device-first" /> On this device first <small>(recommended)</small></label>
+      <label title="The cloud list below goes first; this device only covers lines the cloud could not. Better on slang, but the text of every line leaves the browser."><input type="radio" name="pmode" value="cloud-first" /> Cloud first</label>
+      <label title="Nothing is ever sent anywhere. Lines this browser cannot translate say so instead."><input type="radio" name="pmode" value="device-only" /> On this device only</label>
+    </fieldset>
+
+    <section class="sh-sec">
+      <h4>On this device</h4>
+      <p id="odStatus"></p>
+      <button class="btn-ol" type="button" id="sheetDl" hidden title="Fetches the language pack once; after that these lines are translated here and never sent anywhere."></button>
+    </section>
+
+    <section class="sh-sec">
+      <h4>Cloud</h4>
+      <label class="chk" title="Your answer to the one-time question. Off = nothing is sent to any of the services below."><input type="checkbox" id="cloudOk" /> Allow cloud translators (only the text of each line is sent; names and the channel never are)</label>
+      <ol class="pvlist" id="provList"></ol>
+      <label class="fld" for="lingvaIn" title="Lingva is open source and anyone can run it. If you have an instance you trust, it is tried before the public ones.">Your own Lingva instance (optional)</label>
+      <input class="txt" id="lingvaIn" type="url" inputmode="url" spellcheck="false" autocapitalize="off" placeholder="https://lingva.example.org" />
+    </section>
+
+    <section class="sh-sec sh-row">
+      <span><b>Cache</b> <span id="cacheCount"></span></span>
+      <button class="btn-ol" type="button" id="clearCacheBtn" title="Forget saved translations on this browser. Asks first.">Clear cache</button>
+    </section>
+  </div>
+</div>
+
+<!-- Confirm (decisions). Closes only via its buttons. -->
+<div class="backdrop" id="confirmModal" hidden>
+  <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="cfTitle" aria-describedby="cfText">
+    <h3 id="cfTitle"></h3>
+    <p id="cfText"></p>
+    <div class="acts">
+      <button class="b2" type="button" id="cfCancel" title="Leave everything as it is">Cancel</button>
+      <button class="b1" type="button" id="cfOk"></button>
     </div>
   </div>
 </div>

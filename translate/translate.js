@@ -384,6 +384,144 @@ export const google = {
   }
 };
 
+function timeout(ms) {
+  return typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(ms) : undefined;
+}
+
+/* Runs fn over items, `n` at a time; resolves to results in order. */
+async function pool(items, n, fn) {
+  const out = new Array(items.length);
+  let next = 0;
+  async function w() { while (next < items.length) { const i = next++; out[i] = await fn(items[i], i); } }
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, w));
+  return out;
+}
+
+/* Our own Worker (stumble-worker POST /translate, Workers AI m2m100, capped
+   at the free daily allowance). m2m100 needs the source language, so lines
+   the detector could not place are left to the next provider. */
+const M2M = new Set(('af am ar az be bg bn bs ca cs cy da de el en es et fa fi fr ga gl gu he hi hr hu hy id is it ja ' +
+  'jv ka kk km kn ko lo lt lv mk ml mn mr ms my ne nl no pa pl ps pt ro ru sd si sk sl so sq sr sv sw ta th tl tr ' +
+  'uk ur uz vi zh fil zh-Hant').split(' '));
+export function createWorkerProvider(base) {
+  return {
+    name: 'server',
+    label: 'our server',
+    supports: function (j, target) { return !!j.src && M2M.has(j.src) && M2M.has(target) && j.src !== target; },
+    async batch(items, target) {
+      const res = await fetch(base() + '/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target: target, items: items.map(function (it, i) { return { id: String(i), text: it.text, src: it.src }; }) }),
+        credentials: 'omit',
+        signal: timeout(15000)
+      });
+      if (!res.ok) {
+        let e = '';
+        try { e = (await res.json()).error || ''; } catch (x) { /* not json */ }
+        throw new Error('server ' + res.status + (e ? ' ' + e : ''));
+      }
+      const d = await res.json();
+      const by = {};
+      (d.items || []).forEach(function (x) { by[x.id] = x.text; });
+      return items.map(function (it, i) { return { text: by[String(i)] || '', src: it.src }; });
+    }
+  };
+}
+
+/* MyMemory: one request per line, about 1 s each, 5,000 characters a day per
+   IP. Poor on chat, so it sits near the end of the chain. */
+export const mymemory = {
+  name: 'mymemory',
+  label: 'MyMemory',
+  supports: function (j) { return j.text.length <= 480; },
+  async batch(items, target) {
+    let quota = false;
+    const out = await pool(items, 3, async function (it) {
+      if (quota) return { text: '', src: '' };
+      const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(it.text) +
+        '&langpair=' + encodeURIComponent((it.src || 'Autodetect') + '|' + target);
+      try {
+        const r = await fetch(url, { credentials: 'omit', signal: timeout(10000) });
+        const d = await r.json();
+        if (d.quotaFinished || d.responseStatus === 429 || d.responseStatus === '429') { quota = true; return { text: '', src: '' }; }
+        const t = d.responseData && d.responseData.translatedText;
+        if (!t || /^(MYMEMORY WARNING|PLEASE SELECT|INVALID)/i.test(t)) return { text: '', src: '' };
+        return { text: t, src: it.src };
+      } catch (e) { return { text: '', src: '' }; }
+    });
+    if (quota && !out.some(function (x) { return x.text; })) throw new Error('mymemory quota');
+    return out;
+  }
+};
+
+/* Lingva: a pool of public instances (plus one of your own), rotated when
+   one fails. One request per line. An answer equal to the input counts as
+   no answer (seen on short lines). */
+export const LINGVA_POOL = ['https://lingva.ml', 'https://lingva.lunar.icu'];
+export function createLingva(getCustom) {
+  let start = 0;
+  return {
+    name: 'lingva',
+    label: 'Lingva',
+    supports: function (j) { return j.text.length <= 480; },
+    async batch(items, target) {
+      const custom = getCustom ? getCustom() : '';
+      const list = (custom ? [custom] : []).concat(LINGVA_POOL);
+      const tl = ({ zh: 'zh', 'zh-Hant': 'zh_HANT', fil: 'tl', he: 'iw' })[target] || target;
+      let ok = 0;
+      const out = await pool(items, 3, async function (it) {
+        for (let k = 0; k < list.length; k++) {
+          const host = list[(start + k) % list.length];
+          try {
+            const r = await fetch(host + '/api/v1/' + (it.src || 'auto') + '/' + tl + '/' + encodeURIComponent(it.text),
+              { credentials: 'omit', signal: timeout(8000) });
+            if (!r.ok) throw new Error('lingva ' + r.status);
+            const d = await r.json();
+            const t = d && d.translation;
+            if (!t || t.trim().toLowerCase() === it.text.trim().toLowerCase()) return { text: '', src: '' };
+            ok++;
+            return { text: t, src: (d.info && normLang(d.info.detectedSource)) || it.src };
+          } catch (e) { start = (start + 1) % list.length; }
+        }
+        return { text: '', src: '' };
+      });
+      if (!ok) throw new Error('lingva none');
+      return out;
+    }
+  };
+}
+
+/* Cooldown wrapper: a provider that fails rests 10 s, doubling up to 5 min;
+   a success resets it. */
+export const COOLDOWN_MIN = 10000;
+export const COOLDOWN_MAX = 5 * 60000;
+export function withCooldown(p) {
+  const w = Object.assign({}, p);
+  w.fails = 0;
+  w.until = 0;
+  w.lastError = '';
+  w.ready = function (now) { return (now || Date.now()) >= w.until; };
+  w.onFailure = function (e) {
+    w.fails++;
+    w.lastError = (e && e.message) || 'failed';
+    const budget = /budget|quota/.test(w.lastError);
+    w.until = Date.now() + (budget ? COOLDOWN_MAX : Math.min(COOLDOWN_MIN * Math.pow(2, w.fails - 1), COOLDOWN_MAX));
+  };
+  w.onSuccess = function () { w.fails = 0; w.until = 0; w.lastError = ''; };
+  return w;
+}
+
+/* The order to try cloud providers in: the viewer's enabled list, minus any
+   cooling down, with the last one that worked moved to the front. */
+export function chainOrder(providers, order, enabled, sticky, now) {
+  const list = order.map(function (n) { return providers[n]; })
+    .filter(function (p) { return p && enabled[p.name] !== false && p.ready(now); });
+  const i = list.findIndex(function (p) { return p.name === sticky; });
+  if (i > 0) list.unshift(list.splice(i, 1)[0]);
+  return list;
+}
+
 /* ================= cache (memory LRU in front of IndexedDB) ================= */
 
 export const CACHE_MAX = 2000;
@@ -468,6 +606,18 @@ export function createCache() {
     try { d.transaction('tr', 'readwrite').objectStore('tr').put(val, key); } catch (e) { /* quota */ }
   }
 
+  async function count() {
+    const d = await db();
+    if (!d) return mem.size;
+    return new Promise(function (resolve) {
+      try {
+        const r = d.transaction('tr').objectStore('tr').count();
+        r.onsuccess = function () { resolve(r.result); };
+        r.onerror = function () { resolve(mem.size); };
+      } catch (e) { resolve(mem.size); }
+    });
+  }
+
   async function clear() {
     mem.clear();
     const d = await db();
@@ -475,7 +625,7 @@ export function createCache() {
     try { d.transaction('tr', 'readwrite').objectStore('tr').clear(); } catch (e) { /* ignore */ }
   }
 
-  return { get, put, clear };
+  return { get, put, clear, count };
 }
 
 /* ================= the engine: coalescer + provider chain ================= */
@@ -552,8 +702,10 @@ export function createEngine(opts) {
     let left = rest;
     for (let p = 0; p < providers.length && left.length; p++) {
       const prov = providers[p];
+      // "Unsupported language" is not a failure: that provider just skips the line.
       const usable = prov.supports ? left.filter(function (j) { return prov.supports(j, target); }) : left;
       if (!usable.length) continue;
+      if (opts.onCloudSend) opts.onCloudSend(usable.length, prov.name);
       try {
         const out = await prov.batch(usable, target);
         const failed = [];
@@ -562,7 +714,8 @@ export function createEngine(opts) {
           if (r && r.text) opts.onResult(j, { text: r.text, src: r.src || j.src, provider: prov.name });
           else failed.push(j);
         });
-        if (prov.onSuccess) prov.onSuccess();
+        if (failed.length < usable.length) { if (prov.onSuccess) prov.onSuccess(); }
+        else if (prov.onFailure) prov.onFailure(new Error(prov.name + ' empty'));
         left = left.filter(function (j) { return usable.indexOf(j) === -1; }).concat(failed);
       } catch (e) {
         if (prov.onFailure) prov.onFailure(e);

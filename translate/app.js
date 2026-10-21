@@ -8,9 +8,14 @@ import * as K from './kick.js';
 import { chatFeed, renderRow, renderSystem, el } from './chat.js';
 import * as T from './translate.js';
 
-const VERSION = '0.3.0';
+const VERSION = '0.4.0';
 const $ = function (id) { return document.getElementById(id); };
-const LS = { target: 'kt:target', cloud: 'kt:cloud', orig: 'kt:originals' };
+const LS = { target: 'kt:target', cloud: 'kt:cloud', orig: 'kt:originals', mode: 'kt:mode', order: 'kt:order',
+  enabled: 'kt:enabled', lingva: 'kt:lingva' };
+const CEILING_PER_MIN = 200;   // lines to the cloud per minute before on-demand takes over
+const PHONE_AUTO_DEMAND = 40;  // chat lines per minute that make phones default to on-demand
+const AUTO_DEMAND_QUIET_MS = 5 * 60 * 1000;
+const LAST_N = 20;
 const VIEWER_REFRESH_MS = 60 * 1000;
 const MAX_ROWS = 400;
 const REPEAT_MS = 60 * 1000;
@@ -44,17 +49,51 @@ const S = {
   lastCloud: 0,         // last time a line went to a cloud provider
   lastCloudName: '',
   offered: new Set(),   // download offers already shown or dismissed ('ja>en')
-  dlPair: null          // the pair the download bar is offering
+  dlPair: null,         // the pair the download bar is offering
+  lastPair: null,       // the last pair the device could download (for the sheet)
+  sticky: '',           // the cloud provider that answered last
+  cloudSends: [],       // times of lines sent to the cloud, last minute
+  noAnswer: [],         // times of lines no provider answered
+  onDemand: false,
+  demandQuietUntil: 0   // no automatic on-demand before this (the viewer turned it off)
 };
 
 const OD = T.createOnDevice();
 const cache = T.createCache();
+const PROVIDERS = {
+  google: T.withCooldown(T.google),
+  server: T.withCooldown(T.createWorkerProvider(K.workerBase)),
+  mymemory: T.withCooldown(T.mymemory),
+  lingva: T.withCooldown(T.createLingva(function () { return lsGet(LS.lingva) || ''; }))
+};
+const DEFAULT_ORDER = ['google', 'server', 'mymemory', 'lingva'];
+const PROVIDER_NOTE = {
+  google: 'Fast and good. Sent from your browser, so it uses your own connection\'s allowance.',
+  server: 'Our Cloudflare Worker (Workers AI). Capped at a free daily budget shared by everyone.',
+  mymemory: 'Slow and weaker on chat; about 5,000 characters a day per connection.',
+  lingva: 'Volunteer-run Google front ends. Slow; a last resort so lines are never left blank.'
+};
+const MODE_LABEL = { 'device-first': 'On this device first', 'cloud-first': 'Cloud first', 'device-only': 'On this device only' };
+
+function lsJSON(k, dflt) { try { const v = JSON.parse(lsGet(k)); return v == null ? dflt : v; } catch (e) { return dflt; } }
+function mode() { const m = lsGet(LS.mode); return MODE_LABEL[m] ? m : 'device-first'; }
+function order() {
+  const o = lsJSON(LS.order, DEFAULT_ORDER).filter(function (n) { return PROVIDERS[n]; });
+  DEFAULT_ORDER.forEach(function (n) { if (o.indexOf(n) === -1) o.push(n); });
+  return o;
+}
+function enabled() { return lsJSON(LS.enabled, {}); }
+function provLabel(n) { return n === 'device' ? 'this device' : n === 'cache' ? 'the cache' : (PROVIDERS[n] ? PROVIDERS[n].label : n); }
+function firstCloud() { const o = order().filter(function (n) { return enabled()[n] !== false; }); return o.length ? PROVIDERS[o[0]].label : 'the cloud'; }
+
 const engine = T.createEngine({
   onDevice: OD,
-  cloud: function () { return [T.google]; },
+  mode: mode,
+  cloud: function () { return T.chainOrder(PROVIDERS, order(), enabled(), S.sticky, Date.now()); },
   consent: function () { return lsGet(LS.cloud) || 'ask'; },
   askConsent: askCloud,
   onDownloadable: offerDownload,
+  onCloudSend: noteCloudSend,
   onResult: onResult
 });
 
@@ -357,6 +396,7 @@ async function process(rec, force) {
   if (gen !== rec.gen) return;
   if (src && src === tgt) { markSkip(rec, 'already ' + T.langName(tgt)); return; }
   rec.src = src;
+  if (S.onDemand && !force) { addChip(rec); return; }
   showWait(rec);
   engine.enqueue({ id: rec.msg.id, text: rec.c.text, src: src, target: tgt, rec: rec, gen: gen });
 }
@@ -395,9 +435,10 @@ function onResult(job, res) {
     setSkipNote(rec, res.error);
     if (res.error !== 'cloud is off' && res.error !== 'on-device only') addChip(rec);
     renderStats();
+    if (res.error === 'no provider answered') noteNoAnswer();
     return;
   }
-  if (res.provider !== 'device') { S.lastCloud = Date.now(); S.lastCloudName = res.provider; renderPill(); }
+  if (res.provider !== 'device') { S.lastCloud = Date.now(); S.lastCloudName = res.provider; S.sticky = res.provider; renderPill(); }
   const same = res.src === tgt || T.clean(res.text).text.toLowerCase() === job.text.toLowerCase();
   cache.put(job.text, tgt, { text: same ? '' : res.text, src: same ? tgt : res.src, provider: res.provider });
   if (same) { hideWait(rec); markSkip(rec, 'already ' + T.langName(tgt)); return; }
@@ -407,12 +448,64 @@ function onResult(job, res) {
 
 const PROVIDER_TIP = {
   device: 'Translated on this device: nothing was sent',
-  cache: 'From the cache: seen this line before, nothing was sent',
-  google: 'Translated by Google: the text of this line was sent to it'
+  cache: 'From the cache: seen this line before, nothing was sent'
 };
 
+/* ---------- on-demand ---------- */
+
+/* On demand: nothing is translated by itself; foreign lines get a Translate
+   chip. Turned on by hand, or by the page when the cloud gets too busy:
+   over 200 lines a minute, a phone in a chat over 40 a minute, or no
+   provider answering. */
+function setOnDemand(on, why) {
+  if (S.onDemand === on) return;
+  S.onDemand = on;
+  const b = $('demandBtn');
+  b.classList.toggle('on', on);
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  $('lastBtn').hidden = !on;
+  if (!on) {
+    if (!why) S.demandQuietUntil = Date.now() + AUTO_DEMAND_QUIET_MS;
+    translateLast(RESUME_TRANSLATE, true);
+  }
+  if (on && why) toast(why, 'warn');
+  track('kt_on_demand', { on: on ? 1 : 0, auto: why ? 1 : 0 });
+  renderPill();
+}
+
+function autoDemand(why) {
+  if (S.onDemand || Date.now() < S.demandQuietUntil) return;
+  setOnDemand(true, why);
+}
+
+function noteCloudSend(n) {
+  const now = Date.now();
+  for (let i = 0; i < n; i++) S.cloudSends.push(now);
+  while (S.cloudSends.length && S.cloudSends[0] < now - 60000) S.cloudSends.shift();
+  if (S.cloudSends.length > CEILING_PER_MIN) {
+    autoDemand('Over ' + CEILING_PER_MIN + ' lines a minute were going to the cloud, so translation is now on demand: tap Translate on the lines you want.');
+  }
+}
+
+function noteNoAnswer() {
+  const now = Date.now();
+  S.noAnswer.push(now);
+  while (S.noAnswer.length && S.noAnswer[0] < now - 60000) S.noAnswer.shift();
+  if (S.noAnswer.length >= 3) autoDemand('No translator is answering right now (limits reached), so translation is on demand until you switch it back.');
+}
+
+/* "Translate the last 20": the newest lines still waiting for a tap. */
+function translateLast(n, onlyChips) {
+  const all = Array.from(S.rows.values()).filter(function (r) { return r.state === 'chip' || (!onlyChips && r.state === 'failed'); });
+  all.slice(-n).forEach(function (r) { process(r, true); });
+}
+
+function isPhone() {
+  return !OD.hasTranslator && !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+}
+
 function clearTr(rec) {
-  rec.row.classList.remove('has-tr');
+  rec.row.classList.remove('has-tr', 'tappable');
   rec.row.querySelectorAll('.tr,.skip,.chip').forEach(function (n) { n.remove(); });
 }
 
@@ -437,7 +530,7 @@ function showTr(rec, text, src, provider) {
   t.appendChild(el('span', 'tt', text));
   const kind = provider === 'device' ? 'local' : provider === 'cache' ? 'cache' : 'cloud';
   const d = el('span', 'pd ' + kind);
-  d.title = PROVIDER_TIP[provider] || ('Translated by ' + provider + ': the text of this line was sent to it');
+  d.title = PROVIDER_TIP[provider] || ('Translated by ' + provLabel(provider) + ': the text of this line was sent to it');
   t.appendChild(d);
   rec.row.appendChild(t);
   rec.row.classList.add('has-tr');
@@ -461,11 +554,12 @@ function markSkip(rec, reason) {
 
 function addChip(rec) {
   rec.state = rec.state === 'failed' ? 'failed' : 'chip';
+  rec.row.classList.add('tappable');
   if (rec.row.querySelector('.chip')) return;
   const b = el('button', 'chip', 'Translate');
   b.type = 'button';
-  b.title = 'Translate this line now';
-  b.addEventListener('click', function () { process(rec, true); });
+  b.title = 'Translate this line now, through the same providers as everything else';
+  b.addEventListener('click', function (e) { e.stopPropagation(); rec.row.classList.remove('tappable'); process(rec, true); });
   rec.row.appendChild(b);
 }
 
@@ -501,18 +595,23 @@ function pillState() {
   if (!target()) return { kind: 'off', text: 'Pick your language', tip: 'Choose the language you read first; until then the chat is shown as it is.', sb: 'not translating' };
   if (S.paused) return { kind: 'off', text: 'Paused', tip: 'Nothing is being translated or sent while paused.', sb: 'paused' };
   const consent = lsGet(LS.cloud) || 'ask';
+  const m = mode();
   const device = OD.hasTranslator && !OD.isBroken();
-  if (Date.now() - S.lastCloud < CLOUD_RECENT_MS && consent === 'yes') {
-    const n = S.lastCloudName === 'google' ? 'Google' : S.lastCloudName;
-    return { kind: 'cloud', text: 'Cloud: ' + n, cloud: n, sb: n + ' (cloud)',
-      tip: 'The text of chat lines is sent to ' + n + ' to translate. Names, badges and the channel are not. Click to change.' };
+  const cloudOk = consent === 'yes' && m !== 'device-only';
+  const demand = S.onDemand ? ', on demand' : '';
+  if (cloudOk && (Date.now() - S.lastCloud < CLOUD_RECENT_MS || m === 'cloud-first')) {
+    const n = Date.now() - S.lastCloud < CLOUD_RECENT_MS ? provLabel(S.lastCloudName) : firstCloud();
+    return { kind: 'cloud', text: 'Cloud: ' + n, cloud: n, sb: n + ' (cloud' + demand + ')',
+      tip: 'The text of chat lines is sent to ' + n + ' to translate. Names, badges and the channel are not. Click to choose who translates.' };
   }
-  if (device) return { kind: 'local', text: 'On this device', sb: 'on this device',
-    tip: 'Translations run inside this browser (its built-in translator). Nothing leaves your machine. Click to change the cloud choice.' };
-  if (consent === 'no') return { kind: 'off', text: 'Not translating', sb: 'not translating',
-    tip: 'This browser has no on-device translator and cloud translation is off. Click to change.' };
-  return { kind: 'cloud', text: 'Cloud: Google', cloud: 'Google', sb: 'Google (cloud)',
-    tip: 'This browser cannot translate on the device, so the text of chat lines goes to Google. Names, badges and the channel do not. Click to change.' };
+  if (device) return { kind: 'local', text: 'On this device', sb: 'on this device' + demand,
+    tip: 'Translations run inside this browser (its built-in translator). Nothing leaves your machine. Click to choose who translates.' };
+  if (!cloudOk && consent !== 'ask') return { kind: 'off', text: 'Not translating', sb: 'not translating',
+    tip: m === 'device-only' ? 'Set to on-device only, and this browser has no on-device translator. Click to change.'
+      : 'This browser has no on-device translator and cloud translation is off. Click to change.' };
+  const n = firstCloud();
+  return { kind: 'cloud', text: 'Cloud: ' + n, cloud: n, sb: n + ' (cloud' + demand + ')',
+    tip: 'This browser cannot translate on the device, so the text of chat lines goes to ' + n + '. Names, badges and the channel do not. Click to choose who translates.' };
 }
 
 function renderPill() {
@@ -543,9 +642,13 @@ function openCloudChoice() {
 }
 function showCloudModal() {
   const tgt = T.langName(target()) || 'your language';
-  $('cloudWhy').textContent = OD.hasTranslator && !OD.isBroken()
-    ? 'Some lines are in a language this browser cannot translate on the device yet, so they would be sent to Google to translate into ' + tgt + '.'
-    : 'This browser has no on-device translator, so chat lines would be sent to Google to translate into ' + tgt + '.';
+  const first = firstCloud();
+  $('cloudTitle').textContent = 'Translate through ' + first + '?';
+  $('cloudYes').textContent = 'Use ' + first;
+  $('cloudWhy').textContent = (OD.hasTranslator && !OD.isBroken()
+    ? 'Some lines are in a language this browser cannot translate on the device yet, so they would be sent to ' + first + ' to translate into ' + tgt + '.'
+    : 'This browser has no on-device translator, so chat lines would be sent to ' + first + ' to translate into ' + tgt + '.') +
+    ' If it is busy, the next cloud translator in your list takes over.';
   $('cloudModal').hidden = false;
   $('cloudYes').focus();
   renderPill();
@@ -562,6 +665,7 @@ function answerCloud(yes) {
 /* ---------- on-device download offer ---------- */
 function offerDownload(src, tgt) {
   const k = src + '>' + tgt;
+  S.lastPair = { src: src, tgt: tgt };
   if (S.offered.has(k) || S.dlPair) return;
   S.offered.add(k);
   S.dlPair = { src: src, tgt: tgt };
@@ -570,9 +674,10 @@ function offerDownload(src, tgt) {
   $('dlBar').hidden = false;
 }
 
-async function startDownload() {
-  const p = S.dlPair;
+async function startDownload(pair) {
+  const p = pair && pair.src ? pair : S.dlPair;
   if (!p) return;
+  S.dlPair = p;
   $('dlBar').hidden = true;
   const prog = $('prog');
   prog.hidden = false;
@@ -589,6 +694,129 @@ async function startDownload() {
   prog.hidden = true;
   S.dlPair = null;
   renderPill();
+  if (!$('provSheet').hidden) renderSheet();
+}
+
+/* ---------- Providers sheet ---------- */
+/* Who translates: the mode, the cloud list (order and on/off), the
+   on-device pack, your own Lingva instance, and Clear cache. Has form
+   fields, so it closes only via Done or Esc, never an outside click. */
+function openSheet() {
+  renderSheet();
+  $('provSheet').hidden = false;
+  $('sheetDone').focus();
+}
+function closeSheet() { $('provSheet').hidden = true; renderPill(); }
+
+function renderSheet() {
+  const m = mode();
+  document.querySelectorAll('input[name="pmode"]').forEach(function (r) { r.checked = r.value === m; });
+  // on this device
+  let od;
+  if (!OD.hasTranslator) od = 'This browser has no on-device translator (it needs desktop Chrome or Edge 138 or newer).';
+  else if (OD.isBroken()) od = 'This browser lists an on-device translator but it did not answer within 3 seconds, so it is skipped for now.';
+  else {
+    const p = S.lastPair;
+    const st = p ? OD.state(p.src, p.tgt) : '';
+    od = 'Available. Language packs download once, after a click, and then stay in the browser.' +
+      (p && st === 'downloadable' ? ' ' + T.langName(p.src) + ' to ' + T.langName(p.tgt) + ' is not downloaded yet.' : '');
+  }
+  $('odStatus').textContent = od;
+  const p = S.lastPair;
+  const dl = $('sheetDl');
+  dl.hidden = !(p && OD.hasTranslator && !OD.isBroken() && OD.state(p.src, p.tgt) === 'downloadable');
+  if (!dl.hidden) dl.textContent = 'Download ' + T.langName(p.src) + ' to ' + T.langName(p.tgt) + ' (one time)';
+  // cloud
+  const consent = lsGet(LS.cloud) || 'ask';
+  $('cloudOk').checked = consent === 'yes';
+  const list = $('provList');
+  list.innerHTML = '';
+  const o = order(), en = enabled(), now = Date.now();
+  o.forEach(function (name, i) {
+    const pv = PROVIDERS[name];
+    const li = el('li', 'pv');
+    const lab = el('label', 'pv-on');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = en[name] !== false;
+    cb.title = 'Use ' + pv.label + ' when the providers above it cannot translate a line';
+    cb.addEventListener('change', function () { const e2 = enabled(); e2[name] = cb.checked; lsSet(LS.enabled, JSON.stringify(e2)); renderSheet(); });
+    lab.appendChild(cb);
+    lab.appendChild(el('b', null, pv.label.charAt(0).toUpperCase() + pv.label.slice(1)));
+    li.appendChild(lab);
+    const note = el('span', 'pv-note');
+    note.dataset.name = name;
+    li.appendChild(note);
+    const mv = el('span', 'pv-mv');
+    [['up', -1, 'M6 15l6-6 6 6', 'Try ' + pv.label + ' earlier'], ['down', 1, 'M6 9l6 6 6-6', 'Try ' + pv.label + ' later']].forEach(function (d) {
+      const b = el('button', 'ib');
+      b.type = 'button';
+      b.title = d[3];
+      b.setAttribute('aria-label', d[3]);
+      b.disabled = (d[1] < 0 && i === 0) || (d[1] > 0 && i === o.length - 1);
+      b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + d[2] + '"/></svg>';
+      b.addEventListener('click', function () {
+        const o2 = order();
+        const j = i + d[1];
+        const t = o2[i]; o2[i] = o2[j]; o2[j] = t;
+        lsSet(LS.order, JSON.stringify(o2));
+        renderSheet();
+      });
+      mv.appendChild(b);
+    });
+    li.appendChild(mv);
+    list.appendChild(li);
+  });
+  list.classList.toggle('dim', consent !== 'yes' || m === 'device-only');
+  $('lingvaIn').value = lsGet(LS.lingva) || '';
+  cache.count().then(function (n) { $('cacheCount').textContent = n + ' saved'; });
+  renderProvNotes();
+}
+
+/* The live part of the sheet (cooldowns), refreshed without rebuilding the
+   list so focus and typing are never disturbed. */
+function renderProvNotes() {
+  const now = Date.now();
+  document.querySelectorAll('#provList .pv-note').forEach(function (n) {
+    const name = n.dataset.name, pv = PROVIDERS[name];
+    let state = '';
+    if (!pv.ready(now)) state = 'resting ' + Math.ceil((pv.until - now) / 1000) + ' s after "' + pv.lastError + '"';
+    else if (S.sticky === name) state = 'answered last, so it goes first';
+    n.textContent = PROVIDER_NOTE[name] + (state ? ' Now: ' + state + '.' : '');
+  });
+}
+
+function setMode(m) {
+  lsSet(LS.mode, m);
+  track('kt_mode', { mode: m });
+  renderPill();
+}
+
+function saveLingva() {
+  const v = $('lingvaIn').value.trim().replace(/\/+$/, '');
+  if (v && !/^https:\/\/[a-z0-9.-]+(:\d+)?$/i.test(v)) {
+    toast('A Lingva instance is an https:// address with no path, like https://lingva.example.org.', 'err');
+    return;
+  }
+  lsSet(LS.lingva, v);
+  if (v) toast('Lingva will try ' + v + ' first.');
+}
+
+/* ---------- confirm modal (decisions; closes only via its buttons) ---------- */
+let confirmCb = null;
+function confirmBox(title, text, okLabel, cb) {
+  $('cfTitle').textContent = title;
+  $('cfText').textContent = text;
+  $('cfOk').textContent = okLabel;
+  confirmCb = cb;
+  $('confirmModal').hidden = false;
+  $('cfCancel').focus();
+}
+function closeConfirm(ok) {
+  $('confirmModal').hidden = true;
+  const cb = confirmCb;
+  confirmCb = null;
+  if (ok && cb) cb();
 }
 
 /* ---------- misc ---------- */
@@ -605,6 +833,11 @@ function tickRate() {
   while (S.times.length && S.times[0] < cut) S.times.shift();
   $('lpm').textContent = String(S.times.length);
   renderPill();   // cloud use ages out; the on-device check can fail late
+  // Phones translate everything in the cloud, so a busy chat defaults to on demand.
+  if (isPhone() && S.status === 'live' && target() && S.times.length > PHONE_AUTO_DEMAND) {
+    autoDemand('This chat is busy (over ' + PHONE_AUTO_DEMAND + ' lines a minute) and phones translate in the cloud, so translation is on demand: tap the lines you want.');
+  }
+  if (!$('provSheet').hidden) renderProvNotes();
 }
 
 /* ---------- consent banner (site-wide `greenline-consent` key) ---------- */
@@ -641,14 +874,42 @@ $('jump').addEventListener('click', function () { if (S.paused) setPaused(false)
 $('pauseBtn').addEventListener('click', function () { setPaused(!S.paused); });
 $('origBtn').addEventListener('click', function () { setOriginals($('chat').classList.contains('hideorig')); });
 $('errRetry').addEventListener('click', retry);
-$('pill').addEventListener('click', openCloudChoice);
+$('pill').addEventListener('click', openSheet);
 $('cloudYes').addEventListener('click', function () { answerCloud(true); });
 $('cloudNo').addEventListener('click', function () { answerCloud(false); });
 $('dlBtn').addEventListener('click', startDownload);
 $('dlClose').addEventListener('click', function () { $('dlBar').hidden = true; S.dlPair = null; });
+$('demandBtn').addEventListener('click', function () { setOnDemand(!S.onDemand); });
+$('lastBtn').addEventListener('click', function () { translateLast(LAST_N, false); });
+// Phones: the whole row is the tap target for a waiting line.
+$('lines').addEventListener('click', function (e) {
+  const row = e.target.closest('.row.tappable');
+  if (!row || e.target.closest('a,button') || window.innerWidth > 700) return;
+  const rec = S.rows.get(row.dataset.id);
+  if (rec) process(rec, true);
+});
+document.querySelectorAll('input[name="pmode"]').forEach(function (r) {
+  r.addEventListener('change', function () { if (r.checked) setMode(r.value); renderSheet(); });
+});
+$('cloudOk').addEventListener('change', function () { answerCloud($('cloudOk').checked); renderSheet(); });
+$('sheetDl').addEventListener('click', function () { startDownload(S.lastPair); });
+$('lingvaIn').addEventListener('change', saveLingva);
+$('sheetDone').addEventListener('click', function () { saveLingva(); closeSheet(); });
+$('clearCacheBtn').addEventListener('click', function () {
+  cache.count().then(function (n) {
+    confirmBox('Clear the translation cache?', 'This forgets ' + n + ' saved translations on this browser. Lines seen again will be translated again, which can mean sending them to the cloud again.', 'Clear cache', function () {
+      cache.clear().then(function () { toast('Cache cleared.'); renderSheet(); });
+    });
+  });
+});
+$('cfOk').addEventListener('click', function () { closeConfirm(true); });
+$('cfCancel').addEventListener('click', function () { closeConfirm(false); });
 document.addEventListener('keydown', function (e) {
-  // Esc never closes the cloud question: it needs an answer.
-  if (e.key === 'Escape' && !$('dlBar').hidden) { $('dlBar').hidden = true; S.dlPair = null; }
+  if (e.key !== 'Escape') return;
+  // Esc never closes the cloud question or a confirm: they need an answer.
+  if (!$('confirmModal').hidden || !$('cloudModal').hidden) return;
+  if (!$('provSheet').hidden) { saveLingva(); closeSheet(); return; }
+  if (!$('dlBar').hidden) { $('dlBar').hidden = true; S.dlPair = null; }
 });
 setInterval(tickRate, 2000);
 buildLangSelect();
