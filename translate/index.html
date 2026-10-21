@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.2.0" />
-<title>Kick Translate v0.2.0 - Read any Kick chat in your language | BookHockeys</title>
+<meta name="version" content="0.3.0" />
+<title>Kick Translate v0.3.0 - Read any Kick chat in your language | BookHockeys</title>
 
 <meta name="description" content="Kick Translate shows a Kick channel's live chat with a translation under every line that is not in your language. Type a channel, pick the language you read, and keep it open beside the stream. On desktop Chrome and Edge the translating can happen on your own device. Free, no sign-in, not affiliated with Kick." />
 <meta name="theme-color" content="#050506" />
@@ -101,7 +101,7 @@
 <div class="app" id="app">
 
   <header class="hdr">
-    <div class="wm" title="Kick Translate - read any Kick chat in your language">Kick Translate<small>v0.2.0</small></div>
+    <div class="wm" title="Kick Translate - read any Kick chat in your language">Kick Translate<small>v0.3.0</small></div>
     <form class="chan" id="chanForm" autocomplete="off" novalidate>
       <span class="pre" aria-hidden="true">kick.com/</span>
       <label class="sr" for="chanIn">Kick channel name or link</label>
@@ -111,13 +111,26 @@
     <div class="hright">
       <label class="sr" for="lang">The language you read</label>
       <select id="lang" class="sel unset" title="The language you read. Lines already in it are left alone; everything else gets a translation underneath."></select>
-      <button class="pill off" id="pill" type="button" title="Translation arrives in v0.3.0. For now this shows the chat as Kick sends it.">
+      <button class="pill off" id="pill" type="button" title="Where the chat text is translated: on this device, or sent to a cloud service.">
         <span class="dot" aria-hidden="true"></span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>
         <span id="pillTx">Not translating</span>
       </button>
     </div>
   </header>
+
+  <div class="banner" id="cloudBanner" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 0 0 .4-9A7 7 0 0 0 4.3 12.5 3.5 3.5 0 0 0 5 19z"/></svg>
+    <span>Translating through <b id="bannerProv">Google</b>: the text of chat lines leaves your browser. Names, badges and the channel do not. Change it with the provider pill.</span>
+  </div>
+
+  <div class="dlbar" id="dlBar" hidden>
+    <span id="dlText"></span>
+    <button class="btn" type="button" id="dlBtn" title="Fetches the language pack once (it stays in the browser). After that these lines are translated here and never sent anywhere."></button>
+    <button class="ib" type="button" id="dlClose" title="Not now. The cloud keeps translating these lines (if you allowed it).">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
 
   <div class="strip" id="strip" hidden>
     <img class="av" id="chAv" alt="" width="28" height="28" />
@@ -128,6 +141,9 @@
     <span class="sp"></span>
     <a id="chOpen" class="open" href="#" target="_blank" rel="noopener noreferrer" title="Open this channel on kick.com in a new tab, to watch the stream or chat yourself">Open on Kick</a>
     <div class="tools" id="tools">
+      <button class="tb on" type="button" id="origBtn" aria-pressed="true" title="Show the original line above each translation. Off = translations only, with the original on hover; lines that need no translation always show.">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h12M3 18h18"/></svg><span class="lbl">Originals</span>
+      </button>
       <button class="tb" type="button" id="pauseBtn" aria-pressed="false" title="Freeze the view so you can read. Lines keep arriving underneath and are counted; Resume jumps back to live.">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg><span class="lbl">Pause</span>
       </button>
@@ -141,7 +157,7 @@
     <section class="card idle" id="idle">
       <h1>Read any Kick chat in your language</h1>
       <p>Type a channel above, pick the language you read, and every foreign line gets its translation underneath. Keep it open beside the stream.</p>
-      <p class="note">This first version shows the chat exactly as Kick sends it. Translation lands in v0.3.0.</p>
+      <p class="note">On desktop Chrome and Edge the translating can happen on your own computer, so nothing leaves the browser. Anywhere else, the page asks once before sending chat text to a cloud translator.</p>
       <footer class="ft">
         <span>Not affiliated with Kick.</span>
         <a href="/" title="BookHockeys home">BookHockeys</a>
@@ -160,9 +176,25 @@
     <span class="conn bad" id="conn" title="State of the read-only chat connection">not connected</span>
     <button class="tb" type="button" id="retryBtn" hidden title="Connect to the chat again now">Retry</button>
     <span class="hp" id="lpmWrap" hidden title="Chat lines per minute, over the last minute"><b id="lpm">0</b>/min</span>
+    <span id="stats" hidden>translated <b id="nT">0</b> &middot; skipped <b id="nS">0</b> &middot; cache <b id="nC">0</b></span>
     <span class="sp"></span>
+    <span class="prog" id="prog" hidden><span id="progTx"></span> <i><b id="progBar"></b></i> <span id="progPct">0%</span></span>
     <span id="provSb" title="Who translates the chat">not translating</span>
   </footer>
+</div>
+
+<!-- The one-time cloud question. A decision, so a modal; it closes only via
+     its two buttons (no outside click, no Esc). -->
+<div class="backdrop" id="cloudModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cloudTitle" aria-describedby="cloudWhy">
+    <h3 id="cloudTitle">Translate through Google?</h3>
+    <p id="cloudWhy"></p>
+    <p>Only the text of each line goes; names, badges and the channel stay here. You can change this any time from the provider pill in the header.</p>
+    <div class="acts">
+      <button class="b2" type="button" id="cloudNo" title="Nothing leaves this browser. Lines the device cannot translate stay untranslated.">Keep it on this device only</button>
+      <button class="b1" type="button" id="cloudYes" title="Send the text of chat lines to Google to translate them">Use Google</button>
+    </div>
+  </div>
 </div>
 
 <div class="toasts" id="toasts" aria-live="polite"></div>

@@ -1,4 +1,4 @@
-# Kick Translate v0.2.0 - read any Kick chat in your language
+# Kick Translate v0.3.0 - read any Kick chat in your language
 
 A single page that shows a Kick channel's live chat with a translation under every line
 that is not in your language. Type a channel, pick the language you read, and keep it
@@ -11,8 +11,8 @@ Not affiliated with Kick. Channel info comes from Kick's public channel API, fet
 straight from your browser; the chat itself arrives through a small read-only relay
 (see "How it talks to Kick").
 
-This version renders the chat properly (badges, name colours, emotes, replies,
-moderation) and lets you pause it. Translation arrives in v0.3.0.
+It is always obvious whether chat text stays on your machine or goes to a cloud service,
+and the default keeps it on the machine wherever the browser allows.
 
 ---
 
@@ -22,6 +22,30 @@ moderation) and lets you pause it. Translation arrives in v0.3.0.
   **Go**. The channel is checked against Kick first, so a typo gets a clear error.
 - **Your language** - the select in the header. It starts empty and glows amber until
   you pick one, with your browser's language listed first. The choice is remembered.
+  Changing it re-translates the last 30 lines.
+- **Provider pill** - the most important control on the page. Green "On this device":
+  nothing leaves the browser. Amber "Cloud: Google": the text of chat lines (never names,
+  badges or the channel) is being sent to Google, and an amber banner says so under the
+  header. Grey: not translating (no language picked, paused, or nothing allowed). Click
+  it to change your cloud answer.
+- **The one-time question** - the first time a line needs the cloud, a dialog asks
+  "Translate through Google?" with "Use Google" or "Keep it on this device only". It only
+  closes through those buttons, and the answer is remembered.
+- **Translations** - under each foreign line, with a two-letter tag for the language it
+  came from (hover for the full name) and a small dot: green = translated on this device,
+  amber = sent to a cloud service, grey = from the cache (seen before, nothing sent).
+  Three pulsing dots mean it is on its way.
+- **Lines that are not translated** - hover a line to see why: repeat (same person, same
+  text within a minute), too short, emotes only, laughter (jajaja, kkkk, wwww, 555,
+  ㅋㅋㅋ, хаха...), noise (keyboard smash), slang only (gg, pog, kekw, w...), already in your
+  language, or too long (over 800 characters). The status bar counts translated, skipped
+  and cache hits; hover it for the breakdown by reason.
+- **Download (one time)** - on desktop Chrome and Edge, when a language pair could run on
+  the device, a green bar offers to download it. It needs your click (the browser
+  requires one); progress shows in the status bar. After that those lines never leave the
+  machine.
+- **Originals** - shows the original line above each translation. Off = translations
+  only, with the original on hover; the name always stays.
 - **Channel strip** - avatar, name, LIVE or OFFLINE, viewers (refreshed every minute),
   the language Kick says the stream is in, and a link to open the channel on Kick.
   Offline channels still connect: their chat works, it is just quieter.
@@ -33,22 +57,25 @@ moderation) and lets you pause it. Translation arrives in v0.3.0.
   are kept.
 - **Following live** - the chat sticks to the newest line until you scroll up; then new
   lines are counted in a "N new, jump to live" pill instead of yanking the view away.
-- **Pause** - freezes the view so you can read. Lines keep arriving underneath and are
-  counted; Resume (or the pill) jumps back to live.
+- **Pause** - freezes the view and stops all translating; nothing is sent while paused.
+  Lines keep arriving underneath and are counted. On Resume only the last 30 waiting
+  lines are translated; older ones get a **Translate** chip, so a long pause never turns
+  into hundreds of lines sent at once.
 - **Status bar** - the chat connection (connecting / live / reconnecting / failed, with
-  Retry) and lines per minute.
-- **Phones** - the header folds into rows (name, channel field, language), every row
-  wraps, and nothing scrolls sideways at 375 px.
+  Retry), lines per minute, the counters, and who is translating.
+- **Phones** - the header folds into rows (name, channel field, language and pill), every
+  row wraps, and nothing scrolls sideways at 375 px. Phones have no on-device translator,
+  so the question about the cloud comes up on the first foreign line.
 
 ## Files
 
 ```
 index.html            markup, meta/site kit, analytics bootstrap
 styles.css            design A "Neon Splat" tokens + layout
-app.js                the page: connect flow, chat buffer, status bar, toasts
-chat.js               the relay socket (reconnect rules) and the line renderer
+app.js                the page: connect flow, chat buffer, per-line translation, pill, modal
+chat.js               the relay socket (reconnect rules), event parsing, the line renderer
 kick.js               everything that knows a kick.com URL (channel lookup, relay URL)
-translate.js          reading languages; the translation pipeline from v0.3.0
+translate.js          languages, cleaning, skip rules, detection, cache, providers, batching
 favicon.svg           hand-drawn two-bubble mark
 favicon-*.png         16 / 32 / 192
 apple-touch-icon.png  180x180
@@ -74,11 +101,38 @@ modules do not load from `file://`).
   (`http://127.0.0.1:3460`), so no Worker needs to run locally. `?worker=local` points the
   page at `wrangler dev` on port 8787 instead.
 
+## How it translates
+
+Per line: show the original at once, then **clean** it (emotes, links, @mentions and emoji
+come out; "holaaaa" becomes "hola"; only what is left could ever be sent), check the
+**skip rules**, look in the **cache**, **detect** the language, and if it is not yours,
+queue it.
+
+- **Detection:** the browser's own language detector when it has one (desktop Chrome and
+  Edge); otherwise the script (kana = Japanese, Hangul = Korean, Cyrillic, Arabic, Thai...)
+  and, for Latin-script lines, a small common-word vote, then the channel's declared
+  language. When the on-device detector is unsure about a short Latin line, the word vote
+  and the channel's language win.
+- **On this device first:** Chrome's built-in Translator. Every call to it is raced
+  against a 3-second timeout, because in some Chromium shells it never answers; a hang
+  falls through to the cloud instead of freezing the chat. A language pair is never
+  downloaded without your click.
+- **Google** (cloud): the unofficial `translate.googleapis.com/translate_a/t` endpoint,
+  straight from your browser, so it spends your own connection's allowance. Lines that
+  arrive within 120 ms of each other go out as one request (up to 40 lines), with at most
+  four requests in flight. Google also names the language it saw, which corrects the
+  tag; a line it says is already in your language is dropped.
+- **Cache:** 2,000 entries for 24 hours, in memory and in IndexedDB, keyed by the cleaned
+  text and your language. Chat repeats itself a lot, so this saves real requests.
+
 ## Stored in your browser
 
 | Key | What |
 |---|---|
 | `kt:target` | the language you read |
+| `kt:cloud` | your answer to the cloud question (`yes` / `no`) |
+| `kt:originals` | whether original lines are shown |
+| IndexedDB `kct-cache` | recent translations (24 h, 2,000 at most) |
 | `greenline-consent` | the site-wide analytics consent choice (shared with other bookhockeys.com pages) |
 | `bookhockeys_ga_optout` | set by visiting `?ga=off` once; `?ga=on` clears it |
 
@@ -92,16 +146,35 @@ Analytics events never carry chat text, user names or the channel.
 
 ## Roadmap
 
-- v0.3.0 - translation: on-device first (desktop Chrome and Edge), Google as the cloud
-  fallback after a one-time question, skip rules, cache.
-- v0.4.0 - more providers (our own Worker, MyMemory, Lingva), the Providers sheet,
-  translate-on-demand.
+- v0.4.0 - more providers (our own Worker, MyMemory, Lingva) with cooldowns, the
+  Providers sheet, translate-on-demand.
 - v0.5.0 - language and user filters, glossary, settings, keyboard, recent channels,
   shareable `#channel` links, a self-test.
 
 ---
 
 ## Changelog
+
+### v0.3.0 - 2026-10-20
+
+Translation is here. The point of the page is reading a chat you could not read before,
+without quietly shipping everyone's messages off to a server, so the privacy state is
+built into every step rather than added later.
+
+- Every foreign line gets its translation underneath, tagged with the language it came
+  from and a dot that says whether it was translated on your device, in the cloud, or
+  from the cache.
+- On desktop Chrome and Edge it translates on your own computer when the language pack
+  is there, and offers a one-click download when it is not. Nothing is downloaded
+  without that click.
+- Anything that would leave the browser is asked about once, in a dialog with a clear
+  "keep it on this device only" choice. While the cloud is in use the pill turns amber
+  and a banner says so.
+- Lines not worth translating (repeats, laughter, emotes, "gg") are skipped, and hovering
+  a line says why. That keeps the chat calm and the cloud requests few.
+- Translations are cached for a day, so the same "what game is this" is never sent twice.
+- Pause now also stops translating; resuming translates only the newest lines.
+- An Originals switch shows translations only, with the original on hover.
 
 ### v0.2.0 - 2026-10-20
 
