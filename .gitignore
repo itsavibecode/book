@@ -16,3 +16,10 @@ Thumbs.db
 *.swp
 .vscode/
 .idea/
+
+# Strata (strata/app is the Vite source; the built app is committed in strata/ itself)
+strata/app/node_modules/
+strata/app/dist/
+strata/app/dist-single/
+strata/app/test-results/
+strata/app/playwright-report/
