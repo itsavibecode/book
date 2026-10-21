@@ -23,3 +23,4 @@ strata/app/dist/
 strata/app/dist-single/
 strata/app/test-results/
 strata/app/playwright-report/
+strata/app/.vitest-attachments/
