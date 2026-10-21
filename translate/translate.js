@@ -167,6 +167,53 @@ export function skipReason(c) {
   return '';
 }
 
+/* ================= filters and glossary ================= */
+
+/* Chat bots whose lines are never worth translating (announcements, !commands). */
+export const BOTS = ['botrix', 'fossabot', 'kickbot', 'sery_bot', 'kicklet', 'streamelements', 'nightbot', 'moobot', 'kickbotv2'];
+
+export function isBot(slug) {
+  return BOTS.indexOf(String(slug || '').toLowerCase()) !== -1;
+}
+
+/* "word, other word" or one per line -> lowercase list. */
+export function parseList(s) {
+  return String(s || '').split(/[\n,]+/).map(function (x) { return x.trim().toLowerCase().replace(/^@/, ''); }).filter(Boolean);
+}
+
+function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+/* Whole words only, any case, so "w" does not match inside "wow". */
+export function hasBlockedWord(text, words) {
+  if (!words || !words.length) return '';
+  const low = String(text || '').toLowerCase();
+  for (let i = 0; i < words.length; i++) {
+    const re = new RegExp('(^|[^\\p{L}\\p{N}])' + esc(words[i]) + '($|[^\\p{L}\\p{N}])', 'u');
+    if (re.test(low)) return words[i];
+  }
+  return '';
+}
+
+/* Glossary: one "find = replace" per line. Fixes names and in-jokes the
+   engines mangle; applied to the translation, whole words, any case. */
+export function parseGlossary(s) {
+  return String(s || '').split('\n').map(function (line) {
+    const i = line.indexOf('=');
+    if (i < 1) return null;
+    const find = line.slice(0, i).trim(), rep = line.slice(i + 1).trim();
+    return find ? { find: find, rep: rep } : null;
+  }).filter(Boolean);
+}
+
+export function applyGlossary(text, rules) {
+  let out = String(text || '');
+  (rules || []).forEach(function (r) {
+    const re = new RegExp('(^|[^\\p{L}\\p{N}])' + esc(r.find) + '(?=$|[^\\p{L}\\p{N}])', 'giu');
+    out = out.replace(re, function (m, pre) { return pre + r.rep; });
+  });
+  return out;
+}
+
 /* ================= language detection ================= */
 
 /* Dominant script -> language code, '' when nothing stands out, 'latin'

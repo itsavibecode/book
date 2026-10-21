@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.4.0" />
-<title>Kick Translate v0.4.0 - Read any Kick chat in your language | BookHockeys</title>
+<meta name="version" content="0.5.0" />
+<title>Kick Translate v0.5.0 - Read any Kick chat in your language | BookHockeys</title>
 
 <meta name="description" content="Kick Translate shows a Kick channel's live chat with a translation under every line that is not in your language. Type a channel, pick the language you read, and keep it open beside the stream. On desktop Chrome and Edge the translating can happen on your own device. Free, no sign-in, not affiliated with Kick." />
 <meta name="theme-color" content="#050506" />
@@ -101,12 +101,13 @@
 <div class="app" id="app">
 
   <header class="hdr">
-    <div class="wm" title="Kick Translate - read any Kick chat in your language">Kick Translate<small>v0.4.0</small></div>
+    <div class="wm" title="Kick Translate - read any Kick chat in your language">Kick Translate<small>v0.5.0</small></div>
     <form class="chan" id="chanForm" autocomplete="off" novalidate>
       <span class="pre" aria-hidden="true">kick.com/</span>
       <label class="sr" for="chanIn">Kick channel name or link</label>
       <input id="chanIn" type="text" spellcheck="false" autocapitalize="off" placeholder="channel" title="The channel name as it appears in kick.com/name. Pasting a full kick.com link works too. Press Enter or Go." />
       <button class="go" type="submit" id="goBtn" title="Connect to this channel's chat. Read-only: nothing is ever posted.">Go</button>
+      <div class="recent-box" id="recentBox" hidden aria-label="Recent channels"></div>
     </form>
     <div class="hright">
       <label class="sr" for="lang">The language you read</label>
@@ -141,6 +142,9 @@
     <span class="sp"></span>
     <a id="chOpen" class="open" href="#" target="_blank" rel="noopener noreferrer" title="Open this channel on kick.com in a new tab, to watch the stream or chat yourself">Open on Kick</a>
     <div class="tools" id="tools">
+      <button class="tb" type="button" id="srcBtn" title="Pick which languages get translated. Turning off one you can already read saves budget in mixed chats.">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M8 5v14M4 19h16M12 9h8M12 15h8"/></svg><span class="lbl">Languages</span> <span class="lbl sum" id="srcSum"></span>
+      </button>
       <button class="tb on" type="button" id="origBtn" aria-pressed="true" title="Show the original line above each translation. Off = translations only, with the original on hover; lines that need no translation always show.">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h12M3 18h18"/></svg><span class="lbl">Originals</span>
       </button>
@@ -149,6 +153,9 @@
       </button>
       <button class="tb" type="button" id="pauseBtn" aria-pressed="false" title="Freeze the view so you can read. Lines keep arriving underneath and are counted; Resume jumps back to live.">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg><span class="lbl">Pause</span>
+      </button>
+      <button class="tb" type="button" id="setBtn" title="Text size, glossary, filters (bots, muted people, blocked words), analytics, about" aria-label="Settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
       </button>
     </div>
   </div>
@@ -161,8 +168,14 @@
       <h1>Read any Kick chat in your language</h1>
       <p>Type a channel above, pick the language you read, and every foreign line gets its translation underneath. Keep it open beside the stream.</p>
       <p class="note">On desktop Chrome and Edge the translating can happen on your own computer, so nothing leaves the browser. Anywhere else, the page asks once before sending chat text to a cloud translator.</p>
+      <div class="idle-recent" id="idleRecentWrap" hidden>
+        <span class="lbl-sm">Recent</span>
+        <div class="recent-list" id="idleRecent"></div>
+      </div>
+      <p class="keys">Keys: <kbd>/</kbd> channel &middot; <kbd>Space</kbd> pause &middot; <kbd>o</kbd> originals &middot; <kbd>d</kbd> on demand &middot; <kbd>t</kbd> translate the last 20 &middot; <kbd>Esc</kbd> close</p>
       <footer class="ft">
         <span>Not affiliated with Kick.</span>
+        <button type="button" id="aboutBtn" class="linkish" title="What is sent where, settings and analytics">About</button>
         <a href="/" title="BookHockeys home">BookHockeys</a>
         <button type="button" id="cookieReset" class="linkish" title="Change your analytics cookie choice">Cookies</button>
       </footer>
@@ -233,6 +246,67 @@
     <section class="sh-sec sh-row">
       <span><b>Cache</b> <span id="cacheCount"></span></span>
       <button class="btn-ol" type="button" id="clearCacheBtn" title="Forget saved translations on this browser. Asks first.">Clear cache</button>
+    </section>
+  </div>
+</div>
+
+<!-- Languages sheet: which source languages get translated. -->
+<div class="backdrop sheetwrap" id="srcSheet" hidden>
+  <div class="modal sheet" role="dialog" aria-modal="true" aria-labelledby="srcTitle">
+    <div class="sh-hd">
+      <h3 id="srcTitle">Translate these languages</h3>
+      <button class="btn" type="button" id="srcDone" title="Close">Done</button>
+    </div>
+    <section class="sh-sec">
+      <p>Languages seen in this chat, with how many lines. Turn one off and its lines stay on screen untranslated: handy when you already read it, and it saves budget in mixed chats. Remembered for every channel.</p>
+      <p id="srcEmpty" class="muted">No foreign lines yet. Languages show up here as they arrive.</p>
+      <div class="lchips" id="srcChips"></div>
+      <div class="presets">
+        <button class="btn-ol" type="button" id="srcOnly" hidden title="Translate only the most common language in this chat"></button>
+        <button class="btn-ol" type="button" id="srcSkipEn" title="Leave English lines untranslated">Skip English</button>
+        <button class="btn-ol" type="button" id="srcAll" title="Translate every language again">All on</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Settings sheet. Has form fields, so it closes only via Done or Esc. -->
+<div class="backdrop sheetwrap" id="setSheet" hidden>
+  <div class="modal sheet" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <div class="sh-hd">
+      <h3 id="setTitle">Settings</h3>
+      <button class="btn" type="button" id="setDone" title="Save and close">Done</button>
+    </div>
+    <section class="sh-sec">
+      <h4>Look</h4>
+      <label class="fld" for="setSize" title="Bigger text for a second screen across the room, smaller to fit more lines">Text size</label>
+      <select id="setSize" class="sel"><option value="s">Small</option><option value="m">Medium</option><option value="l">Large</option></select>
+      <label class="chk" title="Less space between lines, so more of a fast chat fits on screen"><input type="checkbox" id="setCompact" /> Compact rows</label>
+      <label class="chk" title="The two-letter tag (JA, ES...) says which language a translation came from"><input type="checkbox" id="setTags" /> Show the source-language tag</label>
+      <label class="chk" title="The small dot says who translated a line: green this device, amber the cloud, grey the cache"><input type="checkbox" id="setDots" /> Show the provider dot</label>
+    </section>
+    <section class="sh-sec">
+      <h4>Filters</h4>
+      <label class="chk" title="BotRix, Fossabot, KickBot, Sery_Bot, Kicklet, StreamElements, Nightbot, Moobot: their lines stay visible but are never sent for translation"><input type="checkbox" id="setBots" /> Do not translate known chat bots</label>
+      <label class="fld" for="setMuted" title="Their lines are not shown at all, on this browser only. Kick and the person are not told.">Muted people (names, one per line or comma-separated)</label>
+      <textarea class="txt area" id="setMuted" rows="2" spellcheck="false" autocapitalize="off" placeholder="spammer123"></textarea>
+      <label class="fld" for="setWords" title="Lines containing any of these whole words are not shown at all">Hide lines with these words</label>
+      <textarea class="txt area" id="setWords" rows="2" spellcheck="false" autocapitalize="off" placeholder="spoiler, free skins"></textarea>
+    </section>
+    <section class="sh-sec">
+      <h4>Glossary</h4>
+      <label class="fld" for="setGloss" title="Translators mangle names and in-jokes. Each rule fixes a word in the translation, whole words, any case.">One rule per line: what the translator wrote = what you want</label>
+      <textarea class="txt area" id="setGloss" rows="3" spellcheck="false" autocapitalize="off" placeholder="Cobra = Lacobraaa"></textarea>
+    </section>
+    <section class="sh-sec">
+      <h4>Analytics</h4>
+      <p id="gaState"></p>
+      <a class="linkish" id="gaLink" href="?ga=off" title="Remembered on this browser; the page reloads"></a>
+    </section>
+    <section class="sh-sec">
+      <h4>About</h4>
+      <p>Kick Translate <span id="aboutVer"></span> shows a Kick channel's chat with translations underneath. Chat arrives read-only through a small relay on bookhockeys.com's side. What leaves your browser for translating is only the text of a line (no names, badges or channel), only when the pill is amber, and only to the services you allowed under <b>Who translates</b>.</p>
+      <p>Not affiliated with Kick. <a class="linkish" href="/" title="BookHockeys home">BookHockeys</a></p>
     </section>
   </div>
 </div>

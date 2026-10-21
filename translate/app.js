@@ -8,10 +8,12 @@ import * as K from './kick.js';
 import { chatFeed, renderRow, renderSystem, el } from './chat.js';
 import * as T from './translate.js';
 
-const VERSION = '0.4.0';
+const VERSION = '0.5.0';
 const $ = function (id) { return document.getElementById(id); };
 const LS = { target: 'kt:target', cloud: 'kt:cloud', orig: 'kt:originals', mode: 'kt:mode', order: 'kt:order',
-  enabled: 'kt:enabled', lingva: 'kt:lingva' };
+  enabled: 'kt:enabled', lingva: 'kt:lingva', settings: 'kt:settings', recent: 'kt:recent', srcOff: 'kt:srcoff' };
+const RECENT_MAX = 8;
+const DEFAULT_SETTINGS = { size: 'm', compact: false, tags: true, dots: true, bots: true, muted: '', words: '', glossary: '' };
 const CEILING_PER_MIN = 200;   // lines to the cloud per minute before on-demand takes over
 const PHONE_AUTO_DEMAND = 40;  // chat lines per minute that make phones default to on-demand
 const AUTO_DEMAND_QUIET_MS = 5 * 60 * 1000;
@@ -55,8 +57,32 @@ const S = {
   cloudSends: [],       // times of lines sent to the cloud, last minute
   noAnswer: [],         // times of lines no provider answered
   onDemand: false,
-  demandQuietUntil: 0   // no automatic on-demand before this (the viewer turned it off)
+  demandQuietUntil: 0,  // no automatic on-demand before this (the viewer turned it off)
+  seenLangs: new Map()  // detected source language -> lines, this channel
 };
+
+/* Settings, plus the parsed lists the pipeline checks on every line. */
+let SET = Object.assign({}, DEFAULT_SETTINGS);
+const F = { muted: [], words: [], glossary: [], srcOff: new Set() };
+function loadSettings() {
+  try { SET = Object.assign({}, DEFAULT_SETTINGS, JSON.parse(lsGet(LS.settings) || '{}')); } catch (e) { SET = Object.assign({}, DEFAULT_SETTINGS); }
+  F.muted = T.parseList(SET.muted);
+  F.words = T.parseList(SET.words);
+  F.glossary = T.parseGlossary(SET.glossary);
+  F.srcOff = new Set(lsJSON(LS.srcOff, []));
+}
+function saveSettings() {
+  lsSet(LS.settings, JSON.stringify(SET));
+  loadSettings();
+  applyLook();
+}
+function applyLook() {
+  const chat = $('chat');
+  chat.dataset.size = SET.size;
+  chat.classList.toggle('compact', !!SET.compact);
+  chat.classList.toggle('notag', !SET.tags);
+  chat.classList.toggle('nodot', !SET.dots);
+}
 
 const OD = T.createOnDevice();
 const cache = T.createCache();
@@ -201,6 +227,13 @@ async function connect(slug) {
   $('lines').innerHTML = '';
   S.rows.clear();
   S.recent.clear();
+  S.seenLangs.clear();
+  renderLangBtn();
+  rememberChannel(c.slug);
+  // The address is the channel, so the link can be shared.
+  if (location.hash.slice(1).toLowerCase() !== c.slug) {
+    try { history.replaceState(null, '', '#' + c.slug); } catch (e) { location.hash = c.slug; }
+  }
   engine.clear();
   S.times = [];
   S.newCount = 0;
@@ -335,6 +368,9 @@ function setPaused(p) {
 function onEvent(ev) {
   if (ev.kind === 'message') {
     S.times.push(Date.now());
+    // Muted people and lines with a blocked word are not shown at all.
+    if (F.muted.indexOf(ev.user.slug) !== -1 || F.muted.indexOf(ev.user.name.toLowerCase()) !== -1) { countFiltered('muted user'); return; }
+    if (T.hasBlockedWord(ev.content, F.words)) { countFiltered('blocked word'); return; }
     const row = renderRow(ev);
     const rec = { msg: ev, row: row, state: 'new' };
     S.rows.set(ev.id, rec);
@@ -372,7 +408,7 @@ async function process(rec, force) {
   clearTr(rec);
   if (!tgt) { rec.state = 'new'; return; }
   if (!rec.c) rec.c = T.clean(rec.msg.content);
-  let reason = T.skipReason(rec.c);
+  let reason = SET.bots && T.isBot(rec.msg.user.slug) ? 'filtered (bot)' : T.skipReason(rec.c);
   if (!reason && !force) {
     const key = rec.msg.user.id + '\u0001' + rec.c.text.toLowerCase();
     const now = Date.now();
@@ -396,6 +432,8 @@ async function process(rec, force) {
   if (gen !== rec.gen) return;
   if (src && src === tgt) { markSkip(rec, 'already ' + T.langName(tgt)); return; }
   rec.src = src;
+  if (src && !rec.counted) { rec.counted = true; S.seenLangs.set(src, (S.seenLangs.get(src) || 0) + 1); renderLangBtn(); }
+  if (src && F.srcOff.has(src) && !force) { markSkip(rec, 'filtered (' + T.langName(src) + ' is off)'); return; }
   if (S.onDemand && !force) { addChip(rec); return; }
   showWait(rec);
   engine.enqueue({ id: rec.msg.id, text: rec.c.text, src: src, target: tgt, rec: rec, gen: gen });
@@ -527,7 +565,7 @@ function showTr(rec, text, src, provider) {
   rec.state = 'done';
   const t = el('div', 'tr');
   if (src) { const lg = el('span', 'lg', T.shortTag(src)); lg.title = 'Translated from ' + T.langName(src); t.appendChild(lg); }
-  t.appendChild(el('span', 'tt', text));
+  t.appendChild(el('span', 'tt', T.applyGlossary(text, F.glossary)));
   const kind = provider === 'device' ? 'local' : provider === 'cache' ? 'cache' : 'cloud';
   const d = el('span', 'pd ' + kind);
   d.title = PROVIDER_TIP[provider] || ('Translated by ' + provLabel(provider) + ': the text of this line was sent to it');
@@ -546,9 +584,15 @@ function setSkipNote(rec, reason) {
 function markSkip(rec, reason) {
   rec.state = 'skip';
   S.stats.skipped++;
-  const key = reason.indexOf('already') === 0 ? 'already your language' : reason;
+  const key = reason.indexOf('already') === 0 ? 'already your language' : reason.indexOf('filtered (') === 0 && reason !== 'filtered (bot)' ? 'filtered language' : reason;
   S.stats.reasons[key] = (S.stats.reasons[key] || 0) + 1;
   setSkipNote(rec, reason);
+  renderStats();
+}
+
+function countFiltered(why) {
+  S.stats.skipped++;
+  S.stats.reasons[why] = (S.stats.reasons[why] || 0) + 1;
   renderStats();
 }
 
@@ -802,6 +846,152 @@ function saveLingva() {
   if (v) toast('Lingva will try ' + v + ' first.');
 }
 
+/* ---------- Languages sheet (source-language filter) ---------- */
+/* Chips for every language seen in this chat, with counts. Turning one off
+   stops translating it, which saves budget in mixed chats. Remembered
+   across channels. */
+function renderLangBtn() {
+  const off = F.srcOff.size;
+  const top = Array.from(S.seenLangs.entries()).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 3)
+    .map(function (e) { return e[0]; });
+  $('srcSum').textContent = top.length ? top.join(' ') + (off ? ' (' + off + ' off)' : '') : (off ? off + ' off' : '');
+  $('srcBtn').classList.toggle('warn', off > 0);
+  if (!$('srcSheet').hidden) renderSrcSheet();
+}
+
+function renderSrcSheet() {
+  const box = $('srcChips');
+  box.innerHTML = '';
+  const seen = Array.from(S.seenLangs.entries());
+  F.srcOff.forEach(function (c) { if (!S.seenLangs.has(c)) seen.push([c, 0]); });
+  seen.sort(function (a, b) { return b[1] - a[1]; });
+  $('srcEmpty').hidden = seen.length > 0;
+  seen.forEach(function (e) {
+    const code = e[0];
+    const on = !F.srcOff.has(code);
+    const b = el('button', 'lchip' + (on ? ' on' : ''));
+    b.type = 'button';
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.title = on ? 'Translating ' + T.langName(code) + '. Click to stop translating it.' : T.langName(code) + ' is off: its lines are shown but not translated. Click to turn it back on.';
+    b.appendChild(el('span', null, T.langName(code)));
+    b.appendChild(el('small', null, String(e[1])));
+    b.addEventListener('click', function () { toggleSrc(code); });
+    box.appendChild(b);
+  });
+  const top = seen.length ? seen[0][0] : '';
+  const only = $('srcOnly');
+  only.hidden = !top || seen.length < 2;
+  if (top) { only.textContent = 'Only ' + T.langName(top); only.dataset.code = top; }
+  const skipEn = $('srcSkipEn');
+  skipEn.hidden = target() === 'en' || F.srcOff.has('en');
+}
+
+function toggleSrc(code) {
+  if (F.srcOff.has(code)) F.srcOff.delete(code); else F.srcOff.add(code);
+  lsSet(LS.srcOff, JSON.stringify(Array.from(F.srcOff)));
+  renderLangBtn();
+  renderSrcSheet();
+}
+
+function srcOnly(code) {
+  S.seenLangs.forEach(function (n, c) { if (c !== code) F.srcOff.add(c); });
+  F.srcOff.delete(code);
+  lsSet(LS.srcOff, JSON.stringify(Array.from(F.srcOff)));
+  renderLangBtn();
+  renderSrcSheet();
+}
+
+/* ---------- Settings sheet ---------- */
+function openSettings() {
+  $('setSize').value = SET.size;
+  $('setCompact').checked = !!SET.compact;
+  $('setTags').checked = !!SET.tags;
+  $('setDots').checked = !!SET.dots;
+  $('setBots').checked = !!SET.bots;
+  $('setMuted').value = SET.muted;
+  $('setWords').value = SET.words;
+  $('setGloss').value = SET.glossary;
+  let off = false;
+  try { off = localStorage.getItem('bookhockeys_ga_optout') === '1'; } catch (e) { /* ignore */ }
+  $('gaState').textContent = off ? 'Analytics are off for this browser.' : 'Anonymous visit counts are on for this browser (never chat text, names or channels).';
+  const a = $('gaLink');
+  a.textContent = off ? 'Turn analytics back on' : 'Turn analytics off for this browser';
+  a.href = '?ga=' + (off ? 'on' : 'off') + location.hash;
+  $('aboutVer').textContent = 'v' + VERSION;
+  $('setSheet').hidden = false;
+  $('setDone').focus();
+}
+function closeSettings() {
+  SET.size = $('setSize').value;
+  SET.compact = $('setCompact').checked;
+  SET.tags = $('setTags').checked;
+  SET.dots = $('setDots').checked;
+  SET.bots = $('setBots').checked;
+  SET.muted = $('setMuted').value;
+  SET.words = $('setWords').value;
+  SET.glossary = $('setGloss').value;
+  saveSettings();
+  $('setSheet').hidden = true;
+}
+
+/* ---------- recent channels ---------- */
+function recentList() { return lsJSON(LS.recent, []).filter(function (s) { return K.parseSlug(s); }); }
+function rememberChannel(slug) {
+  const l = recentList().filter(function (s) { return s !== slug; });
+  l.unshift(slug);
+  lsSet(LS.recent, JSON.stringify(l.slice(0, RECENT_MAX)));
+  renderRecent();
+}
+function renderRecent() {
+  const l = recentList();
+  [$('recentBox'), $('idleRecent')].forEach(function (box) {
+    box.innerHTML = '';
+    l.forEach(function (s) {
+      const b = el('button', 'rchip', s);
+      b.type = 'button';
+      b.title = 'Open ' + s + '\'s chat again';
+      // mousedown, so it fires before the field's blur hides the list
+      b.addEventListener('mousedown', function (e) { e.preventDefault(); go(s); });
+      b.addEventListener('click', function () { go(s); });
+      box.appendChild(b);
+    });
+  });
+  $('idleRecentWrap').hidden = !l.length;
+}
+
+function go(slug) {
+  OD.initDetector();   // inside a click, so a first-time model download is allowed
+  $('chanIn').value = slug;
+  $('chanIn').blur();
+  $('recentBox').hidden = true;
+  if (!S.channel || S.channel.slug !== slug || S.status === 'failed' || S.status === 'idle') connect(slug);
+}
+
+/* ---------- keyboard ---------- */
+/* "/" channel field, Space pause, o originals, d on demand, t translate the
+   last 20, Esc closes sheets. Never while typing or while a question is open. */
+function onKey(e) {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const tag = (e.target && e.target.tagName) || '';
+  const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target && e.target.isContentEditable);
+  const blocking = !$('confirmModal').hidden || !$('cloudModal').hidden;
+  if (e.key === 'Escape') {
+    if (blocking) return;   // the questions need an answer
+    if (!$('setSheet').hidden) { closeSettings(); return; }
+    if (!$('srcSheet').hidden) { $('srcSheet').hidden = true; return; }
+    if (!$('provSheet').hidden) { saveLingva(); closeSheet(); return; }
+    if (!$('dlBar').hidden) { $('dlBar').hidden = true; S.dlPair = null; return; }
+    if (tag === 'INPUT') e.target.blur();
+    return;
+  }
+  if (typing || blocking || !$('provSheet').hidden || !$('setSheet').hidden || !$('srcSheet').hidden) return;
+  if (e.key === '/') { e.preventDefault(); $('chanIn').focus(); $('chanIn').select(); }
+  else if (e.key === ' ' && tag !== 'BUTTON' && tag !== 'A') { if (!S.channel) return; e.preventDefault(); setPaused(!S.paused); }
+  else if (e.key === 'o' || e.key === 'O') setOriginals($('chat').classList.contains('hideorig'));
+  else if (e.key === 'd' || e.key === 'D') setOnDemand(!S.onDemand);
+  else if (e.key === 't' || e.key === 'T') translateLast(LAST_N, false);
+}
+
 /* ---------- confirm modal (decisions; closes only via its buttons) ---------- */
 let confirmCb = null;
 function confirmBox(title, text, okLabel, cb) {
@@ -861,13 +1051,12 @@ function initConsent() {
 /* ---------- boot ---------- */
 $('chanForm').addEventListener('submit', function (e) {
   e.preventDefault();
-  OD.initDetector();   // inside the click, so a first-time model download is allowed
   const slug = K.parseSlug($('chanIn').value);
-  if (!slug) { toast('That does not look like a Kick channel name.', 'err'); $('chanIn').focus(); return; }
-  $('chanIn').value = slug;
-  $('chanIn').blur();
-  connect(slug);
+  if (!slug) { OD.initDetector(); toast('That does not look like a Kick channel name.', 'err'); $('chanIn').focus(); return; }
+  go(slug);
 });
+$('chanIn').addEventListener('focus', function () { $('recentBox').hidden = !recentList().length; });
+$('chanIn').addEventListener('blur', function () { $('recentBox').hidden = true; });
 $('retryBtn').addEventListener('click', retry);
 $('lines').addEventListener('scroll', onScroll, { passive: true });
 $('jump').addEventListener('click', function () { if (S.paused) setPaused(false); else scrollToLive(); });
@@ -904,15 +1093,30 @@ $('clearCacheBtn').addEventListener('click', function () {
 });
 $('cfOk').addEventListener('click', function () { closeConfirm(true); });
 $('cfCancel').addEventListener('click', function () { closeConfirm(false); });
-document.addEventListener('keydown', function (e) {
-  if (e.key !== 'Escape') return;
-  // Esc never closes the cloud question or a confirm: they need an answer.
-  if (!$('confirmModal').hidden || !$('cloudModal').hidden) return;
-  if (!$('provSheet').hidden) { saveLingva(); closeSheet(); return; }
-  if (!$('dlBar').hidden) { $('dlBar').hidden = true; S.dlPair = null; }
+$('srcBtn').addEventListener('click', function () { renderSrcSheet(); $('srcSheet').hidden = false; $('srcDone').focus(); });
+$('srcDone').addEventListener('click', function () { $('srcSheet').hidden = true; });
+$('srcOnly').addEventListener('click', function () { srcOnly($('srcOnly').dataset.code); });
+$('srcSkipEn').addEventListener('click', function () { if (!F.srcOff.has('en')) toggleSrc('en'); });
+$('srcAll').addEventListener('click', function () { F.srcOff.clear(); lsSet(LS.srcOff, '[]'); renderLangBtn(); renderSrcSheet(); });
+$('setBtn').addEventListener('click', openSettings);
+$('setDone').addEventListener('click', closeSettings);
+$('aboutBtn').addEventListener('click', openSettings);
+document.addEventListener('keydown', onKey);
+window.addEventListener('hashchange', function () {
+  const slug = K.parseSlug(location.hash);
+  if (slug && (!S.channel || S.channel.slug !== slug)) go(slug);
 });
 setInterval(tickRate, 2000);
+loadSettings();
+applyLook();
 buildLangSelect();
 setOriginals(lsGet(LS.orig) !== '0');
 renderPill();
+renderRecent();
+renderLangBtn();
 initConsent();
+// bookhockeys.com/translate/#channel opens that chat straight away.
+(function () {
+  const slug = K.parseSlug(location.hash);
+  if (slug) { $('chanIn').value = slug; connect(slug); }
+})();

@@ -1,4 +1,4 @@
-# Kick Translate v0.4.0 - read any Kick chat in your language
+# Kick Translate v0.5.0 - read any Kick chat in your language
 
 A single page that shows a Kick channel's live chat with a translation under every line
 that is not in your language. Type a channel, pick the language you read, and keep it
@@ -19,7 +19,10 @@ and the default keeps it on the machine wherever the browser allows.
 ## Using it
 
 - **Channel** - type a channel name, or paste a `kick.com/name` link, then Enter or
-  **Go**. The channel is checked against Kick first, so a typo gets a clear error.
+  **Go**. The channel is checked against Kick first, so a typo gets a clear error. Your
+  last 8 channels show as one-click chips under the field (and on the start page).
+- **Links** - the address is the channel: `bookhockeys.com/translate/#korekore_ch` opens
+  that chat straight away, so a link can be shared or bookmarked.
 - **Your language** - the select in the header. It starts empty and glows amber until
   you pick one, with your browser's language listed first. The choice is remembered.
   Changing it re-translates the last 30 lines.
@@ -57,6 +60,19 @@ and the default keeps it on the machine wherever the browser allows.
   the device, a green bar offers to download it. It needs your click (the browser
   requires one); progress shows in the status bar. After that those lines never leave the
   machine.
+- **Languages** - every language seen in this chat, with a line count. Turn one off and
+  its lines stay on screen untranslated (useful when you read it anyway, and it saves
+  budget in mixed chats). Presets: "Only <the most common one>", "Skip English", "All
+  on". Remembered across channels.
+- **Settings** (gear) - text size, compact rows, the language tag and provider dot on or
+  off; filters: do not translate known chat bots (BotRix, Fossabot, KickBot, Sery_Bot,
+  Kicklet, StreamElements, Nightbot, Moobot; on by default), muted people (their lines
+  are not shown at all, on this browser only), and words that hide a line; a glossary
+  ("what the translator wrote = what you want", whole words, any case) for names and
+  in-jokes the engines mangle; the analytics switch for this browser; About.
+- **Keys** - `/` channel field, `Space` pause, `o` originals, `d` on demand, `t` translate
+  the last 20, `Esc` closes a sheet. Never while you are typing, and never over a
+  question that needs an answer.
 - **Originals** - shows the original line above each translation. Off = translations
   only, with the original on hover; the name always stays.
 - **Channel strip** - avatar, name, LIVE or OFFLINE, viewers (refreshed every minute),
@@ -94,10 +110,23 @@ favicon-*.png         16 / 32 / 192
 apple-touch-icon.png  180x180
 og-card.png           1200x630 share card
 tools/make-assets.py  regenerates every PNG above (Pillow)
+tools/selftest.mjs    checks the pure parts under Node (see "Self-test")
+tools/fixture.mjs     200 real-looking chat lines with the expected skip reason and script
 ```
 
 No build step, no runtime dependencies. Serve the folder over HTTP and open it (ES
 modules do not load from `file://`).
+
+## Self-test
+
+```
+node tools/selftest.mjs
+```
+
+No browser and no network: cleaning, every skip rule and the laughter table, the script
+detector against the 200-line fixture, the Latin word vote, language codes, filters and
+glossary, provider order and cooldowns, the chat frame parser (messages, replies,
+deletions, bans, clears) and the name-colour floor. Exits 1 on any failure.
 
 ## How it talks to Kick
 
@@ -160,6 +189,9 @@ queue it.
 | `kt:mode` | on this device first / cloud first / on this device only |
 | `kt:order`, `kt:enabled` | your cloud list: order and which are on |
 | `kt:lingva` | your own Lingva instance, if any |
+| `kt:settings` | look, filters (bots, muted people, hidden words) and glossary |
+| `kt:srcoff` | languages you turned off |
+| `kt:recent` | your last 8 channels |
 | IndexedDB `kct-cache` | recent translations (24 h, 2,000 at most) |
 | `greenline-consent` | the site-wide analytics consent choice (shared with other bookhockeys.com pages) |
 | `bookhockeys_ga_optout` | set by visiting `?ga=off` once; `?ga=on` clears it |
@@ -174,12 +206,30 @@ Analytics events never carry chat text, user names or the channel.
 
 ## Roadmap
 
-- v0.5.0 - language and user filters, glossary, settings, keyboard, recent channels,
-  shareable `#channel` links, a self-test.
+- v1.0.0 - a row on the bookhockeys.com home page, sitemap, llms.txt, release.
+- v2.0.0 - Sign in with Kick and reply in the channel's language (previewed as you type),
+  7TV emotes, maybe several channels in tabs.
 
 ---
 
 ## Changelog
+
+### v0.5.0 - 2026-10-20
+
+The page now fits how people actually read a chat for hours: you choose what is worth
+translating, and the noise you never want to see stays out of the way. It is the last
+step before the public release.
+
+- **Languages**: see which languages the chat is in and switch any of them off, or keep
+  only the main one.
+- **Filters**: bots are not translated, muted people and lines with words you pick are
+  not shown at all.
+- **Glossary**: fix names and in-jokes the translators get wrong, once, for every line.
+- **Settings**: text size, compact rows, and the tag and dot under each line on or off.
+- **Keys** for everything you do often, a list of recent channels, and links that open a
+  channel directly (`/translate/#name`).
+- A self-test with 200 real-looking chat lines guards the skip rules and language
+  detection against regressions.
 
 ### v0.4.0 - 2026-10-20
 
