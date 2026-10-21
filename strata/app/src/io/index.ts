@@ -1,15 +1,19 @@
-// IO ENTRY POINT. STUB until the engine agent replaces each line with the real implementation.
+// IO ENTRY POINT.
 import type { IoApi } from '@/engine/contract';
+import { classifyFiles as classify, importImageFile as importFile } from './import';
+import { estimateSize as estimate, exportImage as exportImg } from './export';
+import { lossList as losses } from './loss';
+import { openStrata as openProject, saveStrata as saveProject } from './strata';
+import { downloadBlob as download, saveAs as saveFile } from './download';
+
 export type { ExportFormat, ExportOptions, ExportResult, ImportedImage, LossItem } from '@/engine/contract';
 
-const stub = (name: string) => (() => { throw new Error(`io stub: ${name}`); }) as never;
-
-export const importImageFile: IoApi['importImageFile'] = stub('importImageFile');
-export const classifyFiles: IoApi['classifyFiles'] = stub('classifyFiles');
-export const exportImage: IoApi['exportImage'] = stub('exportImage');
-export const lossList: IoApi['lossList'] = stub('lossList');
-export const estimateSize: IoApi['estimateSize'] = stub('estimateSize');
-export const saveStrata: IoApi['saveStrata'] = stub('saveStrata');
-export const openStrata: IoApi['openStrata'] = stub('openStrata');
-export const downloadBlob: IoApi['downloadBlob'] = stub('downloadBlob');
-export const saveAs: IoApi['saveAs'] = stub('saveAs');
+export const importImageFile: IoApi['importImageFile'] = importFile;
+export const classifyFiles: IoApi['classifyFiles'] = classify;
+export const exportImage: IoApi['exportImage'] = exportImg;
+export const lossList: IoApi['lossList'] = losses;
+export const estimateSize: IoApi['estimateSize'] = estimate;
+export const saveStrata: IoApi['saveStrata'] = saveProject;
+export const openStrata: IoApi['openStrata'] = openProject;
+export const downloadBlob: IoApi['downloadBlob'] = download;
+export const saveAs: IoApi['saveAs'] = saveFile;

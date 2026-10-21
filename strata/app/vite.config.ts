@@ -24,6 +24,7 @@ export default defineConfig(({ mode }) => {
       ? { outDir: 'dist-single', emptyOutDir: true, target: 'es2022' }
       : { outDir: '..', emptyOutDir: false, assetsDir: 'assets', target: 'es2022', sourcemap: false },
     server: { port: 5173, strictPort: false },
+    optimizeDeps: { include: ['fflate'] },
     test: {
       projects: [
         {
