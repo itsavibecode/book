@@ -9,7 +9,7 @@ Personal site of streamer Book Hockeys. Live at **[bookhockeys.com](https://book
 | `/` | Landing page — Kick + Twitch links over the brand video | this README |
 | `/bigtext/` | Fullscreen large-text display with theme picker, screenshot export, copy/share, ALL CAPS toggle | [`bigtext/README.md`](bigtext/README.md) |
 | `/greenline/` | Green Line Theory auto-tester (in-browser, BlazeFace + MoveNet) | [`greenline/README.md`](greenline/README.md) |
-| `/strata/` | Strata — browser image editor with layers, masks, selections and live effects. Pixels never leave the device; a network log in the app proves it. Built from `strata/app/` (Vite + TypeScript); the built app is committed | [`strata/README.md`](strata/README.md) |
+| `/photochop/` | PhotoChop — browser image editor with layers, masks, selections and live effects. Pixels never leave the device; a network log in the app proves it. Built from `photochop/app/` (Vite + TypeScript); the built app is committed | [`photochop/README.md`](photochop/README.md) |
 | `/troll/` | Baited — troll video maker. Bait + a sound or clip preset rendered to an MP4 in the browser with ffmpeg.wasm, nothing uploaded | [`troll/README.md`](troll/README.md) |
 | `/stacked/` | Stacked — multi-stream viewer for Kick. Up to 8 embeds as a grid, row, stack or focus layout with drag-to-resize gutters and drag-to-swap tiles, one audible at a time; channels and layout live in the `#` so the URL is the share link | [`stacked/README.md`](stacked/README.md) |
 | `/gifclipper/` | GIF Clipper — install page for the Kick GIF Clipper Tampermonkey add-on (record / rewind a live Kick stream, trim, crop, caption, export GIF or WebM). Hosts the `.user.js` that installs and updates come from; it is a byte-for-byte copy of the source in the userscripts repo, re-copied on every release | [`gifclipper/README.md`](gifclipper/README.md) |
@@ -145,4 +145,4 @@ First proper release of the landing page. Brings it up to the same baseline `/gr
 
 The `/greenline/` subproject is versioned independently — see [`greenline/README.md`](greenline/README.md) for its changelog.
 
-The `/strata/` subproject is versioned independently — see [`strata/README.md`](strata/README.md) for its changelog.
+The `/photochop/` subproject is versioned independently — see [`photochop/README.md`](photochop/README.md) for its changelog.

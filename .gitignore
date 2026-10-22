@@ -17,10 +17,10 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Strata (strata/app is the Vite source; the built app is committed in strata/ itself)
-strata/app/node_modules/
-strata/app/dist/
-strata/app/dist-single/
-strata/app/test-results/
-strata/app/playwright-report/
-strata/app/.vitest-attachments/
+# PhotoChop (photochop/app is the Vite source; the built app is committed in photochop/ itself)
+photochop/app/node_modules/
+photochop/app/dist/
+photochop/app/dist-single/
+photochop/app/test-results/
+photochop/app/playwright-report/
+photochop/app/.vitest-attachments/
