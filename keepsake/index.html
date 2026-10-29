@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="version" content="0.1.0" />
+<title>Keepsake v0.1.0 - Instagram post downloader | BookHockeys</title>
+
+<meta name="description" content="Save a public Instagram post, reel or carousel at the size Instagram stores it, with sound. Paste the link, see every photo and video uncropped, then save one or all. No sign-in, no ads, not affiliated with Instagram." />
+<meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#1b1a17" media="(prefers-color-scheme: dark)" />
+<meta name="color-scheme" content="light dark" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="https://bookhockeys.com/keepsake/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="Keepsake - Instagram post downloader" />
+<meta property="og:description" content="Paste a public Instagram link. Save the photos or video at the size Instagram stores them, with sound." />
+<meta property="og:url" content="https://bookhockeys.com/keepsake/" />
+<meta property="og:image" content="https://bookhockeys.com/keepsake/og-card.png" />
+<meta property="og:image:secure_url" content="https://bookhockeys.com/keepsake/og-card.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content="Keepsake: a framed wordmark on off-white paper above a numbered film strip of five frames." />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Keepsake - Instagram post downloader" />
+<meta name="twitter:description" content="Paste a public Instagram link. Save the photos or video at the size Instagram stores them, with sound." />
+<meta name="twitter:image" content="https://bookhockeys.com/keepsake/og-card.png" />
+<meta name="twitter:image:alt" content="Keepsake - Instagram post downloader" />
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="apple-mobile-web-app-title" content="Keepsake" />
+<meta name="application-name" content="Keepsake" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+<link rel="preconnect" href="https://keepsake-worker.sevendwarfs.workers.dev" crossorigin />
+
+<!-- Theme before first paint: a choice made with the footer toggle wins,
+     otherwise the page follows the device (PLAN D6). -->
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('keepsake-theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+
+<!-- Analytics: per-device opt-out first (?ga=off / ?ga=on, remembered in
+     localStorage), then Google Consent Mode v2 defaults, then GA4. The
+     consent decision shares the site-wide `greenline-consent` key, so a
+     choice made on any bookhockeys.com page applies here too. -->
+<script>
+(function () {
+  var GA_ID = 'G-DYME377V2S';
+  var OPT_KEY = 'bookhockeys_ga_optout';
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.get('ga') === 'off') localStorage.setItem(OPT_KEY, '1');
+    if (p.get('ga') === 'on') localStorage.removeItem(OPT_KEY);
+  } catch (e) {}
+  var optedOut = false;
+  try { optedOut = localStorage.getItem(OPT_KEY) === '1'; } catch (e) {}
+  window['ga-disable-' + GA_ID] = optedOut;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  if (optedOut) return;
+
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  // EU/EEA/UK/CH by browser timezone: no IP lookup, errs toward asking.
+  var tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  var euExtras = ['Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+    'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'];
+  var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+  var saved = null;
+  try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+  if (saved === 'granted' || (saved !== 'denied' && !likelyEU)) {
+    gtag('consent', 'update', { 'analytics_storage': 'granted' });
+  } else if (saved !== 'denied') {
+    window.__needsConsent = true;
+  }
+
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  document.head.appendChild(s);
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+})();
+</script>
+
+<style>
+/* Design: PLAN 4.4, B Paper with contact-sheet details.
+   Reading this as: a single-purpose phone utility for people who already have
+   an Instagram link copied, in a photo-lab language where the media is the
+   only thing that matters; dial ENERGY 2 / RHYTHM 2 / MOTION 1.
+   - Paper and ink (#f6f3ee / #1c1b19): a light page reads outdoors on a phone
+     and sets Keepsake apart from the black bookhockeys tools.
+   - One green stamp (#1f7a3a): the save button and the selected frame only.
+   - Identity motif, the frame: the wordmark, the white mat around the viewer
+     and the numbered film strip are the same frame at three sizes.
+   - System font, tabular figures for pixels, sizes and file names: nothing to
+     download on a phone, and numbers line up in the spec table.
+   - Square media frames (a print has square corners), 6 px on buttons and the
+     link field so controls read as controls. */
+:root{
+  --bg:#f6f3ee;--card:#fbf9f5;--plate:#ffffff;--plate-bd:#cfc7ba;--media:#e2dccf;
+  --text:#1c1b19;--muted:#5b554c;--line:#dcd5c9;--line-strong:#8a8174;--sel:#ebe6dc;--field:#ffffff;
+  --accent:#1f7a3a;--accent-hover:#18652f;--on-accent:#ffffff;
+  --strip:#e2dccf;--hole:#f6f3ee;--strip-bd:#1c1b19;
+  --r-btn:6px;--plate-pad:22px;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1b1a17;--card:#22211e;--plate:#2b2925;--plate-bd:#4a463f;--media:#3a3731;
+    --text:#ede7db;--muted:#aca496;--line:#37342f;--line-strong:#7d7568;--sel:#302e29;--field:#22211e;
+    --accent:#5bb974;--accent-hover:#6fc786;--on-accent:#0f1a12;
+    --strip:#3a3731;--hole:#1b1a17;--strip-bd:#7d7568;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1b1a17;--card:#22211e;--plate:#2b2925;--plate-bd:#4a463f;--media:#3a3731;
+  --text:#ede7db;--muted:#aca496;--line:#37342f;--line-strong:#7d7568;--sel:#302e29;--field:#22211e;
+  --accent:#5bb974;--accent-hover:#6fc786;--on-accent:#0f1a12;
+  --strip:#3a3731;--hole:#1b1a17;--strip-bd:#7d7568;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;overflow-x:hidden}
+a{color:var(--text);text-decoration:underline;text-underline-offset:3px}
+button{font:inherit;cursor:pointer}
+[hidden]{display:none !important}
+:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.ico{width:16px;height:16px;flex:0 0 auto}
+
+.wrap{max-width:1040px;margin:0 auto;padding:28px 28px 40px}
+.narrow{max-width:640px}
+
+/* wordmark: the frame motif at its smallest */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:22px}
+.wm{display:inline-flex;text-decoration:none;font-weight:800;font-size:19px;line-height:1.2}
+.wm-frame{display:inline-block;background:var(--plate);border:1px solid var(--plate-bd);padding:6px 14px}
+.top .sub{margin:0;color:var(--muted);font-size:14px}
+
+/* link field */
+.field-row{display:flex;gap:8px}
+.field{flex:1 1 auto;display:flex;align-items:center;height:52px;background:var(--field);border:1px solid var(--line-strong);border-radius:var(--r-btn);padding:0 3px 0 14px}
+.field:focus-within{outline:2px solid var(--text);outline-offset:2px}
+.field input{flex:1 1 auto;width:100%;height:100%;border:0;background:transparent;color:var(--text);font:inherit;font-size:16px;outline:none;text-overflow:ellipsis}
+.field input::placeholder{color:var(--muted);opacity:1}
+.field input[readonly]{color:var(--muted)}
+.paste{flex:0 0 auto;height:44px;display:inline-flex;align-items:center;gap:6px;padding:0 12px;background:transparent;color:var(--text);border:0;border-left:1px solid var(--line);font-size:14px;border-radius:0 var(--r-btn) var(--r-btn) 0}
+.paste[disabled]{color:var(--muted);cursor:default}
+.btn{min-height:44px;height:52px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 20px;border:1px solid transparent;border-radius:var(--r-btn);font-size:15px;font-weight:650;text-decoration:none;white-space:nowrap;flex:0 0 auto}
+.btn-ink{background:var(--text);color:var(--bg)}
+.btn-ink:hover{opacity:.88}
+.btn-ghost{height:44px;background:transparent;color:var(--text);border-color:var(--line-strong);font-size:14px;font-weight:500}
+.btn-ghost:hover{background:var(--sel)}
+.btn-save{width:100%;background:var(--accent);color:var(--on-accent);font-size:16px;font-weight:700}
+.btn-save:hover{background:var(--accent-hover)}
+.btn[aria-disabled="true"]{opacity:.6;cursor:progress}
+.linkish{background:none;border:0;padding:0;color:var(--text);text-decoration:underline;text-underline-offset:3px;font-size:inherit}
+.note{margin:8px 0 0;font-size:13px;color:var(--muted)}
+
+/* guide */
+.guide{margin:24px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 18px;font-size:14px}
+.guide dt{font-weight:650}
+.guide dd{margin:0;color:var(--muted)}
+
+/* working */
+.panel{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-btn);padding:18px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.steps li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;color:var(--muted)}
+.steps li b{display:block;color:var(--text);font-weight:650}
+.steps li.todo b{color:var(--muted);font-weight:500}
+.mk{display:grid;place-items:center;height:22px}
+.mk i{display:block;width:12px;height:12px;border-radius:50%;border:2px solid var(--line-strong)}
+.mk i.on{border-color:var(--text);background:var(--text)}
+.prow{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:14px;font-size:13px;color:var(--muted)}
+.prow .r{margin-left:auto}
+
+/* error */
+.err{margin-top:20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-btn);padding:16px}
+.err p{margin:0;flex:1 1 260px}
+.err b{display:block}
+.err small{display:block;margin-top:6px;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+
+/* result: media left, details right on wide screens, same DOM order */
+.result{margin-top:24px;display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:start;animation:fadein 120ms ease-out both}
+@keyframes fadein{from{opacity:0}}
+@media (prefers-reduced-motion: reduce){.result{animation:none}}
+@media (min-width: 860px){.result{grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:28px}}
+
+/* the viewer: a white mat with a hairline, the frame number in its margin */
+.viewer{position:relative;background:var(--plate);border:1px solid var(--plate-bd);padding:var(--plate-pad) var(--plate-pad) calc(var(--plate-pad) + 14px)}
+.strip{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;height:var(--h,360px)}
+.strip::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;width:100%;height:100%;scroll-snap-align:center;scroll-snap-stop:always;display:grid;grid-template:100% / 100%;place-items:center;overflow:hidden}
+.slide > *{grid-area:1 / 1}
+.slide[data-msg]::before{content:attr(data-msg);grid-area:1 / 1;font-size:13px;color:var(--muted);text-align:center;padding:0 12px}
+.slide img,.slide video{display:block;max-width:100%;max-height:100%;width:auto;height:auto;background:var(--media)}
+.slide video{width:100%;height:100%;object-fit:contain}
+.slide button.zoom-btn{all:unset;display:grid;place-items:center;max-width:100%;max-height:100%;cursor:zoom-in}
+.slide button.zoom-btn:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.idx{position:absolute;left:var(--plate-pad);bottom:8px;font-size:12px;color:var(--muted)}
+
+/* the film strip: the only sprocketed element, recoloured to the paper */
+.rail{position:relative;margin-top:12px;background:var(--strip);border:1px solid var(--strip-bd);padding:16px 8px;display:grid;grid-template-columns:repeat(auto-fill,56px);gap:8px;justify-content:center}
+.rail::before,.rail::after{content:"";position:absolute;left:6px;right:6px;height:5px;pointer-events:none;
+  background:repeating-linear-gradient(90deg,var(--hole) 0 5px,transparent 5px 11px)}
+.rail::before{top:5px}
+.rail::after{bottom:5px}
+.th{display:grid;grid-template-rows:56px auto;justify-items:center;gap:6px;padding:0;background:transparent;border:0;color:var(--muted)}
+.th .box{width:56px;height:56px;display:grid;place-items:center;background:var(--plate);position:relative}
+.th img{max-width:48px;max-height:48px;display:block;background:var(--media)}
+.th .play{position:absolute;width:16px;height:16px;color:var(--plate);filter:drop-shadow(0 0 1px var(--text))}
+.th .n{font-size:11px;line-height:1.3;color:var(--text)}
+.th[aria-current="true"] .box{outline:2px solid var(--accent);outline-offset:2px}
+
+/* details */
+.who{display:flex;flex-wrap:wrap;align-items:center;gap:0 12px;margin:-6px 0 8px}
+.who a{font-size:17px;font-weight:650;display:inline-flex;align-items:center;min-height:44px}
+.spec{margin:0 0 14px;border:1px solid var(--line-strong)}
+.spec div{display:grid;grid-template-columns:7.5em minmax(0,1fr)}
+.spec div + div{border-top:1px solid var(--line)}
+.spec dt,.spec dd{margin:0;padding:7px 10px;font-size:14px}
+.spec dt{color:var(--muted);border-right:1px solid var(--line)}
+.spec dd{overflow-wrap:anywhere}
+.capt{margin:0;font-size:14px;white-space:pre-line;overflow-wrap:anywhere}
+.capt.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.more{display:inline-flex;align-items:center;min-height:44px;min-width:44px;font-size:14px}
+.save{margin-top:14px}
+.subl{margin:6px 0 0;font-size:13px;color:var(--muted)}
+.fname{margin:8px 0 0;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.fname span{color:var(--text)}
+.btn-all{width:100%;margin-top:14px}
+.allnote{margin:6px 0 0;font-size:13px;color:var(--muted)}
+.sec{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.sec .btn-ghost{flex:1 1 140px}
+
+/* phone save bar */
+.pbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bg);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.pbar .row{display:flex;align-items:center;gap:12px}
+.pbar .cnt{font-size:14px;white-space:nowrap}
+.pbar .btn-save{flex:1 1 auto;width:auto;height:48px}
+.pbar .subl{font-size:12px}
+
+/* lightbox: native zoom inside a scrollable full-screen layer */
+.lb{width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--bg);color:var(--text)}
+.lb::backdrop{background:var(--bg)}
+.lb-bar{position:sticky;top:0;left:0;z-index:1;display:flex;justify-content:flex-end;gap:8px;padding:8px 12px;background:var(--bg);border-bottom:1px solid var(--line)}
+.lb-scroll{height:calc(100dvh - 61px);overflow:auto;display:grid;place-items:center}
+.lb-scroll img{max-width:100%;max-height:100%;display:block}
+.lb-scroll.actual{place-items:start}
+.lb-scroll.actual img{max-width:none;max-height:none}
+
+/* toast: passive confirmations only, top centre */
+.toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:40;background:var(--text);color:var(--bg);padding:8px 14px;border-radius:var(--r-btn);font-size:14px;max-width:calc(100vw - 32px)}
+
+/* footer */
+.foot{margin-top:36px;padding-top:10px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:0 18px;font-size:13px;color:var(--muted)}
+.foot a,.foot .linkish{display:inline-flex;align-items:center;min-height:44px;min-width:44px}
+
+/* consent banner (site-wide `greenline-consent` key) */
+.consent{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-top:1px solid var(--line-strong);padding:14px 16px calc(14px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
+.consent-text{max-width:640px;font-size:13px;color:var(--muted)}
+.consent-text strong{display:block;color:var(--text);font-size:14px}
+.consent-text p{margin:0}
+.consent-btns{display:flex;gap:8px}
+
+/* phones: stacked controls, the save button moves to the bar at the bottom */
+@media (max-width: 640px){
+  :root{--plate-pad:12px}
+  .wrap{padding:16px 16px 28px}
+  .top{margin-bottom:16px}
+  .field-row{flex-direction:column}
+  .field-row .btn{width:100%}
+  .rail{grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px 5px;padding:15px 4px}
+  .th{grid-template-rows:auto auto}
+  .th .box{width:100%;height:auto;aspect-ratio:1}
+  .th img{max-width:86%;max-height:86%}
+  .guide{grid-template-columns:minmax(0,1fr);gap:2px}
+  .guide dd{margin-bottom:10px}
+  body.has-bar .save{display:none}
+  body.has-bar .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+}
+@media (min-width: 641px){.pbar{display:none !important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="wm" href="./" title="Keepsake home"><span class="wm-frame">Keepsake</span></a>
+    <p class="sub">Paste a public Instagram link. Save the photos or video at the size Instagram stores them.</p>
+  </header>
+
+  <main>
+    <div class="narrow" id="entry">
+      <form class="field-row" id="form" novalidate>
+        <div class="field">
+          <input id="url" type="url" inputmode="url" enterkeyhint="go" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"
+                 aria-label="Instagram post link" placeholder="instagram.com/p/... or /reel/..." />
+          <button type="button" class="paste" id="paste" title="Paste the link you copied in Instagram">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M9 3.5h6v3.5H9zM9 5H5.5v15.5h13V5H15"/></svg>Paste</button>
+        </div>
+        <button type="submit" class="btn btn-ink" id="go" title="Look up the post">Fetch</button>
+      </form>
+      <p class="note" id="note" role="status" hidden></p>
+
+      <section class="panel" id="working" role="status" hidden>
+        <ol class="steps">
+          <li id="st1"><span class="mk"></span><span><b>Reading post</b><span class="d">Asking Instagram for the post</span></span></li>
+          <li id="st2"><span class="mk"></span><span><b>Fetching media</b><span class="d num"></span></span></li>
+          <li id="st3"><span class="mk"></span><span><b>Ready</b></span></li>
+        </ol>
+        <div class="prow"><span>Files come through our server as a pipe.</span><span class="r">Esc to cancel</span></div>
+      </section>
+
+      <section class="err" id="error" role="alert" hidden>
+        <p><b id="errHead"></b><span id="errBody"></span><small id="errDetail" hidden></small></p>
+        <button type="button" class="btn btn-ink" id="retry" title="Ask Instagram for the post again">Retry</button>
+      </section>
+    </div>
+
+    <section class="result" id="result" hidden aria-label="Post">
+      <div class="col-media">
+        <div class="viewer">
+          <div class="strip" id="strip" tabindex="-1" aria-roledescription="carousel" aria-label="Post media"></div>
+          <span class="idx num" id="idx" aria-hidden="true"></span>
+        </div>
+        <div class="rail" id="rail" hidden aria-label="Every item in this post"></div>
+      </div>
+      <div class="details">
+        <p class="who"><a id="user" href="#" target="_blank" rel="noopener" title="Open this account on Instagram"></a></p>
+        <dl class="spec" id="spec"></dl>
+        <div id="captBox">
+          <p class="capt clamp" id="capt"></p>
+          <button type="button" class="linkish more" id="more" aria-expanded="false" aria-controls="capt" hidden>more</button>
+        </div>
+        <div class="save" id="saveBox">
+          <a class="btn btn-save" id="save" href="#"></a>
+          <p class="subl" id="saveSub" aria-live="polite"></p>
+        </div>
+        <p class="fname">File name <span class="num" id="fname"></span></p>
+        <div id="allBox" hidden>
+          <button type="button" class="btn btn-ghost btn-all" id="saveAll"></button>
+          <p class="allnote" id="allNote" aria-live="polite"></p>
+        </div>
+        <div class="sec">
+          <button type="button" class="btn btn-ghost" id="copyCap" title="Copy the caption text">Copy caption</button>
+          <a class="btn btn-ghost" id="openIg" href="#" target="_blank" rel="noopener" title="Open the post on instagram.com">Open on Instagram</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="narrow" id="guideBox">
+      <h2 class="sr">How to use Keepsake</h2>
+      <dl class="guide">
+        <dt>iPhone</dt><dd>In Instagram tap Share under the post, then Copy link. Come back here and press Paste.</dd>
+        <dt>Android</dt><dd>In Instagram tap Share, then Copy link. Come back here and press Paste.</dd>
+        <dt>Saving</dt><dd>On iPhone, Save to Photos opens the share sheet; pick Save Image or Save Video. On Android and desktop the file goes to your Downloads folder.</dd>
+      </dl>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <a href="terms.html" title="Read the terms of use">Terms</a>
+    <button type="button" class="linkish" id="themeBtn" title="Switch between the light and dark page"></button>
+    <button type="button" class="linkish" id="cookieReset" title="Change your analytics cookie choice">Cookies</button>
+    <span>Keepsake v0.1.0</span>
+    <span>Files pass through our server as a pipe and are never stored.</span>
+  </footer>
+</div>
+
+<div class="pbar" id="pbar" hidden>
+  <div class="row"><span class="cnt num" id="pcnt"></span><a class="btn btn-save" id="psave" href="#"></a></div>
+  <p class="subl" id="psub" aria-live="polite"></p>
+</div>
+
+<dialog class="lb" id="lightbox" aria-label="Photo at full size">
+  <div class="lb-bar">
+    <button type="button" class="btn btn-ghost" id="lbActual" aria-pressed="false" title="Show the photo pixel for pixel">Actual size</button>
+    <button type="button" class="btn btn-ghost" id="lbClose" title="Close (Esc)">Close</button>
+  </div>
+  <div class="lb-scroll" id="lbScroll"><img id="lbImg" alt="" crossorigin="anonymous" /></div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<div class="consent" id="consentBanner" hidden role="dialog" aria-labelledby="consentTitle" aria-describedby="consentDesc">
+  <div class="consent-text">
+    <strong id="consentTitle">Cookies for analytics</strong>
+    <p id="consentDesc">Keepsake uses Google Analytics to count anonymous visits. No ads, no personal data sold, never a post link. The page works either way.</p>
+  </div>
+  <div class="consent-btns">
+    <button class="btn btn-ghost" id="consentReject" type="button" title="No analytics cookies">Reject</button>
+    <button class="btn btn-ink" id="consentAccept" type="button" title="Allow anonymous analytics">Accept</button>
+  </div>
+</div>
+
+<script src="ig.js"></script>
+<script src="save.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IG = window.KeepsakeIG;
+  var SV = window.KeepsakeSave;
+  var $ = function (id) { return document.getElementById(id); };
+  var ZIP_CAP = 300 * 1024 * 1024;
+  var CHECK = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var PLAY = '<svg class="play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>';
+
+  var el = {
+    form: $('form'), url: $('url'), paste: $('paste'), go: $('go'), note: $('note'),
+    working: $('working'), error: $('error'), errHead: $('errHead'), errBody: $('errBody'), errDetail: $('errDetail'), retry: $('retry'),
+    result: $('result'), strip: $('strip'), idx: $('idx'), rail: $('rail'),
+    user: $('user'), spec: $('spec'), captBox: $('captBox'), capt: $('capt'), more: $('more'),
+    save: $('save'), saveSub: $('saveSub'), fname: $('fname'), allBox: $('allBox'), saveAll: $('saveAll'), allNote: $('allNote'),
+    copyCap: $('copyCap'), openIg: $('openIg'), guide: $('guideBox'),
+    pbar: $('pbar'), pcnt: $('pcnt'), psave: $('psave'), psub: $('psub'),
+    lb: $('lightbox'), lbImg: $('lbImg'), lbScroll: $('lbScroll'), lbActual: $('lbActual'), lbClose: $('lbClose'),
+    toast: $('toast'), themeBtn: $('themeBtn')
+  };
+
+  var view = 'idle';
+  var run = null;      // { ctrl } while resolving
+  var post = null;     // the resolved post
+  var cur = 0;         // current item, 0-based
+  var lastLink = '';
+  var files = {};      // iOS: index -> File already fetched for the share sheet
+  var sizes = {};      // index -> bytes from a HEAD through the proxy
+  var allRun = null;   // { ctrl } while Save all runs
+
+  function track(name, params) {
+    try { if (window.gtag) window.gtag('event', name, params || {}); } catch (e) {}
+  }
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+  var toastTimer = null;
+  function toast(text) {
+    el.toast.textContent = text;
+    el.toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.toast.hidden = true; }, 2200);
+  }
+  function note(text) {
+    el.note.textContent = text || '';
+    el.note.hidden = !text;
+  }
+
+  /* ---------- view switching ---------- */
+
+  function setView(v) {
+    view = v;
+    el.working.hidden = v !== 'working';
+    el.error.hidden = v !== 'error';
+    el.result.hidden = v !== 'done';
+    el.guide.hidden = v === 'done' || v === 'working';
+    el.pbar.hidden = v !== 'done';
+    document.body.classList.toggle('has-bar', v === 'done');
+    var busy = v === 'working';
+    el.url.readOnly = busy;
+    el.paste.disabled = busy;
+    el.go.textContent = busy ? 'Cancel' : 'Fetch';
+    el.go.className = busy ? 'btn btn-ghost' : 'btn btn-ink';
+    el.go.title = busy ? 'Stop (Esc)' : 'Look up the post';
+  }
+
+  function step(n, state, detail) {
+    var li = $('st' + n);
+    li.className = state === 'todo' ? 'todo' : '';
+    li.querySelector('.mk').innerHTML = state === 'done' ? CHECK : '<i class="' + (state === 'on' ? 'on' : '') + '"></i>';
+    var d = li.querySelector('.d');
+    if (d && detail != null) d.textContent = detail;
+  }
+
+  function showError(cause, detail) {
+    var copy = IG.ERRORS[cause] || IG.ERRORS.changed;
+    el.errHead.textContent = copy[0];
+    el.errBody.textContent = ' ' + copy[1];
+    el.errDetail.textContent = cause === 'changed' && detail ? 'Tried: ' + detail : '';
+    el.errDetail.hidden = !(cause === 'changed' && detail);
+    // Retrying a link that is not a post link changes nothing.
+    el.retry.hidden = cause === 'link' || cause === 'share';
+    setView('error');
+    track('keepsake_error', { cause: cause });
+  }
+
+  /* ---------- resolve ---------- */
+
+  function start(text) {
+    var raw = text != null ? text : el.url.value;
+    var link = IG.parseLink(raw);
+    note('');
+    if (link.error === 'empty') { el.url.focus(); return; }
+    if (link.error) { showError(link.error); return; }
+    if (run) cancel();
+    lastLink = link.url;
+    files = {};
+    sizes = {};
+    var ctrl = new AbortController();
+    run = { ctrl: ctrl };
+    setView('working');
+    step(1, 'on', 'Asking Instagram for the post');
+    step(2, 'todo', '');
+    step(3, 'todo');
+    IG.resolve(link.url, ctrl.signal).then(function (p) {
+      if (run === null || run.ctrl !== ctrl) return;
+      step(1, 'done', (p.username ? '@' + p.username + ', ' : '') + describeType(p));
+      step(2, 'on', 'Loading item 1 of ' + p.items.length);
+      return preloadFirst(p, ctrl.signal).then(function () {
+        if (run === null || run.ctrl !== ctrl) return;
+        run = null;
+        post = p;
+        step(2, 'done');
+        step(3, 'done');
+        render();
+        track('keepsake_resolve', { method: p.method });
+      });
+    }).catch(function (err) {
+      if (run === null || run.ctrl !== ctrl) return;
+      run = null;
+      if (err.cause === 'cancelled') { setView('idle'); return; }
+      showError(err.cause || 'network', err.detail);
+    });
+  }
+
+  function cancel() {
+    if (!run) return;
+    run.ctrl.abort();
+    run = null;
+    setView(post ? 'done' : 'idle');
+    note('Stopped.');
+  }
+
+  /* Wait for the first photo or poster so the result opens with its picture.
+     A slow or failed image does not block: the viewer shows its own state. */
+  function preloadFirst(p, signal) {
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      var done = function () { clearTimeout(t); resolve(); };
+      var t = setTimeout(done, 8000);
+      img.onload = img.onerror = done;
+      signal.addEventListener('abort', done);
+      img.src = p.items[0].image.url;
+    });
+  }
+
+  function describeType(p) {
+    if (p.type === 'carousel') return 'carousel of ' + p.items.length;
+    return p.type;
+  }
+
+  /* ---------- result ---------- */
+
+  function render() {
+    cur = 0;
+    var many = post.items.length > 1;
+    el.strip.innerHTML = '';
+    el.rail.innerHTML = '';
+    post.items.forEach(function (it, i) {
+      var s = document.createElement('div');
+      s.className = 'slide';
+      s.setAttribute('role', 'group');
+      s.setAttribute('aria-roledescription', 'slide');
+      s.setAttribute('aria-label', (i + 1) + ' of ' + post.items.length + ', ' + it.kind);
+      if (it.kind === 'video') {
+        var v = document.createElement('video');
+        // Every /media request carries an Origin, so the browser cache never
+        // hands a non-CORS copy to a later fetch (Size, Save to Photos, zip).
+        v.crossOrigin = 'anonymous';
+        v.controls = true;
+        v.playsInline = true;
+        v.setAttribute('playsinline', '');
+        v.preload = 'none';
+        v.poster = it.image.url;
+        v.dataset.src = it.video.url;
+        v.setAttribute('aria-label', 'Video ' + (i + 1));
+        s.appendChild(v);
+      } else {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'zoom-btn';
+        b.title = 'Open the photo full screen';
+        var img = document.createElement('img');
+        img.crossOrigin = 'anonymous';
+        img.src = it.image.url;
+        img.alt = 'Photo ' + (i + 1) + (post.username ? ' from @' + post.username : '');
+        if (i > 0) img.loading = 'lazy';
+        img.decoding = 'async';
+        s.dataset.msg = 'Loading photo ' + (i + 1);
+        img.addEventListener('load', function () {
+          s.removeAttribute('data-msg');
+          if (!it.height) { it.width = img.naturalWidth; it.height = img.naturalHeight; fit(); if (i === cur) details(); }
+        });
+        img.addEventListener('error', function () {
+          s.dataset.msg = 'This photo did not load. Fetch the post again.';
+          img.hidden = true;
+        });
+        b.appendChild(img);
+        b.addEventListener('click', function () { openLightbox(it); });
+        s.appendChild(b);
+      }
+      el.strip.appendChild(s);
+
+      if (many) {
+        var t = document.createElement('button');
+        t.type = 'button';
+        t.className = 'th';
+        t.setAttribute('aria-label', 'Item ' + (i + 1) + ', ' + it.kind);
+        t.title = 'Show item ' + (i + 1);
+        t.innerHTML = '<span class="box"><img alt="" loading="lazy" decoding="async" crossorigin="anonymous"></span><span class="n num">' + (i + 1) + '</span>';
+        t.querySelector('img').src = it.image.thumb;
+        if (it.kind === 'video') t.querySelector('.box').insertAdjacentHTML('beforeend', PLAY);
+        t.addEventListener('click', function () { go(i, true); });
+        el.rail.appendChild(t);
+      }
+    });
+    el.rail.hidden = !many;
+
+    el.user.textContent = post.username ? '@' + post.username : 'Instagram post';
+    el.user.href = post.userUrl || post.url;
+    el.openIg.href = post.url;
+    el.capt.textContent = post.caption || '';
+    el.captBox.hidden = !post.caption;
+    el.copyCap.hidden = !post.caption;
+    el.capt.classList.add('clamp');
+    el.more.textContent = 'more';
+    el.more.setAttribute('aria-expanded', 'false');
+
+    el.allBox.hidden = !many;
+    if (many) {
+      el.saveAll.textContent = 'Save all (' + post.items.length + ' files)';
+      el.saveAll.title = SV.USE_SHARE ? 'One zip file with every item; it opens the share sheet, where Save to Files keeps it' : 'One zip file with every item, built in your browser';
+      el.allNote.textContent = SV.USE_SHARE
+        ? 'On iPhone, Save all makes one zip that lands in Files. To put items in Photos, save them one at a time.'
+        : 'One zip file, built in your browser. Up to 300 MB.';
+    }
+
+    setView('done');
+    fit();
+    requestAnimationFrame(function () {
+      el.capt.classList.add('clamp');
+      el.more.hidden = el.capt.scrollHeight <= el.capt.clientHeight + 2;
+    });
+    el.strip.scrollLeft = 0;
+    select(0);
+  }
+
+  /* The strip is as tall as the tallest item needs at this width, capped at
+     70% of the screen so the save bar stays in view; shorter items sit
+     letterboxed on the mat. */
+  function fit() {
+    if (!post) return;
+    var w = el.strip.clientWidth || 320;
+    var phone = window.matchMedia('(max-width: 640px)').matches;
+    var cap = phone ? window.innerHeight * 0.7 - 40 : Math.min(window.innerHeight * 0.7, 720);
+    var need = 0;
+    post.items.forEach(function (it) {
+      var ar = it.width && it.height ? it.height / it.width : 1;
+      need = Math.max(need, w * ar);
+    });
+    el.strip.style.setProperty('--h', Math.round(Math.max(160, Math.min(cap, need))) + 'px');
+    el.strip.scrollLeft = cur * el.strip.clientWidth;
+  }
+
+  function go(i, focusRail) {
+    if (!post) return;
+    var inMedia = el.strip.contains(document.activeElement);
+    i = Math.max(0, Math.min(post.items.length - 1, i));
+    var smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.strip.scrollTo({ left: i * el.strip.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
+    select(i);
+    if (focusRail && el.rail.children[i]) el.rail.children[i].focus();
+    else if (inMedia) {
+      var c = el.strip.children[i].querySelector('button, video');
+      if (c) c.focus({ preventScroll: true });
+    }
+  }
+
+  function select(i) {
+    cur = i;
+    var n = post.items.length;
+    el.idx.textContent = (i + 1) + ' / ' + n;
+    Array.prototype.forEach.call(el.rail.children, function (t, k) {
+      if (k === i) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current');
+    });
+    // Only the frame on screen can take focus; the others are out of view.
+    Array.prototype.forEach.call(el.strip.children, function (s, k) { s.inert = k !== i; });
+    Array.prototype.forEach.call(el.strip.querySelectorAll('video'), function (v, k) {
+      var slide = v.closest('.slide');
+      var idx = Array.prototype.indexOf.call(el.strip.children, slide);
+      if (idx === i) {
+        if (!v.getAttribute('src')) { v.src = v.dataset.src; v.preload = 'metadata'; }
+      } else if (!v.paused) {
+        v.pause();
+      }
+    });
+    details();
+  }
+
+  el.strip.addEventListener('scroll', function () {
+    if (!post) return;
+    var i = Math.round(el.strip.scrollLeft / Math.max(1, el.strip.clientWidth));
+    if (i !== cur && i >= 0 && i < post.items.length) select(i);
+  }, { passive: true });
+
+  window.addEventListener('resize', function () { if (view === 'done') fit(); });
+
+  function dims(w, h) { return w && h ? w + ' x ' + h : ''; }
+
+  function details() {
+    var it = post.items[cur];
+    var many = post.items.length > 1;
+    var rows = [];
+    rows.push(['Type', many ? 'Carousel, ' + post.items.length + ' items' : it.kind === 'video' ? 'Video' : 'Photo']);
+    if (it.kind === 'photo') {
+      rows.push([many ? 'This item' : 'Pixels', (many ? 'Photo, ' : '') + dims(it.width, it.height), true]);
+    } else {
+      var v = it.video;
+      var len = IG.duration(v.duration);
+      rows.push([many ? 'This item' : 'File', (many ? 'Video, ' : 'MP4, ') + (dims(v.width, v.height) || dims(it.width, it.height)) + (len ? ', ' + len : ''), true]);
+      rows.push(['Sound', v.hasAudio === true ? 'With sound' : v.hasAudio === false ? 'No sound on this video' : 'Not stated by Instagram']);
+      if (v.best) rows.push(['Also', v.best.label + ' available', false, 'Instagram also keeps a ' + v.best.width + ' x ' + v.best.height + ' ' + (v.best.codec || '') + ' copy' + (v.hasAudio ? ', stored apart from its sound' : '') + '. Saving it comes in a later version.']);
+    }
+    rows.push(['Size', sizes[cur] != null ? IG.bytes(sizes[cur]) : 'Checking', true, '', 'size']);
+    if (post.takenAt) {
+      var d = new Date(post.takenAt * 1000);
+      rows.push(['Posted', d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }), false,
+        d.toISOString().slice(0, 16).replace('T', ' ') + ' UTC']);
+    }
+    el.spec.innerHTML = '';
+    rows.forEach(function (r) {
+      var div = document.createElement('div');
+      var dt = document.createElement('dt');
+      var dd = document.createElement('dd');
+      dt.textContent = r[0];
+      dd.textContent = r[1];
+      if (r[2]) dd.className = 'num';
+      if (r[3]) dd.title = r[3];
+      if (r[4]) div.id = 'row-' + r[4];
+      div.appendChild(dt);
+      div.appendChild(dd);
+      el.spec.appendChild(div);
+    });
+    if (sizes[cur] == null) loadSize(cur);
+
+    var name = IG.filename(post, it);
+    el.fname.textContent = name;
+    var target = it.kind === 'video' ? it.video.url : it.image.url;
+    var label = SV.USE_SHARE ? (files[cur] ? 'Save to Photos (ready)' : 'Save to Photos') : 'Download';
+    var sub = SV.USE_SHARE ? 'Opens the share sheet. Pick ' + (it.kind === 'video' ? 'Save Video.' : 'Save Image.') : 'Saves to your Downloads folder.';
+    [el.save, el.psave].forEach(function (a) {
+      a.textContent = label;
+      a.href = IG.downloadUrl(target, name);
+      a.title = SV.USE_SHARE ? 'Save this ' + it.kind + ' to Photos through the share sheet' : 'Download ' + name;
+      if (SV.USE_SHARE) { a.setAttribute('role', 'button'); a.removeAttribute('download'); }
+      else { a.removeAttribute('role'); a.setAttribute('download', name); }
+      a.removeAttribute('aria-disabled');
+    });
+    el.saveSub.textContent = sub;
+    el.psub.textContent = sub;
+    el.pcnt.textContent = many ? (cur + 1) + ' / ' + post.items.length : '1 ' + it.kind;
+  }
+
+  function loadSize(i) {
+    var it = post.items[i];
+    var target = it.kind === 'video' ? it.video.url : it.image.url;
+    fetch(target, { method: 'HEAD' }).then(function (r) {
+      var n = Number(r.headers.get('Content-Length'));
+      if (!r.ok || !n) throw new Error('no size');
+      sizes[i] = n;
+    }).catch(function () { sizes[i] = null; }).then(function () {
+      if (!post || i !== cur) return;
+      var row = $('row-size');
+      if (!row) return;
+      if (sizes[i] == null) row.remove();
+      else row.querySelector('dd').textContent = IG.bytes(sizes[i]);
+    });
+  }
+
+  /* ---------- saving ---------- */
+
+  function saveStatus(text) { el.saveSub.textContent = text; el.psub.textContent = text; }
+
+  function onSave(e) {
+    if (!post) return;
+    var it = post.items[cur];
+    var name = IG.filename(post, it);
+    if (!SV.USE_SHARE) { track('keepsake_save', { method: 'download' }); return; } // the link does the work
+    e.preventDefault();
+    var a = e.currentTarget;
+    if (a.getAttribute('aria-disabled') === 'true') return;
+    var index = cur;
+    if (files[index]) { share(files[index], it); return; }
+    var target = it.kind === 'video' ? it.video.url : it.image.url;
+    [el.save, el.psave].forEach(function (b) { b.setAttribute('aria-disabled', 'true'); });
+    saveStatus('Getting the file');
+    SV.fetchBlob(target, {
+      onProgress: function (got, total) {
+        saveStatus('Getting the file, ' + IG.bytes(got) + (total ? ' of ' + IG.bytes(total) : ''));
+      }
+    }).then(function (blob) {
+      files[index] = new File([blob], name, { type: blob.type || (it.kind === 'video' ? 'video/mp4' : 'image/jpeg') });
+      if (index !== cur) return;
+      [el.save, el.psave].forEach(function (b) { b.removeAttribute('aria-disabled'); });
+      share(files[index], it);
+    }).catch(function (err) {
+      [el.save, el.psave].forEach(function (b) { b.removeAttribute('aria-disabled'); });
+      if (err.cause === 'expired') { showError('expired'); return; }
+      saveStatus(err.cause === 'limited' ? 'Too many files at once. Wait a minute and tap again.' : 'The file did not come through. Tap to try again.');
+    });
+  }
+
+  function share(file, it) {
+    SV.shareFile(file).then(function (r) {
+      if (r === 'shared') { saveStatus('Saved through the share sheet.'); track('keepsake_save', { method: 'share' }); }
+      else if (r === 'needs-tap') {
+        [el.save, el.psave].forEach(function (b) { b.textContent = 'Save to Photos (ready)'; });
+        saveStatus('The file is ready. Tap Save to Photos once more.');
+      } else {
+        saveStatus('Share sheet closed. Tap Save to Photos to open it again.');
+      }
+    });
+  }
+
+  el.save.addEventListener('click', onSave);
+  el.psave.addEventListener('click', onSave);
+
+  function allStatus(t) { el.allNote.textContent = t; }
+
+  el.saveAll.addEventListener('click', function () {
+    if (!post) return;
+    if (allRun) { allRun.ctrl.abort(); return; }
+    var ctrl = new AbortController();
+    allRun = { ctrl: ctrl };
+    el.saveAll.textContent = 'Stop saving';
+    var entries = [];
+    var total = 0;
+    var items = post.items.slice();
+    var p = post;
+    var chain = Promise.resolve();
+    items.forEach(function (it, k) {
+      chain = chain.then(function () {
+        var base = total;
+        allStatus('Saving ' + (k + 1) + ' of ' + items.length + ', ' + IG.bytes(total || 1));
+        return SV.fetchBlob(it.kind === 'video' ? it.video.url : it.image.url, {
+          signal: ctrl.signal,
+          onProgress: function (got) {
+            if (base + got > ZIP_CAP) ctrl.abort();
+            allStatus('Saving ' + (k + 1) + ' of ' + items.length + ', ' + IG.bytes(base + got));
+          }
+        }).then(function (blob) {
+          total += blob.size;
+          if (total > ZIP_CAP) { var e = new Error('cap'); e.cause = 'too-big'; throw e; }
+          entries.push({ name: IG.filename(p, it), blob: blob });
+        });
+      });
+    });
+    chain.then(function () {
+      allStatus('Building the zip');
+      return SV.zip(entries);
+    }).then(function (zipBlob) {
+      var name = IG.zipName(p);
+      if (SV.USE_SHARE) {
+        var f = new File([zipBlob], name, { type: 'application/zip' });
+        return SV.shareFile(f).then(function (r) {
+          if (r === 'needs-tap') { SV.downloadBlob(zipBlob, name); }
+          allStatus(r === 'dismissed' ? 'Share sheet closed.' : 'Zip ready: ' + IG.bytes(zipBlob.size) + '.');
+          track('keepsake_save', { method: 'zip' });
+        });
+      }
+      SV.downloadBlob(zipBlob, name);
+      allStatus('Saved ' + name + ', ' + IG.bytes(zipBlob.size) + '.');
+      track('keepsake_save', { method: 'zip' });
+    }).catch(function (err) {
+      if (err.cause === 'too-big' || total > ZIP_CAP) allStatus('This post is over 300 MB, too big to zip on this device. Save the items one at a time.');
+      else if (ctrl.signal.aborted) allStatus('Stopped.');
+      else if (err.cause === 'expired') showError('expired');
+      else if (err.cause === 'limited') allStatus('Too many files at once. Wait a minute and try again.');
+      else allStatus('A file did not come through. Try Save all again.');
+    }).then(function () {
+      allRun = null;
+      if (post === p) el.saveAll.textContent = 'Save all (' + p.items.length + ' files)';
+    });
+  });
+
+  /* ---------- caption, lightbox ---------- */
+
+  el.more.addEventListener('click', function () {
+    var open = el.capt.classList.toggle('clamp') === false;
+    el.more.textContent = open ? 'less' : 'more';
+    el.more.setAttribute('aria-expanded', String(open));
+  });
+
+  el.copyCap.addEventListener('click', function () {
+    if (!post || !post.caption) return;
+    (navigator.clipboard ? navigator.clipboard.writeText(post.caption) : Promise.reject()).then(function () {
+      toast('Caption copied');
+    }, function () { note('Copying was blocked. Select the caption and copy it by hand.'); });
+  });
+
+  function openLightbox(it) {
+    el.lbImg.src = it.image.url;
+    el.lbImg.alt = 'Photo ' + it.index + (post.username ? ' from @' + post.username : '') + ' at full size';
+    el.lbScroll.classList.remove('actual');
+    el.lbActual.setAttribute('aria-pressed', 'false');
+    if (el.lb.showModal) el.lb.showModal(); else el.lb.setAttribute('open', '');
+    el.lbClose.focus();
+  }
+  el.lbActual.addEventListener('click', function () {
+    var on = el.lbScroll.classList.toggle('actual');
+    el.lbActual.setAttribute('aria-pressed', String(on));
+  });
+  el.lbClose.addEventListener('click', function () { el.lb.close ? el.lb.close() : el.lb.removeAttribute('open'); });
+
+  /* ---------- input ---------- */
+
+  el.form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (run) cancel(); else start();
+  });
+  el.retry.addEventListener('click', function () { start(lastLink || el.url.value); });
+
+  // A pasted post link starts on its own; typed text still needs Fetch.
+  el.url.addEventListener('paste', function (e) {
+    var text = (e.clipboardData || window.clipboardData).getData('text');
+    if (IG.parseLink(text).error) return;
+    e.preventDefault();
+    el.url.value = text.trim();
+    start();
+  });
+
+  var PASTE_BY_HAND = window.matchMedia('(pointer: coarse)').matches
+    ? 'Long-press the field and choose Paste.'
+    : 'Click the field and press Ctrl+V (Cmd+V on a Mac).';
+
+  el.paste.addEventListener('click', function () {
+    if (!navigator.clipboard || !navigator.clipboard.readText) {
+      el.url.focus();
+      note(PASTE_BY_HAND);
+      return;
+    }
+    navigator.clipboard.readText().then(function (text) {
+      text = (text || '').trim();
+      if (!text) { el.url.focus(); note('The clipboard is empty. Copy the link in Instagram first.'); return; }
+      el.url.value = text;
+      start(text);
+    }, function () {
+      el.url.focus();
+      note(PASTE_BY_HAND);
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && run) { e.preventDefault(); cancel(); return; }
+    if (view !== 'done' || el.lb.open) return;
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'VIDEO')) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1, el.rail.contains(t)); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1, el.rail.contains(t)); }
+  });
+
+  /* ---------- theme ---------- */
+
+  function effectiveTheme() {
+    var t = document.documentElement.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paintThemeButton() {
+    var dark = effectiveTheme() === 'dark';
+    el.themeBtn.textContent = dark ? 'Light page' : 'Dark page';
+    var color = dark ? '#1b1a17' : '#f6f3ee';
+    document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.setAttribute('content', color); });
+  }
+  el.themeBtn.addEventListener('click', function () {
+    var next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+    // Choosing the device's own theme again goes back to following it.
+    var os = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (next === os) { document.documentElement.removeAttribute('data-theme'); lsDel('keepsake-theme'); }
+    else { document.documentElement.setAttribute('data-theme', next); lsSet('keepsake-theme', next); }
+    paintThemeButton();
+  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', paintThemeButton);
+  paintThemeButton();
+
+  /* ---------- consent banner (site-wide `greenline-consent` key) ---------- */
+  (function () {
+    var banner = $('consentBanner');
+    function record(state) {
+      try { if (window.gtag) window.gtag('consent', 'update', { 'analytics_storage': state }); } catch (e) {}
+      lsSet('greenline-consent', state);
+      banner.hidden = true;
+    }
+    $('consentAccept').addEventListener('click', function () { record('granted'); });
+    $('consentReject').addEventListener('click', function () { record('denied'); });
+    $('cookieReset').addEventListener('click', function () {
+      lsDel('greenline-consent');
+      try { if (window.gtag) window.gtag('consent', 'update', { 'analytics_storage': 'denied' }); } catch (e) {}
+      banner.hidden = false;
+    });
+    if (window.__needsConsent) banner.hidden = false;
+  })();
+
+  setView('idle');
+
+  // ?url= resolves on load (PLAN 2.1); `text` is read too, for the share
+  // target that arrives in M2.
+  try {
+    var q = new URLSearchParams(location.search);
+    var given = q.get('url') || q.get('text');
+    if (given) { el.url.value = given; start(given); }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

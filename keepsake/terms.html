@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="version" content="0.1.0" />
+<title>Terms of use - Keepsake v0.1.0 | BookHockeys</title>
+
+<meta name="description" content="Terms of use for Keepsake, the Instagram post downloader on bookhockeys.com. Public posts only. Files pass through our server as a pipe and are never stored. Not affiliated with Instagram or Meta." />
+<meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#1b1a17" media="(prefers-color-scheme: dark)" />
+<meta name="color-scheme" content="light dark" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://bookhockeys.com/keepsake/terms.html" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="BookHockeys" />
+<meta property="og:title" content="Terms of use - Keepsake" />
+<meta property="og:description" content="Public posts only. Files pass through our server as a pipe and are never stored." />
+<meta property="og:url" content="https://bookhockeys.com/keepsake/terms.html" />
+<meta property="og:image" content="https://bookhockeys.com/keepsake/og-card.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<link rel="manifest" href="manifest.webmanifest" />
+
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('keepsake-theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+
+<!-- Analytics: same setup as the downloader page (?ga=off / ?ga=on opt-out,
+     Consent Mode v2, site-wide `greenline-consent` key). -->
+<script>
+(function () {
+  var GA_ID = 'G-DYME377V2S';
+  var OPT_KEY = 'bookhockeys_ga_optout';
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.get('ga') === 'off') localStorage.setItem(OPT_KEY, '1');
+    if (p.get('ga') === 'on') localStorage.removeItem(OPT_KEY);
+  } catch (e) {}
+  var optedOut = false;
+  try { optedOut = localStorage.getItem(OPT_KEY) === '1'; } catch (e) {}
+  window['ga-disable-' + GA_ID] = optedOut;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  if (optedOut) return;
+  gtag('consent', 'default', {
+    'ad_storage': 'denied', 'ad_user_data': 'denied', 'ad_personalization': 'denied',
+    'analytics_storage': 'denied', 'wait_for_update': 500
+  });
+  var tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  var euExtras = ['Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+    'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'];
+  var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+  var saved = null;
+  try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+  if (saved === 'granted' || (saved !== 'denied' && !likelyEU)) {
+    gtag('consent', 'update', { 'analytics_storage': 'granted' });
+  } else if (saved !== 'denied') {
+    window.__needsConsent = true;
+  }
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  document.head.appendChild(s);
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+})();
+</script>
+
+<style>
+/* Same tokens as index.html (PLAN 4.4). */
+:root{
+  --bg:#f6f3ee;--card:#fbf9f5;--plate:#ffffff;--plate-bd:#cfc7ba;
+  --text:#1c1b19;--muted:#5b554c;--line:#dcd5c9;--line-strong:#8a8174;--sel:#ebe6dc;
+  --r-btn:6px;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1b1a17;--card:#22211e;--plate:#2b2925;--plate-bd:#4a463f;
+    --text:#ede7db;--muted:#aca496;--line:#37342f;--line-strong:#7d7568;--sel:#302e29;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1b1a17;--card:#22211e;--plate:#2b2925;--plate-bd:#4a463f;
+  --text:#ede7db;--muted:#aca496;--line:#37342f;--line-strong:#7d7568;--sel:#302e29;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.55;overflow-x:hidden}
+a{color:var(--text);text-decoration:underline;text-underline-offset:3px}
+button{font:inherit;cursor:pointer}
+[hidden]{display:none !important}
+:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 28px 40px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:22px}
+.wm{display:inline-flex;text-decoration:none;font-weight:800;font-size:19px;line-height:1.2}
+.wm-frame{display:inline-block;background:var(--plate);border:1px solid var(--plate-bd);padding:6px 14px}
+.top .back{margin-left:auto;font-size:14px;display:inline-flex;align-items:center;min-height:44px}
+.terms{max-width:680px}
+.terms h1{font-size:24px;line-height:1.2;margin:0 0 4px}
+.terms .date{color:var(--muted);font-size:13px;margin:0 0 18px}
+.terms h2{font-size:16px;margin:22px 0 6px}
+.terms p{margin:0 0 8px;font-size:15px}
+.terms .warn{margin-top:22px;padding:10px 12px;border:1px dashed var(--line-strong);font-size:14px;color:var(--muted)}
+.linkish{background:none;border:0;padding:0;color:var(--text);text-decoration:underline;text-underline-offset:3px;font-size:inherit}
+.btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0 18px;border:1px solid var(--line-strong);border-radius:var(--r-btn);font-size:14px;background:transparent;color:var(--text)}
+.btn-ink{background:var(--text);color:var(--bg);border-color:var(--text)}
+.foot{margin-top:36px;padding-top:10px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:0 18px;font-size:13px;color:var(--muted)}
+.foot a,.foot .linkish{display:inline-flex;align-items:center;min-height:44px;min-width:44px}
+.consent{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-top:1px solid var(--line-strong);padding:14px 16px calc(14px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
+.consent-text{max-width:640px;font-size:13px;color:var(--muted)}
+.consent-text strong{display:block;color:var(--text);font-size:14px}
+.consent-text p{margin:0}
+.consent-btns{display:flex;gap:8px}
+@media (max-width: 640px){ .wrap{padding:16px 16px 28px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="wm" href="./" title="Keepsake home"><span class="wm-frame">Keepsake</span></a>
+    <a class="back" href="./" title="Back to the downloader">Back to Keepsake</a>
+  </header>
+
+  <main class="terms">
+    <h1>Terms of use</h1>
+    <p class="date">Version dated October 29, 2026</p>
+
+    <h2>1. What this is</h2>
+    <p>Keepsake saves a copy of a public Instagram post to your own device. It is not affiliated with, endorsed by or connected to Instagram or Meta.</p>
+
+    <h2>2. Public posts only</h2>
+    <p>It works only on posts Instagram shows without a login. Private accounts, stories, highlights and messages are out of reach, and Keepsake does not try to get around that.</p>
+
+    <h2>3. How the files travel</h2>
+    <p>Files pass through our server as a pipe and are never stored. Instagram does not let a browser download its files directly, so our server fetches each file and streams it straight to you. Links, usernames and captions are not logged.</p>
+
+    <h2>4. Rights stay with the poster</h2>
+    <p>Every photo and video belongs to the person who posted it. Saving a copy gives you no rights in it. Ask the owner before you repost, edit or sell anything, and respect Instagram's terms and copyright law where you live. You are responsible for what you do with a saved file.</p>
+
+    <h2>5. Takedowns</h2>
+    <p>We host nothing, so there is nothing here to remove. Rights holders should use Instagram's own reporting process. If you believe the tool itself infringes something, contact the site owner via the <a href="https://kick.com/bookhockeys" target="_blank" rel="noopener" title="The BookHockeys channel on kick.com">BookHockeys Kick channel</a>.</p>
+
+    <h2>6. Privacy</h2>
+    <p>No accounts and no uploads. Google Analytics counts page views and three events (resolve, save, error) with a method or cause label only, never a link, username or caption. Visitors in Europe are asked first; the Cookies link below changes your choice. The light or dark page choice is kept in your browser only.</p>
+
+    <h2>7. No warranty</h2>
+    <p>Provided as it is. It stops working whenever Instagram changes something, until it is fixed. No guarantee of availability or fitness for any purpose.</p>
+
+    <h2>8. Changes</h2>
+    <p>These terms may change; the date above is the version.</p>
+
+    <p class="warn">Written in plain language on purpose. If anything here is unclear, ask on the <a href="https://kick.com/bookhockeys" target="_blank" rel="noopener" title="The BookHockeys channel on kick.com">BookHockeys Kick channel</a>.</p>
+  </main>
+
+  <footer class="foot">
+    <a href="./" title="Back to the downloader">Downloader</a>
+    <button type="button" class="linkish" id="cookieReset" title="Change your analytics cookie choice">Cookies</button>
+    <span>Keepsake v0.1.0</span>
+    <span>Files pass through our server as a pipe and are never stored.</span>
+  </footer>
+</div>
+
+<div class="consent" id="consentBanner" hidden role="dialog" aria-labelledby="consentTitle" aria-describedby="consentDesc">
+  <div class="consent-text">
+    <strong id="consentTitle">Cookies for analytics</strong>
+    <p id="consentDesc">Keepsake uses Google Analytics to count anonymous visits. No ads, no personal data sold, never a post link. The page works either way.</p>
+  </div>
+  <div class="consent-btns">
+    <button class="btn" id="consentReject" type="button" title="No analytics cookies">Reject</button>
+    <button class="btn btn-ink" id="consentAccept" type="button" title="Allow anonymous analytics">Accept</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var banner = $('consentBanner');
+  function record(state) {
+    try { if (window.gtag) window.gtag('consent', 'update', { 'analytics_storage': state }); } catch (e) {}
+    try { localStorage.setItem('greenline-consent', state); } catch (e) {}
+    banner.hidden = true;
+  }
+  $('consentAccept').addEventListener('click', function () { record('granted'); });
+  $('consentReject').addEventListener('click', function () { record('denied'); });
+  $('cookieReset').addEventListener('click', function () {
+    try { localStorage.removeItem('greenline-consent'); } catch (e) {}
+    try { if (window.gtag) window.gtag('consent', 'update', { 'analytics_storage': 'denied' }); } catch (e) {}
+    banner.hidden = false;
+  });
+  if (window.__needsConsent) banner.hidden = false;
+})();
+</script>
+</body>
+</html>
