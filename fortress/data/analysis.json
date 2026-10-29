@@ -1,0 +1,109 @@
+{
+  "updated": "2026-10-29",
+  "author": "Analysis by Claude (Fable 5.1), 2026-10-29. Reasoning, not a prediction.",
+  "intro": "Governments do not usually tell people to fill a cupboard with water unless something changed. The question is what. Below, each theory people are sharing is held to the same four questions: what would have to happen for it to be the reason, what we would expect to see first, which of those signs are actually on the board today, and what the boring explanation is. Links go to the claims with their labels, so this section is only as strong as the evidence it points at.",
+  "verdict": "The evidence on the board fits a coordinated resilience push better than any single looming event. The FORTRESS memo is a planning document with a program office and no deadline for the base work. The UK, the EU and Japan are asking for three days, which is the standard household figure, not a wartime one. The one real near-term date, November 17, is a scheduled broadcast test that has happened before. None of the war, blackout or false-flag theories has a sign on the board that could not also be explained by governments reacting to the US-Iran war, a year of attacks on utilities, and a public that stopped keeping emergency supplies. That can change. If the board starts showing orders rather than plans, dates rather than campaigns, or an official linking the warnings to a specific threat, this verdict gets rewritten and the change is logged.",
+  "theories": [
+    {
+      "theory": "resilience-policy",
+      "title": "The boring one: a resilience push after the Iran war and a year of utility attacks",
+      "trigger": "A war that strained supply lines, visible attacks on water and power systems, and defense planners who concluded that bases depending on the civilian grid is a weakness. Nothing secret is needed.",
+      "earlySigns": [
+        "Policy memos and campaigns rather than orders with dates",
+        "The same household figure (72 hours or 3 days) repeated across countries",
+        "Officials saying the quiet part out loud: the grid is the weak point"
+      ],
+      "visibleToday": ["fortress-memo-signed", "fortress-program-office-30-days", "uk-be-ready-launch", "eu-72-hours", "japan-hosono-request", "parnell-two-oceans", "ncsc-cyber-incidents"],
+      "boringExplanation": "This is the boring explanation. Every item above is a plan, a campaign or a standing goal. None names a date or a specific threat."
+    },
+    {
+      "theory": "cyberattack",
+      "title": "A cyberattack on utilities, including the AI-found vulnerability angle",
+      "trigger": "A government learns that attackers can take down water or power at scale, or sees it start to happen, and wants households to ride out days of outage without panic.",
+      "earlySigns": [
+        "Emergency patch orders with short deadlines",
+        "Utilities reporting intrusions, not just attempts",
+        "Officials naming cyber as the reason for the household advice"
+      ],
+      "visibleToday": ["php2shell-ai-flaw", "cisa-php-exploited", "ncsc-cyber-incidents", "streeting-alert-not-alarmed"],
+      "boringExplanation": "The PHP flaws are real and are being exploited, and the UK minister did cite cyberattacks. But the flaws affect web servers, not grid control systems, and no official has connected them to the preparedness advice. Patch orders with three-day deadlines are routine for critical flaws."
+    },
+    {
+      "theory": "iran",
+      "title": "Preparation for a renewed war with Iran after the midterms",
+      "trigger": "A decision to resume strikes, with planners expecting retaliation against infrastructure, including cyber and drone attacks on the homeland.",
+      "earlySigns": [
+        "Carrier and air-defense movements reported by multiple outlets",
+        "Evacuation advisories for US citizens in the region",
+        "Congressional briefings or war-powers notices"
+      ],
+      "visibleToday": ["trump-iran-midterms-pledge", "theory-iran-war"],
+      "boringExplanation": "The only hard item is a pledge not to strike before November 3, which cuts both ways. There is no deployment, advisory or briefing on the board. The base plan has no completion date, so it cannot be timed to a war a few weeks out."
+    },
+    {
+      "theory": "russia",
+      "title": "Europe stocking up because war with Russia is close",
+      "trigger": "Intelligence that Russia is preparing a move against a NATO member, with hybrid attacks on power, water and transport expected first.",
+      "earlySigns": [
+        "Troop concentrations and mobilization reported by allied governments",
+        "Reserve call-ups in frontline states",
+        "Civil defense drills with dates, not leaflets"
+      ],
+      "visibleToday": ["streeting-1000-days", "europe-national-guidance", "theory-russia-europe"],
+      "boringExplanation": "Streeting's 1,000-days line is a budget and readiness argument, and Europe's household guidance has been building since the EU's March 2025 strategy. Guidance ranging from 3 days to 2 weeks across countries looks like each government picking a number, not a shared alarm."
+    },
+    {
+      "theory": "china",
+      "title": "Hardening bases for a conflict with China over Taiwan",
+      "trigger": "Planners expecting that a Pacific war would begin with attacks on US power and logistics at home, so bases need to run alone for months.",
+      "earlySigns": [
+        "Pacific base construction and prepositioning in budget documents",
+        "Taiwan Strait incidents reported by wire services",
+        "Export controls and sanctions tightening in the same weeks"
+      ],
+      "visibleToday": ["fortress-five-pillars", "reactors-microgrids-plan", "theory-china-grid"],
+      "boringExplanation": "FORTRESS reads like a long-horizon program, which is what a China planner would write, but also what any planner would write after a year of grid attacks. Nothing on the board ties the timing to the Pacific."
+    },
+    {
+      "theory": "solar",
+      "title": "A Carrington-class solar storm",
+      "trigger": "A large coronal mass ejection aimed at Earth. In 1859 the Carrington event set telegraph lines sparking and lit auroras near the equator. On today's grid it could damage large transformers that take months to replace.",
+      "earlySigns": [
+        "A NOAA Space Weather Prediction Center watch, which gives one to three days of notice",
+        "Grid operators announcing protective shutdowns",
+        "Nobody can schedule it, so a date like November 17 would be a coincidence"
+      ],
+      "visibleToday": ["simpsons-solar-debunked"],
+      "boringExplanation": "Nobody notable is pushing this in October 2026 and no space-weather watch is in effect. It appears here because it is the one scenario where 90 days of base self-sufficiency makes plain sense, and because a 2024 Simpsons solar-storm claim was already debunked."
+    },
+    {
+      "theory": "midterms",
+      "title": "Something happens around the November 3 midterms",
+      "trigger": "A plan to disrupt or delay the election, or an expectation of unrest after it, with the preparedness advice as cover.",
+      "earlySigns": [
+        "State election officials reporting threats or interference",
+        "National Guard activations announced before the vote",
+        "Officials refusing to commit to a normal count"
+      ],
+      "visibleToday": ["trump-iran-midterms-pledge", "theory-midterms", "fema-test-routine"],
+      "boringExplanation": "The alert test is two weeks after the election and was scheduled in September under a law that requires one every three years. The UK, EU and Japan advice has nothing to do with a US election."
+    },
+    {
+      "theory": "false-flag",
+      "title": "A staged attack on the grid, then water",
+      "trigger": "A government deciding to manufacture a crisis. This would require thousands of people to keep a secret and would leave a paper trail in the agencies told to prepare.",
+      "earlySigns": [
+        "Leaks from people inside those agencies",
+        "Preparations that only make sense if the date is known in advance",
+        "Media pre-positioned on a story before it breaks"
+      ],
+      "visibleToday": ["theory-false-flag", "viral-blackout-chain-post", "simpsons-nov17-claim"],
+      "boringExplanation": "Every item pointing at this is a social post with no source beyond itself. The Simpsons episode people cite aired in 2023 and shows no date. The same November 17 claim circulated in 2025 and nothing happened."
+    }
+  ],
+  "nov17": {
+    "title": "What November 17 actually is",
+    "text": "FEMA and the FCC scheduled a nationwide test of the Emergency Alert System for Tuesday, November 17, 2026, between 2:20 and 2:50 pm Eastern, with December 3 as the backup date. It goes to radio, TV, cable and satellite. Phones are not part of this one. Federal law requires a national test at least every three years, and earlier ones ran in 2011, 2017, 2018 and 2023. FEMA calls it routine and no official source links it to FORTRESS.",
+    "itemIds": ["fema-eas-test-nov17", "fema-test-routine"]
+  }
+}

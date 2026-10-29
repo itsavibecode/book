@@ -1,0 +1,64 @@
+[
+  {
+    "country": "United Kingdom",
+    "guidance": "Be Ready household campaign: water (3 litres per person per day), food that needs no cooking, a torch, a radio, medicines and cash.",
+    "duration": "3 days",
+    "date": "2026-10-22",
+    "dateNote": "launched",
+    "officialUrl": "https://beready.campaign.gov.uk/",
+    "officialLabel": "beready.campaign.gov.uk",
+    "itemIds": [
+      "uk-be-ready-launch",
+      "uk-checklist-items"
+    ]
+  },
+  {
+    "country": "United States",
+    "guidance": "Ready.gov basic kit: one gallon of water per person per day, non-perishable food, a battery or hand-crank radio, a flashlight, a first aid kit and a phone backup battery. No new federal figure in this period; the 30-day figure came from a podcast host, not a government.",
+    "duration": "Several days",
+    "date": "2026-10-29",
+    "dateNote": "standing guidance, checked",
+    "officialUrl": "https://www.ready.gov/kit",
+    "officialLabel": "ready.gov/kit",
+    "itemIds": [
+      "ready-gov-kit",
+      "bongino-30-days"
+    ]
+  },
+  {
+    "country": "European Union",
+    "guidance": "Preparedness Union Strategy: households should manage on their own for at least 72 hours. Non-binding.",
+    "duration": "72 hours",
+    "date": "2025-03-26",
+    "dateNote": "standing since",
+    "officialUrl": "https://commission.europa.eu/topics/preparedness_en",
+    "officialLabel": "European Commission",
+    "itemIds": [
+      "eu-72-hours"
+    ]
+  },
+  {
+    "country": "Japan",
+    "guidance": "Nationwide request due on November 2, when the new Disaster Management Agency launches. The stated reason is natural disasters such as a Nankai Trough megaquake.",
+    "duration": "3 days, ideally a week",
+    "date": "2026-10-26",
+    "dateNote": "announced",
+    "officialUrl": "",
+    "officialLabel": "No official page yet; reported by IBTimes UK and Business Today",
+    "itemIds": [
+      "japan-hosono-request"
+    ]
+  },
+  {
+    "country": "Other European countries",
+    "guidance": "Sweden at least a week, Norway a week (up from three days), Austria 10 to 14 days. France, Ireland and the Netherlands use three days.",
+    "duration": "3 days to 2 weeks",
+    "date": "2026-10-29",
+    "dateNote": "reported",
+    "officialUrl": "",
+    "officialLabel": "Single secondary source, not yet checked against each government",
+    "itemIds": [
+      "europe-national-guidance"
+    ]
+  }
+]

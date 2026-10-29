@@ -296,7 +296,13 @@ days; UK Be Ready campaign 3 days; stockpile food water warning 2026; Bongino 30
 food water; FEMA emergency alert test November 17 2026; Simpsons blackout November 17;
 why are governments telling people to stock up.
 
-## 13. Decisions needed (D1-D8)
+## 13. Decisions (D1-D10)
+
+Decided 2026-10-29: D2 = C (user: "design c looks good"). The rest proceed on the
+recommended defaults until the user says otherwise: D1 Fortress Watch, D3 every 6 hours,
+D4 hand-curated labels (no API step yet), D5 theories rail in place, D6 inbox images are
+research only, D7 no gear links, D8 Fable reviews then the user pushes, D9 analysis right
+after the theories rail, D10 tag plus filter chip.
 
 - D1 Site name: Fortress Watch / Ninety / Rumor Board (section 2).
 - D2 Design: A / B / C after you click through the switcher (section 9).

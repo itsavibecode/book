@@ -1,0 +1,42 @@
+[
+  {
+    "q": "Is the Pentagon preparing bases to run 90 days without power?",
+    "a": "Partly. FORTRESS America is real: Hegseth signed the memo on September 30, 2026, and said every major base will make its own power. The 90-day figure comes from Fox News Digital, which reported it from internal documents. No public Pentagon document states 90 days yet, and Snopes lists that part as unverified.",
+    "itemIds": ["fortress-memo-signed", "hegseth-quantico-own-power", "fox-90-day-report", "ninety-day-unconfirmed"]
+  },
+  {
+    "q": "What is FORTRESS America?",
+    "a": "A Department of War program created by a September 30, 2026 memo. It has five pillars: energy independence, supply chain resilience, a strategic defense reserve, installation hardening and cyber resilience, and resilience in space. The memo ordered a program office within 30 days. No budget or completion date has been published.",
+    "itemIds": ["fortress-memo-signed", "fortress-five-pillars", "fortress-program-office-30-days", "cost-timeline-unknown"]
+  },
+  {
+    "q": "Did the UK tell people to stock up for 30 days?",
+    "a": "No. The UK's Be Ready campaign, launched October 22, 2026, asks households to prepare for 3 days. The 30-day line came from Dan Bongino's podcast and then spread as UK advice.",
+    "itemIds": ["uk-30-days-claim", "uk-be-ready-launch", "bongino-30-days"]
+  },
+  {
+    "q": "What does the UK Be Ready campaign ask for?",
+    "a": "Enough for 3 days without power, water, phones or internet: 3 litres of drinking water per person per day, food that needs no cooking, a torch, a power bank, a battery or wind-up radio, first aid, medicines, pet supplies and some cash.",
+    "itemIds": ["uk-be-ready-launch", "uk-checklist-items"]
+  },
+  {
+    "q": "Did Dan Bongino say to keep 30 days of food and water?",
+    "a": "Yes. On his podcast on October 26, the former FBI deputy director told listeners to keep 30 days of food and water. He is not a government official, and no government source we found asks for 30 days.",
+    "itemIds": ["bongino-30-days", "uk-30-days-claim"]
+  },
+  {
+    "q": "Is the FEMA emergency alert test on November 17, 2026 real?",
+    "a": "Yes. FEMA and the FCC scheduled a nationwide Emergency Alert System test for November 17, 2026, at about 2:20 pm Eastern on radio and TV, with December 3 as the backup date. Phones are not included and no action is needed. Federal law requires a test at least every three years; earlier ones ran in 2011, 2017, 2018 and 2023.",
+    "itemIds": ["fema-eas-test-nov17", "fema-test-routine"]
+  },
+  {
+    "q": "Did The Simpsons predict a blackout on November 17?",
+    "a": "There is no evidence of that. The episode people cite, It's a Blunderful Life, aired on November 19, 2023 and shows no calendar date. The same claim went around for November 17, 2025, and nothing happened.",
+    "itemIds": ["simpsons-nov17-claim", "simpsons-episode-check", "viral-blackout-chain-post"]
+  },
+  {
+    "q": "Why are governments telling people to stock up?",
+    "a": "The governments themselves name power cuts, floods, cyberattacks, natural disasters and possible conflict. The UK, the EU and Japan ask for about 3 days, the standard household figure. Our analysis below finds the evidence fits a coordinated resilience push better than any single looming event, and says what would change that reading.",
+    "itemIds": ["streeting-alert-not-alarmed", "eu-72-hours", "japan-hosono-request", "ncsc-cyber-incidents"]
+  }
+]
