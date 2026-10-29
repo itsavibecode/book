@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="en" class="design-a" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Fortress Watch: design preview A / B / C</title>
+<script>
+/* Apply the saved option before first paint so the page does not flash. */
+(function () {
+  var DEF = { a: 'light', b: 'dark', c: 'light' };
+  var s = null;
+  try { s = JSON.parse(localStorage.getItem('fortressSwitcher') || 'null'); } catch (e) {}
+  var d = s && /^[abc]$/.test(s.design) ? s.design : 'a';
+  var t = s && s.theme && (s.theme[d] === 'light' || s.theme[d] === 'dark') ? s.theme[d] : DEF[d];
+  document.documentElement.className = 'design-' + d;
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;700&family=Barlow+Condensed:wght@600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<style>
+/* ---------- Tokens per design and theme (contrast-checked, see report) ---------- */
+html { color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
+
+html.design-a {
+  --font-head: "Source Serif 4", Georgia, serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-stamp: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-time: inherit;
+  --head-weight: 600;
+  --stamp-bw: 1px; --stamp-rotate: 0deg; --stamp-shadow: none; --stamp-caps: all-small-caps; --stamp-track: .04em;
+  --radius: 2px;
+}
+html.design-a[data-theme="light"] {
+  --bg: #fbfaf7; --ink: #141414; --muted: #55534e; --line: #d6d2c8; --ctl-bd: #76736c;
+  --link: #2b5d8a; --chip-on-bg: #2b5d8a; --chip-on-fg: #ffffff; --conf: #373736; --grey: #5f5f5f;
+  --time: var(--ink); --alert: var(--ink);
+}
+html.design-a[data-theme="dark"] {
+  --bg: #15171a; --ink: #e8e6e1; --muted: #a6a39b; --line: #33373d; --ctl-bd: #7d7a73;
+  --link: #7fb0dc; --chip-on-bg: #7fb0dc; --chip-on-fg: #15171a; --conf: #c8c7c3; --grey: #9a9a9a;
+  --time: var(--ink); --alert: var(--ink);
+}
+html.design-a {
+  --st-fact-bg: var(--ink); --st-fact-fg: var(--bg); --st-fact-bd: var(--ink);
+  --st-conf-bg: var(--conf); --st-conf-fg: var(--bg); --st-conf-bd: var(--conf);
+  --st-rep-bg: transparent; --st-rep-fg: var(--ink); --st-rep-bd: var(--ink);
+  --st-rum-bg: transparent; --st-rum-fg: var(--ink); --st-rum-bd: var(--ink); --st-rum-bs: dashed;
+  --st-spec-bg: transparent; --st-spec-fg: var(--ink); --st-spec-bd: var(--ink); --st-spec-bs: dotted;
+  --st-deb-bg: transparent; --st-deb-fg: var(--ink); --st-deb-bd: var(--ink);
+}
+
+html.design-b {
+  --font-head: "Archivo", system-ui, Arial, sans-serif;
+  --font-body: "Archivo", system-ui, Arial, sans-serif;
+  --font-stamp: "Archivo", system-ui, Arial, sans-serif;
+  --font-time: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  --head-weight: 700;
+  --stamp-bw: 2px; --stamp-rotate: 0deg; --stamp-shadow: none; --stamp-caps: normal; --stamp-track: .06em;
+  --radius: 0;
+}
+html.design-b[data-theme="dark"] {
+  --bg: #1b2230; --ink: #e9e4d8; --muted: #a9b1bf; --line: #36415a; --ctl-bd: #7c869a;
+  --link: var(--ink); --chip-on-bg: var(--ink); --chip-on-fg: #1b2230; --conf: #cac7bf; --grey: #9aa3b2;
+  --amber: #e0a429; --amber-text: #e0a429; --amber-bd: #e0a429; --on-amber: #1b2230;
+  --time: var(--amber-text); --alert: var(--ink);
+}
+html.design-b[data-theme="light"] {
+  --bg: #eef1f5; --ink: #1b2230; --muted: #4a5466; --line: #c9d0da; --ctl-bd: #6b7487;
+  --link: var(--ink); --chip-on-bg: var(--ink); --chip-on-fg: #eef1f5; --conf: #3b414e; --grey: #5b6474;
+  --amber: #e0a429; --amber-text: #835500; --amber-bd: #835500; --on-amber: #1b2230;
+  --time: var(--amber-text); --alert: var(--ink);
+}
+html.design-b {
+  --st-fact-bg: var(--ink); --st-fact-fg: var(--bg); --st-fact-bd: var(--ink);
+  --st-conf-bg: var(--conf); --st-conf-fg: var(--bg); --st-conf-bd: var(--conf);
+  --st-rep-bg: transparent; --st-rep-fg: var(--ink); --st-rep-bd: var(--ink);
+  --st-rum-bg: var(--amber); --st-rum-fg: var(--on-amber); --st-rum-bd: var(--amber); --st-rum-bs: solid;
+  --st-spec-bg: transparent; --st-spec-fg: var(--amber-text); --st-spec-bd: var(--amber-bd); --st-spec-bs: solid;
+  --st-deb-bg: transparent; --st-deb-fg: var(--ink); --st-deb-bd: var(--ink);
+}
+
+html.design-c {
+  --font-head: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, serif;
+  --font-stamp: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-time: inherit;
+  --head-weight: 700;
+  --stamp-bw: 2px; --stamp-rotate: -1.5deg; --stamp-caps: normal; --stamp-track: .07em;
+  --radius: 0;
+}
+html.design-c[data-theme="light"] {
+  --bg: #f4efe6; --ink: #1a1814; --muted: #5b554b; --line: #d3cbbd; --ctl-bd: #7a7366;
+  --link: var(--ink); --chip-on-bg: var(--ink); --chip-on-fg: #f4efe6; --conf: #3b3834; --grey: #67625a;
+  --red: #b3261e; --red-fill: #b3261e; --on-red: #f4efe6;
+  --amber: #c98a12; --amber-text: #7a5206; --amber-bd: #a8720f; --on-amber: #1a1814;
+  --haz-a: #1a1814; --haz-b: #c98a12;
+  --time: var(--ink); --alert: var(--red);
+  --stamp-shadow: inset 0 0 0 1px rgba(0,0,0,.10), inset 0 0 3px rgba(0,0,0,.22);
+}
+html.design-c[data-theme="dark"] {
+  --bg: #171512; --ink: #ece6da; --muted: #b0a898; --line: #3a352e; --ctl-bd: #857d6f;
+  --link: var(--ink); --chip-on-bg: var(--ink); --chip-on-fg: #171512; --conf: #ccc7bc; --grey: #a39d92;
+  --red: #ff8a7e; --red-fill: #e0574a; --on-red: #171512;
+  --amber: #e0a12e; --amber-text: #e8ac3e; --amber-bd: #e0a12e; --on-amber: #171512;
+  --haz-a: #000000; --haz-b: #e0a12e;
+  --time: var(--ink); --alert: var(--red);
+  --stamp-shadow: inset 0 0 0 1px rgba(0,0,0,.25), inset 0 0 3px rgba(0,0,0,.40);
+}
+html.design-c {
+  --st-fact-bg: var(--ink); --st-fact-fg: var(--bg); --st-fact-bd: var(--ink);
+  --st-conf-bg: var(--conf); --st-conf-fg: var(--bg); --st-conf-bd: var(--conf);
+  --st-rep-bg: transparent; --st-rep-fg: var(--ink); --st-rep-bd: var(--ink);
+  --st-rum-bg: var(--amber); --st-rum-fg: var(--on-amber); --st-rum-bd: var(--amber); --st-rum-bs: solid;
+  --st-spec-bg: transparent; --st-spec-fg: var(--amber-text); --st-spec-bd: var(--amber-bd); --st-spec-bs: solid;
+  --st-deb-bg: var(--red-fill); --st-deb-fg: var(--on-red); --st-deb-bd: var(--red-fill);
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 1rem; line-height: 1.5;
+  overflow-wrap: break-word; -webkit-text-size-adjust: 100%;
+}
+a { color: var(--link); text-underline-offset: .15em; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.wrap { max-width: 62rem; margin: 0 auto; padding: 0 16px; }
+h1, h2, h3 { font-family: var(--font-head); font-weight: var(--head-weight); margin: 0; }
+time, .tnum { font-variant-numeric: tabular-nums; }
+.ph { color: var(--muted); font-style: italic; }
+button, select { font: inherit; color: inherit; }
+
+.btn {
+  min-height: 44px; min-width: 44px; padding: 0 .9rem;
+  background: transparent; color: var(--ink);
+  border: 1px solid var(--ctl-bd); border-radius: var(--radius);
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+}
+.btn:hover { border-color: var(--ink); }
+.btn[aria-pressed="true"] { background: var(--chip-on-bg); color: var(--chip-on-fg); border-color: var(--chip-on-bg); }
+
+/* ---------- Switcher chrome ---------- */
+.sw { border-bottom: 2px solid var(--ink); }
+.sw-row { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; padding-top: .6rem; padding-bottom: .6rem; }
+.sw-title { margin: 0 auto 0 0; font-weight: 700; font-size: .95rem; }
+.sw-opts { display: flex; gap: .35rem; }
+.sw-opts .btn { font-weight: 700; }
+.sw-state { display: inline-flex; align-items: center; gap: .4rem; font-size: .9rem; }
+.sw-state select {
+  min-height: 44px; padding: 0 .5rem; background: var(--bg); color: var(--ink);
+  border: 1px solid var(--ctl-bd); border-radius: var(--radius);
+}
+.sw-cap { padding-bottom: .8rem; font-size: .9rem; }
+.sw-cap p { margin: .15rem 0; }
+.sw-cap .dials { color: var(--muted); }
+.sw-key { display: flex; flex-wrap: wrap; gap: .5rem .6rem; align-items: center; margin-top: .45rem !important; }
+.sw-hint { color: var(--muted); }
+@media (max-width: 639px) {
+  .opt-name { display: none; }
+  .sw-title { flex-basis: 100%; }
+}
+
+/* ---------- Stamps ---------- */
+.stamp {
+  display: inline-block; font-family: var(--font-stamp); font-weight: 700;
+  font-size: .78rem; line-height: 1; padding: .32em .5em .3em;
+  letter-spacing: var(--stamp-track); text-transform: uppercase; font-variant-caps: var(--stamp-caps);
+  border: var(--stamp-bw) solid; border-radius: 0;
+  transform: rotate(var(--stamp-rotate)); box-shadow: var(--stamp-shadow);
+  white-space: nowrap;
+}
+html.design-c .stamp { font-size: .9rem; }
+.s-fact { background: var(--st-fact-bg); color: var(--st-fact-fg); border-color: var(--st-fact-bd); }
+.s-confirmed { background: var(--st-conf-bg); color: var(--st-conf-fg); border-color: var(--st-conf-bd); }
+.s-reported { background: var(--st-rep-bg); color: var(--st-rep-fg); border-color: var(--st-rep-bd); }
+.s-rumor { background: var(--st-rum-bg); color: var(--st-rum-fg); border-color: var(--st-rum-bd); border-style: var(--st-rum-bs); }
+.s-speculation { background: var(--st-spec-bg); color: var(--st-spec-fg); border-color: var(--st-spec-bd); border-style: var(--st-spec-bs); }
+.s-debunked { background: var(--st-deb-bg); color: var(--st-deb-fg); border-color: var(--st-deb-bd); text-decoration: line-through; text-decoration-thickness: 2px; }
+.s-analysis { background: transparent; color: var(--grey); border-color: var(--grey); }
+
+/* Small flags next to a stamp: tags, not statuses */
+.flag {
+  display: inline-block; font-size: .72rem; font-weight: 700; line-height: 1.2;
+  padding: .2em .4em; border: 1px solid var(--ctl-bd); color: var(--muted);
+  letter-spacing: .03em; font-family: var(--font-body);
+}
+.flag-simpsons { background: #f2c94c; color: #1a1814; border-color: #f2c94c; cursor: help; }
+.countdown { color: var(--time); font-family: var(--font-time); font-variant-numeric: tabular-nums; font-weight: 700; font-size: .85rem; }
+
+/* ---------- Masthead and status line ---------- */
+.mast { padding-top: 1.25rem; padding-bottom: .25rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem 1rem; }
+.mast h1 { font-size: 1.35rem; }
+html.design-c .mast h1 { font-size: 1.7rem; text-transform: uppercase; letter-spacing: .02em; }
+.mast p { margin: 0; color: var(--muted); }
+
+.status { padding-top: 2rem; padding-bottom: 2.25rem; }
+.status-line { font-family: var(--font-head); font-weight: var(--head-weight); margin: 0; }
+.status-line p { margin: 0; }
+.status-line .l1, .status-line .l2 { font-size: clamp(1.45rem, 1.05rem + 1.9vw, 2.4rem); line-height: 1.18; }
+html.design-c .status-line .l1, html.design-c .status-line .l2 { font-size: clamp(1.9rem, 1.3rem + 3vw, 3.3rem); line-height: 1.04; letter-spacing: -.005em; }
+.status-line .l2 { margin-top: .6rem; color: var(--alert); }
+html.design-a .status-line .l2 .lead { background: var(--ink); color: var(--bg); padding: 0 .25em; }
+html.design-b .status-line .l2 { border: 2px solid var(--ink); padding: .35em .55em; }
+html.design-c .status-line .l2 .lead { text-transform: uppercase; }
+.hazard { display: none; }
+html.design-c .hazard {
+  display: block; height: 6px; margin-top: 1.1rem;
+  background: repeating-linear-gradient(-45deg, var(--haz-a) 0 8px, var(--haz-b) 8px 16px);
+}
+.status-meta { margin-top: 1.1rem; font-size: .9rem; color: var(--muted); }
+.status-meta p { margin: .15rem 0; }
+.status-meta time { color: var(--time); font-family: var(--font-time); font-weight: 700; }
+
+/* ---------- Section headings ---------- */
+.sec { padding-top: 2rem; padding-bottom: 1rem; }
+.sec > h2, .sec-head h2 { font-size: 1.35rem; margin-bottom: .75rem; }
+html.design-c .sec > h2, html.design-c .sec-head h2 { font-size: 1.9rem; text-transform: uppercase; letter-spacing: .01em; }
+
+/* ---------- Filters ---------- */
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-bottom: .5rem; }
+.filters .btn { font-size: .9rem; }
+.divider { width: 1px; align-self: stretch; min-height: 44px; background: var(--ctl-bd); margin: 0 .3rem; }
+.mintrust { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .1rem .35rem; margin-left: .2rem; }
+.mintrust-label { font-size: .9rem; font-weight: 700; }
+.mintrust-btns { display: inline-flex; }
+.mt-btn {
+  min-width: 44px; min-height: 44px; padding: 0; background: transparent; border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.mt-btn i { display: block; width: 10px; height: 14px; border: 1px solid var(--ctl-bd); }
+.mt-btn.on i { background: var(--ink); border-color: var(--ink); }
+.mt-btn:hover i { border-color: var(--ink); }
+.mintrust-readout { font-size: .9rem; color: var(--muted); }
+.result-count { font-size: .9rem; color: var(--muted); margin: .25rem 0 .5rem; }
+
+/* ---------- Board rows ---------- */
+.board { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
+.claim {
+  display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: .25rem 1rem;
+  padding: .8rem 0; border-bottom: 1px solid var(--line);
+}
+html.design-b .claim { padding: .95rem 0; }
+html.design-c .claim { padding: 1.05rem 0; }
+.claim-meta { display: flex; flex-direction: column; align-items: flex-start; gap: .45rem; min-width: 0; }
+.claim-meta time { font-size: .9rem; color: var(--muted); font-family: var(--font-time); }
+html.design-b .claim-meta time { color: var(--ink); }
+.claim-body { min-width: 0; }
+.flags { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; margin-bottom: .3rem; }
+.flags:empty { display: none; }
+.claim h3 { font-size: 1.12rem; line-height: 1.3; }
+html.design-c .claim h3 { font-size: 1.5rem; line-height: 1.08; }
+.claim .summary { margin: .25rem 0 .55rem; }
+html.design-a .claim .summary { font-size: .95rem; }
+.update-note { font-size: .85rem; color: var(--muted); margin: 0 0 .5rem; }
+.outlets { display: flex; flex-wrap: wrap; gap: .4rem .6rem; margin-bottom: .55rem; }
+.outlet {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: .2rem .45rem;
+  font-size: .85rem; padding: .25rem .45rem; border: 1px solid var(--line); max-width: 100%;
+}
+.outlet-name { font-weight: 700; }
+.meter { display: inline-flex; gap: 2px; }
+.meter i { display: block; width: 10px; height: 14px; border: 1px solid var(--ctl-bd); }
+.meter i.on { background: var(--ink); border-color: var(--ink); }
+.trust-text { color: var(--muted); white-space: nowrap; }
+.actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+.actions .btn { font-size: .88rem; }
+.sources { margin-top: .6rem; padding: .6rem .75rem; border: 1px solid var(--line); font-size: .9rem; }
+.sources h4 { margin: 0 0 .25rem; font-size: .85rem; font-family: var(--font-body); }
+.sources ul { margin: 0 0 .5rem; padding-left: 1.1rem; }
+.sources ul:last-child, .sources p:last-child { margin-bottom: 0; }
+.sources p { margin: 0 0 .5rem; }
+@media (max-width: 639px) {
+  .claim { grid-template-columns: minmax(0, 1fr); }
+  .claim-meta { flex-direction: row; flex-wrap: wrap; align-items: center; gap: .6rem; }
+}
+.board-state { padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
+.board-state p { margin: 0 0 .6rem; }
+.board-state strong { display: block; margin-bottom: .2rem; }
+
+/* ---------- Theories rail ---------- */
+.theories { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+.theory { border: 1px solid var(--ctl-bd); padding: .9rem 1rem; min-width: 0; }
+html.design-b .theory, html.design-c .theory { border-width: 2px; }
+html.design-c .theory { border-color: var(--ink); }
+.theory h3 { font-size: 1.15rem; margin: .55rem 0 .4rem; }
+html.design-c .theory h3 { font-size: 1.45rem; text-transform: uppercase; }
+.theory ul { margin: 0; padding-left: 1.1rem; }
+.theory li { margin: .2rem 0; }
+.theory-wide { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: .25rem 1.5rem; align-items: start; }
+.theory-wide h3 { font-size: 1.45rem; }
+html.design-c .theory-wide h3 { font-size: 2rem; }
+@media (max-width: 639px) {
+  .theories { grid-template-columns: minmax(0, 1fr); }
+  .theory-wide { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- Analysis ---------- */
+.analysis { border-top: 1px solid var(--grey); border-bottom: 1px solid var(--grey); padding: 1.25rem 0; }
+.analysis h2 { margin: .6rem 0 .35rem; font-size: 1.35rem; }
+html.design-c .analysis h2 { font-size: 1.9rem; text-transform: uppercase; }
+.analysis .sig { color: var(--grey); font-style: italic; margin: 0 0 .6rem; }
+.analysis .body { margin: 0; max-width: 42rem; }
+
+/* ---------- Guidance table (card stack under 640px) ---------- */
+.guide-table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.guide-table th, .guide-table td { text-align: left; padding: .55rem .6rem .55rem 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.guide-table thead th { border-bottom: 2px solid var(--ink); font-size: .85rem; }
+.guide-table td.dur { font-weight: 700; }
+@media (max-width: 639px) {
+  .guide-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .guide-table, .guide-table tbody, .guide-table tr, .guide-table td, .guide-table th { display: block; width: 100%; }
+  .guide-table tr { border: 1px solid var(--ctl-bd); padding: .5rem .75rem; margin-bottom: .6rem; }
+  .guide-table td, .guide-table th[scope="row"] {
+    border: 0; padding: .2rem 0; display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: .5rem;
+  }
+  .guide-table td::before, .guide-table th[scope="row"]::before { content: attr(data-label); font-weight: 700; font-size: .85rem; color: var(--muted); }
+}
+
+/* ---------- Footer, toast ---------- */
+.foot { margin-top: 2.5rem; padding-top: 1rem; padding-bottom: 2rem; border-top: 1px solid var(--ink); font-size: .9rem; color: var(--muted); }
+.foot p { margin: 0; }
+.foot a { display: inline-block; padding: .6rem 0; margin: -.6rem 0; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .9em; }
+.toast {
+  position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 10;
+  background: var(--ink); color: var(--bg); padding: .55rem .9rem; font-size: .9rem; font-weight: 700;
+  max-width: calc(100vw - 32px); border-radius: var(--radius);
+}
+.toast[hidden] { display: none; }
+</style>
+</head>
+<body>
+
+<header class="sw" aria-label="Design preview controls">
+  <div class="wrap sw-row">
+    <p class="sw-title">Fortress Watch design preview</p>
+    <div class="sw-opts" role="group" aria-label="Design option">
+      <button type="button" class="btn" data-opt="a" aria-label="Option A, Wire desk">A<span class="opt-name" aria-hidden="true">&nbsp;Wire desk</span></button>
+      <button type="button" class="btn" data-opt="b" aria-label="Option B, Situation board">B<span class="opt-name" aria-hidden="true">&nbsp;Situation board</span></button>
+      <button type="button" class="btn" data-opt="c" aria-label="Option C, Civil defense, recommended">C<span class="opt-name" aria-hidden="true">&nbsp;Civil defense</span></button>
+    </div>
+    <button type="button" class="btn" id="themeBtn" aria-pressed="false">Dark mode</button>
+    <label class="sw-state" title="Preview the board's loading, empty and error states">Board
+      <select id="stateSel">
+        <option value="normal">Normal</option>
+        <option value="loading">Loading</option>
+        <option value="empty">Empty</option>
+        <option value="error">Error</option>
+      </select>
+    </label>
+  </div>
+  <div class="wrap sw-cap" aria-live="polite">
+    <p><strong id="capName"></strong> <span id="capIntent"></span></p>
+    <p class="dials" id="capDials"></p>
+    <p class="sw-key"><span>Stamps:</span>
+      <span class="stamp s-fact">Fact</span>
+      <span class="stamp s-confirmed">Confirmed</span>
+      <span class="stamp s-reported">Reported</span>
+      <span class="stamp s-rumor">Rumor</span>
+      <span class="stamp s-speculation">Speculation</span>
+      <span class="stamp s-debunked">Debunked</span>
+      <span class="stamp s-analysis">Analysis</span>
+    </p>
+    <p class="sw-hint">Keys: a, b, c or 1, 2, 3 switch the design; d toggles dark mode.</p>
+  </div>
+</header>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<main id="mock">
+  <div class="wrap mast">
+    <h1>Fortress Watch</h1>
+    <p>What is confirmed, what is just going around.</p>
+  </div>
+
+  <section class="wrap status" aria-labelledby="status-h">
+    <h2 id="status-h" class="sr-only">Current status</h2>
+    <div class="status-line">
+      <p class="l1"><span class="lead">Confirmed:</span> the Pentagon has ordered its bases to stop depending on the civilian grid.</p>
+      <p class="l2"><span class="lead">Not true:</span> the UK told people to stock 30 days. The official figure is 3 days.</p>
+    </div>
+    <div class="hazard" aria-hidden="true"></div>
+    <div class="status-meta">
+      <p>Last updated <time datetime="2026-10-29T18:00Z">2026-10-29 18:00 UTC</time></p>
+      <p class="tnum" id="labelCounts"></p>
+    </div>
+  </section>
+
+  <section class="wrap sec" aria-labelledby="board-h">
+    <h2 id="board-h">The board</h2>
+    <div class="filters" role="group" aria-label="Filter claims">
+      <button type="button" class="btn chip" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" class="btn chip" data-filter="fact" aria-pressed="false">Fact</button>
+      <button type="button" class="btn chip" data-filter="confirmed" aria-pressed="false">Confirmed</button>
+      <button type="button" class="btn chip" data-filter="reported" aria-pressed="false">Reported</button>
+      <button type="button" class="btn chip" data-filter="rumor" aria-pressed="false">Rumor</button>
+      <button type="button" class="btn chip" data-filter="speculation" aria-pressed="false">Speculation</button>
+      <button type="button" class="btn chip" data-filter="debunked" aria-pressed="false">Debunked</button>
+      <span class="divider" aria-hidden="true"></span>
+      <button type="button" class="btn chip" id="simpsonsChip" aria-pressed="false">Simpsons links</button>
+      <span class="mintrust" role="group" aria-labelledby="mt-label">
+        <span class="mintrust-label" id="mt-label">Min trust</span>
+        <span class="mintrust-btns" id="mtBtns"></span>
+        <span class="mintrust-readout" id="mtReadout" aria-hidden="true"></span>
+      </span>
+    </div>
+    <p class="result-count" id="resultCount" aria-live="polite"></p>
+    <ol class="board" id="board"></ol>
+  </section>
+
+  <section class="wrap sec" aria-labelledby="theories-h">
+    <h2 id="theories-h">What people think it means</h2>
+    <div class="theories">
+      <article class="theory theory-wide">
+        <div>
+          <span class="stamp s-speculation">Speculation</span>
+          <h3>Cyberattack on utilities</h3>
+        </div>
+        <ul>
+          <li><strong>Points toward:</strong> <span class="ph">[filled from research]</span></li>
+          <li><strong>Points against:</strong> <span class="ph">[filled from research]</span></li>
+        </ul>
+      </article>
+      <article class="theory">
+        <span class="stamp s-speculation">Speculation</span>
+        <h3>Iran or Russia escalation</h3>
+        <ul>
+          <li><strong>Points toward:</strong> <span class="ph">[filled from research]</span></li>
+          <li><strong>Points against:</strong> <span class="ph">[filled from research]</span></li>
+        </ul>
+      </article>
+      <article class="theory">
+        <span class="stamp s-speculation">Speculation</span>
+        <h3>Geomagnetic storm (Carrington 1859)</h3>
+        <ul>
+          <li><strong>Points toward:</strong> <span class="ph">[filled from research]</span></li>
+          <li><strong>Points against:</strong> <span class="ph">[filled from research]</span></li>
+        </ul>
+      </article>
+      <article class="theory">
+        <span class="stamp s-speculation">Speculation</span>
+        <h3>Election-period disruption</h3>
+        <ul>
+          <li><strong>Points toward:</strong> <span class="ph">[filled from research]</span></li>
+          <li><strong>Points against:</strong> <span class="ph">[filled from research]</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap sec" aria-labelledby="analysis-h">
+    <div class="analysis">
+      <span class="stamp s-analysis">Analysis</span>
+      <h2 id="analysis-h">What would have to be true</h2>
+      <p class="sig">Analysis by Claude, 2026-10-29, not a prediction.</p>
+      <p class="body ph">[analysis text comes from analysis.json]</p>
+    </div>
+  </section>
+
+  <section class="wrap sec" aria-labelledby="guide-h">
+    <h2 id="guide-h">What officials actually recommend</h2>
+    <table class="guide-table">
+      <thead>
+        <tr><th scope="col">Country</th><th scope="col">Guidance</th><th scope="col">Duration</th><th scope="col">Date</th><th scope="col">Source</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row" data-label="Country">United Kingdom</th><td data-label="Guidance">Be Ready household kit</td><td class="dur" data-label="Duration">3 days</td><td data-label="Date"><time datetime="2026-10-22">2026-10-22</time></td><td data-label="Source">gov.uk</td></tr>
+        <tr><th scope="row" data-label="Country">United States</th><td data-label="Guidance">ready.gov basic kit</td><td class="dur" data-label="Duration">72 hours</td><td data-label="Date">standing guidance</td><td data-label="Source">ready.gov</td></tr>
+        <tr><th scope="row" data-label="Country">European Union</th><td data-label="Guidance">Preparedness Union Strategy</td><td class="dur" data-label="Duration">72 hours</td><td data-label="Date"><time datetime="2025-03">2025-03</time></td><td data-label="Source">European Commission</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer class="wrap foot">
+    <p>Fortress Watch v0.1.0, a BookHockeys page. <a href="#" class="ph-link" title="placeholder in mock">Privacy</a>. Analytics opt-out: add <code>?ga=off</code> to the address.</p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var OPTIONS = {
+    a: { name: 'A. Wire desk.', intent: 'Reads like a newsroom tool, which is the trust signal.', dials: 'ENERGY 2 / RHYTHM 2 / MOTION 1. Light by default.' },
+    b: { name: 'B. Situation board.', intent: 'The monitoring genre this domain already uses, where dark is justified by genre and not by default.', dials: 'ENERGY 2 / RHYTHM 2 / MOTION 1. Dark by default.' },
+    c: { name: 'C. Civil defense (recommended).', intent: 'Distinctive enough to be recognized in a repost, sober enough to be believed.', dials: 'ENERGY 3 / RHYTHM 3 / MOTION 1. Light by default.' }
+  };
+  var DEFAULT_THEME = { a: 'light', b: 'dark', c: 'light' };
+  var STORE_KEY = 'fortressSwitcher';
+  var SHARE_BASE = 'https://bookhockeys.com/fortress/#c-';
+
+  var OUTLETS = {
+    dod:     { name: 'Department of Defense', trust: 5, reason: 'Primary government source' },
+    fox:     { name: 'Fox News Digital', trust: 4, reason: 'Major outlet with corrections policy' },
+    fortune: { name: 'Fortune', trust: 4, reason: 'Major outlet with corrections policy' },
+    newsweek:{ name: 'Newsweek', trust: 3, reason: 'Aggregating magazine' },
+    dwg:     { name: 'Defense Writers Group transcript', trust: 5, reason: 'Primary source: on-record transcript' },
+    govuk:   { name: 'gov.uk', trust: 5, reason: 'Primary government source' },
+    indy:    { name: 'The Independent', trust: 4, reason: 'Major outlet with corrections policy' },
+    katu:    { name: 'KATU', trust: 3, reason: 'Local TV affiliate' },
+    fb:      { name: 'Facebook post', trust: 1, reason: 'Anonymous social post' },
+    xpost:   { name: 'X post', trust: 1, reason: 'Anonymous social post' },
+    reddit:  { name: 'Reddit r/conspiracy', trust: 1, reason: 'Anonymous forum post' },
+    snopes:  { name: 'Snopes', trust: 5, reason: 'Fact-checker that publishes its sources' },
+    fema:    { name: 'FEMA', trust: 5, reason: 'Primary government source' },
+    fcc:     { name: 'FCC', trust: 5, reason: 'Primary government source' }
+  };
+
+  var ROWS = [
+    { id: 'fortress-unveiled', date: '2026-09-30', status: 'fact',
+      headline: 'Hegseth unveils FORTRESS America',
+      summary: 'The Secretary of Defense announced the installation-resilience program at the Pentagon.',
+      outlets: ['dod', 'fox'], sources: ['DoD release, 2026-09-30', 'Fox News Digital, 2026-10-24'] },
+    { id: 'bases-90-days', date: '2026-10-24', status: 'reported',
+      headline: 'Fox News reports bases must run 90 days without outside power, water or fuel',
+      summary: 'From internal documents Fox reviewed. The public memo has no 90-day figure; Snopes rates it unconfirmed.',
+      outlets: ['fox', 'snopes'] },
+    { id: '500-installations', date: '2026-10-20', status: 'fact',
+      headline: 'About 500 continental US installations being assessed for energy needs, senior official says',
+      summary: 'Said at the Defense Writers Group roundtable.',
+      outlets: ['dwg'] },
+    { id: 'uk-be-ready', date: '2026-10-22', status: 'fact',
+      headline: 'UK launches Be Ready: three days of water, food, a radio and some cash',
+      summary: 'UK Defence Secretary Wes Streeting announced the campaign. Three days, not 30.',
+      outlets: ['govuk', 'indy'], updated: { date: '2026-10-29', note: 'Added the official guidance page.' } },
+    { id: 'uk-30-days-false', date: '2026-10-27', status: 'debunked',
+      headline: 'Claim that the UK told people to prepare for 30 days is false: it says 3',
+      summary: 'The 30-day line comes from Dan Bongino, former FBI deputy director, on his podcast, then spread as UK advice.',
+      outlets: ['govuk', 'katu'] },
+    { id: 'blackout-viral', date: '2026-10-28', status: 'rumor',
+      headline: 'Governments are telling people to stock up because a national blackout is coming',
+      summary: 'Viral post; no source beyond the post itself.',
+      outlets: ['fb', 'xpost'], simpsons: 'Cites a Simpsons episode as predictive programming.' },
+    { id: 'ai-cyber-theory', date: '2026-10-28', status: 'speculation', theory: 'ai-cyber',
+      headline: 'The warnings follow AI tools finding web and PHP vulnerabilities at scale',
+      summary: 'A theory about why, not a report of what happened.',
+      outlets: ['reddit'] },
+    { id: 'eas-test', date: '2026-11-17', status: 'fact', eventDate: '2026-11-17', countdown: '19 days',
+      headline: 'FEMA and FCC nationwide Emergency Alert System test',
+      summary: 'FEMA release HQ-26-137 and FCC DA 26-989. Routine, radio and TV only, no phone alerts. Not linked to FORTRESS.',
+      outlets: ['fema', 'fcc'] }
+  ];
+
+  var html = document.documentElement;
+  var state = { design: 'a', theme: { a: null, b: null, c: null } };
+  var filters = { statuses: new Set(), simpsons: false, minTrust: 1 };
+  var boardMode = 'normal';
+
+  function load() {
+    try {
+      var s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+      if (s && /^[abc]$/.test(s.design)) state.design = s.design;
+      if (s && s.theme) ['a', 'b', 'c'].forEach(function (k) {
+        if (s.theme[k] === 'light' || s.theme[k] === 'dark') state.theme[k] = s.theme[k];
+      });
+    } catch (e) { /* storage unavailable: defaults stand */ }
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+  }
+  function currentTheme() { return state.theme[state.design] || DEFAULT_THEME[state.design]; }
+
+  function applyDesign() {
+    var d = state.design, t = currentTheme();
+    html.className = 'design-' + d;
+    html.setAttribute('data-theme', t);
+    document.querySelectorAll('[data-opt]').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-opt') === d ? 'true' : 'false');
+    });
+    var tb = document.getElementById('themeBtn');
+    tb.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+    var o = OPTIONS[d];
+    document.getElementById('capName').textContent = o.name;
+    document.getElementById('capIntent').textContent = o.intent;
+    document.getElementById('capDials').textContent = 'Dials: ' + o.dials + ' Showing ' + t + ' mode.';
+  }
+  function setDesign(d) { state.design = d; save(); applyDesign(); }
+  function toggleTheme() {
+    state.theme[state.design] = currentTheme() === 'dark' ? 'light' : 'dark';
+    save(); applyDesign();
+  }
+
+  /* ---------- Toast ---------- */
+  var toastEl = document.getElementById('toast'), toastTimer = null;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, 2200);
+  }
+
+  /* ---------- Share ---------- */
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+  function share(id, btn) {
+    var url = SHARE_BASE + id;
+    function done(ok) {
+      toast(ok ? 'Copied' : 'Copy failed. Link: ' + url);
+      btn.focus();
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(function () { done(true); }, function () { done(fallbackCopy(url)); });
+    } else {
+      done(fallbackCopy(url));
+    }
+  }
+
+  /* ---------- Render helpers ---------- */
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function meter(trust) {
+    var m = el('span', 'meter');
+    m.setAttribute('aria-hidden', 'true');
+    for (var i = 1; i <= 5; i++) m.appendChild(el('i', i <= trust ? 'on' : ''));
+    return m;
+  }
+  function stamp(status) {
+    var s = el('span', 'stamp s-' + status);
+    s.appendChild(el('span', 'sr-only', 'Status: '));
+    s.appendChild(document.createTextNode(status.toUpperCase()));
+    return s;
+  }
+  function maxTrust(row) {
+    return row.outlets.reduce(function (m, k) { return Math.max(m, OUTLETS[k].trust); }, 0);
+  }
+
+  function renderRow(row) {
+    var li = el('li', 'claim');
+    li.id = 'c-' + row.id;
+    li.dataset.status = row.status;
+
+    var meta = el('div', 'claim-meta');
+    var t = el('time', 'tnum', row.date);
+    t.setAttribute('datetime', row.date);
+    meta.appendChild(t);
+    meta.appendChild(stamp(row.status));
+    li.appendChild(meta);
+
+    var body = el('div', 'claim-body');
+    var flags = el('div', 'flags');
+    if (row.simpsons) {
+      var sp = el('span', 'flag flag-simpsons', 'SIMPSONS');
+      sp.title = row.simpsons;
+      flags.appendChild(sp);
+    }
+    if (row.theory) flags.appendChild(el('span', 'flag', 'Theory: ' + row.theory));
+    if (row.updated) flags.appendChild(el('span', 'flag tnum', 'UPDATED ' + row.updated.date));
+    if (row.eventDate) {
+      flags.appendChild(el('span', 'flag tnum', 'DATE ' + row.eventDate));
+      flags.appendChild(el('span', 'countdown', row.countdown));
+    }
+    body.appendChild(flags);
+
+    body.appendChild(el('h3', null, row.headline));
+    var sum = el('p', 'summary', row.summary);
+    if (row.pending) {
+      sum.appendChild(document.createTextNode(' '));
+      sum.appendChild(el('span', 'flag', 'pending official confirmation'));
+    }
+    body.appendChild(sum);
+    if (row.updated) body.appendChild(el('p', 'update-note', 'Update ' + row.updated.date + ': ' + row.updated.note));
+
+    var outs = el('div', 'outlets');
+    row.outlets.forEach(function (k) {
+      var o = OUTLETS[k];
+      var c = el('span', 'outlet');
+      c.title = o.reason;
+      c.appendChild(el('span', 'outlet-name', o.name));
+      c.appendChild(meter(o.trust));
+      c.appendChild(el('span', 'trust-text', 'Trust ' + o.trust + ' of 5'));
+      outs.appendChild(c);
+    });
+    body.appendChild(outs);
+
+    var actions = el('div', 'actions');
+    var shareBtn = el('button', 'btn', 'Share');
+    shareBtn.type = 'button';
+    shareBtn.setAttribute('aria-label', 'Copy link to this claim: ' + row.headline);
+    shareBtn.addEventListener('click', function () { share(row.id, shareBtn); });
+    var panelId = 'src-' + row.id;
+    var exp = el('button', 'btn', 'Show sources');
+    exp.type = 'button';
+    exp.setAttribute('aria-expanded', 'false');
+    exp.setAttribute('aria-controls', panelId);
+    actions.appendChild(shareBtn);
+    actions.appendChild(exp);
+    body.appendChild(actions);
+
+    var panel = el('div', 'sources');
+    panel.id = panelId;
+    panel.hidden = true;
+    panel.appendChild(el('h4', null, 'Sources'));
+    var ul = el('ul');
+    if (row.sources) {
+      row.sources.forEach(function (s) { ul.appendChild(el('li', null, s)); });
+    } else {
+      row.outlets.forEach(function (k) {
+        var li2 = el('li', null, OUTLETS[k].name + ' ');
+        li2.appendChild(el('span', 'ph', '[link and date filled from sources.json]'));
+        ul.appendChild(li2);
+      });
+    }
+    panel.appendChild(ul);
+    panel.appendChild(el('h4', null, 'Why each outlet has its rating'));
+    var ul2 = el('ul');
+    row.outlets.forEach(function (k) {
+      var o = OUTLETS[k];
+      ul2.appendChild(el('li', null, o.name + ': Trust ' + o.trust + ' of 5. ' + o.reason + '.'));
+    });
+    panel.appendChild(ul2);
+    if (row.simpsons) {
+      panel.appendChild(el('h4', null, 'Simpsons link'));
+      var p = el('p', null, row.simpsons + ' ');
+      p.appendChild(el('span', 'ph', '[episode name, air date and what it actually shows, filled from research]'));
+      panel.appendChild(p);
+    }
+    body.appendChild(panel);
+
+    exp.addEventListener('click', function () {
+      var open = exp.getAttribute('aria-expanded') === 'true';
+      exp.setAttribute('aria-expanded', open ? 'false' : 'true');
+      exp.textContent = open ? 'Show sources' : 'Hide sources';
+      panel.hidden = open;
+    });
+
+    li.appendChild(body);
+    return li;
+  }
+
+  var boardEl = document.getElementById('board');
+  var countEl = document.getElementById('resultCount');
+
+  function stateBlock(title, text, btnLabel, onClick) {
+    var li = el('li', 'board-state');
+    li.appendChild(el('strong', null, title));
+    li.appendChild(el('p', null, text));
+    if (btnLabel) {
+      var b = el('button', 'btn', btnLabel);
+      b.type = 'button';
+      b.addEventListener('click', onClick);
+      li.appendChild(b);
+    }
+    return li;
+  }
+
+  function renderBoard() {
+    boardEl.textContent = '';
+    if (boardMode === 'loading') {
+      boardEl.setAttribute('aria-busy', 'true');
+      boardEl.appendChild(stateBlock('Loading the claims list.', 'Fetching items.json and sources.json. The status line above is from the last load.'));
+      countEl.textContent = '';
+      return;
+    }
+    boardEl.removeAttribute('aria-busy');
+    if (boardMode === 'error') {
+      boardEl.appendChild(stateBlock('The claims list did not load.', 'items.json could not be read. Reload the page to try again; the status line above is from the last good load.', 'Reload the page', function () { location.reload(); }));
+      countEl.textContent = '';
+      return;
+    }
+    if (boardMode === 'empty') {
+      boardEl.appendChild(stateBlock('No claims on the board yet.', 'Claims appear here after the first hand review of the sources.'));
+      countEl.textContent = '';
+      return;
+    }
+    var shown = ROWS.filter(function (r) {
+      if (filters.statuses.size && !filters.statuses.has(r.status)) return false;
+      if (filters.simpsons && !r.simpsons) return false;
+      if (maxTrust(r) < filters.minTrust) return false;
+      return true;
+    });
+    shown.forEach(function (r) { boardEl.appendChild(renderRow(r)); });
+    if (!shown.length) {
+      boardEl.appendChild(stateBlock('No claims match these filters.', 'Try fewer labels or a lower minimum trust.', 'Clear all filters', clearFilters));
+    }
+    countEl.textContent = 'Showing ' + shown.length + ' of ' + ROWS.length + ' claims';
+  }
+
+  /* ---------- Filters ---------- */
+  var chips = document.querySelectorAll('[data-filter]');
+  var simpsonsChip = document.getElementById('simpsonsChip');
+  var mtWrap = document.getElementById('mtBtns');
+  var mtReadout = document.getElementById('mtReadout');
+  var mtButtons = [];
+
+  for (var i = 1; i <= 5; i++) {
+    (function (n) {
+      var b = el('button', 'mt-btn');
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Minimum trust ' + n + ' of 5');
+      b.appendChild(el('i'));
+      b.addEventListener('click', function () { filters.minTrust = n; syncFilters(); renderBoard(); });
+      mtWrap.appendChild(b);
+      mtButtons.push(b);
+    })(i);
+  }
+
+  function syncFilters() {
+    chips.forEach(function (c) {
+      var f = c.getAttribute('data-filter');
+      var on = f === 'all' ? filters.statuses.size === 0 : filters.statuses.has(f);
+      c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    simpsonsChip.setAttribute('aria-pressed', filters.simpsons ? 'true' : 'false');
+    mtButtons.forEach(function (b, idx) {
+      b.classList.toggle('on', idx < filters.minTrust);
+      b.setAttribute('aria-pressed', idx + 1 === filters.minTrust ? 'true' : 'false');
+    });
+    mtReadout.textContent = filters.minTrust === 1 ? 'Any' : filters.minTrust + ' and up';
+  }
+  function clearFilters() {
+    filters.statuses.clear(); filters.simpsons = false; filters.minTrust = 1;
+    syncFilters(); renderBoard();
+  }
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () {
+      var f = c.getAttribute('data-filter');
+      if (f === 'all') filters.statuses.clear();
+      else if (filters.statuses.has(f)) filters.statuses.delete(f);
+      else filters.statuses.add(f);
+      syncFilters(); renderBoard();
+    });
+  });
+  simpsonsChip.addEventListener('click', function () {
+    filters.simpsons = !filters.simpsons; syncFilters(); renderBoard();
+  });
+
+  /* ---------- Switcher wiring ---------- */
+  document.querySelectorAll('[data-opt]').forEach(function (b) {
+    b.addEventListener('click', function () { setDesign(b.getAttribute('data-opt')); });
+  });
+  document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+  document.getElementById('stateSel').addEventListener('change', function (e) {
+    boardMode = e.target.value; renderBoard();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    var k = e.key.toLowerCase();
+    var map = { a: 'a', '1': 'a', b: 'b', '2': 'b', c: 'c', '3': 'c' };
+    if (map[k]) { setDesign(map[k]); }
+    else if (k === 'd') { toggleTheme(); }
+  });
+  document.querySelectorAll('.ph-link').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      toast('Placeholder in mock: the privacy page is not built yet');
+    });
+  });
+
+  /* Label counts come from the rows rendered at load, so they can never disagree with the board. */
+  function renderCounts() {
+    var order = ['fact', 'confirmed', 'reported', 'rumor', 'speculation', 'debunked'];
+    var tally = {};
+    boardEl.querySelectorAll('.claim').forEach(function (li) {
+      tally[li.dataset.status] = (tally[li.dataset.status] || 0) + 1;
+    });
+    document.getElementById('labelCounts').textContent = order
+      .filter(function (s) { return tally[s]; })
+      .map(function (s) { return tally[s] + ' ' + s.toUpperCase(); })
+      .join(', ');
+  }
+
+  load();
+  applyDesign();
+  syncFilters();
+  renderBoard();
+  renderCounts();
+})();
+</script>
+</body>
+</html>
