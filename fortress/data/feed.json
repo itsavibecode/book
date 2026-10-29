@@ -6,8 +6,8 @@
   "url": "https://news.google.com/rss/articles/CBMingJBVV95cUxPYmtJRkVwcFlJZGUzRTVIdFIwM2pZMEdLTXNnRnFBSlVfWk5kbHpxb0ZyZGo3VWRYcW0yUTgwUnEwODZta2hRUmttZDN5QlBTNnZ3NEhYdHV1MWZRdjRaOEtXVzNMTml5QWtQNHliNDJweWhpdFRnTHBhSGdOR3B1RjBnclZYbDRLNUJBYWZjQXEyU1pPR2hrdnVrOUw2cFExYlRENmlNX1pySjQ5QTBEWWJNcWVzWjlPZmE5UjdwVjNobWxxVXhEaXlnWXNJUXVwWWVTYmxjbS1vcERPOHhabG1Oa3V6N09wWlJUQTBiSkxsUndabWhzVkRkM3NWSGRuNkhneV9HX1BTU3BMRXNBM0UxZXAwVWozcldhQTlB0gGjAkFVX3lxTFAwOGJLYW9wT0ZyTjBiNjlzMWRUMjRsR2tHMVo2TlJGX2tkcnQ2RHBYUHN5SzRBZ1JlbkRpNnNJWjBQaXBQQktjTGZhR21HTHNNOUlDQ0hOc2RvcWJGUmptMDN5b3NDc09rVGZ6TEE4dFE2ZDNJTFBqSXNCZGp6M0QtczlGTFh3WjlBcVlZb1FkMTlxVzM1anc0REhUWU9iMndBQTV6dm5aanpxbkV6X2VJWkllVXZGaUY2Y2NHUEI4Q3U3QnFBQXZhMzZpbTY2R2JTbDBTY0lHUm90djNDMzhnS1RlREhidHg0Nm9FUG5MaVNYX2Y3V3JmWUtKWlk0WUF3LURWc3dJRWVjTWkySkcyb1hlNDY5QllQTi1ja2Q5ZGJTbw?oc=5",
   "domain": "m.economictimes.com",
   "outlet": "The Economic Times",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "economic-times",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -16,8 +16,8 @@
   "url": "https://news.google.com/rss/articles/CBMi-AFBVV95cUxOdHl6TVJWcG4wUFB5b2FBMkVEcXdfQjMtREs1a01GTnowY0Y1OWNIbi02NUx6RzlqZDREcTZHb0hueVZDbExQTVE2SjBOSkQ0SGtfUVFadDRDSC01TnM0LUFoLVRYMHdESjltcVpWeThvT2h3VHBmLVpmRWpvVk55M1FqcmlOWGpWdkctNHhaSXB0eUtwbEo2eVpfb05hQXB1cVh6Zk03c25BMF9fZGxVdU51VVlWMWtrSTZ6WFQ1TVJGdjh6SWg3cWx1elUtTE5NblM0QndMaE1OUGpQNTEwdXVfYzlDVGlST2VKVlpnUU5kTG92bjdaaw?oc=5",
   "domain": "cronista.com",
   "outlet": "El Cronista",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "cronista",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -26,8 +26,8 @@
   "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxOdGJJbk9KUTBlbHp2QjlDM01TdlVYQ3pfTy1PdVNTTHYydzRlZE00UTFYclVkLWxaQkZHUkdiTDZ0Wk9UOFQzRE9CQnRTVjEtYk81c01NWWRHQmFsNTdOMnBzMUVtQ0c0WXFOdUdSalpNMWdYTGJtekVjRkk2SFMzNFU4OUpZUVlZSzdpSFRONmN3RWU2Y2I4RkQtaDg0cWVCYTR4cTV4Y0toSzFrTU9DOS1SNXVpNWFIYm9YeGduX3NiZGRtZU1feHd6cG9NR2hiQk55YXBTbzROUzE4?oc=5",
   "domain": "fox23.com",
   "outlet": "KOKI FOX 23",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "fox23",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -36,8 +36,8 @@
   "url": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxOaVR5ZHEtYThNMFJKak9XZEllZXNZRVZPZXdjSkdHcnRWV3dCYzF0bXR5YWo1Z2tUbjZkQ0JzMXpzQ19COUFwSG5JTGI2U3QySjJFTE1fdGNrQV90MzZzcEFBV2lLTXpHanNyenVEMVQwY0NUSDhZVGxiS3pfSTdtSlpxUnJUbG9kMnFuelpyVE5mcXNUZFRvZDBteGZjSVhxTnF0Mmw1UlVkQ2ZKelloRFlxbUMtaDltTExLUFBLZEdEbF9reGhZaTQ3NkpmYTZyLXpLTVRmS1lWYURWRTNBUG1CRQ?oc=5",
   "domain": "abc6onyourside.com",
   "outlet": "WSYX",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "katu-tnnd",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -46,8 +46,8 @@
   "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxOSGRLUldaMjRmUmdpQzBCbzNreVBuSWNXZ2hYaFpWQTBRN190anFic3k5QldfMEJqWVRRalQzOE1KNmtabHUtZzJRdmdrRWpsQUFka2loTGl0Z25JZDJ3ckQ3Y0hMeFlSckVsQkVaOUxFS0tIRmQzQl91RVRjeXJpSEM3Slp5N01EZnVsdHo4YkpqSmNfek1vMENVZG5FcDlSOGpQVE9wcHdlV1FOM3dCTVRUQ2d2UUNJbDNfci1icjBEQ0N6T0RwajkwbHZ5TDRvb2tMenhB?oc=5",
   "domain": "wpde.com",
   "outlet": "WPDE",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "katu-tnnd",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -56,8 +56,8 @@
   "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPdm94OVhaRmFGb25TSXNSNzhPeDFBUm91dFRxYnVRQ2NkNnhwYnlwV21CcDRvSkZqUzlidngwM2RGLVp5Ym1kVGFSVzVoOWZibGRtQmV3UFhGcWwyRTIzMno0YXVDRGtTUlJVbUhwd01GYnpqemZ1c0gtZUpzNlZKNnU1Um1pQVBzUHZOUWl2X0lEc3ozc3VoekVvdFFFZjRrdFdfNUhOSENKT3NkS21iMUhqVGtFZ2l2d0ZORmJhdW9Nclllb3Z5ekNuNEY0Ykx3d1pIcGdqU3JRVUU?oc=5",
   "domain": "komonews.com",
   "outlet": "KOMO",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "katu-tnnd",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -66,8 +66,8 @@
   "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxORnBsN2NoNlVzMTkyWGZVcVp1RU1EMEpqUFJaeGw4M1AwRk4zMHBTejVZSXpKQjlJRDA4WlJGazg5LUlGT1Q3SDQ1NWxBUU15dnZwcUozWlJRNmpmeDQyWldxRnNkc3BybjJndkZfRkZGSjFrdWRuZlRseWVBNGViWTZnbDBnWXJiMFVxOTFRa1p0dWg4cld4QdIBmAFBVV95cUxORnBsN2NoNlVzMTkyWGZVcVp1RU1EMEpqUFJaeGw4M1AwRk4zMHBTejVZSXpKQjlJRDA4WlJGazg5LUlGT1Q3SDQ1NWxBUU15dnZwcUozWlJRNmpmeDQyWldxRnNkc3BybjJndkZfRkZGSjFrdWRuZlRseWVBNGViWTZnbDBnWXJiMFVxOTFRa1p0dWg4cld4QQ?oc=5",
   "domain": "examinerlive.co.uk",
   "outlet": "Yorkshire Live",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "examiner-live",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -76,8 +76,8 @@
   "url": "https://news.google.com/rss/articles/CBMiiwJBVV95cUxQVjgzQ042Q0lYekFGaGtqT3FtOW9zeGtwV2ZhSVloS2dSS3d3cGt5VlpMNXFYallqZGl3c3hYb3JLeGpDYXVFUXc5T001Rm51NUhTeDJCZEZZcllkeXp5UG1Pa2t6VGtadGlzeWxwOEdjeUZ6WVA4OHBEekMwNlVnOXYwN240dzVBSGxud1dhUS1oRVlPcUlNa3lrYXoyQ0tQUkNDb3dxZUM5ekotUVVUWjVkendUczBSb3VqVWQ0b2NMM3hlQ2liN1NQNmR4LWtnNjlBdkpheHF2UEN5R2o2N0gwS2p6cjV0UTZjd3pYVWpOZnFJZUlXNThBSzUtVTdwTFNaOEsxN2lLLW_SAZACQVVfeXFMTWlDVXFJNFdiWjlTZkVQUzJEbUZVVkszY3RfODVxYlM3ZTBDYm95YU9yQ3Z5Y0RMQnF3R0dxNXU4TDQxeEk2QkpuVU5vODdoNDBwNnpVMDRHMGVZRnNnbjJ4MXRXQlV1cFExZmg2U3RmVXN0TUJ6bXJKVWhMYW83QjZmem15ZTdhbFY3UWtUb1o3YmM4UnJUZTd0VmJaX012bUNTbTZLYnZSRWxIVVpkbVlGNzlxMDhOdUctdHNjYUtVUlBwdW5BZlNDUW1zQ1JWMWpHU0Y3Qlg4NmRLR3RFTW9ndFRoYWNtbGJxMDV0eUdNWEdsOVA1Z3paMzBOcmdkN25MVzJhRUJORFRPM2ZMYXQ?oc=5",
   "domain": "m.economictimes.com",
   "outlet": "The Economic Times",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "economic-times",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -86,8 +86,8 @@
   "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPcDlETnYyeEJ4NVBrMm1wMTZPM3RHQU5uTVVPdlJFZzBocFE0SHlBSXlINmF6VW1YcEJoRWFBT2NCbzN1WTRaLVNUcHdmLUQzaHRaQ3ZaSEtTaURvWnRGVHFXZnpxQWQweTI4Qm9WYkU3UWlhVVBYTUtQaFRGZUpuVFRWNW51cHI3NjdjNUNTTjNaUlpRWm5vcEFqTjdlX2M?oc=5",
   "domain": "energynow.ca",
   "outlet": "EnergyNow",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "energy-now",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -96,8 +96,8 @@
   "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOTGllM2ZOTDZPY3hEMDNVNXM1WVpMM1B0dElHbUdjOWNUaFBOZGVvTkZtLVlTQnBZRVJPTDZHMFU5M092VVczRGF4VzFzbnF2clRDVVdmTjB2WVhOS09sUVFUVVFGMmVGTXBKdkhxLVZ2SF9UenFKZlNuUi1reElBY1I5UzRKNjVoc3B1b0tPXy1wbFJacjlhbnZrV0tWaURjcmRsWA?oc=5",
   "domain": "elledecoration.co.uk",
   "outlet": "ELLE Decoration UK",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "elle-decoration",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -106,8 +106,8 @@
   "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQcEwtNjVobV9OYm9kNlk1dmQtVHhwVjdGb01DWk5jVnRubFRyc08taEhPbWFseFhENU9BbGlJQWtpc1Q4MUpubmN5QWhxdV91ckR6d1pZRHZWMktDdHlWOUJIM01RZ3lKdWYxR0V1NTQ5VVhqdGVBalhFdFZRbDgwb3pMNnpHYXc?oc=5",
   "domain": "unilad.com",
   "outlet": "UNILAD",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "unilad",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -116,8 +116,8 @@
   "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPcXZDeW84V2RldEM5MEpmY0ptY0xwR1FhZTBKb095c0h0YzRXV3c3N3k3NG4xSk1Sd2xCNUVnSldBcUNoTFFfYk5oN01pS2EwZU1VTUdaVExodHJ1WlAzVXpyNjEyYmdrYVBmMDZsTnc1MmY5ZHhfaVhnTkM4YWh1dGtxUGhFLVQwalhlRGJqY2NMNHIydXJBMC1KVjNtX3J6Zi1lc0VRaUsyNk1YdUdsdU5NRElqek1YVGfSAb8BQVVfeXFMTVZoMkItU2sxOXNfZHNsc2VwdHlmTDZWQ1VhbDJPalI0Ym5ETnhsNzUyZTV3Yl9kVXVwYVdxNEdSX2VGYlRyS3dYMzJIanUxeDdUMEloY1ZYTGF5SmczakUzVm0xN01oUmRvRlhjVDFfU1JNbzFjb09zU0duLXVHRnB1MTRyWUtYWGlkalY2dXZXdldrcEp5cUxoallGUUxJcWV3RWs3ZkZyV2tYdTQtcjhhRnF1LU4wM3ZzWUxiZXc?oc=5",
   "domain": "indiatoday.in",
   "outlet": "India Today",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "india-today",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -136,8 +136,8 @@
   "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOWmRveklfclAyWDBEOUYxZWdtMlBhb21uRmQwLU5xdVlyTWxWbGxrWUR5aWl2Q2ZxZnVqbnh1NVRHVVlrcWxzc284bjJvZ0pYOTVNWlBMNmxPVkVWRzhraUpwVFdEaUlWdnNtNVRnTkVBLWpiVmlQRFdOUVc0ZGxVenJ6cUMtZllkUWpKdDY0YkhYTm5RS1BYZnVn?oc=5",
   "domain": "theblaze.com",
   "outlet": "Blaze Media",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "the-blaze",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -146,8 +146,8 @@
   "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE5nNmJYYUcxMmVub1hxczFHeDlwWHY1TmplUTNqZTZJUVE2QUJVU1R2T3JjNFl2RDY5eEpIUEdWa0d1Mll0ZHp6RkNQWnFQMENwNkZzSVdCeUlhZkk?oc=5",
   "domain": "bbc.com",
   "outlet": "BBC",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "bbc",
+  "trust": 5
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -166,8 +166,8 @@
   "url": "https://news.google.com/rss/articles/CBMikAJBVV95cUxPdGljcU03QlNlc0xBczVRQU9ydHVMRXg1cFhDMy1tMkgwQjQ2M2FLOXJxM3BlNDdCeG40Y0FDaXNUR2tQNU5pQUdGdzEtbE5fS2hmZVpoaUQyX2hOY0Y2U1J5cmtCN19RcjBPeV9LcTY5T2xDS1EycmtvVXJrcjR3cV9WejV4ZUdUUlNUWmtaTEZLU3BqR0I1M19GUE01bFVyLWttajJzQ3RZc0dFaTdydlQ3eGtGVW13TGZTbmpZM1YtY0NOVTFKY21icVBpYzNYS2xtN2ZLT0VEOE5LTUhlbGozOXNzMlhZYjd4RTBrNGVZbkF6S0d2QjZaWHZLMi13MWcwY091bzRJd0JvWWpsa9IBlgJBVV95cUxNV21VcGp5d3FsUGxhcGlMNS1vWW9aUzloa01rT0RmVkpUSFB2MzYxelJ1Tkg4cVFsbTBBN3ZWYXZBV3JOVUpJbVAwVUppOVlGTmF5S3phTnJRdGlzTTFyQ294OF9FblFMbUJyZU9yZTBORFBFQVFQdXpnUTVXaWkzRTN0YTBPWTlRZjExN085STh6N1hQa1ZiZWl2anNaamNaUWF0T3MtQnpDWmJaVnpfMjZCdUYzUkgxTzVUbzFoeW5IYlVvczJURDFYRzVfd1NZWjJXMi1UTm1wVHRzbVZmak94emJLS2lEVnctNU1DMVFiOXNaT2hiSUdaVEtCZnBxQ0lPZkt6U0Mzbk4zYV9Ddl83bDBfQQ?oc=5",
   "domain": "indiatoday.in",
   "outlet": "India Today",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "india-today",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -186,8 +186,8 @@
   "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTE9lcVF3U21ld2ZQMVpNT2dYMVZiVGxFbHpmWDZpZGJQaGNjdUtRTVo0VEpxNUk0QmNsc3VBaDVGa0I3cXhuT1lMcGVVVUNzNnM0a1JRcUZISGdXVi10QTM2VGVSWXZOX1dyQVZGR3paUmlBeUU5Q3JCdA?oc=5",
   "domain": "aapsonline.org",
   "outlet": "Association of American Physicians and Surgeons",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "aaps",
+  "trust": 1
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -196,8 +196,8 @@
   "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPOEVSWjBlV1RzRUk0WjFudFNDNmZycTZxdEJWWUIwLUhSa3piSWhXUEdSaFhqbUdlYUFmN09ZOHRENUJ1STRxNTNFSWlxc29icFRFVFlPUUFrSGV3dnlfQVFkeUpwaW04eXBJUEFIQWRCMk5vWENWZnVZS29wbW9ud3NFdXhSSGc1WlVwSWtHYjNhNXRfMzFvVmNIVC02UDB6YUNEcUpweEZWbGQ5T2ozQWx1aDRSeUJWMVM1U1ROVTNsVUVNWnhXdldLX0I3SFhRSzg4MUNQTHdzeDDSAeABQVVfeXFMUENsa2JXRWEwY1JxdjAtNjJ1SGctQUtzdXRXSkhuNzRWbGgyM3FQMm1rWl9oZEFwUE51MmYwdXNScVdMLWsyN0lKNHg3V3dJZjFRc2hMOHVHRkZISkpPLWdieDdfX09vRmtWZTY1dW1GT1NMS2NfZ3Rlb3lnVkxSQ0tZazlod1loREthT3FYNndyamhSSzRxMk16Qk5ReVJreElSZ3ljSGVTaU9sTXZobkJIdlZKeTVHcEl3X0pJcHdiTEVlV3l0NDA0NHNKcXhyc18tZWxScTd6Yzdna3NHSHI?oc=5",
   "domain": "wionews.com",
   "outlet": "WION",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "wion",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -206,8 +206,8 @@
   "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNeEZnVko3UDUyQTQxYV9YUGdUMGQ3dnoxdWtvbmN2d0N5VkZ4RFljYWY0QXdNVzZXeW1jcFNadDN6dlVGT2E0TmVWaDBRbndOSV9Cd2ZNaktlTGUwVDE5X0RIV2prdzFCTElqN0h3UGtIdGM5RHVGS1pmZExzZnZJdkNxWHFOdnhacDljWXl4Y9IBlAFBVV95cUxOblRQaFoyNVNrWGVoR3loS2xWN0hfNTdwSDA5N2xjeW8yV3VtRDJqbk5najlkdlpOb0VVS1pIOEJnNnFSOGZmQkdodHlROWtHMmI1X0g5ME9FcnhkRHF6S3lSU1RsUWV2N2J2QUc5NzlUdDRaUnMzOVRxT0tqenhiY2pBWThkSnVZM1FidURjSDM3TGRM?oc=5",
   "domain": "newsnationnow.com",
   "outlet": "NewsNation",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "newsnation",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -216,8 +216,8 @@
   "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxONGVIWVgycjJRdmRlbmc5MDJza3l2NEZkTlFKODUtMW5IZ3NUX1BFb0U5WlpaVWl3enQwaGNPc0lQNG8wMmY3QUhUMmZNNUZuaVVGYVNRLXFUX3h1UlktY2JkTDA1VF85Z0lwbG41MDc4amdjMjl1cHlPMmlyOS0xUENPT2hLb0ljSVN3c0ZGSHZkV2tTMG1CVTdYcHZVakljLTlGNzFtZmVtakY2RnFNZTl1aG5ScXhWbXJnQnJVUQ?oc=5",
   "domain": "au.news.yahoo.com",
   "outlet": "Yahoo News Australia",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "yahoo",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -226,8 +226,8 @@
   "url": "https://news.google.com/rss/articles/CBMizAFBVV95cUxQRlhJczVJXzhNMkJrc3NhUk0yaExzV1Azamp4U183T2xFcnhTQ0lpQ05fNUo5YTFpMGhnU19vVFVObE8zQ0dqTzVCb01MdnctUFFwNFotTW52UXRLdUxDWmFYZnFIci1sTUwwWENmZWJLaXdGVlRTNXUzcHo3QlV2TVItSXROM05JaTkxMHhEVTFYU0ZjWkJSWm9iSU1rVjVvcmJzUFowc3IwRlB4blpTbngwUUtfZnB4ZmxnMG9BSXAzQ1B0cmttUGNJZjM?oc=5",
   "domain": "peakprosperity.com",
   "outlet": "Peak Prosperity",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "peak-prosperity",
+  "trust": 1
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -236,8 +236,8 @@
   "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxPcnJYbmdHdXBBRDBtcWhZM21xOUQ2NHhyRDdhLTJBYTVsZ3I0dmZIa1N0OWZoZnRSTnBVcXFsd0tsejZpQ2FCRnJKZkdLbWFrc2RLcUVsM2ZLT2pvMzA4WExPb3JERWpzM1VtbVd0amlNekRJOU1KenhVelpqN2RQRVo2aU9xcW5LTklGWm4xNEs5UmJaMWEyUVBRNHNVdw?oc=5",
   "domain": "unilad.com",
   "outlet": "UNILAD",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "unilad",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -246,8 +246,8 @@
   "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxQM1NBcjBydkRibk1YckVFUUt1QlRMajBLTW1GYzdPNnpqc2o1Si0tOGhpUDMtT3JiNkpTel84TXRzTXFPdGJBTlZId3UtV056SGoxR0NxRmJaQXI0UGlWaTNweDRmeFZFTWJiMTUxNXdLbEx1Rk9VUlVieVNfaDNleWd0Y3Q5VkhKdFpGSlJZMUV3Yk5rTWEyR0o3ZVZndElneUxvNTFVZmdmTU9tWWlvZ1FxaHJYbzdZR0w5ZkhCTEFLVjZyVzUtOHRyN1hyNXJRMkZRY2c3RmNIQW50M1lBag?oc=5",
   "domain": "cssh.northeastern.edu",
   "outlet": "Northeastern University",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "northeastern-cssh",
+  "trust": 4
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -266,8 +266,8 @@
   "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNbGJBcGV4WlNabndBcll1Z1VXZ1M2MWJFSGw4eTRNZ2ZKSjduSmptNG5LY01MdDJ6SDJMVGtmSUcxekY0MEJRVmpFNVh2RmZ3Rll6eUp1elhpbUF1REE3aVNXdFFVSEZsZ0thRk1hb2M5cnVnemlYMEx1cmxNNnRlbkh6TUlUbTg4SlNtYVFSSUN6WXNldUxNT2dPOHdmR2k3Rzhv?oc=5",
   "domain": "insiderpaper.com",
   "outlet": "Insider Paper",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "insider-paper",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -276,8 +276,8 @@
   "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTE5Ycmlyb0M2REpmSVVOS3YzYmRKQi1yc25PekpaOThsYnJUT0REVG13UVB2TENwZmduMU9yWUFiNDFjZy1YY3prbFRQR0hZclE3anNqczdJNzY2M2pWQzBGVGxIcWVOMmN0alp0TFBR?oc=5",
   "domain": "insiderpaper.com",
   "outlet": "Insider Paper",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "insider-paper",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -286,8 +286,8 @@
   "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNRVNvVFBCRXNOdWNabGs0OEh3d3A3RXlkYlZRdXJHY0ROVWVzMU5hYUprYk1BQ1Y0REhmMnFVejFHTzdDZGFwX213SFZyaF9MbE0wSlpoM1VOSlFrNUw5RGJ1NVJYa2o3dnVZbllxTUo5MHVmalFsWkR2emRUUUc4aFBqeE1PMXR0NlB3?oc=5",
   "domain": "joe.co.uk",
   "outlet": "Joe.co.uk",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "joe",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -306,8 +306,8 @@
   "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxOV3Qtc1oySDdrZGk1NG9MUnZkQWhlanN5ODdGNWdKeU9YUkNhRXA2ZnNZSnZIeFpGQmVmZmZrMnhOR3VFT0JCWTl3OV81dGNBc2RVUzR5VFpfUmgtc2JnQ3A2eDF5cjB4RUlwT0tRaXE3c201SWNOaHFxQ1drOUExZUFtQzZiWkd5dEpCMWdQdnBlTVZPWHdoQmhRZ0RQN2dwcXBUZkRwRWxVb0ZNME1CSFpsUm5sb1FpcjZUYVozNFZLQl9JUlRwajJMSzVnR21RMjFrcnZhbXdnSTUtMmNHbg?oc=5",
   "domain": "armyrecognition.com",
   "outlet": "Army Recognition",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "army-recognition",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -326,8 +326,8 @@
   "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE9Db3QtQWNuU0dvLVBiSEVGNW1ZazhVQVZKQzd5aXE3cjNsWkp1Z3lLaElVM2JwYWVfX09aLUpKcEthT2ZBdUFnTllYb1hNRmpBS3BCMFR5WGFwbHROV3pRSHM3aXFmVHM?oc=5",
   "domain": "us1033.com",
   "outlet": "US 103.3",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "us1033",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -336,8 +336,8 @@
   "url": "https://news.google.com/rss/articles/CBMixAJBVV95cUxQYlVWMnpRUGhKdURyYXJyQVNGNEVIcWVyYnVKa1ozU2YtMmc0VWI5d2xkeEVnbjNRX0F2alBjbk44MmdMd0NIdWFHWU5oYXR1TzVoMEdUYmxGdUNVcGluNFpObjBVYnRRTGZxYmFVMXZ5cXVpNGxvUjdrYzFzSkQ2a0Y4empfVTZ3VUZYcGFtZ25XLWJxVkw0OXh6dVUyRXR1WFFTVzNpZERHWGhzX05BbDQxMjZNQ3FjNEx2RkpXVDlzRGFsd1ZOMnBhSWg1bmdkRGNFMm5iUkxHQm5reXZBS2hXaXhlZFZpdmlfSUZQaUZXUjQxZFpUZUc4UDlWLWtzQWlYVGpuMTlqOEN5MzZray1LNEdZU25XOWl6RFlOUEUtS3FQNUFjeGEzQUpIZzVIR0ItU2EySVE2ZnVXYXdybUhUUmvSAcoCQVVfeXFMTXZfVG4td0tQaXVWNkFDc1NnQVV0UjFjeDdvYW1acXJ5d0xPaXJlcnptNjAtOVJESWg1SUlnMTNVeGVfdTQ5M2lyUEZjclJFUkZzZ3o3ZnZCQkNzNWhXdTZUeWo3SVVBUVFva3czVU11eS1PWnVwRGJSWkdheTdrOHRmY19Cd0kyTTZtaDRGSzNyaVpjTENDa2lNU2RtX0NtcEhiQTFmQ0Q4eDJ6Q3lIMEMySE5USHBuV0RTckp4UFlSM2I1QWFEM1pvTWUtSjc0WGR0a3pQaUNPQXIyVkMtRHdUcjRYcEhWQ1h4RDFkM3dxNWVIMWM2V19Ea21JcUhwRUhZdDZHcmZ3eTA2T256d2dOckVFdmZSMGluQW9id3pHVGhqZ3pQakZoWld3Nk0yVDhWVlp6RUwtZnJDSVBFOHBYa3NrR2Y4Qnp3?oc=5",
   "domain": "m.economictimes.com",
   "outlet": "The Economic Times",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "economic-times",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -346,8 +346,8 @@
   "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOLWgxMXZyeURXNWZ1UVpxdFRYVGRDV25nV1c4UkUxclBXblBjYXZvTEljRHZ5bER3X010R0VUTGpLNFBqVWpEUjFxd3diOUxRbzVyX0tMWl9Nb2VnX0F4YThVajNHazQzMWZ6Q2pZX25zRlYydmxPMFlXUkpWbUxBdW16Zl9paUZQT1Bha1hSYlViY1dwb2p6VHdSV185MGs5X3ZUWXJnQ0U?oc=5",
   "domain": "messengernewspapers.co.uk",
   "outlet": "Messenger Newspapers",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "messenger-newspapers",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -356,8 +356,8 @@
   "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxONElONHJ6dEtCSkFnSmVlVklnVUFqQlJ2eXlWOWlLdElOdG41eGlRVHVidHZteUlKYW1CbThqVDNVOTRLa25ISDlma0J0bEs4Y3JUNnlRU2d0QlhxaGpKQnBKUWJTb2ktOUVSZzd4OWJ0eTJPTl9kU2dWcHlpbEkwZXREcE9NMUhEd2JmRFVYZVVmRHc3bkd2OVV30gGfAUFVX3lxTE55YkkzTzJBbFFlbVZnTU12LVNiVUlvbC1pZmNiMDNBaS1rUFRMOFNNQlNUVlhYcWxVZDg1QmkzSjctT3ZEaGRiZGNZTUpaZXk4MlRTMVRjSFhRRE5BM2ZEUVprZ0JDTEg2ZE5RdVNaQ282UW5QNmlDTTlCbWkwSXNNWWVxNnd1MFU4ZnIwMGxwVXNtSWRlN1hzS3ZUUTF4QQ?oc=5",
   "domain": "dailymail.com",
   "outlet": "Daily Mail",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "daily-mail",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -366,8 +366,8 @@
   "url": "https://news.google.com/rss/articles/CBMiggJBVV95cUxOcDc2dUI2N0xfcC1RQ2kxTEhRMjJGWHhFU0hYcDllcVhkM2dXSXMta2RVTkREbkttWVJPaUo4SDBJVzN2SV9yWWxrVkxnclFmRXNvdTBzV3FXdTF5MDRKYVpkRXNCSDQ4YWR5SGlSc3g1NVd5M1NSa1BaMjRRRFl0VDF3RnZYUTdydUoxWmxZNldFLTdTSDdRQk1JcXQtUk12amhjS3R1RkowcWk5aFAteUk2dGtMRDFxdFVkNFRSRkNRd0JWQ0ROcGpScWxpZ2oyc19QY2poMk14YTJhanVfM0toM3NGaXFEWkw2Sm8wb1duS0xzQllnN21mWFVvaUZTbkE?oc=5",
   "domain": "primetimer.com",
   "outlet": "primetimer.com",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "primetimer",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -376,8 +376,8 @@
   "url": "https://news.google.com/rss/articles/CBMi3gJBVV95cUxQUkxFanpPUlF4cGxkYXlfMUhxOTg0Q2hCc0ZfaEEwWVdOSWViN1VjWXBOQUFkblVWVzNGdHJROThaaHdoU1Bld1hqaDRodEN6cjF5ejQxdms2dWJVZU1iUGtPLXFkLVVuX1RjTXMydWRPWFZpUDgzUVo5NkJTUVFjSk1TaGRZSE1reXAzMnFJZnltT2xldTY0NmZwYjNyVEdOdzM5VVhUVFpCZ0FwdWx1RXhYUkstM2puWGIyNXhjRnA2TUtoeDZNZjd5Y1MxeUUtNml5eFM1aXRHdDFvRDdIcl93V2NzSDR6bjZBcHg4VVgwVWcyMXpnMFh6dGp3OTdjamJkV1hpc19MWndLOXcwY0RsZTBkaHZ2bkRaREF2VURlUGQ0NmZPeHl6TXhLZzJOOW9GLW1hUEgxRzIwcndBai13WVNiTXU3QWFZeElHdWh1T093X3NIdl9QakZjdw?oc=5",
   "domain": "newsbreak.com",
   "outlet": "NewsBreak: Local News & Alerts",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "newsbreak",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -386,8 +386,8 @@
   "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQX2VYY0ZmR3k3VnpVLTJIQkhxVVdocGxYeHdmbGt2ZDhvNnVtc3lpdGs1VU1hNEdyT0JmWWRwWnVMZEUzX2Fhd1cxLU82WFFWdlMzcERqUjgyUk44aXNGRG8zM1o2SDlVWEFfNzZxSnFwLUZRanRWVEoySjlvOGRvNHpvY3dzMWt6Q0lN?oc=5",
   "domain": "thesun.co.uk",
   "outlet": "The Sun",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "the-sun",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -396,8 +396,8 @@
   "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNWHlBekxzYWhrYXhMNW12VlZFRnBBQXAwZm1yUVRqYm9hNzNIdGVGMlF4S1hyelc2dUtQbnpmMk9QME1kX0J6cnd6YUx2UXE1WFZ4SmdtOUhxNEZXRmxXRi1SLWMzdldfbWpJVWtXTVBPcjgwQ3JVYmhhRENhWTZ1VDFiM1ZmYnIyZ3FQaHBacHN2REpBNUJqTURNNER3c21K?oc=5",
   "domain": "benzinga.com",
   "outlet": "Benzinga",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "benzinga",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -406,8 +406,8 @@
   "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPVTA4NWxvdnYxNEJPZG9tWUJiUHdMbmFoR0VIcENFZkM3cEhUeDBmQlN1WUtSRmR0enhsZmMxdFFvYkMxVVdSMW5WOFEwS2NWY0Y2cnpYa1EyNGNqU09OcnNKNFc2Tzdid3A4TTZJQkJfZFFwSHU2NmVnWTctcXVjQ2RHRFd5anB3UkR0by1kRFVWY2M3emhkc3VlZkxrMlQwWHlUMm1kcmt0RzlmVkkya0I5aEdaYU1QaGtWd29OSQ?oc=5",
   "domain": "lavocedinewyork.com",
   "outlet": "La Voce di New York",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "la-voce-ny",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -416,8 +416,8 @@
   "url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxOVEtNZE56MkVDX01qWi1NMFlrNXU1eWhUSVRwSW9aWTZ2bmRiZm83WlI5WkZWaGNqcGo4dTU2Mjc4eW4zaVFaWF9RQmc4Uk9neGRtUktvbGtEblhoaHRveEh1ZDMyMG9iSDZtSmtfd1VyMW0tZ0R1bWgxd2k3aUtOMnM0RVJiOVdlSVRJWFJhRnFpa1ZvUlEzOF9rTEk3VGJkcTJJUXJQRmZLVWtsUUpyRzZHNkxTbU5VclIydnU0TkozTUVGaGJNRXM1S0tNODN1dmdpRkl6M0rSAd4BQVVfeXFMTlhhcW9uM3d0T2tVXzZ5RDRCRExUQkNnUG1kZ3VhZ1hpYmtXNTBSMG5mUEt6X3RReG5aWEhhbmNPaVFfSXpTb2JUYjNkekhzOVhIMDJoVnFBbWFmcW5ubUZiYl9VWmd0Q2ZUaTk3ZzFEbjZ0UzA1Tk5JLUpsMGZ6SFg1aDRnWWZaTjRGT0NveXBKanc5Yzg4U0kwQndPbjhwNjltR2hBQUd3RHJNTjRDOHBaeW9RSjg1SHEwLTE1Tk9kc2JsWC10QXVEZVBYUjkwWDNNRWZiVlJmM0hZczBR?oc=5",
   "domain": "news18.com",
   "outlet": "News18",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "news18",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -426,8 +426,8 @@
   "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE90QTVtX2lqRXhaNWQyUHllN3NrdkpKbVhnVm4yenFtODBGS1hnQ0xId3R4Y2pFdllVTUxFeTFYSmNJRm92VzRWSXpCSmxxZU1LRUJndnlGLW9YaEZnTTdDVEZ4YXhndUoyaTRJYy1JV2ZNd3dvM2RhZ3hiU09hOTA?oc=5",
   "domain": "aol.com",
   "outlet": "AOL.com",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "aol",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -436,8 +436,8 @@
   "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQUHpXT0tFTVMzanVRS29BUXZKdXlPaEFTQ29oMG03d2dEbVRTTWRHa0RsS2Q4OHBYSTB3TWV6Y092RElOaHBkZnpWZUV5a1N5TXFDcXVRdWM5OWw1d2FiT240MFZDYnZuSWJfdzNsdUNpcEhKTVZwY08zcmdoLW5lWGRyRFhZNC1nbkRSaWxQczdvOFlvTS1nMFV1TzlUWm9WQzA0dVBZU3EzZ1JEREg3QUdQZ0RSbW85cW5OeWZjYTFpOGs?oc=5",
   "domain": "ntd.com",
   "outlet": "NTD News",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "ntd",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -446,8 +446,8 @@
   "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQNkZoa2hSS0lxbExMSDBiUzZLMlpGZFMwbXU3OWpYU3kta2NLVlc3djhQNVhDQ085NUpXc2J2YmZCLXI4aE5ldFVfcE9pRXRmT3Y2MXkzMEZCZDh6OEVyZmttN2xVNDFzTEd1YXFRUktXNmlJQ3pVMHdsT1NWdW1WSnNCNlFqZmh1c0FkZHZ4WnR2bk00MXBN?oc=5",
   "domain": "unilad.com",
   "outlet": "UNILAD",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "unilad",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -456,8 +456,8 @@
   "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNR2VZMmx3Q3pRc2wzLXpnaHFIVmR6aXZaZEQ1RmwzcjdKN3hUcEtwUjBYcnNvMGJ6WjB6aVpPcTVvbF9xRUttVlo3RlFPU05udG0wdEJNQzZpRkUwNk9TVHg1ZHF1Y21obW04dGk5b09CcnNxRl9yazlhYmV1aXowTHJtZ0x6dTJfRUk5c0hrbVRTaFVBLTdtajROR3fSAaIBQVVfeXFMTlFYeWwyRjRwTXo1NVI2YW4xTlp6WExmXzFDcjBUSHhIOXFYbVVhbmpsZk8xRUdjSEVROGlwd09XdEFWa095eDhXYXJPVVpqRE5ZX0ZJeE0zZkRsQ21FRXVjNE5BZUZxRVZhU3h5X2g0YWkweGRaXzl3cllMREtnMzlTX19zQkNoQkVIdmJrUG9xbGxpTExkVGxkVXdrbVpzeW5n?oc=5",
   "domain": "birminghammail.co.uk",
   "outlet": "Birmingham Live",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "birmingham-mail",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -466,8 +466,8 @@
   "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPaS1ISVFHTU5wYTJHVTZ5UGl3bXVpbmhTQ0wwT0xBLU1sTUs4Z1pHMFlEVEtFT1RBMkR1MGR0QVNlUXFFWllFczRBQ2JUUmVQdUhkOUpEbm85VEZkMHp5aUVnVHZyZHdLZ216MGJJT0JnSGNYNlhRdkFCa203bE9aSzJyNXpfQ0ZiNXhyWmxacDRqOWg3RHpOZg?oc=5",
   "domain": "globalinfo.az",
   "outlet": "GlobalInfo.az",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "globalinfo-az",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -476,8 +476,8 @@
   "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNWTBNWnRXb2RjbmJhY2xpQVpQaXN0SnpPS19jTFZQRTQxdlYzdXhiZVpqQWpBYWk1M2lTT3lxMzNNYVg2SFRFWDdRdkVXMEFFcjRVWnRvM1R0UVE5b2U5SnhaSThEdjFGdWFxX3l1SHc3SkZCRGpIdG9zYWhzUmJVajFqQ3JVNlVuWG5PUFlMR0FjdFk?oc=5",
   "domain": "tippinsights.com",
   "outlet": "tippinsights",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "tipp-insights",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -486,8 +486,8 @@
   "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE4zbUFqRzRwOVQxbTBWWmdBd3ZzeXZ4Tmc2QWtPc0luMlZtZlNBaVZrVldfX0x6b1dwQ3RqSnB6NnFlMTlhOW1MTHN0ejJlVmNqMllySm9vbE43eU10dDFZX3JKdEpiZ9IBa0FVX3lxTE9kMWFUZ2VmQnRrVlR0VGdtZlVwNXRWMG43WDJvZ2F2bkFlYkJYazR6bTRuOGhPeGdYU2hZLTBwQzFMaG9GeE83SkNObllKUldqNjhOQTNSMWN1QTM5MVA5QU1ybXRwZEQ0U1hr?oc=5",
   "domain": "fox10phoenix.com",
   "outlet": "FOX 10 Phoenix",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "fox10-phoenix",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -496,8 +496,8 @@
   "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9QMjBmbG82NkthQ181bUhYWE83MlRPOGUxRWZXXzV2S3F5SkhmcUtWWi1vb3Z6MmNzbVpSYXpROUFqU0FiWEU3TndSaW95MnUxcUNNajFCRTc?oc=5",
   "domain": "en.fnnews.com",
   "outlet": "파이낸셜뉴스",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "fn-news",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -506,8 +506,8 @@
   "url": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE5XWFc4VkpjaF9DM0RDcUlSR1BmYjhqUkRVNm5oMmJiZmJ1ZjZib0hfNGQ0VUUyUU1oc01FeTN5c1k4eW1TYUU2RnZhaGZnNUE?oc=5",
   "domain": "mk.co.kr",
   "outlet": "매일경제",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "mk-korea",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -516,8 +516,8 @@
   "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE8zRlZDRk03ZjRXSXcwWndnYUV4SnFUWGlCZlY1djB4dURSQ2hwQ08xbkQzMV9tTG5kcmQxSnMtc1FHeWhjaVd1OXRCUkFwbENac044Zi1OSTNrc1huUC1JbVkxMGw?oc=5",
   "domain": "asiae.co.kr",
   "outlet": "아시아경제",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "asiae",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -526,8 +526,8 @@
   "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE9MMW45ekRmaERINjl2dTg3Q0dJNFBmUWIwV2o4eEwwb2dtUHFQNVo4ejJtczhsb1BGNTdzb1BfZzh4dnIzX0hxcjloQVBIOTVSbWVTXzhJRnVpc3RycEE?oc=5",
   "domain": "bbc.co.uk",
   "outlet": "BBC",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "bbc",
+  "trust": 5
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -536,8 +536,8 @@
   "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTFB3S1AyQU9LU1ZCNlY3WDY0MEd1czNyVk1WWlJYdFRvWDE4TnJmemc4NDc1MVJxUnlHeFIxeVdCcVRCZXljVlpLbzlPd21mTFBaY05oQlhKY3ozMHFxNndSdTdEVzhoY2ppdmRDNjVxOHZCU3hvcTFQTmJEZ2lDdw?oc=5",
   "domain": "aol.com",
   "outlet": "AOL.com",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "aol",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -546,8 +546,8 @@
   "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNcUthY3pxUVo4d2lkVmJQX2IxR2JfUnZUWGdmS1FJQVJieldaakRRd3hheFNmYTU4cVJjeEgzVVJRVy1uaUk2YTZLSkFObHJPZWdwMnNSX1RCMi1mZ2xpbDZ3aTdhVW9Da1l6aUdFa1J6Qkx4RUNfWVJpcVgwbWFYaS1nS0xBcndIVlQ0NnF3TnJNRndfM1FyZ1JjWTZENFlBREgyRTRTcWoxZWt1Y2x4SlM4cm1WM00?oc=5",
   "domain": "radaronline.com",
   "outlet": "RadarOnline",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "radar-online",
+  "trust": 1
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -566,8 +566,8 @@
   "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPNlN0dTB3ejBGNkl3am1rTFNhNVEtZ1ZXMUtFQ2VHeW5OZVlTLVBpRkgzcmIwS3ZUSG4yZHpSZXFEOTk4SlI2THZBYjJrM2FSUm1jUmJEV3JCNU5sVWMxa1pxTmZqNDN0X0xtQmNPdFQ5MVBiVGtSc0Z3VmhwcFV3VlFla1pSdG52bW1yRzhRaDk1WXpKRC1NbmJFdTR6SkkwRVVtcGNCX3J1SXBUdllEN0lJS2xrakk?oc=5",
   "domain": "thetimes.com",
   "outlet": "The Times",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "the-times",
+  "trust": 4
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -576,8 +576,8 @@
   "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQUnJJNmxUVGJ2V2NOdDhiTEV3MFZzNWloajBzRlVaamF0TmtNZlBaanRpcEl5WGxWWS14VVBRUHkzZ0lzVVJJZTZqR3ZXOXhTcEVRdGZvWDZIRE9ES1RlUW5GUklIZGdrMURfNERwSTFnUkF1UkkyNE1QUXNzTGI1MVFKeTBtZ0xkUU5PMElHcGNWSzQ?oc=5",
   "domain": "yahoo.com",
   "outlet": "Yahoo",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "yahoo",
+  "trust": 3
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -586,8 +586,8 @@
   "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxNNHBUZE9qSXI1blgwV01meGg5NTVJdDlvTGx1aGxtYWFtSkdRR3JVT1ZBUm5uWnFFMTRvMzVBTVdMRG5tcHppRmRVVU9CWGNRbVFRMlhCMU9VZ2ZmdVlvWUxGT1ZSZVFkRkUxSXJ3SlpUakZDanQ2YjZtcTdhWWt5UjJB?oc=5",
   "domain": "insiderpaper.com",
   "outlet": "Insider Paper",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "insider-paper",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -596,8 +596,8 @@
   "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQV1VRZG5STmpBc21WdGFscGctTTVBWk1Oc255LWY2eno2WGI3dzZiNjRpaXV6M1hQd0xMR25YczRHcWViQ0NVaC1wbkJaYjFNaVFGc09McjB1cV9tUDhyNjZUckpEVmhuVTBIZk8tTWpndU1tYTNSSHJqazFJQjlWS1h3SmNmOHJaRVZNUXFnNTJtNEk?oc=5",
   "domain": "firearmsnews.com",
   "outlet": "Firearms News",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "firearms-news",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -606,8 +606,8 @@
   "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOSzlwdW9hUGtmekZvZ1U1bjZPcVhTX0cyeHlkQVRka1dWYS0xTGMycERrSnZDRTRMbjRwckF3RHNZUEtXZXkzLU5tVE1SbnlTOWhBX2hkaFRHclFkNEtyckN4UzdsRmFNUzFGZno2dzdhRjZDSkN3WE1HZVllN1A5dDVfYzZjaHcwazB6MTV3?oc=5",
   "domain": "unilad.com",
   "outlet": "UNILAD",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "unilad",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -616,8 +616,8 @@
   "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOcVhxZ3BYZEg2VlozaHlheG1IMHFTSGJHRG1oQ0dVdmdwZ29Va2R2MGNHT2pCX29McFdybGZzT0g1TXNwTHIwbUNOTUQtWHRNZ1BqTUtlamVhdmhkQlFJaHIyQXdrQVQ4SHBGcGdlWG1aQlhScl90QU9KVnpzUE1yVEprM1lFS2JiZDFqXzhYMHZSZ0pJanlxV1M4YlNWM09TcWZjOEQ5YUd2b0FWNmY0Z2NMQV9JTGtvVnJWR2dXVTc?oc=5",
   "domain": "tampafp.com",
   "outlet": "Tampa Free Press",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "tampa-free-press",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -626,8 +626,8 @@
   "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNZHVoTnZsUGVUZFYtdEpuakNXejFGQnNMWkkyajhGX2VVZ09lRm5vcHYtemtjS2sxXzFybHF6NDRLVzN3YzVzR1BZSXdLaENRRmxnbzhVMWlJNmpYT3FwRTJfaldwQU1STExYbnFYLVNCcFpVTFlQRzJkVmlCMWNhRGlCZUxfTllpVTVxc1U1c3hEdVNqcDlBSWZkUTczQkpyR3haRnUzZHMwR2JUS3ctd0FiWUYxZWZUQm9CNEx5RDhMZw?oc=5",
   "domain": "newsbreak.com",
   "outlet": "NewsBreak: Local News & Alerts",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "newsbreak",
+  "trust": 2
  },
  {
   "fetched": "2026-10-29T17:35:47Z",
@@ -636,8 +636,8 @@
   "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPVFpIYlYzc0t6MGZNS2NIam00dlZZX3J0S3ZCZFY0ZUZYUG1QMmdqZnZyWllzVmI1c081dkQzRnNaYm54ZmVxNDZrWm9LMWg2X2gwMEJkM2xoMEMyUEpzMU8tbE05TUQ1STdYQkR6NXNYNnF2S1ZaT29va0h0dzFjREprcmd2ZU52TWh1ellzRV9YbUdhbXZ2X2ZsSHkxVk01ZlViQkJDY25vb21PSG5BTg?oc=5",
   "domain": "bizpacreview.com",
   "outlet": "BizPac Review",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "bizpac-review",
+  "trust": 1
  },
  {
   "fetched": "2026-10-29T17:21:56Z",
@@ -646,7 +646,7 @@
   "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPZmNxdEp5U2VQNzVnNlRNakNzRnVkQWR3SFk4UWxEM0FzR3RsSXB1MHJPdDNnODZBSHJFbUhTSV9SdzJuUHZiTVJZcWlZa1lrVTA2SDIyWE90RzlZRmt6c1dYb1E3WHVyWl9WNmhLS2h6ZDB5OHAzaGxkZFVqQVVwNEw5ZjFJa25wYS05YkJqR0szMW9UQTYwcnRSUUV3bnV4alRXMVI2Y3g3R1NSbmlnMFg2U2tjVVJLTmhMWWlOZml2cHY4OGFlUHFjVFp4dzZwbnBlU0VfNWw2dTA?oc=5",
   "domain": "theguardian.com",
   "outlet": "The Guardian",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "guardian",
+  "trust": 4
  }
 ]

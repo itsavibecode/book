@@ -126,6 +126,7 @@
       "newsweek"
     ],
     "urls": [
+      "https://www.foxnews.com/politics/inside-pentagons-doomsday-plan-keep-america-fighting-global-war-erupts",
       "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/",
       "https://www.twz.com/nuclear/90-days-no-help-fortress-americas-goal-to-make-bases-resilient-bastions-in-a-crisis"
     ],
@@ -182,6 +183,7 @@
       "fortune"
     ],
     "urls": [
+      "https://www.foxnews.com/politics/inside-pentagons-doomsday-plan-keep-america-fighting-global-war-erupts",
       "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/"
     ],
     "region": "US"
@@ -561,9 +563,11 @@
     "status": "speculation",
     "theory": "false-flag",
     "sourceIds": [
-      "instagram"
+      "instagram",
+      "instagram-imzephyy"
     ],
     "urls": [
+      "https://www.instagram.com/p/DfDH0VDln34/",
       "https://www.instagram.com/p/DfDH0VDln34/?img_index=4"
     ],
     "region": "US"
@@ -593,10 +597,12 @@
     "status": "speculation",
     "theory": "china",
     "sourceIds": [
-      "newsweek"
+      "newsweek",
+      "instagram-imzephyy"
     ],
     "urls": [
-      "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804"
+      "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804",
+      "https://www.instagram.com/p/DfDH0VDln34/"
     ],
     "region": "Global"
   },
@@ -708,5 +714,256 @@
       "https://www.fema.gov/fact-sheet/2026-national-test-faqs"
     ],
     "region": "US"
+  },
+  {
+    "id": "fox-factories-wartime-production",
+    "date": "2026-10-25",
+    "headline": "Fox: FORTRESS also readies US factories to switch to defense production on short notice",
+    "summary": "Fox News Digital's October 25 report says the plan lays groundwork for American factories to shift to wartime defense production on short notice. Fox's own social post attributes this to Pentagon spokesperson Sean Parnell, but no public Pentagon document states it.",
+    "status": "reported",
+    "theory": null,
+    "sourceIds": [
+      "fox-news"
+    ],
+    "urls": [
+      "https://www.foxnews.com/politics/inside-pentagons-doomsday-plan-keep-america-fighting-global-war-erupts"
+    ],
+    "region": "US"
+  },
+  {
+    "id": "northwoods-1962-real",
+    "date": "1962-03-13",
+    "headline": "Operation Northwoods was a real 1962 false-flag proposal, and it was never carried out",
+    "summary": "On March 13, 1962 the Joint Chiefs of Staff sent Defense Secretary Robert McNamara a memo proposing staged incidents to justify intervention in Cuba. The Kennedy administration rejected it, and it was made public on November 18, 1997 by the JFK Assassination Records Review Board. It is cited online as proof that a 2026 attack will be staged, but it says nothing about 2026.",
+    "status": "fact",
+    "theory": null,
+    "sourceIds": [
+      "nsarchive",
+      "wikipedia",
+      "instagram-imzephyy"
+    ],
+    "urls": [
+      "https://nsarchive2.gwu.edu/news/20010430/northwoods.pdf",
+      "https://en.wikipedia.org/wiki/Operation_Northwoods",
+      "https://www.instagram.com/p/DfDH0VDln34/"
+    ],
+    "region": "US"
+  },
+  {
+    "id": "epa-water-cyber-2024",
+    "date": "2024-05-20",
+    "headline": "EPA in 2024: over 70% of water systems it inspected broke basic security rules",
+    "summary": "A May 20, 2024 EPA enforcement alert said over 70 percent of drinking water systems it inspected since September 2023 violated basic Safe Drinking Water Act Section 1433 requirements, such as default passwords and shared logins. An Instagram carousel cites it as a sign that water systems will be attacked next; the alert predicts no attack.",
+    "status": "fact",
+    "theory": null,
+    "sourceIds": [
+      "epa",
+      "instagram-imzephyy"
+    ],
+    "urls": [
+      "https://www.epa.gov/enforcement/enforcement-alert-drinking-water-systems-address-cybersecurity-vulnerabilities",
+      "https://www.instagram.com/p/DfDH0VDln34/"
+    ],
+    "quote": "Over 70% of the systems inspected by EPA since September 2023 are in violation of basic SDWA Section 1433 requirements (EPA enforcement alert)",
+    "region": "US"
+  },
+  {
+    "id": "ready-gov-kit",
+    "date": "2026-10-29",
+    "headline": "US advice on Ready.gov: one gallon of water per person per day for several days",
+    "summary": "Ready.gov's basic kit lists one gallon of water per person per day for several days, a several-day supply of non-perishable food, a battery or hand-crank radio, a flashlight, a first aid kit and a phone backup battery. Social posts call it a 72-hour kit, but the page itself says several days and gives no hour figure.",
+    "status": "fact",
+    "theory": null,
+    "sourceIds": [
+      "ready-gov",
+      "instagram-imzephyy"
+    ],
+    "urls": [
+      "https://www.ready.gov/kit",
+      "https://www.instagram.com/p/DfDH0VDln34/"
+    ],
+    "quote": "one gallon per person per day for several days, for drinking and sanitation (Ready.gov)",
+    "region": "US"
+  },
+  {
+    "id": "korea-safe-korea-2026",
+    "date": "2026-10-19",
+    "headline": "South Korea runs its Safe Korea disaster drill Oct 19 to 30 with 236 agencies",
+    "summary": "South Korea's Ministry of the Interior and Safety announced the second-half 2026 Safe Korea disaster response training, run October 19 to 30 by 236 central, local and public agencies. Safe Korea is a recurring national drill, and this round covers disasters such as wildfires and crowd crushes.",
+    "status": "fact",
+    "theory": null,
+    "sourceIds": [
+      "kr-mois",
+      "x-thedebriefing17"
+    ],
+    "urls": [
+      "https://eiec.kdi.re.kr/policy/materialView.do?num=288253"
+    ],
+    "region": "Asia"
+  },
+  {
+    "id": "nz-shakeout-2026",
+    "date": "2026-10-21",
+    "headline": "New Zealand held its national ShakeOut earthquake and tsunami drill on October 21",
+    "summary": "New Zealand ShakeOut 2026, the national earthquake drill and tsunami evacuation practice, was set for 1:30 pm on Wednesday, October 21, run by the National Emergency Management Agency. ShakeOut is a recurring national drill, also held in earlier years.",
+    "status": "fact",
+    "theory": null,
+    "sourceIds": [
+      "nz-nema",
+      "x-thedebriefing17"
+    ],
+    "urls": [
+      "https://getready.govt.nz/involved/shakeout"
+    ],
+    "region": "Global"
+  },
+  {
+    "id": "eu-integrated-resolve-2026",
+    "date": "2026-10-19",
+    "headline": "EU runs its Integrated Resolve 2026 crisis exercise from October 19 to November 20",
+    "summary": "The EU's External Action Service announced EU Integrated Resolve 2026 on October 19, an exercise testing how the EU responds to a complex crisis of a hybrid nature inside and outside the Union. Planning documents for it date back to 2025.",
+    "status": "fact",
+    "theory": null,
+    "sourceIds": [
+      "eeas",
+      "x-thedebriefing17"
+    ],
+    "urls": [
+      "https://www.eeas.europa.eu/eeas/stronger-eu-crisis-response-exercise-eu-integrated-resolve-2026_en"
+    ],
+    "region": "EU"
+  },
+  {
+    "id": "ausalert-launch",
+    "date": "2026-10-01",
+    "headline": "Australia's new AusAlert phone warning system was set to start on October 1, 2026",
+    "summary": "AusAlert, a cell broadcast system that sends emergency warnings straight to phones, was scheduled to replace the SMS-based Emergency Alert on October 1, 2026 after a national test on July 27. States and territories can choose to run it alongside the old system.",
+    "status": "fact",
+    "theory": null,
+    "sourceIds": [
+      "ausalert",
+      "abc-au",
+      "x-thedebriefing17"
+    ],
+    "urls": [
+      "https://www.ausalert.gov.au/alerts-explained/ausalert-launch",
+      "https://www.abc.net.au/news/2026-07-22/emergency-warning-system-in-doubt-as-states-raise-concerns/106942870"
+    ],
+    "region": "Global"
+  },
+  {
+    "id": "theory-coordinated-timing",
+    "date": "2026-10-27",
+    "headline": "Theory: governments preparing at the same time means they expect the same event",
+    "summary": "An October 27 X post by TheDebriefing17 lines up preparedness steps in Japan, the UK, Australia, South Korea, New Zealand and the EU and asks why they are happening at once. The steps it lists check out, but several are recurring drills or launches scheduled months in advance, and no government links them.",
+    "status": "speculation",
+    "theory": "other",
+    "sourceIds": [
+      "x-thedebriefing17",
+      "kr-mois",
+      "eeas",
+      "nz-nema",
+      "ausalert"
+    ],
+    "urls": [
+      "https://eiec.kdi.re.kr/policy/materialView.do?num=288253",
+      "https://www.eeas.europa.eu/eeas/stronger-eu-crisis-response-exercise-eu-integrated-resolve-2026_en",
+      "https://getready.govt.nz/involved/shakeout",
+      "https://www.ausalert.gov.au/alerts-explained/ausalert-launch"
+    ],
+    "region": "Global"
+  },
+  {
+    "id": "commissary-freezer-outages",
+    "date": "2026-08-28",
+    "headline": "Freezers fail at military commissaries across several states in late August",
+    "summary": "Between about August 26 and 28, refrigeration units at commissaries on at least six bases, including Fort Huachuca, Fort Irwin and F.E. Warren, went into defrost mode and food spoiled. The Defense Department acknowledged a possible refrigeration disruption, and Army, Air Force and defense criminal investigators opened probes without naming a cause.",
+    "status": "confirmed",
+    "theory": null,
+    "sourceIds": [
+      "military-times",
+      "stars-and-stripes"
+    ],
+    "urls": [
+      "https://militarytimes.com/news/your-military/2026/08/28/dod-confirms-refrigeration-disruption-at-military-commissaries/",
+      "https://www.stripes.com/theaters/us/2026-08-28/refrigeration-outages-multiple-us-commissaries-22684428.html",
+      "https://www.stripes.com/theaters/us/2026-09-01/army-cid-investigates-commissary-refrigerator-outages-22721718.html"
+    ],
+    "region": "US"
+  },
+  {
+    "id": "freezer-suspected-cyberattack",
+    "date": "2026-10-29",
+    "headline": "Pentagon treating base freezer failures as a suspected hack, Reuters reports",
+    "summary": "Four officials told Reuters the Pentagon now treats the August commissary freezer failures as a suspected cyberattack, with a Cyber Command unit and Army CID involved and in contact with French police over a similar attack on 350+ French shops. Reuters could not determine whether investigators have reached any conclusion or identified a culprit.",
+    "status": "reported",
+    "theory": null,
+    "sourceIds": [
+      "reuters",
+      "the-independent",
+      "aol"
+    ],
+    "urls": [
+      "https://www.tbsnews.net/world/pentagon-treating-military-base-freezer-malfunctions-suspected-cyberattack-officials-say",
+      "https://srnnews.com/exclusive-pentagon-treating-military-base-freezer-malfunctions-as-suspected-cyberattack-officials-say/"
+    ],
+    "quote": "working in close coordination with interagency and law enforcement partners (Pentagon statement on the Cyber Command unit)",
+    "region": "US"
+  },
+  {
+    "id": "freezer-fortress-timing",
+    "date": "2026-10-29",
+    "headline": "Theory: base freezer failures are connected to the 90-day FORTRESS plan",
+    "summary": "Headlines saying the freezers failed days before the 90-day plan imply a link. The outages were in late August, about a month before the September 30 memo and two months before the October 25 Fox report, and no official has connected them to FORTRESS.",
+    "status": "speculation",
+    "theory": "cyberattack",
+    "sourceIds": [
+      "economic-times",
+      "the-independent"
+    ],
+    "urls": [
+      "https://militarytimes.com/news/your-military/2026/08/28/dod-confirms-refrigeration-disruption-at-military-commissaries/",
+      "https://media.defense.gov/2026/Sep/30/2004009303/-1/-1/1/ESTABLISHMENT-OF-FORTRESS-AMERICA-AS-A-DEPARTMENT-OF-WAR-PROGRAM-FOR-THE-DEFENSE-OF-THE-AMERICAN-HOMELAND.PDF"
+    ],
+    "region": "US"
+  },
+  {
+    "id": "sylvia-fired-leak-probe",
+    "date": "2026-10-29",
+    "headline": "Hegseth fires the Joint Staff's top planner, Lt. Gen. Brett Sylvia, in a leak probe",
+    "summary": "Officials say Sylvia, director of strategy, plans and policy (J5), is accused of leaking classified information on the Iran and Russia-Ukraine wars and the case was referred to the Justice Department. Two Pentagon sources told CBS the accusations are not true, and no report ties the leaks to the FORTRESS or 90-day documents.",
+    "status": "confirmed",
+    "theory": null,
+    "sourceIds": [
+      "military-com",
+      "washington-times",
+      "fox-news",
+      "cbs-news",
+      "turkiye-today"
+    ],
+    "urls": [
+      "https://www.military.com/pete-hegseth-fires-pentagons-top-military-planner-over-what-official-says-were-classified-leaks-to-media",
+      "https://www.washingtontimes.com/news/2026/oct/29/pete-hegseth-fires-top-military-planner-pentagon/",
+      "https://www.foxnews.com/politics/hegseth-fires-top-pentagon-strategist-accused-leaking-classified-iran-ukraine-war-information"
+    ],
+    "quote": "zero tolerance (Sean Parnell, Pentagon chief spokesperson, on unauthorized disclosures)",
+    "region": "US"
+  },
+  {
+    "id": "uk-preparedness-buying",
+    "date": "2026-10-28",
+    "headline": "UK shoppers buy torches, generators and water after Be Ready launch",
+    "summary": "Retailers told the Daily Mail that sales jumped after the campaign, with Toolstation reporting rises of up to 172 percent for generators and torches. The British Retail Consortium said food supplies are fine, and the Evening Standard ran a guide to buying kit items.",
+    "status": "reported",
+    "theory": null,
+    "sourceIds": [
+      "daily-mail",
+      "insider-paper",
+      "evening-standard"
+    ],
+    "urls": [
+      "https://insiderpaper.com/uk-shoppers-stockpile-toilet-paper-water-after-government-emergency-warning"
+    ],
+    "region": "UK"
   }
 ]
