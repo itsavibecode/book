@@ -113,7 +113,7 @@
 
   function duration(sec) {
     if (!sec || !isFinite(sec)) return '';
-    var s = Math.round(sec);
+    var s = Math.floor(sec); // the way video players count, so 59.8 s reads 0:59 in both places
     return Math.floor(s / 60) + ':' + pad(s % 60);
   }
 

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="version" content="0.1.0" />
-<title>Keepsake v0.1.0 - Instagram post downloader | BookHockeys</title>
+<meta name="version" content="0.2.0" />
+<title>Keepsake v0.2.0 - Instagram post downloader | BookHockeys</title>
 
 <meta name="description" content="Save a public Instagram post, reel or carousel at the size Instagram stores it, with sound. Paste the link, see every photo and video uncropped, then save one or all. No sign-in, no ads, not affiliated with Instagram." />
 <meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)" />
@@ -254,6 +254,16 @@ button{font:inherit;cursor:pointer}
 .capt{margin:0;font-size:14px;white-space:pre-line;overflow-wrap:anywhere}
 .capt.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .more{display:inline-flex;align-items:center;min-height:44px;min-width:44px;font-size:14px}
+.quality{margin:0 0 14px}
+.qlab{font-size:13px;color:var(--muted);margin:0 0 6px}
+.seg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border:1px solid var(--line-strong);border-radius:var(--r-btn);overflow:hidden}
+.opt{min-height:56px;display:flex;gap:8px;align-items:flex-start;padding:9px 12px;background:transparent;color:var(--text);border:0;font-size:14px;text-align:left}
+.opt + .opt{border-left:1px solid var(--line-strong)}
+.opt[aria-checked="true"]{background:var(--sel);font-weight:650}
+.opt .ico{margin-top:3px;visibility:hidden}
+.opt[aria-checked="true"] .ico{visibility:visible}
+.opt:focus-visible{outline-offset:-3px}
+.qnote{margin:6px 0 0;font-size:13px;color:var(--muted)}
 .save{margin-top:14px}
 .subl{margin:6px 0 0;font-size:13px;color:var(--muted)}
 .fname{margin:8px 0 0;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
@@ -306,6 +316,8 @@ button{font:inherit;cursor:pointer}
   .th img{max-width:86%;max-height:86%}
   .guide{grid-template-columns:minmax(0,1fr);gap:2px}
   .guide dd{margin-bottom:10px}
+  .seg{grid-template-columns:minmax(0,1fr)}
+  .opt + .opt{border-left:0;border-top:1px solid var(--line-strong)}
   body.has-bar .save{display:none}
   body.has-bar .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
 }
@@ -358,6 +370,16 @@ button{font:inherit;cursor:pointer}
       <div class="details">
         <p class="who"><a id="user" href="#" target="_blank" rel="noopener" title="Open this account on Instagram"></a></p>
         <dl class="spec" id="spec"></dl>
+        <div class="quality" id="qualityBox" hidden>
+          <p class="qlab" id="qlab">Quality</p>
+          <div class="seg" role="radiogroup" aria-labelledby="qlab">
+            <button type="button" class="opt" role="radio" id="qBest" data-q="best" title="The largest version Instagram keeps, joined with its sound in your browser">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span id="qBestLabel"></span></button>
+            <button type="button" class="opt" role="radio" id="qSd" data-q="sd" title="Instagram's ready-made MP4: one file that plays on every phone, including iPhone Photos">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span id="qSdLabel"></span></button>
+          </div>
+          <p class="qnote" id="qnote"></p>
+        </div>
         <div id="captBox">
           <p class="capt clamp" id="capt"></p>
           <button type="button" class="linkish more" id="more" aria-expanded="false" aria-controls="capt" hidden>more</button>
@@ -392,7 +414,7 @@ button{font:inherit;cursor:pointer}
     <a href="terms.html" title="Read the terms of use">Terms</a>
     <button type="button" class="linkish" id="themeBtn" title="Switch between the light and dark page"></button>
     <button type="button" class="linkish" id="cookieReset" title="Change your analytics cookie choice">Cookies</button>
-    <span>Keepsake v0.1.0</span>
+    <span>Keepsake v0.2.0</span>
     <span>Files pass through our server as a pipe and are never stored.</span>
   </footer>
 </div>
@@ -442,6 +464,7 @@ button{font:inherit;cursor:pointer}
     user: $('user'), spec: $('spec'), captBox: $('captBox'), capt: $('capt'), more: $('more'),
     save: $('save'), saveSub: $('saveSub'), fname: $('fname'), allBox: $('allBox'), saveAll: $('saveAll'), allNote: $('allNote'),
     copyCap: $('copyCap'), openIg: $('openIg'), guide: $('guideBox'),
+    qualityBox: $('qualityBox'), qBest: $('qBest'), qSd: $('qSd'), qBestLabel: $('qBestLabel'), qSdLabel: $('qSdLabel'), qnote: $('qnote'),
     pbar: $('pbar'), pcnt: $('pcnt'), psave: $('psave'), psub: $('psub'),
     lb: $('lightbox'), lbImg: $('lbImg'), lbScroll: $('lbScroll'), lbActual: $('lbActual'), lbClose: $('lbClose'),
     toast: $('toast'), themeBtn: $('themeBtn')
@@ -452,7 +475,13 @@ button{font:inherit;cursor:pointer}
   var post = null;     // the resolved post
   var cur = 0;         // current item, 0-based
   var lastLink = '';
-  var files = {};      // iOS: index -> File already fetched for the share sheet
+  var files = {};      // "<index>" or "<index>:best" -> File already built, so a second save is instant
+  // Videos save at the best quality Instagram keeps. On iPhone the default
+  // stays the ready-made 720p MP4, because the best version is VP9 and
+  // iPhone Photos may not play it; one tap switches.
+  var quality = SV.IOS ? 'sd' : 'best';
+  var noMux = false;   // set when this browser could not join video and sound
+  var saving = false;
   var sizes = {};      // index -> bytes from a HEAD through the proxy
   var allRun = null;   // { ctrl } while Save all runs
 
@@ -747,11 +776,15 @@ button{font:inherit;cursor:pointer}
     } else {
       var v = it.video;
       var len = IG.duration(v.duration);
-      rows.push([many ? 'This item' : 'File', (many ? 'Video, ' : 'MP4, ') + (dims(v.width, v.height) || dims(it.width, it.height)) + (len ? ', ' + len : ''), true]);
+      var px = wantsBest(it) ? dims(v.best.width, v.best.height) : (dims(v.width, v.height) || dims(it.width, it.height));
+      rows.push([many ? 'This item' : 'File', (many ? 'Video, ' : 'MP4, ') + px + (len ? ', ' + len : ''), true]);
       rows.push(['Sound', v.hasAudio === true ? 'With sound' : v.hasAudio === false ? 'No sound on this video' : 'Not stated by Instagram']);
-      if (v.best) rows.push(['Also', v.best.label + ' available', false, 'Instagram also keeps a ' + v.best.width + ' x ' + v.best.height + ' ' + (v.best.codec || '') + ' copy' + (v.hasAudio ? ', stored apart from its sound' : '') + '. Saving it comes in a later version.']);
     }
-    rows.push(['Size', sizes[cur] != null ? IG.bytes(sizes[cur]) : 'Checking', true, '', 'size']);
+    if (wantsBest(it)) {
+      if (it.video.best.bytes) rows.push(['Size', IG.bytes(it.video.best.bytes), true]);
+    } else {
+      rows.push(['Size', sizes[cur] != null ? IG.bytes(sizes[cur]) : 'Checking', true, '', 'size']);
+    }
     if (post.takenAt) {
       var d = new Date(post.takenAt * 1000);
       rows.push(['Posted', d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }), false,
@@ -771,20 +804,22 @@ button{font:inherit;cursor:pointer}
       div.appendChild(dd);
       el.spec.appendChild(div);
     });
-    if (sizes[cur] == null) loadSize(cur);
+    if (!wantsBest(it) && sizes[cur] == null) loadSize(cur);
+    qualityControl(it);
 
     var name = IG.filename(post, it);
     el.fname.textContent = name;
     var target = it.kind === 'video' ? it.video.url : it.image.url;
-    var label = SV.USE_SHARE ? (files[cur] ? 'Save to Photos (ready)' : 'Save to Photos') : 'Download';
+    var label = SV.USE_SHARE ? (files[fileKey(cur, it)] ? 'Save to Photos (ready)' : 'Save to Photos') : 'Download';
     var sub = SV.USE_SHARE ? 'Opens the share sheet. Pick ' + (it.kind === 'video' ? 'Save Video.' : 'Save Image.') : 'Saves to your Downloads folder.';
     [el.save, el.psave].forEach(function (a) {
       a.textContent = label;
       a.href = IG.downloadUrl(target, name);
       a.title = SV.USE_SHARE ? 'Save this ' + it.kind + ' to Photos through the share sheet' : 'Download ' + name;
-      if (SV.USE_SHARE) { a.setAttribute('role', 'button'); a.removeAttribute('download'); }
+      // The best video is built in the page, so that save is a button too.
+      if (SV.USE_SHARE || wantsBest(it)) { a.setAttribute('role', 'button'); a.removeAttribute('download'); }
       else { a.removeAttribute('role'); a.setAttribute('download', name); }
-      a.removeAttribute('aria-disabled');
+      if (!saving) a.removeAttribute('aria-disabled');
     });
     el.saveSub.textContent = sub;
     el.psub.textContent = sub;
@@ -811,38 +846,128 @@ button{font:inherit;cursor:pointer}
 
   function saveStatus(text) { el.saveSub.textContent = text; el.psub.textContent = text; }
 
+  function wantsBest(it) { return it.kind === 'video' && !!it.video.best && quality === 'best' && !noMux; }
+  function fileKey(i, it) { return wantsBest(it) ? i + ':best' : String(i); }
+
+  /* "720p" for Instagram's 718 x 1276 file: labels use the short side. */
+  function pLabel(w, h) {
+    var s = Math.min(w || 0, h || 0);
+    if (!s) return 'Standard';
+    return (s >= 710 && s <= 720 ? 720 : s >= 1070 && s <= 1080 ? 1080 : s) + 'p';
+  }
+
+  function qualityControl(it) {
+    var show = it.kind === 'video' && !!it.video.best && !noMux;
+    el.qualityBox.hidden = !show;
+    if (!show) return;
+    var v = it.video;
+    var silent = v.hasAudio === false;
+    el.qBestLabel.textContent = v.best.label + ', best';
+    el.qSdLabel.textContent = pLabel(v.width, v.height) + ', plays everywhere';
+    [el.qBest, el.qSd].forEach(function (b) {
+      var on = b.dataset.q === quality;
+      b.setAttribute('aria-checked', String(on));
+      b.tabIndex = on ? 0 : -1;
+    });
+    el.qnote.textContent = quality === 'best'
+      ? (silent ? "Instagram's " + v.best.label + ' file. ' : "Joins Instagram's separate video and sound files in your browser. ") +
+        (v.best.codec || 'This') + ' video plays on desktop and Android; iPhone Photos may not play it.'
+      : "Instagram's ready-made MP4" + (silent ? '' : ' with sound') + '. Plays everywhere, including iPhone Photos.';
+  }
+
+  function setQuality(q, focus) {
+    if (q !== quality) { quality = q; details(); }
+    if (focus) (q === 'best' ? el.qBest : el.qSd).focus();
+  }
+  el.qBest.addEventListener('click', function () { setQuality('best'); });
+  el.qSd.addEventListener('click', function () { setQuality('sd'); });
+
+  var muxer = null;
+  function loadMuxer() {
+    if (!muxer) muxer = import('./mux.js').catch(function (err) { muxer = null; throw err; });
+    return muxer;
+  }
+
+  /* The bytes one item saves as: the photo, the ready-made MP4, or the best
+     video file and its sound file joined into one MP4. Errors carry .cause
+     from save.js; a failed join has cause 'mux'. */
+  function itemBlob(it, opts) {
+    if (!wantsBest(it)) {
+      return SV.fetchBlob(it.kind === 'video' ? it.video.url : it.image.url, { signal: opts.signal, onProgress: opts.onProgress });
+    }
+    var b = it.video.best;
+    var got = [0, 0];
+    var report = function () { if (opts.onProgress) opts.onProgress(got[0] + got[1], b.bytes || 0); };
+    var mod = loadMuxer();
+    mod.catch(function () {}); // reported below, once the downloads are in
+    return Promise.all([
+      SV.fetchBlob(b.videoUrl, { signal: opts.signal, onProgress: function (n) { got[0] = n; report(); } }),
+      b.audioUrl ? SV.fetchBlob(b.audioUrl, { signal: opts.signal, onProgress: function (n) { got[1] = n; report(); } }) : Promise.resolve(null)
+    ]).then(function (parts) {
+      if (opts.onJoin) opts.onJoin();
+      return mod.then(function (m) { return m.mux(parts[0], parts[1]); });
+    }).catch(function (err) {
+      if (err && err.cause) throw err;
+      var e = new Error('mux failed');
+      e.cause = 'mux';
+      e.detail = err && err.message;
+      throw e;
+    });
+  }
+
+  function setSaving(on) {
+    saving = on;
+    [el.save, el.psave].forEach(function (b) {
+      if (on) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled');
+    });
+  }
+
   function onSave(e) {
     if (!post) return;
     var it = post.items[cur];
-    var name = IG.filename(post, it);
-    if (!SV.USE_SHARE) { track('keepsake_save', { method: 'download' }); return; } // the link does the work
+    var best = wantsBest(it);
+    if (!SV.USE_SHARE && !best) { track('keepsake_save', { method: 'download' }); return; } // the link does the work
     e.preventDefault();
-    var a = e.currentTarget;
-    if (a.getAttribute('aria-disabled') === 'true') return;
+    if (saving) return;
     var index = cur;
-    if (files[index]) { share(files[index], it); return; }
-    var target = it.kind === 'video' ? it.video.url : it.image.url;
-    [el.save, el.psave].forEach(function (b) { b.setAttribute('aria-disabled', 'true'); });
-    saveStatus('Getting the file');
-    SV.fetchBlob(target, {
-      onProgress: function (got, total) {
-        saveStatus('Getting the file, ' + IG.bytes(got) + (total ? ' of ' + IG.bytes(total) : ''));
-      }
+    var key = fileKey(index, it);
+    if (files[key]) { deliver(files[key], best); return; }
+    var name = IG.filename(post, it);
+    var what = best ? 'Getting the ' + it.video.best.label + ' video' : 'Getting the file';
+    setSaving(true);
+    saveStatus(what);
+    itemBlob(it, {
+      onProgress: function (got, total) { saveStatus(what + ', ' + IG.bytes(got) + (total ? ' of ' + IG.bytes(total) : '')); },
+      onJoin: function () { saveStatus(it.video.hasAudio === false ? 'Writing the MP4' : 'Joining video and sound'); }
     }).then(function (blob) {
-      files[index] = new File([blob], name, { type: blob.type || (it.kind === 'video' ? 'video/mp4' : 'image/jpeg') });
-      if (index !== cur) return;
-      [el.save, el.psave].forEach(function (b) { b.removeAttribute('aria-disabled'); });
-      share(files[index], it);
+      files[key] = new File([blob], name, { type: blob.type || (it.kind === 'video' ? 'video/mp4' : 'image/jpeg') });
+      setSaving(false);
+      if (index === cur) deliver(files[key], best);
     }).catch(function (err) {
-      [el.save, el.psave].forEach(function (b) { b.removeAttribute('aria-disabled'); });
+      setSaving(false);
       if (err.cause === 'expired') { showError('expired'); return; }
+      if (err.cause === 'mux') {
+        // This browser cannot join the files: offer the ready-made MP4.
+        console.error(err.detail);
+        noMux = true;
+        details();
+        saveStatus('This browser could not join the ' + it.video.best.label + ' video and its sound. Save the ' + pLabel(it.video.width, it.video.height) + ' file instead.');
+        return;
+      }
       saveStatus(err.cause === 'limited' ? 'Too many files at once. Wait a minute and tap again.' : 'The file did not come through. Tap to try again.');
     });
   }
 
-  function share(file, it) {
+  function deliver(file, best) {
+    if (SV.USE_SHARE) { share(file, best); return; }
+    SV.downloadBlob(file, file.name);
+    saveStatus('Saved ' + file.name + ', ' + IG.bytes(file.size) + '.');
+    track('keepsake_save', { method: best ? 'download-best' : 'download' });
+  }
+
+  function share(file, best) {
     SV.shareFile(file).then(function (r) {
-      if (r === 'shared') { saveStatus('Saved through the share sheet.'); track('keepsake_save', { method: 'share' }); }
+      if (r === 'shared') { saveStatus('Saved through the share sheet.'); track('keepsake_save', { method: best ? 'share-best' : 'share' }); }
       else if (r === 'needs-tap') {
         [el.save, el.psave].forEach(function (b) { b.textContent = 'Save to Photos (ready)'; });
         saveStatus('The file is ready. Tap Save to Photos once more.');
@@ -872,12 +997,19 @@ button{font:inherit;cursor:pointer}
       chain = chain.then(function () {
         var base = total;
         allStatus('Saving ' + (k + 1) + ' of ' + items.length + ', ' + IG.bytes(total || 1));
-        return SV.fetchBlob(it.kind === 'video' ? it.video.url : it.image.url, {
+        var opts = {
           signal: ctrl.signal,
           onProgress: function (got) {
             if (base + got > ZIP_CAP) ctrl.abort();
             allStatus('Saving ' + (k + 1) + ' of ' + items.length + ', ' + IG.bytes(base + got));
-          }
+          },
+          onJoin: function () { allStatus('Joining video and sound for ' + (k + 1) + ' of ' + items.length); }
+        };
+        return itemBlob(it, opts).catch(function (err) {
+          if (err.cause !== 'mux') throw err;
+          // Could not join the best files here: the ready-made MP4 goes in instead.
+          noMux = true;
+          return itemBlob(it, opts);
         }).then(function (blob) {
           total += blob.size;
           if (total > ZIP_CAP) { var e = new Error('cap'); e.cause = 'too-big'; throw e; }
@@ -984,6 +1116,11 @@ button{font:inherit;cursor:pointer}
     if (e.key === 'Escape' && run) { e.preventDefault(); cancel(); return; }
     if (view !== 'done' || el.lb.open) return;
     var t = e.target;
+    if (t && t.getAttribute && t.getAttribute('role') === 'radio' && /^Arrow/.test(e.key)) {
+      e.preventDefault();
+      setQuality(quality === 'best' ? 'sd' : 'best', true);
+      return;
+    }
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'VIDEO')) return;
     if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1, el.rail.contains(t)); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1, el.rail.contains(t)); }
