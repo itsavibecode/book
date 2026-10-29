@@ -895,17 +895,29 @@
     "id": "freezer-suspected-cyberattack",
     "date": "2026-10-29",
     "headline": "Pentagon treating base freezer failures as a suspected hack, Reuters reports",
-    "summary": "Four officials told Reuters the Pentagon now treats the August commissary freezer failures as a suspected cyberattack, with a Cyber Command unit and Army CID involved and in contact with French police over a similar attack on 350+ French shops. Reuters could not determine whether investigators have reached any conclusion or identified a culprit.",
+    "summary": "Four officials told Reuters the Pentagon now treats the August commissary freezer failures as a suspected cyberattack, with a Cyber Command unit and Army CID involved and in contact with French police over a similar attack on 350+ French shops. Reuters could not determine whether investigators have reached any conclusion or identified a culprit. NY Post, Insider Paper and Mario Nawfal reposted the same Reuters exclusive on October 29, so it remains a single-source report.",
     "status": "reported",
     "theory": null,
     "sourceIds": [
       "reuters",
       "the-independent",
-      "aol"
+      "aol",
+      "ny-post",
+      "insider-paper",
+      "x-marionawfal",
+      "x-theinsiderpaper",
+      "x"
     ],
     "urls": [
+      "https://www.reuters.com/technology/pentagon-treating-military-base-freezer-malfunctions-suspected-cyberattack-2026-10-29/",
       "https://www.tbsnews.net/world/pentagon-treating-military-base-freezer-malfunctions-suspected-cyberattack-officials-say",
-      "https://srnnews.com/exclusive-pentagon-treating-military-base-freezer-malfunctions-as-suspected-cyberattack-officials-say/"
+      "https://srnnews.com/exclusive-pentagon-treating-military-base-freezer-malfunctions-as-suspected-cyberattack-officials-say/",
+      "https://x.com/Reuters/status/2115841126854705204",
+      "https://nypost.com/2026/10/29/us-news/pentagon-treating-military-base-freezer-malfunctions-as-suspected-cyberattack-officials-say/",
+      "https://x.com/nypost/status/2115765732671701035",
+      "https://insiderpaper.com/pentagon-cyberattack-freezer-military-bases/",
+      "https://x.com/TheInsiderPaper/status/2115775893985800394",
+      "https://x.com/MarioNawfal/status/2115823471158776180"
     ],
     "quote": "working in close coordination with interagency and law enforcement partners (Pentagon statement on the Cyber Command unit)",
     "region": "US"

@@ -1309,5 +1309,23 @@
     "trust": 1,
     "trustReason": "Hyperpartisan site with low factual reporting ratings.",
     "url": "https://www.bizpacreview.com/"
+  },
+  {
+    "id": "x-marionawfal",
+    "name": "Mario Nawfal (@MarioNawfal) on X",
+    "domain": "x.com",
+    "type": "social",
+    "trust": 2,
+    "trustReason": "High-volume aggregator account that reposts wire stories with dramatic framing and rarely links the original source.",
+    "url": "https://x.com/MarioNawfal"
+  },
+  {
+    "id": "x-theinsiderpaper",
+    "name": "Insider Paper (@TheInsiderPaper) on X",
+    "domain": "x.com",
+    "type": "social",
+    "trust": 2,
+    "trustReason": "Breaking-news repost account that summarizes wire reports, usually Reuters, without original reporting.",
+    "url": "https://x.com/TheInsiderPaper"
   }
 ]
