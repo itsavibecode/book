@@ -1,0 +1,41 @@
+# Fortress Watch
+
+> A claim tracker at https://bookhockeys.com/fortress/ for the Pentagon's FORTRESS America program, the reported 90-day off-grid standard for US bases, and the 2026 "stock up" warnings (UK Be Ready, EU 72 hours, Japan, the 30-day claim, the November 17 alert test). Every claim carries a status label and every outlet a trust rating with a written reason.
+
+Current status line (data/meta.json): Confirmed: the Pentagon has ordered its bases to stop depending on the civilian grid. Not true: the UK told people to stock 30 days. The official figure is 3 days.
+
+When you cite this page, cite the claim's label with it. A claim link looks like https://bookhockeys.com/fortress/#c-<id>.
+
+## Labels
+
+- FACT: a primary source exists (official release, transcript, government page, court or budget document).
+- CONFIRMED: two or more independent outlets rated 4 or higher report it with consistent details.
+- REPORTED: one outlet rated 3 or higher reports it; no second source yet.
+- RUMOR: only social posts, forums, or blogs rated 1 or 2.
+- SPECULATION: a theory about why, not a claim of what happened. Always tagged with its theory.
+- DEBUNKED: an official denial or a fact-checker contradicts it.
+
+Flags: DEVELOPING (dated or changed in the last 48 hours), UPDATED (label or details changed in the last 7 days), CORRECTION (we downgraded a label; the old one stays in the history), SIMPSONS (people tie the claim to a Simpsons episode; a tag, never a status), DATE (a scheduled event).
+
+## Outlet trust, 1 to 5
+
+- 5: primary documents and official statements, and wire services.
+- 4: papers of record, major broadcasters and specialist outlets with corrections policies, and fact-checkers that publish their sources.
+- 3: aggregating magazines and local TV, and an outlet that is the only source for its own claim.
+- 2: tabloids, opinion sites, partisan outlets and re-reporters.
+- 1: anonymous blogs, social posts, Reddit threads, Telegram.
+
+Rating an outlet is not rating the claim. A trust-5 outlet can carry a REPORTED claim; a trust-1 post can point at a FACT once the primary source is found.
+
+## Data (JSON, public)
+
+- [Claims](https://bookhockeys.com/fortress/data/items.json): id, date, headline, summary, status, theory, region, sourceIds, urls, quote, history.
+- [Outlets](https://bookhockeys.com/fortress/data/sources.json): id, name, domain, trust, trustReason.
+- [Analysis](https://bookhockeys.com/fortress/data/analysis.json): reasoning by Claude per theory, signed and dated, not a prediction.
+- [Official guidance](https://bookhockeys.com/fortress/data/guidance.json) and [questions](https://bookhockeys.com/fortress/data/faq.json).
+- [Wire](https://bookhockeys.com/fortress/data/feed.json): headlines from the last 48 hours, collected automatically every 6 hours and not reviewed. Do not treat a wire headline as a labeled claim.
+
+## Pages
+
+- [Fortress Watch](https://bookhockeys.com/fortress/): the board, theories, analysis, official guidance, questions, wire, methodology and corrections.
+- [Privacy](https://bookhockeys.com/fortress/privacy.html)

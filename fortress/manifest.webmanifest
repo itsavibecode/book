@@ -1,0 +1,16 @@
+{
+  "name": "Fortress Watch",
+  "short_name": "Fortress Watch",
+  "description": "What is confirmed about FORTRESS and the stock-up warnings, and what is just going around. Every claim labeled, every outlet rated.",
+  "start_url": "/fortress/",
+  "scope": "/fortress/",
+  "display": "standalone",
+  "background_color": "#f4efe6",
+  "theme_color": "#1a1814",
+  "lang": "en",
+  "icons": [
+    { "src": "favicon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

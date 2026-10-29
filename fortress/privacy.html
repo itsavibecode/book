@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="version" content="0.1.0">
+<title>Privacy | Fortress Watch v0.1.0</title>
+<meta name="description" content="What Fortress Watch collects (anonymous Google Analytics page views) and what it does not.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#f4efe6">
+<link rel="canonical" href="https://bookhockeys.com/fortress/privacy.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script>
+(function () {
+  try {
+    if (localStorage.getItem('fortress-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  } catch (e) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .doc { max-width: 44rem; padding-bottom: 1rem; }
+  .doc h1 { font-size: 2.6rem; text-transform: uppercase; margin: 1.5rem 0 1rem; }
+  .doc h2 { font-size: 1.5rem; text-transform: uppercase; margin: 1.75rem 0 .5rem; }
+  .doc ul { padding-left: 1.2rem; }
+  .doc li { margin: .3rem 0; }
+  .back { display: inline-block; padding: .7rem 0; font-family: var(--font-ui); }
+</style>
+</head>
+<body>
+<header class="wrap mast">
+  <a class="back" href="./">Back to Fortress Watch</a>
+</header>
+<main class="wrap doc">
+  <h1>Privacy</h1>
+  <p>Fortress Watch is a static page. There is no sign-up, no account, no comment box and no upload. Nothing you do on the page is sent to a server we run.</p>
+
+  <h2>What is collected</h2>
+  <p>Google Analytics 4 (measurement ID <code>G-DYME377V2S</code>, shared across bookhockeys.com) records anonymous page views, basic device and locale information, and one event: when you use a claim's Share buttons (which claim, and whether you copied or opened X or Reddit). No personal identifiers are collected.</p>
+
+  <h2>What is not collected</h2>
+  <ul>
+    <li>No name, email address or other identifying information is stored or sent by this page.</li>
+    <li>No uploads of any kind.</li>
+    <li>No accounts or logins.</li>
+    <li>No advertising or remarketing cookies. <code>ad_storage</code>, <code>ad_user_data</code> and <code>ad_personalization</code> are denied by default in Google Consent Mode v2 and are never granted.</li>
+  </ul>
+
+  <h2>EU, EEA, UK and Swiss visitors</h2>
+  <p>If your browser's time zone is in <code>Europe/*</code> (or an EEA-adjacent outlier such as Iceland, Cyprus, the Azores, Madeira or the Canary Islands), <code>analytics_storage</code> is also denied by default and a banner asks you first. Analytics only run if you accept. Your choice is stored in your browser under the key <code>greenline-consent</code> and applies across bookhockeys.com.</p>
+
+  <h2>Visitors elsewhere</h2>
+  <p>Outside Europe, anonymous analytics are on by default with no banner. You can change your choice with "Change cookie choice" in the page footer.</p>
+
+  <h2>Turning analytics off on one device</h2>
+  <p>Open the page with <code>?ga=off</code> at the end of the address (for example <code>bookhockeys.com/fortress/?ga=off</code>). The browser remembers it under <code>bookhockeys_ga_optout</code> and Google Analytics is not loaded at all on that device. <code>?ga=on</code> removes it.</p>
+
+  <h2>Other things your browser stores or loads</h2>
+  <ul>
+    <li>If you switch to dark mode, the choice is kept in your browser under <code>fortress-theme</code>. Nothing else about you is stored.</li>
+    <li>The fonts load from Google Fonts. Like any web request, that sends your IP address to Google.</li>
+    <li>Links to sources and the X and Reddit share links take you to those sites, which have their own privacy policies.</li>
+  </ul>
+
+  <h2>What the page shows</h2>
+  <p>The board lists public claims, reported by named outlets or posted publicly, with a label and an outlet rating. It does not publish private people's posts as images.</p>
+
+  <h2>Contact</h2>
+  <p>This is a personal hobby project. There is no operations team and no contact email.</p>
+</main>
+<footer class="wrap foot">
+  <p>Last updated 2026-10-29. Fortress Watch v0.1.0, a BookHockeys page. <a href="./">Back to the board</a></p>
+</footer>
+</body>
+</html>

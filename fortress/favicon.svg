@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Fortress Watch</title>
+  <rect width="64" height="64" fill="#f4efe6"/>
+  <g transform="rotate(-6 32 32)">
+    <rect x="8.3" y="8.3" width="47.4" height="47.4" fill="#1a1814"/>
+    <path fill="#f4efe6" d="M22.5 17.8h21.1v8.1H30.6v4.3h11.7v7.3H30.6v8.7h-8.1z"/>
+  </g>
+</svg>
