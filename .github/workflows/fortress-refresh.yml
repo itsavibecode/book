@@ -1,0 +1,78 @@
+name: Fortress Watch feed refresh
+
+# Every 6 hours and on demand from the Actions tab.
+# :17 past the hour keeps it off the top-of-hour rush on GitHub's schedulers.
+# refresh.py is idempotent: each news query is fetched on its own, a failing
+# query keeps the headlines already collected, and nothing is committed unless
+# a file changed. The script never changes a claim's label.
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+# Per-workflow override; the default GITHUB_TOKEN is read-only.
+permissions:
+  contents: write
+
+# Don't pile up runs if the previous one is still going.
+concurrency:
+  group: fortress-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run refresh script
+        working-directory: fortress
+        run: python -I refresh.py
+
+      - name: Commit and push if changed
+        id: commit
+        run: |
+          set -e
+          if [[ -z "$(git status --porcelain -- fortress sitemap.xml)" ]]; then
+            echo "::notice::No changes - nothing to commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "fortress-watch-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add fortress/data/feed.json fortress/data/meta.json fortress/index.html sitemap.xml
+          DATE_UTC=$(date -u +%Y-%m-%d)
+          git commit -m "fortress: feed refresh ${DATE_UTC}" \
+            -m "Refreshed by .github/workflows/fortress-refresh.yml" \
+            -m "$(git diff --cached --stat)"
+          # Someone may have pushed while this ran; replay the refresh on top once.
+          git push || (git pull --rebase && git push)
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+          echo "::notice::Committed and pushed feed refresh for ${DATE_UTC}"
+
+      # IndexNow ping (Bing and other IndexNow engines), same pattern as niceshirt.
+      # Off until the book repo has a key file at its root. To turn it on:
+      #   1. Generate a key: python -c "import secrets; print(secrets.token_hex(16))"
+      #   2. Commit a file named <key>.txt containing only the key to the root of
+      #      the book repo, so https://bookhockeys.com/<key>.txt serves it.
+      #   3. Replace KEY below with the key and remove the leading "# " from the step.
+      # - name: Ping IndexNow
+      #   if: steps.commit.outputs.pushed == 'true'
+      #   run: |
+      #     curl -sS -o /dev/null -w "IndexNow HTTP %{http_code}\n" \
+      #       -X POST "https://api.indexnow.org/indexnow" \
+      #       -H "Content-Type: application/json; charset=utf-8" \
+      #       -d '{
+      #         "host": "bookhockeys.com",
+      #         "key": "KEY",
+      #         "keyLocation": "https://bookhockeys.com/KEY.txt",
+      #         "urlList": [
+      #           "https://bookhockeys.com/fortress/",
+      #           "https://bookhockeys.com/fortress/llms.txt"
+      #         ]
+      #       }'
