@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Ink frame on paper with a K: kmark(inset=3) in tools/make-assets.py -->
+  <rect width="32" height="32" fill="#f6f3ee"/>
+  <rect x="3" y="3" width="26" height="26" fill="none" stroke="#1c1b19" stroke-width="2.5"/>
+  <g stroke="#1c1b19" stroke-width="2.9" stroke-linecap="butt" fill="none">
+    <path d="M11.67 8.96V23.04"/>
+    <path d="M20.88 8.96L12.32 16.65"/>
+    <path d="M14.7 14.7L21.42 23.04"/>
+  </g>
+</svg>
