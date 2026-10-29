@@ -6,7 +6,7 @@ GitHub Actions runs it every 6 hours (.github/workflows/fortress-refresh.yml).
 What it does, each step on its own so one failure never aborts the run:
   1. Pulls Google News RSS for each query in QUERIES (last 2 days).
   2. Keeps headlines published in the last 48 hours that mention the topic,
-     dedupes them by link and by title, merges them with the headlines already
+     (see TOPIC_WORDS), dedupes them by link and by title, merges them with the headlines already
      in data/feed.json, and maps each outlet's domain to data/sources.json for
      its trust rating. A query that fails is skipped; if every query fails,
      feed.json is left exactly as it was.
@@ -52,11 +52,14 @@ QUERIES = [
 RSS = 'https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en'
 KEEP_HOURS = 48
 MAX_ENTRIES = 150
-# A headline must mention at least one of these to count as on topic, so a
-# loose query like "90 days bases" does not pull in sports or real estate.
-TOPIC = re.compile(r'fortress|pentagon|hegseth|military base|bases|off[- ]grid|stockpil|stock up|stock-up|'
-                   r'be ready|prepare|preparedness|emergency|food and water|food, water|30 days|90 days|'
-                   r'blackout|power grid|fema|alert test|bongino|streeting', re.I)
+# The wire keeps only headlines whose title contains at least one of these
+# (case-insensitive), so off-topic Pentagon or base stories stay out.
+# This is the one place the list lives.
+TOPIC_WORDS = ['fortress', '90 day', '90-day', 'off-grid', 'stockpile', 'stock up',
+               'be ready', '30 days', 'emergency alert', 'blackout', 'prepared']
+# Second-level suffixes where the registrable domain has three labels (bbc.co.uk).
+SECOND_LEVEL = {'co.uk', 'org.uk', 'ac.uk', 'gov.uk', 'com.au', 'net.au', 'org.au', 'gov.au',
+                'co.nz', 'govt.nz', 'co.in', 'co.jp', 'or.jp', 'go.jp', 'com.br', 'co.za', 'go.kr', 'co.kr'}
 UA = 'FortressWatch/0.1 (+https://bookhockeys.com/fortress/)'
 
 DEFAULT_META = {
@@ -112,11 +115,39 @@ def host_of(url):
         return ''
 
 
+def on_topic(title):
+    t = (title or '').lower()
+    return any(w in t for w in TOPIC_WORDS)
+
+
+def registrable(host):
+    """news.sky.com -> sky.com, www.bbc.co.uk -> bbc.co.uk."""
+    parts = host.split('.')
+    if len(parts) >= 3 and '.'.join(parts[-2:]) in SECOND_LEVEL:
+        return '.'.join(parts[-3:])
+    return '.'.join(parts[-2:])
+
+
+def source_domains(s):
+    doms = [s.get('domain') or ''] + list(s.get('altDomains') or [])
+    return [d.lower().removeprefix('www.') for d in doms if isinstance(d, str) and '.' in d]
+
+
 def source_for(host, sources):
+    """Match a hostname to a source by domain or altDomains: exact or subdomain
+    first, then same registrable domain when one side is the bare registrable name."""
+    host = (host or '').lower().removeprefix('www.')
+    if not host:
+        return None
     for s in sources:
-        dom = (s.get('domain') or '').lower()
-        if dom and '.' in dom and (host == dom or host.endswith('.' + dom)):
-            return s
+        for d in source_domains(s):
+            if host == d or host.endswith('.' + d):
+                return s
+    reg = registrable(host)
+    for s in sources:
+        for d in source_domains(s):
+            if registrable(d) == reg and (d == reg or host == reg):
+                return s
     return None
 
 
@@ -197,7 +228,7 @@ def step_feed(sources):
     for e in old + fresh:
         if not isinstance(e, dict) or not e.get('url') or not within_window(e):
             continue
-        if not TOPIC.search(e.get('title', '')):
+        if not on_topic(e.get('title', '')):
             continue
         lk, tk = link_key(e['url']), norm_title(e.get('title', '')) + '|' + (e.get('domain') or '')
         if lk in seen_links or tk in seen_titles:

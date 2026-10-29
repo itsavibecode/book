@@ -66,11 +66,33 @@
   function hostOf(url) {
     try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return ''; }
   }
+  /* Registrable domain: news.sky.com -> sky.com, www.bbc.co.uk -> bbc.co.uk.
+     Same second-level list as refresh.py. */
+  var SECOND_LEVEL = ['co.uk', 'org.uk', 'ac.uk', 'gov.uk', 'com.au', 'net.au', 'org.au', 'gov.au',
+    'co.nz', 'govt.nz', 'co.in', 'co.jp', 'or.jp', 'go.jp', 'com.br', 'co.za', 'go.kr', 'co.kr'];
+  function registrable(host) {
+    var p = host.split('.');
+    return p.length >= 3 && SECOND_LEVEL.indexOf(p.slice(-2).join('.')) > -1 ? p.slice(-3).join('.') : p.slice(-2).join('.');
+  }
+  function sourceDomains(s) {
+    return [s.domain].concat(Array.isArray(s.altDomains) ? s.altDomains : [])
+      .filter(function (d) { return typeof d === 'string' && d.indexOf('.') > -1; })
+      .map(function (d) { return d.toLowerCase().replace(/^www\./, ''); });
+  }
+  /* Exact or subdomain match on domain / altDomains first, then the same
+     registrable domain when one side is the bare registrable name. */
   function sourceForHost(host) {
+    host = (host || '').toLowerCase().replace(/^www\./, '');
     if (!host) return null;
-    for (var i = 0; i < D.sources.length; i++) {
-      var dom = D.sources[i].domain;
-      if (dom && (host === dom || host.slice(-(dom.length + 1)) === '.' + dom)) return D.sources[i];
+    var i, k, ds;
+    for (i = 0; i < D.sources.length; i++) {
+      ds = sourceDomains(D.sources[i]);
+      for (k = 0; k < ds.length; k++) if (host === ds[k] || host.slice(-(ds[k].length + 1)) === '.' + ds[k]) return D.sources[i];
+    }
+    var reg = registrable(host);
+    for (i = 0; i < D.sources.length; i++) {
+      ds = sourceDomains(D.sources[i]);
+      for (k = 0; k < ds.length; k++) if (registrable(ds[k]) === reg && (ds[k] === reg || host === reg)) return D.sources[i];
     }
     return null;
   }
@@ -850,11 +872,12 @@
       a.href = e.url; a.target = '_blank'; a.rel = 'noopener nofollow';
       b.appendChild(a);
       var src = el('div', 'w-src');
-      var known = e.sourceId ? D.srcById[e.sourceId] : null;
+      var known = (e.sourceId && D.srcById[e.sourceId]) || sourceForHost(e.domain);
+      var trust = known ? known.trust : e.trust;
       src.appendChild(el('span', null, (known ? known.name : (e.outlet || e.domain || 'Unknown outlet'))));
-      if (e.trust) {
-        src.appendChild(meter(e.trust));
-        src.appendChild(el('span', 'trust-text', 'Trust ' + e.trust + ' of 5'));
+      if (trust) {
+        src.appendChild(meter(trust));
+        src.appendChild(el('span', 'trust-text', 'Trust ' + trust + ' of 5'));
       } else {
         src.appendChild(el('span', null, 'Outlet not rated'));
       }
