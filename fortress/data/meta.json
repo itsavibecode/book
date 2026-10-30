@@ -3,9 +3,9 @@
  "statusConfirmed": "the Pentagon has ordered its bases to stop depending on the civilian grid.",
  "statusNotTrue": "the UK told people to stock 30 days. The official figure is 3 days.",
  "lastUpdated": "2026-10-29T20:30:18Z",
- "lastFeedRun": "2026-10-30T05:42:26Z",
- "lastFeedAttempt": "2026-10-30T05:42:26Z",
+ "lastFeedRun": "2026-10-30T12:49:17Z",
+ "lastFeedAttempt": "2026-10-30T12:49:17Z",
  "feedStatus": "ok",
- "feedCount": 73,
+ "feedCount": 61,
  "boardHash": "3070bb911b5ee399"
 }
