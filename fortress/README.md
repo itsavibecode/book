@@ -1,6 +1,6 @@
 # Fortress Watch
 
-Live at https://bookhockeys.com/fortress/ . Version 0.1.0.
+Live at https://bookhockeys.com/fortress/ . Version 0.2.0.
 
 One page that answers "what is actually confirmed about FORTRESS and the 90-day / 30-day
 warnings, and what is just going around". Every claim carries a status label. Every outlet
@@ -64,6 +64,8 @@ Notes for editors:
   Moves into or out of SPECULATION are not counted as downgrades.
 - `eventDate` (YYYY-MM-DD) adds the DATE tag and, within 30 days, a countdown in the row
   and in the status line.
+- `geo` (`{ lat, lng, place, kind }`) pins the claim on the map page; `geoAlso`
+  (`[{ lat, lng, place }]`) adds smaller dashed pins for other places it names.
 - `simpsons` can be `true`, or `{ "episode", "aired", "shows" }` to show the episode in the
   tooltip and the expanded row.
 - Theories: nuclear, iran, midterms, false-flag, cyberattack, ai-cyber, grid, solar, russia,
@@ -71,6 +73,22 @@ Notes for editors:
   comes from the matching `analysis.json` entry (`ai-cyber` maps to `cyberattack`).
 - After editing, run `python -I tools/build-seo.py` so the JSON-LD and the static status
   line follow (the refresh also does this every 6 hours).
+
+## Map page (`map.html`, `map.js`)
+
+"Where the FORTRESS claims come from": a Leaflet 1.9.4 map (from unpkg) with one pin per
+claim that has `geo`, filled with its stamp colour and sized by recency (last 48 hours
+largest, then 7 days, 30 days, older). Chips filter by Last 48 hours / 7 days / 30 days /
+All (default 7 days, or All when fewer than 3 claims are that recent) and by label. Popups
+show the date, stamp, headline, place and an "Open on the board" link. A plain list of the
+same claims sits under the map for keyboard and screen-reader users; `tools/build-seo.py`
+also writes it into `map.html` so the page works without JavaScript. The theme toggle
+shares `fortress-theme` with the board.
+
+Tiles: the plan named CARTO Voyager and Dark Matter, but `basemaps.cartocdn.com` now
+answers every tile with "API KEY REQUIRED", so the page uses Esri's keyless Light Gray and
+Dark Gray Canvas. Switching back to CARTO with a key is two URLs and the attribution at the
+top of `map.js`.
 
 ## Blackout starter kit
 
@@ -140,6 +158,17 @@ on one device, `?ga=on` turns it back on.
   (checked with the antislop `contrast-check.py`).
 
 ## Changelog
+
+### v0.2.0 (2026-10-30)
+
+- Readers kept asking two things the board did not answer: what should I actually buy,
+  and where are these claims coming from.
+- Blackout starter kit: a tick-off list built only from the official checklists
+  (Ready.gov and UK Be Ready), with their quantities, a "Find on Amazon" search per item,
+  and a "Copy my list" button. It is the governments' advice, not ours, and the page says so.
+- Map page: every located claim as a pin in its label colour, newest biggest, with filters
+  by date and label and a plain list underneath. Linked from the header, the status line
+  and the footer.
 
 ### v0.1.0 (2026-10-29)
 

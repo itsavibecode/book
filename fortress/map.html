@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="version" content="0.2.0">
+<title>Where the FORTRESS claims come from | Fortress Watch v0.2.0</title>
+<meta name="description" content="A map of where each claim about FORTRESS America, the 90-day base plan and the 2026 stock-up warnings comes from, coloured by its label: fact, confirmed, reported, rumor, speculation or debunked.">
+<meta name="author" content="BookHockeys">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#f4efe6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171512" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://bookhockeys.com/fortress/map.html">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fortress Watch">
+<meta property="og:title" content="Where the FORTRESS claims come from | Fortress Watch">
+<meta property="og:description" content="Every pinned claim about FORTRESS and the stock-up warnings, placed where it comes from and coloured by its label.">
+<meta property="og:url" content="https://bookhockeys.com/fortress/map.html">
+<meta property="og:image" content="https://bookhockeys.com/fortress/og-card.png">
+<meta property="og:image:secure_url" content="https://bookhockeys.com/fortress/og-card.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Fortress Watch status line on off-white paper with rubber-stamp claim labels FACT, REPORTED, RUMOR, DEBUNKED.">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Where the FORTRESS claims come from | Fortress Watch">
+<meta name="twitter:description" content="Every pinned claim about FORTRESS and the stock-up warnings, placed where it comes from and coloured by its label.">
+<meta name="twitter:image" content="https://bookhockeys.com/fortress/og-card.png">
+<meta name="twitter:image:alt" content="Fortress Watch status line with rubber-stamp claim labels">
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Fortress Watch">
+<meta name="application-name" content="Fortress Watch">
+<link rel="alternate" type="text/plain" title="llms.txt" href="llms.txt">
+
+<!-- Theme before first paint: shared with the board through the same key. -->
+<script>
+(function () {
+  try {
+    if (localStorage.getItem('fortress-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  } catch (e) {}
+})();
+</script>
+
+<!-- Analytics: per-device opt-out first (?ga=off / ?ga=on, remembered in
+     localStorage), then Google Consent Mode v2 defaults, then GA4. The
+     consent decision shares the site-wide `greenline-consent` key. -->
+<script>
+(function () {
+  var GA_ID = 'G-DYME377V2S';
+  var OPT_KEY = 'bookhockeys_ga_optout';
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.get('ga') === 'off') localStorage.setItem(OPT_KEY, '1');
+    if (p.get('ga') === 'on') localStorage.removeItem(OPT_KEY);
+  } catch (e) {}
+  var optedOut = false;
+  try { optedOut = localStorage.getItem(OPT_KEY) === '1'; } catch (e) {}
+  window['ga-disable-' + GA_ID] = optedOut;
+  window.__gaOptedOut = optedOut;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  if (optedOut) return;
+
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  // EU/EEA/UK/CH by browser timezone: no IP lookup, errs toward asking.
+  var tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  var euExtras = ['Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+    'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'];
+  var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+  var saved = null;
+  try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+  if (saved === 'granted' || (saved !== 'denied' && !likelyEU)) {
+    gtag('consent', 'update', { 'analytics_storage': 'granted' });
+  } else if (saved !== 'denied') {
+    window.__needsConsent = true;
+  }
+
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  document.head.appendChild(s);
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="map-page">
+<a class="skip-link" href="#list-h">Skip to the list of pinned claims</a>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<header class="wrap mast">
+  <div class="mast-row">
+    <a class="site-name" href="index.html">Fortress Watch</a>
+    <div class="mast-actions">
+      <a class="btn" href="index.html">Board</a>
+      <button type="button" class="btn" id="themeBtn" aria-pressed="false">Dark mode</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="wrap map-intro" aria-labelledby="map-h">
+    <h1 id="map-h">Where the FORTRESS claims come from</h1>
+    <p class="sec-intro">Each pin is a claim on the board, placed where it comes from. The colour is the claim's label, and newer claims get bigger pins. Smaller pins mark other places the same claim names. Every pinned claim is also in the list under the map.</p>
+    <div class="filters" role="group" aria-label="Filter the pins">
+      <div class="f-row" role="group" aria-labelledby="fl-when"><span class="f-label" id="fl-when">When</span><span id="rangeChips" class="f-row"></span></div>
+      <div class="f-row" role="group" aria-labelledby="fl-label"><span class="f-label" id="fl-label">Label</span><span id="statusChips" class="f-row"></span></div>
+    </div>
+    <p class="result-count" id="mapCount" aria-live="polite"></p>
+    <div id="mapState" class="map-state" aria-live="polite"><div class="state"><strong>Loading the map and the pinned claims.</strong></div></div>
+  </section>
+
+  <div class="wrap">
+    <div class="map-wrap" id="mapWrap">
+      <div id="map" role="region" aria-label="Map of where the claims come from. The same claims are listed below the map."></div>
+    </div>
+    <ul class="legend" id="legend" aria-label="Pin colours"></ul>
+  </div>
+
+  <section class="wrap sec" aria-labelledby="list-h">
+    <div class="sec-head"><h2 id="list-h" tabindex="-1">Pinned claims, newest first</h2></div>
+    <ol class="map-list" id="mapList">
+<!-- seo:maplist:start (generated by tools/build-seo.py from data/items.json) -->
+      <li><time class="tnum" datetime="2026-10-29">2026-10-29</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-sylvia-fired-leak-probe">Hegseth fires the Joint Staff's top planner, Lt. Gen. Brett Sylvia, in a leak probe</a> <span class="map-place">Pentagon, Arlington VA</span></li>
+      <li><time class="tnum" datetime="2026-10-29">2026-10-29</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-ready-gov-kit">US advice on Ready.gov: one gallon of water per person per day for several days</a> <span class="map-place">FEMA HQ, Washington DC</span></li>
+      <li><time class="tnum" datetime="2026-10-29">2026-10-29</time> <span class="stamp stamp-sm s-reported">Reported</span> <a href="index.html#c-freezer-suspected-cyberattack">Pentagon treating base freezer failures as a suspected hack, Reuters reports</a> <span class="map-place">Pentagon, Arlington VA</span></li>
+      <li><time class="tnum" datetime="2026-10-29">2026-10-29</time> <span class="stamp stamp-sm s-reported">Reported</span> <a href="index.html#c-europe-national-guidance">Other countries' advice ranges from 3 days to 2 weeks</a> <span class="map-place">Stockholm; Oslo; Vienna</span></li>
+      <li><time class="tnum" datetime="2026-10-28">2026-10-28</time> <span class="stamp stamp-sm s-reported">Reported</span> <a href="index.html#c-wtkr-norfolk-hearing">Norfolk TV: Navy leaders pushed for on-base reactors at a May hearing</a> <span class="map-place">US Capitol, Washington DC</span></li>
+      <li><time class="tnum" datetime="2026-10-28">2026-10-28</time> <span class="stamp stamp-sm s-reported">Reported</span> <a href="index.html#c-uk-preparedness-buying">UK shoppers buy torches, generators and water after Be Ready launch</a> <span class="map-place">London</span></li>
+      <li><time class="tnum" datetime="2026-10-28">2026-10-28</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-japan-hosono-request">Japan to ask citizens to stock 3 days of supplies, ideally a week</a> <span class="map-place">Tokyo</span></li>
+      <li><time class="tnum" datetime="2026-10-27">2026-10-27</time> <span class="stamp stamp-sm s-debunked">Debunked</span> <a href="index.html#c-uk-30-days-claim">Claim that the UK told people to prepare for 30 days is false: it says 3</a> <span class="map-place">Mediaite, New York</span></li>
+      <li><time class="tnum" datetime="2026-10-27">2026-10-27</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-cisa-php-exploited">CISA confirms hackers are exploiting the PHP flaws, orders 3-day fix</a> <span class="map-place">Washington DC (CISA)</span></li>
+      <li><time class="tnum" datetime="2026-10-27">2026-10-27</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-bongino-30-days">Ex-FBI deputy director Dan Bongino urges Americans to stock 30 days of food</a> <span class="map-place">Mediaite, New York</span></li>
+      <li><time class="tnum" datetime="2026-10-26">2026-10-26</time> <span class="stamp stamp-sm s-reported">Reported</span> <a href="index.html#c-ncsc-cyber-incidents">UK cyber agency handled 200+ attacks on critical infrastructure in a year</a> <span class="map-place">NCSC, London</span></li>
+      <li><time class="tnum" datetime="2026-10-26">2026-10-26</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-fortress-acronym">What FORTRESS stands for</a> <span class="map-place">Pentagon, Arlington VA</span></li>
+      <li><time class="tnum" datetime="2026-10-26">2026-10-26</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-cost-timeline-unknown">No budget or completion date for FORTRESS has been released</a> <span class="map-place">Pentagon, Arlington VA</span></li>
+      <li><time class="tnum" datetime="2026-10-25">2026-10-25</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-streeting-1000-days">Streeting: UK and NATO have a little over 1,000 days to prepare</a> <span class="map-place">London</span></li>
+      <li><time class="tnum" datetime="2026-10-25">2026-10-25</time> <span class="stamp stamp-sm s-reported">Reported</span> <a href="index.html#c-reactors-microgrids-plan">Plan calls for portable reactors, big batteries and microgrids on bases</a> <span class="map-place">Fox News, New York</span></li>
+      <li><time class="tnum" datetime="2026-10-25">2026-10-25</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-parnell-two-oceans">Pentagon spokesman: we can no longer rely on two oceans to protect us</a> <span class="map-place">Pentagon, Arlington VA</span></li>
+      <li><time class="tnum" datetime="2026-10-25">2026-10-25</time> <span class="stamp stamp-sm s-reported">Reported</span> <a href="index.html#c-fox-factories-wartime-production">Fox: FORTRESS also readies US factories to switch to defense production on short notice</a> <span class="map-place">Fox News, New York</span></li>
+      <li><time class="tnum" datetime="2026-10-25">2026-10-25</time> <span class="stamp stamp-sm s-reported">Reported</span> <a href="index.html#c-fox-90-day-report">Fox News reports bases must run 90 days without outside power, water or fuel</a> <span class="map-place">Fox News, New York</span></li>
+      <li><time class="tnum" datetime="2026-10-22">2026-10-22</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-uk-checklist-items">UK checklist: 3 litres of water per person per day, cash, radio, torch</a> <span class="map-place">Whitehall, London</span></li>
+      <li><time class="tnum" datetime="2026-10-22">2026-10-22</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-uk-be-ready-launch">UK launches Be Ready campaign: prepare for 3 days of disruption</a> <span class="map-place">Whitehall, London</span></li>
+      <li><time class="tnum" datetime="2026-10-21">2026-10-21</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-php2shell-ai-flaw">AI tools helped find two critical PHP flaws affecting much of the web</a> <span class="map-place">Fortune, New York</span></li>
+      <li><time class="tnum" datetime="2026-10-21">2026-10-21</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-nz-shakeout-2026">New Zealand held its national ShakeOut earthquake and tsunami drill on October 21</a> <span class="map-place">Wellington</span></li>
+      <li><time class="tnum" datetime="2026-10-20">2026-10-20</time> <span class="stamp stamp-sm s-reported">Reported</span> <a href="index.html#c-roundtable-500-bases">Defense official: about 500 US bases under review, energy comes first</a> <span class="map-place">Washington DC</span></li>
+      <li><time class="tnum" datetime="2026-10-19">2026-10-19</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-korea-safe-korea-2026">South Korea runs its Safe Korea disaster drill Oct 19 to 30 with 236 agencies</a> <span class="map-place">Seoul</span></li>
+      <li><time class="tnum" datetime="2026-10-19">2026-10-19</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-eu-integrated-resolve-2026">EU runs its Integrated Resolve 2026 crisis exercise from October 19 to November 20</a> <span class="map-place">Brussels</span></li>
+      <li><time class="tnum" datetime="2026-10-14">2026-10-14</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-streeting-alert-not-alarmed">Streeting tells households to keep bottled water and tinned food</a> <span class="map-place">London</span></li>
+      <li><time class="tnum" datetime="2026-10-01">2026-10-01</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-ausalert-launch">Australia's new AusAlert phone warning system was set to start on October 1, 2026</a> <span class="map-place">Canberra</span></li>
+      <li><time class="tnum" datetime="2026-09-30">2026-09-30</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-hegseth-quantico-own-power">Hegseth tells Quantico audience every major base will make its own power</a> <span class="map-place">Quantico VA</span></li>
+      <li><time class="tnum" datetime="2026-09-30">2026-09-30</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-fortress-program-office-30-days">Memo orders a FORTRESS program office stood up within 30 days</a> <span class="map-place">Pentagon, Arlington VA</span></li>
+      <li><time class="tnum" datetime="2026-09-30">2026-09-30</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-fortress-memo-signed">Hegseth signs memo creating FORTRESS America as a Department of War program</a> <span class="map-place">Pentagon, Arlington VA</span></li>
+      <li><time class="tnum" datetime="2026-09-30">2026-09-30</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-fortress-five-pillars">FORTRESS has five pillars, from energy independence to space resilience</a> <span class="map-place">Pentagon, Arlington VA</span></li>
+      <li><time class="tnum" datetime="2026-09-16">2026-09-16</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-fema-test-routine">The Nov 17 alert test is routine and not linked to FORTRESS</a> <span class="map-place">FEMA HQ, Washington DC</span></li>
+      <li><time class="tnum" datetime="2026-09-16">2026-09-16</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-fema-eas-test-nov17">FEMA and FCC set a nationwide Emergency Alert System test for Nov 17</a> <span class="map-place">FEMA HQ, Washington DC</span></li>
+      <li><time class="tnum" datetime="2026-08-28">2026-08-28</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-commissary-freezer-outages">Freezers fail at military commissaries across several states in late August</a> <span class="map-place">Fort Huachuca AZ; Fort Irwin CA; F.E. Warren AFB WY</span></li>
+      <li><time class="tnum" datetime="2026-07-20">2026-07-20</time> <span class="stamp stamp-sm s-confirmed">Confirmed</span> <a href="index.html#c-streeting-defence-secretary">Wes Streeting is now UK Defence Secretary, not Health Secretary</a> <span class="map-place">Downing Street, London</span></li>
+      <li><time class="tnum" datetime="2025-03-26">2025-03-26</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-eu-72-hours">EU strategy since March 2025: households should manage 72 hours alone</a> <span class="map-place">Brussels</span></li>
+      <li><time class="tnum" datetime="2024-05-20">2024-05-20</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-epa-water-cyber-2024">EPA in 2024: over 70% of water systems it inspected broke basic security rules</a> <span class="map-place">EPA HQ, Washington DC</span></li>
+      <li><time class="tnum" datetime="1962-03-13">1962-03-13</time> <span class="stamp stamp-sm s-fact">Fact</span> <a href="index.html#c-northwoods-1962-real">Operation Northwoods was a real 1962 false-flag proposal, and it was never carried out</a> <span class="map-place">Pentagon, Arlington VA</span></li>
+<!-- seo:maplist:end -->
+    </ol>
+    <noscript><p class="sec-intro">The map needs JavaScript. The list above has every pinned claim, and the <a href="index.html">board</a> has every claim.</p></noscript>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <p>Fortress Watch v0.2.0, a BookHockeys page. <a href="index.html">The board</a>. <a href="privacy.html">Privacy</a></p>
+  <p>Map tiles &copy; Esri, HERE, Garmin and OpenStreetMap contributors. Analytics opt-out for this device: add <code>?ga=off</code> to the address (<code>?ga=on</code> turns it back on). <button type="button" class="link-btn" id="cookieReset">Change cookie choice</button></p>
+</footer>
+
+<div class="consent" id="consentBanner" hidden role="region" aria-labelledby="consentTitle">
+  <div class="consent-text">
+    <strong id="consentTitle">Cookies for analytics</strong>
+    <p>Fortress Watch uses Google Analytics to count anonymous visits. No ads, no personal data sold. The page works either way.</p>
+  </div>
+  <div class="consent-btns">
+    <button class="btn" id="consentReject" type="button">Reject</button>
+    <button class="btn btn-solid" id="consentAccept" type="button">Accept</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="map.js"></script>
+</body>
+</html>

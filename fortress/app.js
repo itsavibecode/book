@@ -1,4 +1,4 @@
-/* Fortress Watch v0.1.0. Vanilla JS, no build step.
+/* Fortress Watch v0.2.0. Vanilla JS, no build step.
    Fetches data/*.json and renders every section. Each section loads on its
    own, so one missing file shows that section's error and leaves the rest. */
 (function () {
@@ -650,6 +650,11 @@
       p3.textContent = 'Nothing on the board is new or changed in the last 48 hours.';
     }
     box.appendChild(p3);
+    var pm = el('p');
+    var mapA = el('a', null, 'See where the claims come from');
+    mapA.href = 'map.html';
+    pm.appendChild(mapA);
+    box.appendChild(pm);
     var p4 = el('p');
     var kitA = el('a', null, 'What to keep at home: the blackout starter kit from the official lists');
     kitA.href = '#kit';

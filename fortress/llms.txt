@@ -39,4 +39,5 @@ Rating an outlet is not rating the claim. A trust-5 outlet can carry a REPORTED 
 ## Pages
 
 - [Fortress Watch](https://bookhockeys.com/fortress/): the board, theories, analysis, official guidance, questions, wire, methodology and corrections.
+- [Map: where the claims come from](https://bookhockeys.com/fortress/map.html): each claim with a location as a pin coloured by its label, plus the same claims as a plain list. Claims carry `geo` (`lat, lng, place, kind`) and optional `geoAlso` in items.json.
 - [Privacy](https://bookhockeys.com/fortress/privacy.html)

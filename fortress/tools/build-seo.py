@@ -6,12 +6,15 @@ refresh.py runs it after every feed refresh, so a session that edits
 items.json, faq.json or meta.json only has to wait for the next refresh
 (or run this by hand) for the structured data to follow.
 
-It owns two marked blocks in index.html and nothing else:
+It owns two marked blocks in index.html and one in map.html, nothing else:
   <!-- seo:jsonld:start ... -->  ... <!-- seo:jsonld:end -->
       JSON-LD: LiveBlogPosting (one liveBlogUpdate per claim), FAQPage, Organization
   <!-- seo:status:start ... -->  ... <!-- seo:status:end -->
       the two status sentences from meta.json, so crawlers and no-JS readers see them
-The file is written only when one of the blocks changed.
+  map.html  <!-- seo:maplist:start ... --> ... <!-- seo:maplist:end -->
+      the plain list of claims that have a geo pin, newest first (map.js replaces it
+      with the filtered list; without JavaScript this is the whole page)
+A file is written only when one of its blocks changed.
 """
 import html
 import json
@@ -22,6 +25,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / 'data'
 INDEX = ROOT / 'index.html'
+MAP = ROOT / 'map.html'
 SITE = 'https://bookhockeys.com/fortress/'
 TITLE = 'FORTRESS: what is confirmed about the Pentagon 90-day plan and the 30-day stockpile warnings'
 LAUNCH = '2026-10-29T00:00:00Z'
@@ -117,6 +121,42 @@ def build_status(meta):
             '      <p class="l2"><span class="lead">Not true:</span> <span id="statusNotTrue">%s</span></p>\n' % (c, n))
 
 
+def latest_day(it):
+    d = it.get('date') or ''
+    for h in it.get('history') or []:
+        if isinstance(h, dict) and (h.get('date') or '') > d:
+            d = h['date']
+    return d
+
+
+def valid_geo(g):
+    try:
+        return isinstance(g, dict) and abs(float(g['lat'])) <= 90 and abs(float(g['lng'])) <= 180
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def build_maplist(items):
+    pinned = [it for it in items if it.get('id') and it.get('headline') and valid_geo(it.get('geo'))]
+    pinned.sort(key=lambda it: (latest_day(it), it['id']), reverse=True)
+    if not pinned:
+        return ('      <li class="board-state"><strong>No claims have a location yet.</strong> '
+                'Locations are added when a claim is reviewed. <a href="index.html">The board</a> has every claim.</li>\n')
+    rows = []
+    for it in pinned:
+        status = it.get('status') or ''
+        word = STATUS_WORD.get(status, status.upper())
+        cls = status if status in STATUS_WORD else 'reported'
+        places = [it['geo'].get('place')] + [g.get('place') for g in (it.get('geoAlso') or []) if valid_geo(g)]
+        places = '; '.join(html.escape(p, quote=False) for p in places if p)
+        rows.append('      <li><time class="tnum" datetime="%s">%s</time> <span class="stamp stamp-sm s-%s">%s</span> '
+                    '<a href="index.html#c-%s">%s</a>%s</li>\n' % (
+                        html.escape(it.get('date') or ''), html.escape(it.get('date') or ''), cls, word.title(),
+                        html.escape(it['id']), html.escape(it['headline'], quote=False),
+                        (' <span class="map-place">%s</span>' % places) if places else ''))
+    return ''.join(rows)
+
+
 def replace_block(src, name, inner):
     pat = re.compile(r'(<!-- seo:%s:start[^>]*-->\n)(.*?)(<!-- seo:%s:end -->)' % (name, name), re.S)
     if not pat.search(src):
@@ -140,6 +180,15 @@ def main():
         print('build-seo: index.html updated (%d claims, %d questions)' % (len(items), len(faq)))
     else:
         print('build-seo: index.html already current')
+    if MAP.is_file():
+        msrc = MAP.read_text(encoding='utf-8')
+        mout = replace_block(msrc, 'maplist', build_maplist(items))
+        if mout != msrc:
+            with open(MAP, 'w', encoding='utf-8', newline='\n') as f:
+                f.write(mout)
+            print('build-seo: map.html list updated')
+        else:
+            print('build-seo: map.html already current')
     return 0
 
 
