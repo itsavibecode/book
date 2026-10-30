@@ -650,6 +650,147 @@
       p3.textContent = 'Nothing on the board is new or changed in the last 48 hours.';
     }
     box.appendChild(p3);
+    var p4 = el('p');
+    var kitA = el('a', null, 'What to keep at home: the blackout starter kit from the official lists');
+    kitA.href = '#kit';
+    p4.appendChild(kitA);
+    box.appendChild(p4);
+  }
+
+  /* ---------- blackout starter kit ---------- */
+  /* Core items are on both official lists, so they lead as the primary list;
+     items on one list follow in a lighter list. Ticks stay on this device. */
+  var KIT_KEY = 'fortress-kit';
+  function kitLoad() {
+    try { var v = JSON.parse(lsGet(KIT_KEY) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+  }
+  function amazonUrl(q, tag) {
+    return 'https://www.amazon.com/s?k=' + encodeURIComponent(q) + (tag ? '&tag=' + encodeURIComponent(tag) : '');
+  }
+  function renderKit(kit) {
+    var host = $('kitBody');
+    host.textContent = '';
+    var items = (kit && Array.isArray(kit.items) ? kit.items : []).filter(function (k) { return k && k.id && k.name; });
+    if (!items.length) {
+      host.appendChild(stateBlock('div', 'No kit items yet.', 'Items appear here once they are copied from the official checklists. Meanwhile the table above links each government\'s own list.'));
+      return;
+    }
+    var srcBy = {};
+    (kit.sources || []).forEach(function (s) { if (s && s.id) srcBy[s.id] = s; });
+    var tag = (kit.affiliateTag || '').trim();
+    var picked = kitLoad().filter(function (id) { return items.some(function (k) { return k.id === id; }); });
+
+    var intro = el('p', 'sec-intro');
+    intro.appendChild(document.createTextNode('Only items that appear on the official checklists: '));
+    var srcList = (kit.sources || []).filter(function (s) { return s && s.url; });
+    srcList.forEach(function (s, i) {
+      if (i) intro.appendChild(document.createTextNode(i === srcList.length - 1 ? ' and ' : ', '));
+      var a = el('a', null, s.label || hostOf(s.url));
+      a.href = s.url; a.target = '_blank'; a.rel = 'noopener';
+      intro.appendChild(a);
+    });
+    intro.appendChild(document.createTextNode('. Quantities are in their wording. Tick what you want and copy your list.'));
+    host.appendChild(intro);
+
+    var countEl2 = el('p', 'kit-count');
+    countEl2.setAttribute('aria-live', 'polite');
+    var copy = el('button', 'btn btn-solid', 'Copy my list');
+    copy.type = 'button';
+    var clear = el('button', 'btn', 'Clear my list');
+    clear.type = 'button';
+    function syncCount() {
+      countEl2.textContent = picked.length ? plural(picked.length, 'item') + ' on your list.' : 'Nothing on your list yet.';
+      clear.hidden = !picked.length;
+    }
+    function row(k) {
+      var li = el('li', 'kit-item');
+      li.id = 'kit-' + k.id;
+      var main = el('div', 'kit-main');
+      var head = el('p', 'kit-head');
+      head.appendChild(el('span', 'kit-name', k.name));
+      if (k.quantity) head.appendChild(el('span', 'kit-qty', k.quantity));
+      main.appendChild(head);
+      if (k.why) main.appendChild(el('p', 'kit-why', k.why));
+      var chips = el('p', 'kit-src');
+      (k.officialSources || []).forEach(function (id) {
+        var s = srcBy[id];
+        if (!s) return;
+        var c = el('span', 'flag', s.label);
+        c.title = 'On the ' + s.label + ' checklist';
+        chips.appendChild(c);
+      });
+      if (chips.children.length) main.appendChild(chips);
+      li.appendChild(main);
+
+      var acts = el('div', 'kit-acts');
+      var lab = el('label', 'kit-check');
+      var cb = el('input');
+      cb.type = 'checkbox';
+      cb.checked = picked.indexOf(k.id) > -1;
+      cb.addEventListener('change', function () {
+        picked = picked.filter(function (id) { return id !== k.id; });
+        if (cb.checked) picked.push(k.id);
+        lsSet(KIT_KEY, JSON.stringify(picked));
+        syncCount();
+      });
+      lab.appendChild(cb);
+      lab.appendChild(el('span', null, 'Add to my list'));
+      acts.appendChild(lab);
+      if (k.amazonQuery) {
+        var a = el('a', 'btn', 'Find on Amazon');
+        a.href = amazonUrl(k.amazonQuery, tag);
+        a.target = '_blank';
+        a.rel = 'noopener nofollow sponsored';
+        a.setAttribute('aria-label', 'Find ' + k.name + ' on Amazon (opens a new tab)');
+        a.addEventListener('click', function () { track('kit_amazon', { item_id: k.id, tagged: !!tag }); });
+        acts.appendChild(a);
+      }
+      li.appendChild(acts);
+      return li;
+    }
+    var core = items.filter(function (k) { return k.priority !== 'recommended'; });
+    var rec = items.filter(function (k) { return k.priority === 'recommended'; });
+    if (core.length) {
+      host.appendChild(el('h3', 'kit-h', 'On both official lists'));
+      var ul = el('ul', 'kit-list kit-core');
+      core.forEach(function (k) { ul.appendChild(row(k)); });
+      host.appendChild(ul);
+    }
+    if (rec.length) {
+      host.appendChild(el('h3', 'kit-h kit-h-rec', 'Also recommended, on one list'));
+      var ul2 = el('ul', 'kit-list kit-rec');
+      rec.forEach(function (k) { ul2.appendChild(row(k)); });
+      host.appendChild(ul2);
+    }
+
+    var bar = el('div', 'kit-bar');
+    bar.appendChild(countEl2);
+    copy.addEventListener('click', function () {
+      if (!picked.length) { toast('Nothing ticked yet. Tick "Add to my list" on the items you want.'); return; }
+      var lines = items.filter(function (k) { return picked.indexOf(k.id) > -1; })
+        .map(function (k) { return '- ' + k.name + (k.quantity ? ': ' + k.quantity : ''); });
+      var text = 'My blackout starter kit, from the official lists (' + SITE + '#kit)\n' + lines.join('\n');
+      copyText(text, function (ok) {
+        toast(ok ? 'Copied ' + plural(lines.length, 'item') + '. Paste it anywhere.' : 'Copy failed. The page kept your ticks; try again.');
+        track('kit_copy', { count: lines.length });
+      });
+    });
+    clear.addEventListener('click', function () {
+      picked = [];
+      lsDel(KIT_KEY);
+      host.querySelectorAll('.kit-check input').forEach(function (c) { c.checked = false; });
+      syncCount();
+      copy.focus();
+    });
+    bar.appendChild(copy);
+    bar.appendChild(clear);
+    host.appendChild(bar);
+    syncCount();
+
+    var disc = tag ? kit.disclosureWithTag : kit.disclosureNoTag;
+    host.appendChild(el('p', 'kit-disclosure', disc || (tag
+      ? 'The Amazon buttons are affiliate links: BookHockeys may earn a small commission if you buy, at no cost to you.'
+      : 'The Amazon buttons open a plain search. We earn nothing from them.')));
   }
 
   /* ---------- theories rail ---------- */
@@ -978,9 +1119,11 @@
   function settle(p) { return p.then(function (v) { return { ok: true, v: v }; }, function (e) { return { ok: false, e: e }; }); }
 
   buildFilters();
-  Promise.all(['items', 'sources', 'meta', 'analysis', 'guidance', 'faq', 'feed'].map(function (n) { return settle(getJSON(n)); }))
+  Promise.all(['items', 'sources', 'meta', 'analysis', 'guidance', 'faq', 'feed', 'kit'].map(function (n) { return settle(getJSON(n)); }))
     .then(function (r) {
-      var items = r[0], sources = r[1], meta = r[2], analysis = r[3], guidance = r[4], faq = r[5], feed = r[6];
+      var items = r[0], sources = r[1], meta = r[2], analysis = r[3], guidance = r[4], faq = r[5], feed = r[6], kit = r[7];
+      if (kit.ok && kit.v && typeof kit.v === 'object') renderKit(kit.v);
+      else { $('kitBody').textContent = ''; $('kitBody').appendChild(stateBlock('div', 'The starter kit did not load.', 'kit.json could not be read, so the list is empty. The official checklists are linked in the table above. Reload to try again.', 'Reload the page', reload)); }
       var metaOk = meta.ok && meta.v && typeof meta.v === 'object';
       D.meta = metaOk ? meta.v : null;
 

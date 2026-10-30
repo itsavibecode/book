@@ -267,6 +267,36 @@ select.btn { padding-right: .5rem; background: var(--bg); }
   .tbl td::before, .tbl tbody th::before { content: attr(data-label); font-family: var(--font-ui); font-weight: 700; font-size: .8rem; color: var(--muted); padding-top: .15rem; }
 }
 
+/* ---------- Blackout starter kit ---------- */
+/* Core items (on both official lists) get the full row weight; recommended
+   items (on one list) sit in a lighter, more compact list below them. */
+.sec-intro a { padding: .75rem 0; }
+.kit-h { font-size: 1.4rem; text-transform: uppercase; margin: 1rem 0 .4rem; }
+.kit-h-rec { font-size: 1.15rem; color: var(--muted); margin-top: 1.6rem; }
+.kit-list { list-style: none; margin: 0; padding: 0; }
+.kit-core { border-top: 2px solid var(--ink); }
+.kit-rec { border-top: 1px solid var(--ctl-bd); }
+.kit-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem 1.25rem; align-items: center; padding: .85rem 0; border-bottom: 1px solid var(--line); }
+.kit-head { margin: 0 0 .2rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .7rem; }
+.kit-name { font-family: var(--font-head); font-weight: 700; font-size: 1.4rem; line-height: 1.1; }
+.kit-qty { font-family: var(--font-ui); font-weight: 700; font-size: .9rem; }
+.kit-why { margin: 0 0 .35rem; }
+.kit-src { margin: 0; display: flex; flex-wrap: wrap; gap: .3rem; }
+.kit-rec .kit-item { padding: .6rem 0; }
+.kit-rec .kit-name { font-size: 1.15rem; }
+.kit-rec .kit-why { color: var(--muted); font-size: .95rem; }
+.kit-acts { display: flex; flex-wrap: wrap; gap: .4rem .6rem; align-items: center; justify-content: flex-end; font-family: var(--font-ui); }
+.kit-check { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: 0 .3rem; cursor: pointer; font-size: .92rem; }
+.kit-check input { width: 22px; height: 22px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+.kit-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin-top: 1.2rem; padding: .8rem 0; border-top: 2px solid var(--ink); font-family: var(--font-ui); }
+.kit-count { margin: 0; margin-right: auto; font-weight: 700; }
+.kit-disclosure { font-family: var(--font-ui); font-size: .85rem; color: var(--muted); margin-top: .4rem; max-width: 46rem; }
+@media (max-width: 639px) {
+  .kit-item { grid-template-columns: minmax(0, 1fr); }
+  .kit-acts { justify-content: flex-start; }
+  .kit-name { font-size: 1.25rem; }
+}
+
 /* ---------- FAQ ---------- */
 .faq { border-top: 2px solid var(--ink); }
 .faq details { border-bottom: 1px solid var(--line); }

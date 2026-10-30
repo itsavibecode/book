@@ -33,6 +33,7 @@ Rating an outlet is not rating the claim. A trust-5 outlet can carry a REPORTED 
 - [Outlets](https://bookhockeys.com/fortress/data/sources.json): id, name, domain, trust, trustReason.
 - [Analysis](https://bookhockeys.com/fortress/data/analysis.json): reasoning by Claude per theory, signed and dated, not a prediction.
 - [Official guidance](https://bookhockeys.com/fortress/data/guidance.json) and [questions](https://bookhockeys.com/fortress/data/faq.json).
+- [Blackout starter kit](https://bookhockeys.com/fortress/data/kit.json): items copied from the official checklists it links (Ready.gov, UK Be Ready), with their quantities. It is the governments' advice, not ours; the Amazon buttons only open a search.
 - [Wire](https://bookhockeys.com/fortress/data/feed.json): headlines from the last 48 hours, collected automatically every 6 hours and not reviewed. Do not treat a wire headline as a labeled claim.
 
 ## Pages

@@ -53,6 +53,7 @@ the same commit.
 | `analysis.json` | a Claude session only | "What would have to be true": intro, one entry per theory, the Nov 17 note and the verdict |
 | `guidance.json` | a Claude session or you | Rows of the "What officials actually recommend" table, each linked to board items |
 | `faq.json` | a Claude session or you | "Questions people are asking", each answered from board items |
+| `kit.json` | a Claude session or you | The blackout starter kit: `updated, affiliateTag, disclosureNoTag, disclosureWithTag, sources[{id,label,url}], items[{id,name,quantity,why,priority,amazonQuery,officialSources}]` |
 | `meta.json` | `refresh.py`, plus you for three fields | `statusConfirmed` and `statusNotTrue` (the two status sentences, edit them here, not in the HTML), `version`; the rest is written by the refresh |
 | `feed.json` | `refresh.py` only | The Incoming wire: last 48 hours of matching headlines |
 
@@ -70,6 +71,19 @@ Notes for editors:
   comes from the matching `analysis.json` entry (`ai-cyber` maps to `cyberattack`).
 - After editing, run `python -I tools/build-seo.py` so the JSON-LD and the static status
   line follow (the refresh also does this every 6 hours).
+
+## Blackout starter kit
+
+The section after "What officials actually recommend" lists only items that are on the
+official checklists in `kit.json` `sources` (Ready.gov and the UK's Be Ready), with the
+quantity in their wording. `priority: "core"` items (on both lists) lead as the main list;
+`"recommended"` items (on one list) follow in a lighter list. Each row has an
+"Add to my list" checkbox (kept on the device under `fortress-kit`), a "Copy my list" button,
+and a "Find on Amazon" button that opens `https://www.amazon.com/s?k=<amazonQuery>` in a new
+tab with `rel="noopener nofollow sponsored"`. `&tag=<affiliateTag>` is added only when
+`affiliateTag` is not empty, and the matching disclosure (`disclosureWithTag` or
+`disclosureNoTag`) shows under the list. The methodology section says the kit is the
+official lists, not our advice. Never add an item that is not on a linked official list.
 
 ## Refresh
 
