@@ -1,6 +1,6 @@
 # Fortress Watch
 
-Live at https://bookhockeys.com/fortress/ . Version 0.2.0.
+Live at https://bookhockeys.com/fortress/ . Version 0.3.0.
 
 One page that answers "what is actually confirmed about FORTRESS and the 90-day / 30-day
 warnings, and what is just going around". Every claim carries a status label. Every outlet
@@ -90,18 +90,40 @@ answers every tile with "API KEY REQUIRED", so the page uses Esri's keyless Ligh
 Dark Gray Canvas. Switching back to CARTO with a key is two URLs and the attribution at the
 top of `map.js`.
 
-## Blackout starter kit
+## Blackout starter kit (`kit.js`, `kit.html`, `kit-icons.svg`)
 
-The section after "What officials actually recommend" lists only items that are on the
-official checklists in `kit.json` `sources` (Ready.gov and the UK's Be Ready), with the
-quantity in their wording. `priority: "core"` items (on both lists) lead as the main list;
-`"recommended"` items (on one list) follow in a lighter list. Each row has an
-"Add to my list" checkbox (kept on the device under `fortress-kit`), a "Copy my list" button,
-and a "Find on Amazon" button that opens `https://www.amazon.com/s?k=<amazonQuery>` in a new
-tab with `rel="noopener nofollow sponsored"`. `&tag=<affiliateTag>` is added only when
-`affiliateTag` is not empty, and the matching disclosure (`disclosureWithTag` or
-`disclosureNoTag`) shows under the list. The methodology section says the kit is the
-official lists, not our advice. Never add an item that is not on a linked official list.
+The kit lists only items that are on the official checklists in `kit.json` `sources`
+(Ready.gov and the UK's Be Ready), with the quantity in their wording. `kit.js` renders it
+on the board (after "What officials actually recommend") and on the standalone share page
+`kit.html`; on `kit.html` it also runs the theme toggle and the consent banner.
+
+- **Hero band.** The kit section opens with the page's one full-bleed, inverted band: ink
+  ground with paper type in light, paper ground with ink type in dark. Reason (RHYTHM 3): the
+  kit is the one thing readers act on and the part they screenshot, so it gets the one
+  inverted section. It carries the headline, "Every item is on the Ready.gov or UK Be Ready
+  list. Nothing else.", an OFFICIAL LISTS ONLY stamp, the item count computed from
+  `kit.json`, and a flat lay of eight pictograms on a paper card (turned up to 2 degrees so
+  it reads as a laid-out kit). No hazard stripe: that stays unique to the status line.
+- **Pictograms.** `kit-icons.svg` holds one `<symbol id="ki-<item id>">` per kit item,
+  drawn for this site: 24 x 24, 2 px stroke in currentColor, square caps, fills only where a
+  solid shape reads better. R-04 reason: pictograms let people identify an item in a
+  checklist they screenshot. The power bank carries the set's only lightning bolt, because
+  the bolt marks stored charge. `tools/build-seo.py` inlines the sprite into `index.html` and
+  `kit.html` so `<use href="#ki-<id>">` works from the server and from file:// (an external
+  `kit-icons.svg#id` reference is blocked on file://). A new kit item needs a new symbol.
+- **List.** Core items (`priority: "core"`) are full rows in two columns (one under 640 px):
+  pictogram, name, quantity, why, source chips, "Add to my list" (kept on the device under
+  `fortress-kit`) and "Find on Amazon". Recommended items sit as one row of chips that open
+  to the same details. R-14 reason: core items are the base kit (`priority: "core"`), so
+  they get the weight; the extras are optional and stay out of the way until asked.
+- **Amazon.** "Find on Amazon" opens `https://www.amazon.com/s?k=<amazonQuery>` in a new tab
+  with `rel="noopener nofollow sponsored"`. `&tag=<affiliateTag>` is added only when
+  `affiliateTag` is not empty, and the matching disclosure shows under the list.
+- **Kit page.** `kit.html` has the same hero and list, its own title and description, a
+  JSON-LD ItemList of the item names (written by `tools/build-seo.py`; no offers, no prices)
+  and its own share card `og-kit.png` (drawn by `tools/make-kit.py og-kit` from the same
+  sprite). The methodology note says the kit is the official lists, not our advice. Never add
+  an item that is not on a linked official list.
 
 ## Refresh
 
@@ -135,9 +157,10 @@ published.
 
 ## Site kit
 
-`favicon.svg`, `favicon-16/32/192/512.png`, `apple-touch-icon.png`, `favicon.ico` and
-`og-card.png` are drawn by `tools/make-kit.py` (Pillow, Barlow Condensed Bold when
-installed). Re-run it when the status line changes so the share card matches.
+`favicon.svg`, `favicon-16/32/192/512.png`, `apple-touch-icon.png`, `favicon.ico`,
+`og-card.png` and `og-kit.png` are drawn by `tools/make-kit.py` (Pillow, Barlow Condensed Bold
+when installed, Georgia for the kit card's sentence). Re-run it when the status line or the
+kit changes so the share cards match.
 `manifest.webmanifest` makes the page installable. `privacy.html` and `llms.txt` sit beside
 the page. Analytics: GA4 `G-DYME377V2S` with Consent Mode v2; `?ga=off` turns analytics off
 on one device, `?ga=on` turns it back on.
@@ -158,6 +181,18 @@ on one device, `?ga=on` turns it back on.
   (checked with the antislop `contrast-check.py`).
 
 ## Changelog
+
+### v0.3.0 (2026-10-30)
+
+- The kit is the part people screenshot and share, so it got a poster treatment and its
+  own page. It now opens with a full-width band: the headline, an OFFICIAL LISTS ONLY stamp,
+  the item count and eight pictograms laid out like a packed kit.
+- Every kit item has its own pictogram, drawn for this site, so an item is recognizable in a
+  screenshot of the checklist.
+- Core items sit in two columns; the five optional extras fold into chips you open when
+  you want them.
+- New page `kit.html` with the same kit, its own share card and a link from the board, the
+  map and every footer.
 
 ### v0.2.0 (2026-10-30)
 

@@ -6,7 +6,7 @@ refresh.py runs it after every feed refresh, so a session that edits
 items.json, faq.json or meta.json only has to wait for the next refresh
 (or run this by hand) for the structured data to follow.
 
-It owns two marked blocks in index.html and one in map.html, nothing else:
+It owns these marked blocks and nothing else:
   <!-- seo:jsonld:start ... -->  ... <!-- seo:jsonld:end -->
       JSON-LD: LiveBlogPosting (one liveBlogUpdate per claim), FAQPage, Organization
   <!-- seo:status:start ... -->  ... <!-- seo:status:end -->
@@ -14,6 +14,11 @@ It owns two marked blocks in index.html and one in map.html, nothing else:
   map.html  <!-- seo:maplist:start ... --> ... <!-- seo:maplist:end -->
       the plain list of claims that have a geo pin, newest first (map.js replaces it
       with the filtered list; without JavaScript this is the whole page)
+  index.html and kit.html  <!-- seo:sprite:start ... --> ... <!-- seo:sprite:end -->
+      the kit pictograms from kit-icons.svg, inlined so <use href="#ki-<id>"> works
+      from the server and from file:// (an external sprite is blocked on file://)
+  kit.html  <!-- seo:kitld:start ... --> ... <!-- seo:kitld:end -->
+      JSON-LD ItemList of the kit item names from data/kit.json (no offers, no prices)
 A file is written only when one of its blocks changed.
 """
 import html
@@ -26,6 +31,8 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / 'data'
 INDEX = ROOT / 'index.html'
 MAP = ROOT / 'map.html'
+KIT = ROOT / 'kit.html'
+SPRITE = ROOT / 'kit-icons.svg'
 SITE = 'https://bookhockeys.com/fortress/'
 TITLE = 'FORTRESS: what is confirmed about the Pentagon 90-day plan and the 30-day stockpile warnings'
 LAUNCH = '2026-10-29T00:00:00Z'
@@ -157,6 +164,40 @@ def build_maplist(items):
     return ''.join(rows)
 
 
+def build_sprite():
+    try:
+        src = SPRITE.read_text(encoding='utf-8')
+    except OSError:
+        return ''
+    symbols = re.findall(r'<symbol\b.*?</symbol>', src, re.S)
+    symbols = [re.sub(r'\s*<!--.*?-->', '', sym, flags=re.S) for sym in symbols]
+    return ('<svg xmlns="http://www.w3.org/2000/svg" class="sprite" aria-hidden="true" focusable="false" '
+            'width="0" height="0" style="position:absolute;overflow:hidden">\n%s\n</svg>\n' % '\n'.join(symbols))
+
+
+def build_kitld(kit):
+    items = [k for k in (kit.get('items') or []) if isinstance(k, dict) and k.get('name')]
+    data = {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        'name': 'Blackout starter kit: the official Ready.gov and UK Be Ready items',
+        'url': SITE + 'kit.html',
+        'numberOfItems': len(items),
+        'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': k['name']} for i, k in enumerate(items)],
+    }
+    body = json.dumps(data, indent=1, ensure_ascii=False).replace('</', '<\\/')
+    return '<script type="application/ld+json">\n%s\n</script>\n' % body
+
+
+def write_if_changed(path, src, out, label):
+    if out != src:
+        with open(path, 'w', encoding='utf-8', newline='\n') as f:
+            f.write(out)
+        print('build-seo: %s updated' % label)
+    else:
+        print('build-seo: %s already current' % label)
+
+
 def replace_block(src, name, inner):
     pat = re.compile(r'(<!-- seo:%s:start[^>]*-->\n)(.*?)(<!-- seo:%s:end -->)' % (name, name), re.S)
     if not pat.search(src):
@@ -174,6 +215,9 @@ def main():
     src = INDEX.read_text(encoding='utf-8')
     out = replace_block(src, 'jsonld', '<script type="application/ld+json">\n%s\n</script>\n' % build_jsonld(items, faq, meta))
     out = replace_block(out, 'status', build_status(meta))
+    sprite = build_sprite()
+    if sprite and '<!-- seo:sprite:start' in out:
+        out = replace_block(out, 'sprite', sprite)
     if out != src:
         with open(INDEX, 'w', encoding='utf-8', newline='\n') as f:
             f.write(out)
@@ -189,6 +233,15 @@ def main():
             print('build-seo: map.html list updated')
         else:
             print('build-seo: map.html already current')
+    if KIT.is_file():
+        ksrc = KIT.read_text(encoding='utf-8')
+        kout = ksrc
+        if sprite:
+            kout = replace_block(kout, 'sprite', sprite)
+        kit = load('kit.json', {})
+        if isinstance(kit, dict) and kit.get('items'):
+            kout = replace_block(kout, 'kitld', build_kitld(kit))
+        write_if_changed(KIT, ksrc, kout, 'kit.html')
     return 0
 
 

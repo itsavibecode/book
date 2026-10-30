@@ -268,34 +268,84 @@ select.btn { padding-right: .5rem; background: var(--bg); }
 }
 
 /* ---------- Blackout starter kit ---------- */
-/* Core items (on both official lists) get the full row weight; recommended
-   items (on one list) sit in a lighter, more compact list below them. */
-.sec-intro a { padding: .75rem 0; }
-.kit-h { font-size: 1.4rem; text-transform: uppercase; margin: 1rem 0 .4rem; }
-.kit-h-rec { font-size: 1.15rem; color: var(--muted); margin-top: 1.6rem; }
+/* The hero is the page's one full-bleed, inverted band (RHYTHM 3): the kit is
+   the one thing readers act on and the part they screenshot. Ink ground and
+   paper type in light, the reverse in dark, so --ink and --bg simply swap. */
+.sec-intro a, .method-note a { padding: .75rem 0; }
+.kit-sec { padding-top: 2.5rem; }
+.kit-band { background: var(--ink); color: var(--bg); padding: 2.6rem 0 3rem; }
+.kit-band-in { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 2rem 3rem; align-items: center; }
+.kit-band a { color: var(--bg); }
+.kit-band :focus-visible { outline-color: var(--bg); }
+.kit-title { font-size: clamp(3rem, 1.5rem + 6.2vw, 6.4rem); line-height: .9; text-transform: uppercase; letter-spacing: -.005em; margin: 0; color: var(--bg); }
+.kit-lede { font-size: clamp(1.15rem, 1rem + .6vw, 1.45rem); line-height: 1.35; margin: 1rem 0 1.1rem; max-width: 30rem; }
+.kit-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .7rem 1.1rem; margin: 0; font-family: var(--font-ui); font-weight: 700; font-size: .98rem; }
+.kit-stamp { background: transparent; color: var(--bg); border-color: var(--bg); font-size: 1.05rem; transform: rotate(-2deg); box-shadow: none; }
+.kit-cta { margin: 1.3rem 0 0; }
+.btn-band { color: var(--bg); border-color: var(--bg); background: transparent; font-weight: 700; }
+.btn-band:hover { background: var(--bg); color: var(--ink); border-color: var(--bg); }
+.btn-band:active { background: var(--bg); color: var(--ink); }
+/* The flat lay: a paper card on the band with a 1 px frame offset behind it,
+   eight pictograms on a loose 4 x 2 grid nudged and turned up to 2 degrees so
+   it reads as a laid-out kit, not an icon grid. No shadow, no gradient. */
+.kit-lay { position: relative; margin: 0 10px 10px 0; }
+.kit-lay::before { content: ""; position: absolute; inset: 0; border: 1px solid var(--bg); transform: translate(10px, 10px); }
+.kit-card {
+  position: relative; background: var(--bg); color: var(--ink);
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.4rem 1rem; justify-items: center;
+  padding: 1.8rem 1.5rem; outline: 1px solid var(--ink); outline-offset: -8px;
+}
+.ki { display: block; width: 28px; height: 28px; flex: none; }
+.ki.lay { width: 100%; max-width: 84px; height: auto; aspect-ratio: 1; transform: translate(var(--x, 0), var(--y, 0)) rotate(var(--r, 0deg)); }
+@media (max-width: 899px) {
+  .kit-band-in { grid-template-columns: minmax(0, 1fr); }
+  .kit-lay { max-width: 34rem; }
+}
+@media (max-width: 639px) {
+  .kit-band { padding: 2rem 0 2.4rem; }
+  .kit-card { gap: 1rem .6rem; padding: 1.3rem 1rem; }
+}
+
+/* Item list. Core items get full rows in two columns; the optional extras
+   collapse into chips (R-14: the hierarchy is the content's, not a template's). */
+.kit-h { font-size: 1.4rem; text-transform: uppercase; margin: 1.4rem 0 .4rem; }
+.kit-h-rec { font-size: 1.15rem; color: var(--muted); margin-top: 1.8rem; }
 .kit-list { list-style: none; margin: 0; padding: 0; }
-.kit-core { border-top: 2px solid var(--ink); }
-.kit-rec { border-top: 1px solid var(--ctl-bd); }
-.kit-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem 1.25rem; align-items: center; padding: .85rem 0; border-bottom: 1px solid var(--line); }
-.kit-head { margin: 0 0 .2rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .7rem; }
-.kit-name { font-family: var(--font-head); font-weight: 700; font-size: 1.4rem; line-height: 1.1; }
-.kit-qty { font-family: var(--font-ui); font-weight: 700; font-size: .9rem; }
+.kit-core { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2.2rem; border-top: 2px solid var(--ink); }
+.kit-item { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: .3rem .8rem; align-items: start; padding: .9rem 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.ki-row { margin-top: .15rem; }
+.kit-main { min-width: 0; }
+.kit-head { margin: 0 0 .1rem; }
+.kit-name { font-family: var(--font-head); font-weight: 700; font-size: 1.35rem; line-height: 1.1; }
+.kit-qty { font-family: var(--font-ui); font-weight: 600; font-size: .86rem; margin: 0 0 .3rem; }
 .kit-why { margin: 0 0 .35rem; }
 .kit-src { margin: 0; display: flex; flex-wrap: wrap; gap: .3rem; }
-.kit-rec .kit-item { padding: .6rem 0; }
-.kit-rec .kit-name { font-size: 1.15rem; }
-.kit-rec .kit-why { color: var(--muted); font-size: .95rem; }
-.kit-acts { display: flex; flex-wrap: wrap; gap: .4rem .6rem; align-items: center; justify-content: flex-end; font-family: var(--font-ui); }
-.kit-check { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: 0 .3rem; cursor: pointer; font-size: .92rem; }
+.kit-acts { display: flex; flex-wrap: wrap; gap: .4rem .6rem; align-items: center; margin-top: .45rem; font-family: var(--font-ui); }
+.kit-check { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: 0 .3rem 0 0; cursor: pointer; font-size: .92rem; }
 .kit-check input { width: 22px; height: 22px; margin: 0; accent-color: var(--ink); cursor: pointer; }
-.kit-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin-top: 1.2rem; padding: .8rem 0; border-top: 2px solid var(--ink); font-family: var(--font-ui); }
+.kit-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.kit-chip {
+  min-height: 44px; display: inline-flex; align-items: center; gap: .5rem; padding: 0 .85rem 0 .65rem;
+  border: 1px solid var(--ctl-bd); background: transparent; color: var(--ink); cursor: pointer;
+  font-family: var(--font-ui); font-size: .92rem;
+}
+.kit-chip:hover { border-color: var(--ink); }
+.kit-chip[aria-expanded="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.kit-chip .ki-chip { width: 22px; height: 22px; }
+.kit-chip-mark { display: none; font-size: .72rem; font-weight: 700; border: 1px solid currentColor; padding: .05rem .3rem; }
+.kit-chip.is-picked .kit-chip-mark { display: inline-block; }
+.kit-panels { margin-top: .4rem; }
+.kit-panel { border: 1px solid var(--ctl-bd); padding: 0 .9rem; margin-top: .5rem; }
+.kit-panel .kit-item { border-bottom: 0; }
+.kit-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin-top: 1.4rem; padding: .8rem 0; border-top: 2px solid var(--ink); font-family: var(--font-ui); }
 .kit-count { margin: 0; margin-right: auto; font-weight: 700; }
 .kit-disclosure { font-family: var(--font-ui); font-size: .85rem; color: var(--muted); margin-top: .4rem; max-width: 46rem; }
 @media (max-width: 639px) {
-  .kit-item { grid-template-columns: minmax(0, 1fr); }
-  .kit-acts { justify-content: flex-start; }
+  .kit-core { grid-template-columns: minmax(0, 1fr); }
   .kit-name { font-size: 1.25rem; }
 }
+.kit-page .kit-sec { padding-top: 1rem; }
+#kitBody { padding-top: 1.3rem; }
 
 /* ---------- FAQ ---------- */
 .faq { border-top: 2px solid var(--ink); }
