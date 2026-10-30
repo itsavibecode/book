@@ -1,981 +1,1249 @@
 [
-  {
-    "id": "fortress-memo-signed",
-    "date": "2026-09-30",
-    "headline": "Hegseth signs memo creating FORTRESS America as a Department of War program",
-    "summary": "A September 30, 2026 memo from the Secretary of War, titled Establishment of FORTRESS America as a Department of War Program for the Defense of the American Homeland, created the program. It is posted on the department's own media server.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "us-dow",
-      "twz",
-      "snopes"
-    ],
-    "urls": [
-      "https://media.defense.gov/2026/Sep/30/2004009303/-1/-1/1/ESTABLISHMENT-OF-FORTRESS-AMERICA-AS-A-DEPARTMENT-OF-WAR-PROGRAM-FOR-THE-DEFENSE-OF-THE-AMERICAN-HOMELAND.PDF",
-      "https://www.twz.com/nuclear/90-days-no-help-fortress-americas-goal-to-make-bases-resilient-bastions-in-a-crisis"
-    ],
-    "quote": "America cannot be starved out, shut down, or cut off. (Pete Hegseth, FORTRESS memo)",
-    "region": "US"
-  },
-  {
-    "id": "fortress-five-pillars",
-    "date": "2026-09-30",
-    "headline": "FORTRESS has five pillars, from energy independence to space resilience",
-    "summary": "The program covers energy independence, supply chain and defense industrial base resilience, a strategic defense reserve, installation hardening and cyber resilience, and resilience in space and spectrum.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "us-dow",
-      "wtkr",
-      "newsweek"
-    ],
-    "urls": [
-      "https://media.defense.gov/2026/Sep/30/2004009303/-1/-1/1/ESTABLISHMENT-OF-FORTRESS-AMERICA-AS-A-DEPARTMENT-OF-WAR-PROGRAM-FOR-THE-DEFENSE-OF-THE-AMERICAN-HOMELAND.PDF",
-      "https://www.wtkr.com/news/in-the-community/norfolk/fortress-america-new-program-meant-to-help-prepare-military-installations-for-the-future",
-      "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804"
-    ],
-    "quote": "the nation's insurance policy (Pete Hegseth, FORTRESS memo)",
-    "region": "US"
-  },
-  {
-    "id": "fortress-program-office-30-days",
-    "date": "2026-09-30",
-    "headline": "Memo orders a FORTRESS program office stood up within 30 days",
-    "summary": "The memo directs the Under Secretary of War for Acquisition and Sustainment to create a FORTRESS America Program Office within 30 days, run day to day by a Senior Executive Service official with a two-star military advisor. Newsweek puts the deadline at October 30.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "us-dow",
-      "twz",
-      "newsweek"
-    ],
-    "urls": [
-      "https://media.defense.gov/2026/Sep/30/2004009303/-1/-1/1/ESTABLISHMENT-OF-FORTRESS-AMERICA-AS-A-DEPARTMENT-OF-WAR-PROGRAM-FOR-THE-DEFENSE-OF-THE-AMERICAN-HOMELAND.PDF",
-      "https://www.twz.com/nuclear/90-days-no-help-fortress-americas-goal-to-make-bases-resilient-bastions-in-a-crisis",
-      "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804"
-    ],
-    "quote": "stand up the FORTRESS America Program Office within thirty (30) days (FORTRESS memo)",
-    "region": "US"
-  },
-  {
-    "id": "hegseth-quantico-own-power",
-    "date": "2026-09-30",
-    "headline": "Hegseth tells Quantico audience every major base will make its own power",
-    "summary": "Announcing FORTRESS in a speech at Quantico, Hegseth said every major military installation would generate its own power independent of the civilian grid. He did not give a 90-day figure in the speech.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "air-space-forces",
-      "snopes",
-      "fortune"
-    ],
-    "urls": [
-      "https://www.airandspaceforces.com/pentagon-resilient-energy-fortress-america-project/",
-      "https://www.snopes.com/fact-check/pentagon-fortress-initiative-90-days/",
-      "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/"
-    ],
-    "quote": "every major military installation in America is going to generate its own power, independent of the civilian grid. (Pete Hegseth)",
-    "region": "US"
-  },
-  {
-    "id": "fortress-acronym",
-    "date": "2026-10-26",
-    "headline": "What FORTRESS stands for",
-    "summary": "Outlets spell it out as Federal Operations for Resilience, Troop Resources, Energy, Supply, and Survivability. TWZ renders part of it as Energy Supply, without a comma.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "fortune",
-      "newsweek",
-      "twz"
-    ],
-    "urls": [
-      "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/",
-      "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "roundtable-500-bases",
-    "date": "2026-10-20",
-    "headline": "Defense official: about 500 US bases under review, energy comes first",
-    "summary": "At an October 20 Defense Writers Group roundtable, a senior defense official said energy independence is the first priority and around 500 continental US bases are being assessed. Cost is still being worked out, and Air & Space Forces Magazine says full achievement could take decades.",
-    "status": "reported",
-    "theory": null,
-    "sourceIds": [
-      "air-space-forces"
-    ],
-    "urls": [
-      "https://www.airandspaceforces.com/pentagon-resilient-energy-fortress-america-project/"
-    ],
-    "quote": "This is not a wait-and-see kind of a thing. (senior defense official)",
-    "region": "US"
-  },
-  {
-    "id": "fox-90-day-report",
-    "date": "2026-10-25",
-    "headline": "Fox News reports bases must run 90 days without outside power, water or fuel",
-    "summary": "Fox News Digital, citing internal planning documents it reviewed, reported that major continental US installations would be expected to sustain essential operations on their own for at least 90 days, covering electricity, water, fuel and communications. Pentagon spokesperson Sean Parnell told Fox that relying on civilian infrastructure is an intolerable risk.",
-    "status": "reported",
-    "theory": null,
-    "sourceIds": [
-      "fox-news",
-      "fortune",
-      "twz",
-      "newsweek"
-    ],
-    "urls": [
-      "https://www.foxnews.com/politics/inside-pentagons-doomsday-plan-keep-america-fighting-global-war-erupts",
-      "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/",
-      "https://www.twz.com/nuclear/90-days-no-help-fortress-americas-goal-to-make-bases-resilient-bastions-in-a-crisis"
-    ],
-    "quote": "Power is combat now. (Sean Parnell, Pentagon chief spokesperson, to Fox News Digital)",
-    "region": "US"
-  },
-  {
-    "id": "ninety-day-unconfirmed",
-    "date": "2026-10-26",
-    "headline": "No public Pentagon document states the 90-day figure yet",
-    "summary": "Snopes rated the claim Mostly True but listed the 90-day requirement as unverified: Parnell shared the Fox story on X without confirming the number, and the September 30 memo does not state it. TWZ and IBTimes also note the benchmark has not appeared in a public directive.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "snopes",
-      "twz",
-      "ibtimes"
-    ],
-    "urls": [
-      "https://www.snopes.com/fact-check/pentagon-fortress-initiative-90-days/",
-      "https://www.yahoo.com/news/politics/articles/fact-check-know-pentagons-fortress-225800494.html",
-      "https://www.twz.com/nuclear/90-days-no-help-fortress-americas-goal-to-make-bases-resilient-bastions-in-a-crisis"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "parnell-two-oceans",
-    "date": "2026-10-25",
-    "headline": "Pentagon spokesman: we can no longer rely on two oceans to protect us",
-    "summary": "Sean Parnell, who reportedly leads FORTRESS, posted on X that the program is strategic deterrence in action. He has tied it to Golden Dome and a renewed focus on the Western Hemisphere.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "x",
-      "wtkr",
-      "newsweek"
-    ],
-    "urls": [
-      "https://www.wtkr.com/news/in-the-community/norfolk/fortress-america-new-program-meant-to-help-prepare-military-installations-for-the-future",
-      "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804"
-    ],
-    "quote": "I created FORTRESS America because we can no longer rely on two oceans to protect us. (Sean Parnell, on X)",
-    "region": "US"
-  },
-  {
-    "id": "reactors-microgrids-plan",
-    "date": "2026-10-25",
-    "headline": "Plan calls for portable reactors, big batteries and microgrids on bases",
-    "summary": "Per Fox's documents, FORTRESS envisions portable nuclear reactors, large battery storage and microgrids that can disconnect bases from the civilian grid, plus reserves of munitions, fuel and medical supplies. Fortune notes the Army announced up to $2.2 billion in microreactor awards for five bases, including Fort Bragg and Fort Hood, in August.",
-    "status": "reported",
-    "theory": null,
-    "sourceIds": [
-      "fox-news",
-      "fortune"
-    ],
-    "urls": [
-      "https://www.foxnews.com/politics/inside-pentagons-doomsday-plan-keep-america-fighting-global-war-erupts",
-      "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "cost-timeline-unknown",
-    "date": "2026-10-26",
-    "headline": "No budget or completion date for FORTRESS has been released",
-    "summary": "The Pentagon has published no cost estimate or timeline. Air & Space Forces Magazine estimates scores of billions to hundreds of billions of dollars, and CSIS called some goals extremely ambitious. Snopes reports Hegseth said FORTRESS is not meant to stoke fear of war on American soil.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "fortune",
-      "air-space-forces",
-      "newsweek",
-      "snopes"
-    ],
-    "urls": [
-      "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/",
-      "https://www.airandspaceforces.com/pentagon-resilient-energy-fortress-america-project/",
-      "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804",
-      "https://www.snopes.com/fact-check/pentagon-fortress-initiative-90-days/"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "wtkr-norfolk-hearing",
-    "date": "2026-10-28",
-    "headline": "Norfolk TV: Navy leaders pushed for on-base reactors at a May hearing",
-    "summary": "WTKR in Norfolk reports that at a May House Armed Services hearing, Rep. Rob Wittman pressed for on-base power, and Acting Navy Secretary Hun Cao said small reactors could also make fresh water. The station says bases cannot rely on civilian water and electricity.",
-    "status": "reported",
-    "theory": null,
-    "sourceIds": [
-      "wtkr"
-    ],
-    "urls": [
-      "https://www.wtkr.com/news/in-the-community/norfolk/fortress-america-new-program-meant-to-help-prepare-military-installations-for-the-future"
-    ],
-    "quote": "We need to get a pilot established, a target date, and get one going. (Adm. Daryl Caudle, Chief of Naval Operations)",
-    "region": "US"
-  },
-  {
-    "id": "uk-be-ready-launch",
-    "date": "2026-10-22",
-    "headline": "UK launches Be Ready campaign: prepare for 3 days of disruption",
-    "summary": "The Cabinet Office launched Be Ready on October 22, 2026, asking households to prepare for three days without power, water, phones or internet. It is the first stage of a three-year campaign and replaces 2024 Prepare guidance.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "uk-gov-beready",
-      "fortune",
-      "uk-defence-journal"
-    ],
-    "urls": [
-      "https://beready.campaign.gov.uk/",
-      "https://ukdefencejournal.org.uk/households-asked-to-prepare-for-three-days-of-disruption/",
-      "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/"
-    ],
-    "quote": "Being ready for 3 days helps you manage while support reaches those in need. (GOV.UK Be Ready)",
-    "region": "UK"
-  },
-  {
-    "id": "uk-checklist-items",
-    "date": "2026-10-22",
-    "headline": "UK checklist: 3 litres of water per person per day, cash, radio, torch",
-    "summary": "The Be Ready checklist covers drinking water (3 litres per person per day), food that needs no cooking, a torch, power bank, battery or wind-up radio, first aid, medicines, pet supplies and cash in case card payments fail. Security Minister Dan Jarvis urged people who can follow it to do so.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "fortune",
-      "uk-defence-journal"
-    ],
-    "urls": [
-      "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/",
-      "https://ukdefencejournal.org.uk/households-asked-to-prepare-for-three-days-of-disruption/"
-    ],
-    "quote": "Those who can follow this advice should follow this advice. (Dan Jarvis, UK Security Minister)",
-    "region": "UK"
-  },
-  {
-    "id": "streeting-defence-secretary",
-    "date": "2026-07-20",
-    "headline": "Wes Streeting is now UK Defence Secretary, not Health Secretary",
-    "summary": "Streeting resigned as Health Secretary in May 2026 and was appointed Defence Secretary on July 20, 2026 by Prime Minister Andy Burnham. Some posts still describe him as Health Secretary.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "uk-defence-journal",
-      "fortune"
-    ],
-    "urls": [
-      "https://ukdefencejournal.org.uk/?p=70878",
-      "https://en.mercopress.com/2026/07/23/wes-streeting-appointed-uk-defence-secretary-disappointment-with-removal-of-dan-jarvis-responsible-for-dip"
-    ],
-    "region": "UK"
-  },
-  {
-    "id": "streeting-1000-days",
-    "date": "2026-10-25",
-    "headline": "Streeting: UK and NATO have a little over 1,000 days to prepare",
-    "summary": "Writing in the Telegraph, Streeting argued adversaries could have the forces and war economy to attack by 2030. He listed hostile states, cyberattacks, organized crime and climate change as threats.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "fortune",
-      "gb-news"
-    ],
-    "urls": [
-      "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/",
-      "https://www.gbnews.com/politics/wes-streeting-ready-for-war-1000-days-russia-defence-funding"
-    ],
-    "region": "UK"
-  },
-  {
-    "id": "streeting-alert-not-alarmed",
-    "date": "2026-10-14",
-    "headline": "Streeting tells households to keep bottled water and tinned food",
-    "summary": "Ahead of Labour's conference, Streeting said households should keep bottled water and tinned goods for power cuts, floods, cyberattacks and possible conflict. He called it basic preparation, not a call for mass stockpiling.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "grocery-gazette",
-      "the-independent"
-    ],
-    "urls": [
-      "https://www.grocerygazette.co.uk/2026/10/14/households-to-stock-up-on-tinned-food/",
-      "https://www.the-independent.com/news/uk/home-news/wes-streeting-preparedness-warning-stock-up-food-emergency-b3073964.html"
-    ],
-    "quote": "alert not alarmed (Wes Streeting, UK Defence Secretary)",
-    "region": "UK"
-  },
-  {
-    "id": "ncsc-cyber-incidents",
-    "date": "2026-10-26",
-    "headline": "UK cyber agency handled 200+ attacks on critical infrastructure in a year",
-    "summary": "The National Cyber Security Centre dealt with more than 200 incidents affecting critical infrastructure from June 2025 to May 2026. NCSC chief Richard Horne said about 75 percent were believed to be linked to state actors.",
-    "status": "reported",
-    "theory": null,
-    "sourceIds": [
-      "fortune"
-    ],
-    "urls": [
-      "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/"
-    ],
-    "region": "UK"
-  },
-  {
-    "id": "uk-30-days-claim",
-    "date": "2026-10-27",
-    "headline": "Claim that the UK told people to prepare for 30 days is false: it says 3",
-    "summary": "Dan Bongino told listeners the UK government had issued warnings about 30 days of preparedness. The official Be Ready site asks for 3 days, and no government source found asks civilians to prepare for 30 days.",
-    "status": "debunked",
-    "theory": null,
-    "sourceIds": [
-      "uk-gov-beready",
-      "mediaite",
-      "katu-tnnd"
-    ],
-    "urls": [
-      "https://beready.campaign.gov.uk/",
-      "https://www.mediaite.com/media/news/panic-kills-dan-bongino-warns-americans-to-take-stock-up-warnings-seriously/",
-      "https://katu.com/news/nation-world/former-fbi-deputy-director-warns-americans-to-have-30-days-worth-of-food-and-water-uk-cyberattack-russia"
-    ],
-    "region": "UK"
-  },
-  {
-    "id": "bongino-30-days",
-    "date": "2026-10-27",
-    "headline": "Ex-FBI deputy director Dan Bongino urges Americans to stock 30 days of food",
-    "summary": "On his podcast on Monday, October 26, Bongino, who left the FBI in December 2025, told listeners to keep 30 days of food and water, a radio, batteries and water filtration. He is not a government official and cited the Pentagon's reported 90-day base plan.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "mediaite",
-      "katu-tnnd"
-    ],
-    "urls": [
-      "https://www.mediaite.com/media/news/panic-kills-dan-bongino-warns-americans-to-take-stock-up-warnings-seriously/",
-      "https://katu.com/news/nation-world/former-fbi-deputy-director-warns-americans-to-have-30-days-worth-of-food-and-water-uk-cyberattack-russia"
-    ],
-    "quote": "Fortress My House, Fortress My Apartment (Dan Bongino, podcast)",
-    "region": "US"
-  },
-  {
-    "id": "eu-72-hours",
-    "date": "2025-03-26",
-    "headline": "EU strategy since March 2025: households should manage 72 hours alone",
-    "summary": "The European Commission's Preparedness Union Strategy, unveiled March 26, 2025, set a goal of at least 72 hours of population self-sufficiency. It cites natural disasters, cyberattacks and armed aggression, and is non-binding guidance.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "eu-commission",
-      "euronews"
-    ],
-    "urls": [
-      "https://commission.europa.eu/topics/preparedness_en",
-      "https://www.euronews.com/my-europe/2025/03/26/brussels-ask-eu-citizens-to-put-together-a-72-hour-emergency-kit-to-face-crises"
-    ],
-    "region": "EU"
-  },
-  {
-    "id": "japan-hosono-request",
-    "date": "2026-10-28",
-    "headline": "Japan to ask citizens to stock 3 days of supplies, ideally a week",
-    "summary": "Disaster Management Minister Goshi Hosono said on October 26 that Japan will issue a nationwide request on November 2, when its new Disaster Management Agency launches. The stated reason is natural disasters such as a Nankai Trough megaquake, and the 3-day to 1-week advice is long-standing.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "ibtimes",
-      "business-today",
-      "trendingtopics"
-    ],
-    "urls": [
-      "https://www.ibtimes.co.uk/japan-plans-emergency-request-three-day-food-water-stockpiles-amid-reports-online-war-1828362",
-      "https://www.businesstoday.in/world/story/japan-and-uk-urge-citizens-to-keep-emergency-supplies-ready-for-3-days-to-a-week-563963-2026-10-27"
-    ],
-    "region": "Asia"
-  },
-  {
-    "id": "europe-national-guidance",
-    "date": "2026-10-29",
-    "headline": "Other countries' advice ranges from 3 days to 2 weeks",
-    "summary": "Sweden's 2024 booklet In Case of Crisis or War asks for at least a week of self-reliance, Norway raised its advice from three days to one week, and Austria's Interior Ministry suggests 10 to 14 days. France, Ireland and the Netherlands use three days.",
-    "status": "reported",
-    "theory": null,
-    "sourceIds": [
-      "trendingtopics"
-    ],
-    "urls": [
-      "https://www.trendingtopics.eu/emergency-supplies-uk-japan-scandinavia-preparedness/"
-    ],
-    "region": "EU"
-  },
-  {
-    "id": "trump-iran-midterms-pledge",
-    "date": "2026-10-09",
-    "headline": "Trump says no new Iran strikes before the November 3 midterms",
-    "summary": "On Truth Social, Trump said the US would not attack Iran before the midterm elections. The US-Iran war began February 28, 2026, and reports say the Pentagon has drawn up plans for renewed strikes.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "al-jazeera"
-    ],
-    "urls": [
-      "https://www.aljazeera.com/news/2026/10/9/is-trump-signalling-a-return-to-war-with-iran-after-the-midterms",
-      "https://northeasttimes.com/2026/10/01/trump-says-u-s-could-resume-bombing-iran-after-november-midterms/"
-    ],
-    "quote": "we will not be attacking Iran at any time prior to the Midterm Elections (Donald Trump, Truth Social)",
-    "region": "US"
-  },
-  {
-    "id": "fema-eas-test-nov17",
-    "date": "2026-09-16",
-    "headline": "FEMA and FCC set a nationwide Emergency Alert System test for Nov 17",
-    "summary": "The test runs Tuesday, November 17, 2026, at about 2:20 p.m. ET on radio and TV, with December 3 as the backup date. It will not be sent to mobile phones, and no action is needed.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "fema",
-      "fcc",
-      "x"
-    ],
-    "urls": [
-      "https://www.fema.gov/press-release/20260916/fema-and-fcc-schedule-2026-nationwide-test-emergency-alert-system-november",
-      "https://www.fema.gov/emergency-managers/practitioners/integrated-public-alert-warning-system/national-test-2026",
-      "https://docs.fcc.gov/public/attachments/DA-26-989A1.pdf",
-      "https://x.com/fema/status/2115537898103607797"
-    ],
-    "quote": "This is only a test. No action is required by the public. (FEMA)",
-    "region": "US"
-  },
-  {
-    "id": "fema-test-routine",
-    "date": "2026-09-16",
-    "headline": "The Nov 17 alert test is routine and not linked to FORTRESS",
-    "summary": "Federal law requires a nationwide alert test at least once every three years, and earlier national tests ran in 2011, 2017, 2018 and on October 4, 2023. Neither FEMA's release nor its FAQ mentions FORTRESS, the Pentagon or any expected emergency.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "fema"
-    ],
-    "urls": [
-      "https://www.fema.gov/fact-sheet/2026-national-test-faqs",
-      "https://www.fema.gov/press-release/20260916/fema-and-fcc-schedule-2026-nationwide-test-emergency-alert-system-november"
-    ],
-    "quote": "The test is routine and helps ensure the system operates effectively during emergencies. (FEMA FAQ)",
-    "region": "US"
-  },
-  {
-    "id": "php2shell-ai-flaw",
-    "date": "2026-10-21",
-    "headline": "AI tools helped find two critical PHP flaws affecting much of the web",
-    "summary": "The PHP Foundation disclosed and patched PHP2Shell (CVE-2026-109618 and CVE-2026-109619). Security firm Calif, OpenAI's GPT-5.6 Sol and Google-owned Wiz using Gemini 4 Argon each found parts of it in August, and Cloudflare saw exploit attempts climb into the millions.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "fortune",
-      "axios",
-      "npr"
-    ],
-    "urls": [
-      "https://fortune.com/2026/10/21/ai-tools-discovered-the-php-vulnerability-that-could-take-down-70-of-the-internet-now-the-race-is-on-to-patch-it-before-ai-powered-hackers-attack/",
-      "https://www.axios.com/2026/10/21/php-openai-ai-bug-hunting-cyberattacks",
-      "https://www.npr.org/2026/10/23/g-s1-149503/hacking-php-flaws"
-    ],
-    "region": "Global"
-  },
-  {
-    "id": "cisa-php-exploited",
-    "date": "2026-10-27",
-    "headline": "CISA confirms hackers are exploiting the PHP flaws, orders 3-day fix",
-    "summary": "On October 26, CISA said the two PHP vulnerabilities are being actively exploited and told civilian federal agencies to patch within three days. It did not say who is behind the attacks.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "techcrunch",
-      "fortune"
-    ],
-    "urls": [
-      "https://techcrunch.com/2026/10/27/us-government-says-hackers-are-now-exploiting-critical-php-web-bugs/"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "x-trend-war-framing",
-    "date": "2026-10-25",
-    "headline": "X trend framed the base plan as preparation for a major war",
-    "summary": "An X trending summary titled Pentagon Prepares Bases to Run 90 Days Without Civilian Power or Supplies spread on October 25, with posts saying the plan anticipates a war that cripples the grid. Sites like Natural News called it a 90-day doomsday plan.",
-    "status": "rumor",
-    "theory": "other",
-    "sourceIds": [
-      "x",
-      "natural-news"
-    ],
-    "urls": [
-      "https://x.com/i/trending/2114341495650324687",
-      "https://www.naturalnews.com/2026-10-26-pentagon-doomsday-plan-your-wake-up-call.html"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "theory-iran-war",
-    "date": "2026-10-09",
-    "headline": "Theory: FORTRESS and stock-up advice are prep for a renewed Iran war",
-    "summary": "Some commentators connect the warnings to a possible return to strikes on Iran after the midterms, citing Trump's comments. Analysts quoted by Al Jazeera read his remarks as both reassurance and a warning, but no official ties FORTRESS to Iran.",
-    "status": "speculation",
-    "theory": "iran",
-    "sourceIds": [
-      "al-jazeera"
-    ],
-    "urls": [
-      "https://www.aljazeera.com/news/2026/10/9/is-trump-signalling-a-return-to-war-with-iran-after-the-midterms",
-      "https://www.benzinga.com/news/politics/26/10/62648925/marjorie-taylor-greene-pentagon-fortress-plan"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "theory-midterms",
-    "date": "2026-10-28",
-    "headline": "Theory: something big will be revealed after the November 3 midterms",
-    "summary": "The Economic Collapse Blog wrote that governments may know something they are not telling the public and that it may surface after the midterms. It offers no evidence for the timing.",
-    "status": "speculation",
-    "theory": "midterms",
-    "sourceIds": [
-      "economic-collapse-blog"
-    ],
-    "urls": [
-      "https://theeconomiccollapseblog.com/why-are-so-many-countries-suddenly-warning-their-citizens-to-prepare-for-an-emergency-and-stockpile-essential-survival-supplies/"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "theory-false-flag",
-    "date": "2026-10-28",
-    "headline": "Theory: staged attacks on the grid, then water, are coming",
-    "summary": "An Instagram carousel cites the 1962 Operation Northwoods proposal and predicts attacks on the power grid and water supply followed by a story that grants authorities more power. It gives no evidence that any attack is planned.",
-    "status": "speculation",
-    "theory": "false-flag",
-    "sourceIds": [
-      "instagram",
-      "instagram-imzephyy"
-    ],
-    "urls": [
-      "https://www.instagram.com/p/DfDH0VDln34/",
-      "https://www.instagram.com/p/DfDH0VDln34/?img_index=4"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "theory-russia-europe",
-    "date": "2026-10-28",
-    "headline": "Theory: Europe's stock-up advice means war with Russia is close",
-    "summary": "Facebook threads and blogs read the European advice as a sign of imminent war with Russia. Officials name Russia as a top threat, but the UK and EU say the advice covers everyday emergencies and is not a war warning.",
-    "status": "speculation",
-    "theory": "russia",
-    "sourceIds": [
-      "facebook",
-      "economic-collapse-blog"
-    ],
-    "urls": [
-      "https://www.facebook.com/MzoeSeven/posts/why-are-other-countries-telling-their-citizens-to-stock-up-food-water-ermegency-/28085561501119236/",
-      "https://theeconomiccollapseblog.com/why-are-so-many-countries-suddenly-warning-their-citizens-to-prepare-for-an-emergency-and-stockpile-essential-survival-supplies/"
-    ],
-    "region": "Global"
-  },
-  {
-    "id": "theory-china-grid",
-    "date": "2026-10-26",
-    "headline": "Theory: bases are hardening for a China conflict over Taiwan",
-    "summary": "Commentary links FORTRESS to US warnings that Chinese hackers have tried to plant themselves in US infrastructure and to a possible Taiwan crisis. US officials say China aims to be able to invade Taiwan by 2027 but stress that does not mean it will.",
-    "status": "speculation",
-    "theory": "china",
-    "sourceIds": [
-      "newsweek",
-      "instagram-imzephyy"
-    ],
-    "urls": [
-      "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804",
-      "https://www.instagram.com/p/DfDH0VDln34/"
-    ],
-    "region": "Global"
-  },
-  {
-    "id": "theory-ai-cyber",
-    "date": "2026-10-27",
-    "headline": "Theory: AI-found software flaws are the real reason for stock-up advice",
-    "summary": "Some coverage and posts tie the UK and Japan warnings to the PHP2Shell flaw and AI-powered hacking. Business Today wrote that the UK renewed its message after the PHP glitch, but no official has linked the advice to it.",
-    "status": "speculation",
-    "theory": "ai-cyber",
-    "sourceIds": [
-      "business-today",
-      "ibtimes"
-    ],
-    "urls": [
-      "https://www.businesstoday.in/world/story/japan-and-uk-urge-citizens-to-keep-emergency-supplies-ready-for-3-days-to-a-week-563963-2026-10-27",
-      "https://www.ibtimes.co.uk/japan-plans-emergency-request-three-day-food-water-stockpiles-amid-reports-online-war-1828362"
-    ],
-    "region": "Global"
-  },
-  {
-    "id": "civilians-on-their-own",
-    "date": "2026-10-26",
-    "headline": "Claim: the plan shows civilians will be left on their own",
-    "summary": "A Facebook video cited by Snopes argued that FORTRESS means civilians will be left to fend for themselves. Snopes said how FORTRESS affects civilian disaster preparedness is unclear.",
-    "status": "rumor",
-    "theory": null,
-    "sourceIds": [
-      "snopes",
-      "facebook"
-    ],
-    "urls": [
-      "https://www.snopes.com/fact-check/pentagon-fortress-initiative-90-days/"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "simpsons-nov17-claim",
-    "date": "2026-10-26",
-    "headline": "Viral claim: The Simpsons predicted a great blackout on November 17",
-    "summary": "Posts on X, Reddit's r/conspiracy and YouTube Shorts claim a Simpsons episode foretold a blackout on November 17, the date of the FEMA alert test. The same claim circulated for November 17, 2025, and a forum user then could not find the date in episode transcripts.",
-    "status": "rumor",
-    "theory": "other",
-    "simpsons": true,
-    "sourceIds": [
-      "x",
-      "reddit",
-      "youtube",
-      "great-awakening"
-    ],
-    "urls": [
-      "https://x.com/ElTrompudo2022/status/2114539375925108836",
-      "https://www.reddit.com/r/conspiracy/comments/1xgz8z6/predictive_programming_in_the_simpsons_about_a/",
-      "https://www.youtube.com/shorts/m2I7iulzlFQ",
-      "https://www.youtube.com/watch?v=h0p8A-JbYJc",
-      "https://greatawakening.win/p/1ARKEVBLlZ/according-to-the-simpsons-tomorr/c/"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "simpsons-episode-check",
-    "date": "2026-10-29",
-    "headline": "The cited Simpsons episode aired in 2023 and shows no November 17 date",
-    "summary": "The claim points to It's a Blunderful Life (season 35, episode 7), which aired November 19, 2023. In it Mr. Burns overloads an outlet, causing a meltdown and town blackout that Homer is blamed for; the plot summary gives no calendar date, and no fact-checker has yet addressed the 2026 version.",
-    "status": "rumor",
-    "theory": "other",
-    "simpsons": true,
-    "sourceIds": [
-      "wikipedia",
-      "otaku-oddballs"
-    ],
-    "urls": [
-      "https://en.wikipedia.org/wiki/It%27s_a_Blunderful_Life",
-      "https://otakuandoddballs.com/is-the-simpsons-predicting-a-disaster-on-november-17/"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "simpsons-solar-debunked",
-    "date": "2024-01-02",
-    "headline": "Earlier claim that The Simpsons predicted a solar superstorm was debunked",
-    "summary": "Lead Stories found the 2013 episode Homer Goes to Prep School shows a blackout caused by Homer neglecting the power plant, not a solar storm. A real Carrington-scale storm, like the one in 1859, could cause wide blackouts, but no official has cited one as a reason for the 2026 warnings.",
-    "status": "debunked",
-    "theory": "solar",
-    "simpsons": true,
-    "sourceIds": [
-      "lead-stories",
-      "wikipedia"
-    ],
-    "urls": [
-      "https://leadstories.com/hoax-alert/2024/01/fact-check-episode-9-of-season-24-of-the-simpsons-did-not-predict-a-solar-superstorm.html",
-      "https://en.wikipedia.org/wiki/Carrington_Event"
-    ],
-    "region": "Global"
-  },
-  {
-    "id": "viral-blackout-chain-post",
-    "date": "2026-10-28",
-    "headline": "Chain post: stock-up warnings mean a national blackout is coming",
-    "summary": "A widely shared post argues that governments telling citizens to stock up means a national blackout is near, citing Simpsons predictive programming and the November 17 FEMA test. The FEMA test is a routine broadcast-only check, and no official source predicts a blackout.",
-    "status": "rumor",
-    "theory": "other",
-    "simpsons": true,
-    "sourceIds": [
-      "viral-social-post",
-      "fema"
-    ],
-    "urls": [
-      "https://www.fema.gov/fact-sheet/2026-national-test-faqs"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "fox-factories-wartime-production",
-    "date": "2026-10-25",
-    "headline": "Fox: FORTRESS also readies US factories to switch to defense production on short notice",
-    "summary": "Fox News Digital's October 25 report says the plan lays groundwork for American factories to shift to wartime defense production on short notice. Fox's own social post attributes this to Pentagon spokesperson Sean Parnell, but no public Pentagon document states it.",
-    "status": "reported",
-    "theory": null,
-    "sourceIds": [
-      "fox-news"
-    ],
-    "urls": [
-      "https://www.foxnews.com/politics/inside-pentagons-doomsday-plan-keep-america-fighting-global-war-erupts"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "northwoods-1962-real",
-    "date": "1962-03-13",
-    "headline": "Operation Northwoods was a real 1962 false-flag proposal, and it was never carried out",
-    "summary": "On March 13, 1962 the Joint Chiefs of Staff sent Defense Secretary Robert McNamara a memo proposing staged incidents to justify intervention in Cuba. The Kennedy administration rejected it, and it was made public on November 18, 1997 by the JFK Assassination Records Review Board. It is cited online as proof that a 2026 attack will be staged, but it says nothing about 2026.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "nsarchive",
-      "wikipedia",
-      "instagram-imzephyy"
-    ],
-    "urls": [
-      "https://nsarchive2.gwu.edu/news/20010430/northwoods.pdf",
-      "https://en.wikipedia.org/wiki/Operation_Northwoods",
-      "https://www.instagram.com/p/DfDH0VDln34/"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "epa-water-cyber-2024",
-    "date": "2024-05-20",
-    "headline": "EPA in 2024: over 70% of water systems it inspected broke basic security rules",
-    "summary": "A May 20, 2024 EPA enforcement alert said over 70 percent of drinking water systems it inspected since September 2023 violated basic Safe Drinking Water Act Section 1433 requirements, such as default passwords and shared logins. An Instagram carousel cites it as a sign that water systems will be attacked next; the alert predicts no attack.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "epa",
-      "instagram-imzephyy"
-    ],
-    "urls": [
-      "https://www.epa.gov/enforcement/enforcement-alert-drinking-water-systems-address-cybersecurity-vulnerabilities",
-      "https://www.instagram.com/p/DfDH0VDln34/"
-    ],
-    "quote": "Over 70% of the systems inspected by EPA since September 2023 are in violation of basic SDWA Section 1433 requirements (EPA enforcement alert)",
-    "region": "US"
-  },
-  {
-    "id": "ready-gov-kit",
-    "date": "2026-10-29",
-    "headline": "US advice on Ready.gov: one gallon of water per person per day for several days",
-    "summary": "Ready.gov's basic kit lists one gallon of water per person per day for several days, a several-day supply of non-perishable food, a battery or hand-crank radio, a flashlight, a first aid kit and a phone backup battery. Social posts call it a 72-hour kit, but the page itself says several days and gives no hour figure.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "ready-gov",
-      "instagram-imzephyy"
-    ],
-    "urls": [
-      "https://www.ready.gov/kit",
-      "https://www.instagram.com/p/DfDH0VDln34/"
-    ],
-    "quote": "one gallon per person per day for several days, for drinking and sanitation (Ready.gov)",
-    "region": "US"
-  },
-  {
-    "id": "korea-safe-korea-2026",
-    "date": "2026-10-19",
-    "headline": "South Korea runs its Safe Korea disaster drill Oct 19 to 30 with 236 agencies",
-    "summary": "South Korea's Ministry of the Interior and Safety announced the second-half 2026 Safe Korea disaster response training, run October 19 to 30 by 236 central, local and public agencies. Safe Korea is a recurring national drill, and this round covers disasters such as wildfires and crowd crushes.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "kr-mois",
-      "x-thedebriefing17"
-    ],
-    "urls": [
-      "https://eiec.kdi.re.kr/policy/materialView.do?num=288253"
-    ],
-    "region": "Asia"
-  },
-  {
-    "id": "nz-shakeout-2026",
-    "date": "2026-10-21",
-    "headline": "New Zealand held its national ShakeOut earthquake and tsunami drill on October 21",
-    "summary": "New Zealand ShakeOut 2026, the national earthquake drill and tsunami evacuation practice, was set for 1:30 pm on Wednesday, October 21, run by the National Emergency Management Agency. ShakeOut is a recurring national drill, also held in earlier years.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "nz-nema",
-      "x-thedebriefing17"
-    ],
-    "urls": [
-      "https://getready.govt.nz/involved/shakeout"
-    ],
-    "region": "Global"
-  },
-  {
-    "id": "eu-integrated-resolve-2026",
-    "date": "2026-10-19",
-    "headline": "EU runs its Integrated Resolve 2026 crisis exercise from October 19 to November 20",
-    "summary": "The EU's External Action Service announced EU Integrated Resolve 2026 on October 19, an exercise testing how the EU responds to a complex crisis of a hybrid nature inside and outside the Union. Planning documents for it date back to 2025.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "eeas",
-      "x-thedebriefing17"
-    ],
-    "urls": [
-      "https://www.eeas.europa.eu/eeas/stronger-eu-crisis-response-exercise-eu-integrated-resolve-2026_en"
-    ],
-    "region": "EU"
-  },
-  {
-    "id": "ausalert-launch",
-    "date": "2026-10-01",
-    "headline": "Australia's new AusAlert phone warning system was set to start on October 1, 2026",
-    "summary": "AusAlert, a cell broadcast system that sends emergency warnings straight to phones, was scheduled to replace the SMS-based Emergency Alert on October 1, 2026 after a national test on July 27. States and territories can choose to run it alongside the old system.",
-    "status": "fact",
-    "theory": null,
-    "sourceIds": [
-      "ausalert",
-      "abc-au",
-      "x-thedebriefing17"
-    ],
-    "urls": [
-      "https://www.ausalert.gov.au/alerts-explained/ausalert-launch",
-      "https://www.abc.net.au/news/2026-07-22/emergency-warning-system-in-doubt-as-states-raise-concerns/106942870"
-    ],
-    "region": "Global"
-  },
-  {
-    "id": "theory-coordinated-timing",
-    "date": "2026-10-27",
-    "headline": "Theory: governments preparing at the same time means they expect the same event",
-    "summary": "An October 27 X post by TheDebriefing17 lines up preparedness steps in Japan, the UK, Australia, South Korea, New Zealand and the EU and asks why they are happening at once. The steps it lists check out, but several are recurring drills or launches scheduled months in advance, and no government links them.",
-    "status": "speculation",
-    "theory": "other",
-    "sourceIds": [
-      "x-thedebriefing17",
-      "kr-mois",
-      "eeas",
-      "nz-nema",
-      "ausalert"
-    ],
-    "urls": [
-      "https://eiec.kdi.re.kr/policy/materialView.do?num=288253",
-      "https://www.eeas.europa.eu/eeas/stronger-eu-crisis-response-exercise-eu-integrated-resolve-2026_en",
-      "https://getready.govt.nz/involved/shakeout",
-      "https://www.ausalert.gov.au/alerts-explained/ausalert-launch"
-    ],
-    "region": "Global"
-  },
-  {
-    "id": "commissary-freezer-outages",
-    "date": "2026-08-28",
-    "headline": "Freezers fail at military commissaries across several states in late August",
-    "summary": "Between about August 26 and 28, refrigeration units at commissaries on at least six bases, including Fort Huachuca, Fort Irwin and F.E. Warren, went into defrost mode and food spoiled. The Defense Department acknowledged a possible refrigeration disruption, and Army, Air Force and defense criminal investigators opened probes without naming a cause.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "military-times",
-      "stars-and-stripes"
-    ],
-    "urls": [
-      "https://militarytimes.com/news/your-military/2026/08/28/dod-confirms-refrigeration-disruption-at-military-commissaries/",
-      "https://www.stripes.com/theaters/us/2026-08-28/refrigeration-outages-multiple-us-commissaries-22684428.html",
-      "https://www.stripes.com/theaters/us/2026-09-01/army-cid-investigates-commissary-refrigerator-outages-22721718.html"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "freezer-suspected-cyberattack",
-    "date": "2026-10-29",
-    "headline": "Pentagon treating base freezer failures as a suspected hack, Reuters reports",
-    "summary": "Four officials told Reuters the Pentagon now treats the August commissary freezer failures as a suspected cyberattack, with a Cyber Command unit and Army CID involved and in contact with French police over a similar attack on 350+ French shops. Reuters could not determine whether investigators have reached any conclusion or identified a culprit. NY Post, Insider Paper and Mario Nawfal reposted the same Reuters exclusive on October 29, so it remains a single-source report.",
-    "status": "reported",
-    "theory": null,
-    "sourceIds": [
-      "reuters",
-      "the-independent",
-      "aol",
-      "ny-post",
-      "insider-paper",
-      "x-marionawfal",
-      "x-theinsiderpaper",
-      "x"
-    ],
-    "urls": [
-      "https://www.reuters.com/technology/pentagon-treating-military-base-freezer-malfunctions-suspected-cyberattack-2026-10-29/",
-      "https://www.tbsnews.net/world/pentagon-treating-military-base-freezer-malfunctions-suspected-cyberattack-officials-say",
-      "https://srnnews.com/exclusive-pentagon-treating-military-base-freezer-malfunctions-as-suspected-cyberattack-officials-say/",
-      "https://x.com/Reuters/status/2115841126854705204",
-      "https://nypost.com/2026/10/29/us-news/pentagon-treating-military-base-freezer-malfunctions-as-suspected-cyberattack-officials-say/",
-      "https://x.com/nypost/status/2115765732671701035",
-      "https://insiderpaper.com/pentagon-cyberattack-freezer-military-bases/",
-      "https://x.com/TheInsiderPaper/status/2115775893985800394",
-      "https://x.com/MarioNawfal/status/2115823471158776180"
-    ],
-    "quote": "working in close coordination with interagency and law enforcement partners (Pentagon statement on the Cyber Command unit)",
-    "region": "US"
-  },
-  {
-    "id": "freezer-fortress-timing",
-    "date": "2026-10-29",
-    "headline": "Theory: base freezer failures are connected to the 90-day FORTRESS plan",
-    "summary": "Headlines saying the freezers failed days before the 90-day plan imply a link. The outages were in late August, about a month before the September 30 memo and two months before the October 25 Fox report, and no official has connected them to FORTRESS.",
-    "status": "speculation",
-    "theory": "cyberattack",
-    "sourceIds": [
-      "economic-times",
-      "the-independent"
-    ],
-    "urls": [
-      "https://militarytimes.com/news/your-military/2026/08/28/dod-confirms-refrigeration-disruption-at-military-commissaries/",
-      "https://media.defense.gov/2026/Sep/30/2004009303/-1/-1/1/ESTABLISHMENT-OF-FORTRESS-AMERICA-AS-A-DEPARTMENT-OF-WAR-PROGRAM-FOR-THE-DEFENSE-OF-THE-AMERICAN-HOMELAND.PDF"
-    ],
-    "region": "US"
-  },
-  {
-    "id": "sylvia-fired-leak-probe",
-    "date": "2026-10-29",
-    "headline": "Hegseth fires the Joint Staff's top planner, Lt. Gen. Brett Sylvia, in a leak probe",
-    "summary": "Officials say Sylvia, director of strategy, plans and policy (J5), is accused of leaking classified information on the Iran and Russia-Ukraine wars and the case was referred to the Justice Department. Two Pentagon sources told CBS the accusations are not true, and no report ties the leaks to the FORTRESS or 90-day documents.",
-    "status": "confirmed",
-    "theory": null,
-    "sourceIds": [
-      "military-com",
-      "washington-times",
-      "fox-news",
-      "cbs-news",
-      "turkiye-today"
-    ],
-    "urls": [
-      "https://www.military.com/pete-hegseth-fires-pentagons-top-military-planner-over-what-official-says-were-classified-leaks-to-media",
-      "https://www.washingtontimes.com/news/2026/oct/29/pete-hegseth-fires-top-military-planner-pentagon/",
-      "https://www.foxnews.com/politics/hegseth-fires-top-pentagon-strategist-accused-leaking-classified-iran-ukraine-war-information"
-    ],
-    "quote": "zero tolerance (Sean Parnell, Pentagon chief spokesperson, on unauthorized disclosures)",
-    "region": "US"
-  },
-  {
-    "id": "uk-preparedness-buying",
-    "date": "2026-10-28",
-    "headline": "UK shoppers buy torches, generators and water after Be Ready launch",
-    "summary": "Retailers told the Daily Mail that sales jumped after the campaign, with Toolstation reporting rises of up to 172 percent for generators and torches. The British Retail Consortium said food supplies are fine, and the Evening Standard ran a guide to buying kit items.",
-    "status": "reported",
-    "theory": null,
-    "sourceIds": [
-      "daily-mail",
-      "insider-paper",
-      "evening-standard"
-    ],
-    "urls": [
-      "https://insiderpaper.com/uk-shoppers-stockpile-toilet-paper-water-after-government-emergency-warning"
-    ],
-    "region": "UK"
+ {
+  "id": "fortress-memo-signed",
+  "date": "2026-09-30",
+  "headline": "Hegseth signs memo creating FORTRESS America as a Department of War program",
+  "summary": "A September 30, 2026 memo from the Secretary of War, titled Establishment of FORTRESS America as a Department of War Program for the Defense of the American Homeland, created the program. It is posted on the department's own media server.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "us-dow",
+   "twz",
+   "snopes"
+  ],
+  "urls": [
+   "https://media.defense.gov/2026/Sep/30/2004009303/-1/-1/1/ESTABLISHMENT-OF-FORTRESS-AMERICA-AS-A-DEPARTMENT-OF-WAR-PROGRAM-FOR-THE-DEFENSE-OF-THE-AMERICAN-HOMELAND.PDF",
+   "https://www.twz.com/nuclear/90-days-no-help-fortress-americas-goal-to-make-bases-resilient-bastions-in-a-crisis"
+  ],
+  "quote": "America cannot be starved out, shut down, or cut off. (Pete Hegseth, FORTRESS memo)",
+  "region": "US",
+  "geo": {
+   "lat": 38.87,
+   "lng": -77.06,
+   "place": "Pentagon, Arlington VA",
+   "kind": "statement"
   }
+ },
+ {
+  "id": "fortress-five-pillars",
+  "date": "2026-09-30",
+  "headline": "FORTRESS has five pillars, from energy independence to space resilience",
+  "summary": "The program covers energy independence, supply chain and defense industrial base resilience, a strategic defense reserve, installation hardening and cyber resilience, and resilience in space and spectrum.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "us-dow",
+   "wtkr",
+   "newsweek"
+  ],
+  "urls": [
+   "https://media.defense.gov/2026/Sep/30/2004009303/-1/-1/1/ESTABLISHMENT-OF-FORTRESS-AMERICA-AS-A-DEPARTMENT-OF-WAR-PROGRAM-FOR-THE-DEFENSE-OF-THE-AMERICAN-HOMELAND.PDF",
+   "https://www.wtkr.com/news/in-the-community/norfolk/fortress-america-new-program-meant-to-help-prepare-military-installations-for-the-future",
+   "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804"
+  ],
+  "quote": "the nation's insurance policy (Pete Hegseth, FORTRESS memo)",
+  "region": "US",
+  "geo": {
+   "lat": 38.87,
+   "lng": -77.06,
+   "place": "Pentagon, Arlington VA",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "fortress-program-office-30-days",
+  "date": "2026-09-30",
+  "headline": "Memo orders a FORTRESS program office stood up within 30 days",
+  "summary": "The memo directs the Under Secretary of War for Acquisition and Sustainment to create a FORTRESS America Program Office within 30 days, run day to day by a Senior Executive Service official with a two-star military advisor. Newsweek puts the deadline at October 30.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "us-dow",
+   "twz",
+   "newsweek"
+  ],
+  "urls": [
+   "https://media.defense.gov/2026/Sep/30/2004009303/-1/-1/1/ESTABLISHMENT-OF-FORTRESS-AMERICA-AS-A-DEPARTMENT-OF-WAR-PROGRAM-FOR-THE-DEFENSE-OF-THE-AMERICAN-HOMELAND.PDF",
+   "https://www.twz.com/nuclear/90-days-no-help-fortress-americas-goal-to-make-bases-resilient-bastions-in-a-crisis",
+   "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804"
+  ],
+  "quote": "stand up the FORTRESS America Program Office within thirty (30) days (FORTRESS memo)",
+  "region": "US",
+  "geo": {
+   "lat": 38.87,
+   "lng": -77.06,
+   "place": "Pentagon, Arlington VA",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "hegseth-quantico-own-power",
+  "date": "2026-09-30",
+  "headline": "Hegseth tells Quantico audience every major base will make its own power",
+  "summary": "Announcing FORTRESS in a speech at Quantico, Hegseth said every major military installation would generate its own power independent of the civilian grid. He did not give a 90-day figure in the speech.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "air-space-forces",
+   "snopes",
+   "fortune"
+  ],
+  "urls": [
+   "https://www.airandspaceforces.com/pentagon-resilient-energy-fortress-america-project/",
+   "https://www.snopes.com/fact-check/pentagon-fortress-initiative-90-days/",
+   "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/"
+  ],
+  "quote": "every major military installation in America is going to generate its own power, independent of the civilian grid. (Pete Hegseth)",
+  "region": "US",
+  "geo": {
+   "lat": 38.52,
+   "lng": -77.29,
+   "place": "Quantico VA",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "fortress-acronym",
+  "date": "2026-10-26",
+  "headline": "What FORTRESS stands for",
+  "summary": "Outlets spell it out as Federal Operations for Resilience, Troop Resources, Energy, Supply, and Survivability. TWZ renders part of it as Energy Supply, without a comma.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "fortune",
+   "newsweek",
+   "twz"
+  ],
+  "urls": [
+   "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/",
+   "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804"
+  ],
+  "region": "US",
+  "geo": {
+   "lat": 38.87,
+   "lng": -77.06,
+   "place": "Pentagon, Arlington VA",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "roundtable-500-bases",
+  "date": "2026-10-20",
+  "headline": "Defense official: about 500 US bases under review, energy comes first",
+  "summary": "At an October 20 Defense Writers Group roundtable, a senior defense official said energy independence is the first priority and around 500 continental US bases are being assessed. Cost is still being worked out, and Air & Space Forces Magazine says full achievement could take decades.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "air-space-forces"
+  ],
+  "urls": [
+   "https://www.airandspaceforces.com/pentagon-resilient-energy-fortress-america-project/"
+  ],
+  "quote": "This is not a wait-and-see kind of a thing. (senior defense official)",
+  "region": "US",
+  "geo": {
+   "lat": 38.9,
+   "lng": -77.04,
+   "place": "Washington DC",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "fox-90-day-report",
+  "date": "2026-10-25",
+  "headline": "Fox News reports bases must run 90 days without outside power, water or fuel",
+  "summary": "Fox News Digital, citing internal planning documents it reviewed, reported that major continental US installations would be expected to sustain essential operations on their own for at least 90 days, covering electricity, water, fuel and communications. Pentagon spokesperson Sean Parnell told Fox that relying on civilian infrastructure is an intolerable risk.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "fox-news",
+   "fortune",
+   "twz",
+   "newsweek"
+  ],
+  "urls": [
+   "https://www.foxnews.com/politics/inside-pentagons-doomsday-plan-keep-america-fighting-global-war-erupts",
+   "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/",
+   "https://www.twz.com/nuclear/90-days-no-help-fortress-americas-goal-to-make-bases-resilient-bastions-in-a-crisis"
+  ],
+  "quote": "Power is combat now. (Sean Parnell, Pentagon chief spokesperson, to Fox News Digital)",
+  "region": "US",
+  "geo": {
+   "lat": 40.76,
+   "lng": -73.98,
+   "place": "Fox News, New York",
+   "kind": "outlet"
+  }
+ },
+ {
+  "id": "ninety-day-unconfirmed",
+  "date": "2026-10-26",
+  "headline": "No public Pentagon document states the 90-day figure yet",
+  "summary": "Snopes rated the claim Mostly True but listed the 90-day requirement as unverified: Parnell shared the Fox story on X without confirming the number, and the September 30 memo does not state it. TWZ and IBTimes also note the benchmark has not appeared in a public directive.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "snopes",
+   "twz",
+   "ibtimes"
+  ],
+  "urls": [
+   "https://www.snopes.com/fact-check/pentagon-fortress-initiative-90-days/",
+   "https://www.yahoo.com/news/politics/articles/fact-check-know-pentagons-fortress-225800494.html",
+   "https://www.twz.com/nuclear/90-days-no-help-fortress-americas-goal-to-make-bases-resilient-bastions-in-a-crisis"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "parnell-two-oceans",
+  "date": "2026-10-25",
+  "headline": "Pentagon spokesman: we can no longer rely on two oceans to protect us",
+  "summary": "Sean Parnell, who reportedly leads FORTRESS, posted on X that the program is strategic deterrence in action. He has tied it to Golden Dome and a renewed focus on the Western Hemisphere.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "x",
+   "wtkr",
+   "newsweek"
+  ],
+  "urls": [
+   "https://www.wtkr.com/news/in-the-community/norfolk/fortress-america-new-program-meant-to-help-prepare-military-installations-for-the-future",
+   "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804"
+  ],
+  "quote": "I created FORTRESS America because we can no longer rely on two oceans to protect us. (Sean Parnell, on X)",
+  "region": "US",
+  "geo": {
+   "lat": 38.87,
+   "lng": -77.06,
+   "place": "Pentagon, Arlington VA",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "reactors-microgrids-plan",
+  "date": "2026-10-25",
+  "headline": "Plan calls for portable reactors, big batteries and microgrids on bases",
+  "summary": "Per Fox's documents, FORTRESS envisions portable nuclear reactors, large battery storage and microgrids that can disconnect bases from the civilian grid, plus reserves of munitions, fuel and medical supplies. Fortune notes the Army announced up to $2.2 billion in microreactor awards for five bases, including Fort Bragg and Fort Hood, in August.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "fox-news",
+   "fortune"
+  ],
+  "urls": [
+   "https://www.foxnews.com/politics/inside-pentagons-doomsday-plan-keep-america-fighting-global-war-erupts",
+   "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/"
+  ],
+  "region": "US",
+  "geo": {
+   "lat": 40.76,
+   "lng": -73.98,
+   "place": "Fox News, New York",
+   "kind": "outlet"
+  }
+ },
+ {
+  "id": "cost-timeline-unknown",
+  "date": "2026-10-26",
+  "headline": "No budget or completion date for FORTRESS has been released",
+  "summary": "The Pentagon has published no cost estimate or timeline. Air & Space Forces Magazine estimates scores of billions to hundreds of billions of dollars, and CSIS called some goals extremely ambitious. Snopes reports Hegseth said FORTRESS is not meant to stoke fear of war on American soil.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "fortune",
+   "air-space-forces",
+   "newsweek",
+   "snopes"
+  ],
+  "urls": [
+   "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/",
+   "https://www.airandspaceforces.com/pentagon-resilient-energy-fortress-america-project/",
+   "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804",
+   "https://www.snopes.com/fact-check/pentagon-fortress-initiative-90-days/"
+  ],
+  "region": "US",
+  "geo": {
+   "lat": 38.87,
+   "lng": -77.06,
+   "place": "Pentagon, Arlington VA",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "wtkr-norfolk-hearing",
+  "date": "2026-10-28",
+  "headline": "Norfolk TV: Navy leaders pushed for on-base reactors at a May hearing",
+  "summary": "WTKR in Norfolk reports that at a May House Armed Services hearing, Rep. Rob Wittman pressed for on-base power, and Acting Navy Secretary Hun Cao said small reactors could also make fresh water. The station says bases cannot rely on civilian water and electricity.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "wtkr"
+  ],
+  "urls": [
+   "https://www.wtkr.com/news/in-the-community/norfolk/fortress-america-new-program-meant-to-help-prepare-military-installations-for-the-future"
+  ],
+  "quote": "We need to get a pilot established, a target date, and get one going. (Adm. Daryl Caudle, Chief of Naval Operations)",
+  "region": "US",
+  "geo": {
+   "lat": 38.89,
+   "lng": -77.01,
+   "place": "US Capitol, Washington DC",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "uk-be-ready-launch",
+  "date": "2026-10-22",
+  "headline": "UK launches Be Ready campaign: prepare for 3 days of disruption",
+  "summary": "The Cabinet Office launched Be Ready on October 22, 2026, asking households to prepare for three days without power, water, phones or internet. It is the first stage of a three-year campaign and replaces 2024 Prepare guidance.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "uk-gov-beready",
+   "fortune",
+   "uk-defence-journal"
+  ],
+  "urls": [
+   "https://beready.campaign.gov.uk/",
+   "https://ukdefencejournal.org.uk/households-asked-to-prepare-for-three-days-of-disruption/",
+   "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/"
+  ],
+  "quote": "Being ready for 3 days helps you manage while support reaches those in need. (GOV.UK Be Ready)",
+  "region": "UK",
+  "geo": {
+   "lat": 51.5,
+   "lng": -0.13,
+   "place": "Whitehall, London",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "uk-checklist-items",
+  "date": "2026-10-22",
+  "headline": "UK checklist: 3 litres of water per person per day, cash, radio, torch",
+  "summary": "The Be Ready checklist covers drinking water (3 litres per person per day), food that needs no cooking, a torch, power bank, battery or wind-up radio, first aid, medicines, pet supplies and cash in case card payments fail. Security Minister Dan Jarvis urged people who can follow it to do so.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "fortune",
+   "uk-defence-journal"
+  ],
+  "urls": [
+   "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/",
+   "https://ukdefencejournal.org.uk/households-asked-to-prepare-for-three-days-of-disruption/"
+  ],
+  "quote": "Those who can follow this advice should follow this advice. (Dan Jarvis, UK Security Minister)",
+  "region": "UK",
+  "geo": {
+   "lat": 51.5,
+   "lng": -0.13,
+   "place": "Whitehall, London",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "streeting-defence-secretary",
+  "date": "2026-07-20",
+  "headline": "Wes Streeting is now UK Defence Secretary, not Health Secretary",
+  "summary": "Streeting resigned as Health Secretary in May 2026 and was appointed Defence Secretary on July 20, 2026 by Prime Minister Andy Burnham. Some posts still describe him as Health Secretary.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "uk-defence-journal",
+   "fortune"
+  ],
+  "urls": [
+   "https://ukdefencejournal.org.uk/?p=70878",
+   "https://en.mercopress.com/2026/07/23/wes-streeting-appointed-uk-defence-secretary-disappointment-with-removal-of-dan-jarvis-responsible-for-dip"
+  ],
+  "region": "UK",
+  "geo": {
+   "lat": 51.5,
+   "lng": -0.13,
+   "place": "Downing Street, London",
+   "kind": "event"
+  }
+ },
+ {
+  "id": "streeting-1000-days",
+  "date": "2026-10-25",
+  "headline": "Streeting: UK and NATO have a little over 1,000 days to prepare",
+  "summary": "Writing in the Telegraph, Streeting argued adversaries could have the forces and war economy to attack by 2030. He listed hostile states, cyberattacks, organized crime and climate change as threats.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "fortune",
+   "gb-news"
+  ],
+  "urls": [
+   "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/",
+   "https://www.gbnews.com/politics/wes-streeting-ready-for-war-1000-days-russia-defence-funding"
+  ],
+  "region": "UK",
+  "geo": {
+   "lat": 51.5,
+   "lng": -0.13,
+   "place": "London",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "streeting-alert-not-alarmed",
+  "date": "2026-10-14",
+  "headline": "Streeting tells households to keep bottled water and tinned food",
+  "summary": "Ahead of Labour's conference, Streeting said households should keep bottled water and tinned goods for power cuts, floods, cyberattacks and possible conflict. He called it basic preparation, not a call for mass stockpiling.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "grocery-gazette",
+   "the-independent"
+  ],
+  "urls": [
+   "https://www.grocerygazette.co.uk/2026/10/14/households-to-stock-up-on-tinned-food/",
+   "https://www.the-independent.com/news/uk/home-news/wes-streeting-preparedness-warning-stock-up-food-emergency-b3073964.html"
+  ],
+  "quote": "alert not alarmed (Wes Streeting, UK Defence Secretary)",
+  "region": "UK",
+  "geo": {
+   "lat": 51.51,
+   "lng": -0.13,
+   "place": "London",
+   "kind": "outlet"
+  }
+ },
+ {
+  "id": "ncsc-cyber-incidents",
+  "date": "2026-10-26",
+  "headline": "UK cyber agency handled 200+ attacks on critical infrastructure in a year",
+  "summary": "The National Cyber Security Centre dealt with more than 200 incidents affecting critical infrastructure from June 2025 to May 2026. NCSC chief Richard Horne said about 75 percent were believed to be linked to state actors.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "fortune"
+  ],
+  "urls": [
+   "https://fortune.com/2026/10/26/pentagon-fortress-bases-90-days-off-grid-uk-be-ready-stockpile/"
+  ],
+  "region": "UK",
+  "geo": {
+   "lat": 51.5,
+   "lng": -0.14,
+   "place": "NCSC, London",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "uk-30-days-claim",
+  "date": "2026-10-27",
+  "headline": "Claim that the UK told people to prepare for 30 days is false: it says 3",
+  "summary": "Dan Bongino told listeners the UK government had issued warnings about 30 days of preparedness. The official Be Ready site asks for 3 days, and no government source found asks civilians to prepare for 30 days.",
+  "status": "debunked",
+  "theory": null,
+  "sourceIds": [
+   "uk-gov-beready",
+   "mediaite",
+   "katu-tnnd"
+  ],
+  "urls": [
+   "https://beready.campaign.gov.uk/",
+   "https://www.mediaite.com/media/news/panic-kills-dan-bongino-warns-americans-to-take-stock-up-warnings-seriously/",
+   "https://katu.com/news/nation-world/former-fbi-deputy-director-warns-americans-to-have-30-days-worth-of-food-and-water-uk-cyberattack-russia"
+  ],
+  "region": "UK",
+  "geo": {
+   "lat": 40.71,
+   "lng": -74.01,
+   "place": "Mediaite, New York",
+   "kind": "outlet"
+  }
+ },
+ {
+  "id": "bongino-30-days",
+  "date": "2026-10-27",
+  "headline": "Ex-FBI deputy director Dan Bongino urges Americans to stock 30 days of food",
+  "summary": "On his podcast on Monday, October 26, Bongino, who left the FBI in December 2025, told listeners to keep 30 days of food and water, a radio, batteries and water filtration. He is not a government official and cited the Pentagon's reported 90-day base plan.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "mediaite",
+   "katu-tnnd"
+  ],
+  "urls": [
+   "https://www.mediaite.com/media/news/panic-kills-dan-bongino-warns-americans-to-take-stock-up-warnings-seriously/",
+   "https://katu.com/news/nation-world/former-fbi-deputy-director-warns-americans-to-have-30-days-worth-of-food-and-water-uk-cyberattack-russia"
+  ],
+  "quote": "Fortress My House, Fortress My Apartment (Dan Bongino, podcast)",
+  "region": "US",
+  "geo": {
+   "lat": 40.71,
+   "lng": -74.01,
+   "place": "Mediaite, New York",
+   "kind": "outlet"
+  }
+ },
+ {
+  "id": "eu-72-hours",
+  "date": "2025-03-26",
+  "headline": "EU strategy since March 2025: households should manage 72 hours alone",
+  "summary": "The European Commission's Preparedness Union Strategy, unveiled March 26, 2025, set a goal of at least 72 hours of population self-sufficiency. It cites natural disasters, cyberattacks and armed aggression, and is non-binding guidance.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "eu-commission",
+   "euronews"
+  ],
+  "urls": [
+   "https://commission.europa.eu/topics/preparedness_en",
+   "https://www.euronews.com/my-europe/2025/03/26/brussels-ask-eu-citizens-to-put-together-a-72-hour-emergency-kit-to-face-crises"
+  ],
+  "region": "EU",
+  "geo": {
+   "lat": 50.84,
+   "lng": 4.38,
+   "place": "Brussels",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "japan-hosono-request",
+  "date": "2026-10-28",
+  "headline": "Japan to ask citizens to stock 3 days of supplies, ideally a week",
+  "summary": "Disaster Management Minister Goshi Hosono said on October 26 that Japan will issue a nationwide request on November 2, when its new Disaster Management Agency launches. The stated reason is natural disasters such as a Nankai Trough megaquake, and the 3-day to 1-week advice is long-standing.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "ibtimes",
+   "business-today",
+   "trendingtopics"
+  ],
+  "urls": [
+   "https://www.ibtimes.co.uk/japan-plans-emergency-request-three-day-food-water-stockpiles-amid-reports-online-war-1828362",
+   "https://www.businesstoday.in/world/story/japan-and-uk-urge-citizens-to-keep-emergency-supplies-ready-for-3-days-to-a-week-563963-2026-10-27"
+  ],
+  "region": "Asia",
+  "geo": {
+   "lat": 35.68,
+   "lng": 139.76,
+   "place": "Tokyo",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "europe-national-guidance",
+  "date": "2026-10-29",
+  "headline": "Other countries' advice ranges from 3 days to 2 weeks",
+  "summary": "Sweden's 2024 booklet In Case of Crisis or War asks for at least a week of self-reliance, Norway raised its advice from three days to one week, and Austria's Interior Ministry suggests 10 to 14 days. France, Ireland and the Netherlands use three days.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "trendingtopics"
+  ],
+  "urls": [
+   "https://www.trendingtopics.eu/emergency-supplies-uk-japan-scandinavia-preparedness/"
+  ],
+  "region": "EU",
+  "geo": {
+   "lat": 59.33,
+   "lng": 18.07,
+   "place": "Stockholm",
+   "kind": "statement"
+  },
+  "geoAlso": [
+   {
+    "lat": 59.91,
+    "lng": 10.75,
+    "place": "Oslo"
+   },
+   {
+    "lat": 48.21,
+    "lng": 16.37,
+    "place": "Vienna"
+   }
+  ]
+ },
+ {
+  "id": "trump-iran-midterms-pledge",
+  "date": "2026-10-09",
+  "headline": "Trump says no new Iran strikes before the November 3 midterms",
+  "summary": "On Truth Social, Trump said the US would not attack Iran before the midterm elections. The US-Iran war began February 28, 2026, and reports say the Pentagon has drawn up plans for renewed strikes.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "al-jazeera"
+  ],
+  "urls": [
+   "https://www.aljazeera.com/news/2026/10/9/is-trump-signalling-a-return-to-war-with-iran-after-the-midterms",
+   "https://northeasttimes.com/2026/10/01/trump-says-u-s-could-resume-bombing-iran-after-november-midterms/"
+  ],
+  "quote": "we will not be attacking Iran at any time prior to the Midterm Elections (Donald Trump, Truth Social)",
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "fema-eas-test-nov17",
+  "date": "2026-09-16",
+  "headline": "FEMA and FCC set a nationwide Emergency Alert System test for Nov 17",
+  "summary": "The test runs Tuesday, November 17, 2026, at about 2:20 p.m. ET on radio and TV, with December 3 as the backup date. It will not be sent to mobile phones, and no action is needed.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "fema",
+   "fcc",
+   "x"
+  ],
+  "urls": [
+   "https://www.fema.gov/press-release/20260916/fema-and-fcc-schedule-2026-nationwide-test-emergency-alert-system-november",
+   "https://www.fema.gov/emergency-managers/practitioners/integrated-public-alert-warning-system/national-test-2026",
+   "https://docs.fcc.gov/public/attachments/DA-26-989A1.pdf",
+   "https://x.com/fema/status/2115537898103607797"
+  ],
+  "quote": "This is only a test. No action is required by the public. (FEMA)",
+  "region": "US",
+  "geo": {
+   "lat": 38.89,
+   "lng": -77.02,
+   "place": "FEMA HQ, Washington DC",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "fema-test-routine",
+  "date": "2026-09-16",
+  "headline": "The Nov 17 alert test is routine and not linked to FORTRESS",
+  "summary": "Federal law requires a nationwide alert test at least once every three years, and earlier national tests ran in 2011, 2017, 2018 and on October 4, 2023. Neither FEMA's release nor its FAQ mentions FORTRESS, the Pentagon or any expected emergency.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "fema"
+  ],
+  "urls": [
+   "https://www.fema.gov/fact-sheet/2026-national-test-faqs",
+   "https://www.fema.gov/press-release/20260916/fema-and-fcc-schedule-2026-nationwide-test-emergency-alert-system-november"
+  ],
+  "quote": "The test is routine and helps ensure the system operates effectively during emergencies. (FEMA FAQ)",
+  "region": "US",
+  "geo": {
+   "lat": 38.89,
+   "lng": -77.02,
+   "place": "FEMA HQ, Washington DC",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "php2shell-ai-flaw",
+  "date": "2026-10-21",
+  "headline": "AI tools helped find two critical PHP flaws affecting much of the web",
+  "summary": "The PHP Foundation disclosed and patched PHP2Shell (CVE-2026-109618 and CVE-2026-109619). Security firm Calif, OpenAI's GPT-5.6 Sol and Google-owned Wiz using Gemini 4 Argon each found parts of it in August, and Cloudflare saw exploit attempts climb into the millions.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "fortune",
+   "axios",
+   "npr"
+  ],
+  "urls": [
+   "https://fortune.com/2026/10/21/ai-tools-discovered-the-php-vulnerability-that-could-take-down-70-of-the-internet-now-the-race-is-on-to-patch-it-before-ai-powered-hackers-attack/",
+   "https://www.axios.com/2026/10/21/php-openai-ai-bug-hunting-cyberattacks",
+   "https://www.npr.org/2026/10/23/g-s1-149503/hacking-php-flaws"
+  ],
+  "region": "Global",
+  "geo": {
+   "lat": 40.71,
+   "lng": -74.01,
+   "place": "Fortune, New York",
+   "kind": "outlet"
+  }
+ },
+ {
+  "id": "cisa-php-exploited",
+  "date": "2026-10-27",
+  "headline": "CISA confirms hackers are exploiting the PHP flaws, orders 3-day fix",
+  "summary": "On October 26, CISA said the two PHP vulnerabilities are being actively exploited and told civilian federal agencies to patch within three days. It did not say who is behind the attacks.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "techcrunch",
+   "fortune"
+  ],
+  "urls": [
+   "https://techcrunch.com/2026/10/27/us-government-says-hackers-are-now-exploiting-critical-php-web-bugs/"
+  ],
+  "region": "US",
+  "geo": {
+   "lat": 38.9,
+   "lng": -77.04,
+   "place": "Washington DC (CISA)",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "x-trend-war-framing",
+  "date": "2026-10-25",
+  "headline": "X trend framed the base plan as preparation for a major war",
+  "summary": "An X trending summary titled Pentagon Prepares Bases to Run 90 Days Without Civilian Power or Supplies spread on October 25, with posts saying the plan anticipates a war that cripples the grid. Sites like Natural News called it a 90-day doomsday plan.",
+  "status": "rumor",
+  "theory": "other",
+  "sourceIds": [
+   "x",
+   "natural-news"
+  ],
+  "urls": [
+   "https://x.com/i/trending/2114341495650324687",
+   "https://www.naturalnews.com/2026-10-26-pentagon-doomsday-plan-your-wake-up-call.html"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "theory-iran-war",
+  "date": "2026-10-09",
+  "headline": "Theory: FORTRESS and stock-up advice are prep for a renewed Iran war",
+  "summary": "Some commentators connect the warnings to a possible return to strikes on Iran after the midterms, citing Trump's comments. Analysts quoted by Al Jazeera read his remarks as both reassurance and a warning, but no official ties FORTRESS to Iran.",
+  "status": "speculation",
+  "theory": "iran",
+  "sourceIds": [
+   "al-jazeera"
+  ],
+  "urls": [
+   "https://www.aljazeera.com/news/2026/10/9/is-trump-signalling-a-return-to-war-with-iran-after-the-midterms",
+   "https://www.benzinga.com/news/politics/26/10/62648925/marjorie-taylor-greene-pentagon-fortress-plan"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "theory-midterms",
+  "date": "2026-10-28",
+  "headline": "Theory: something big will be revealed after the November 3 midterms",
+  "summary": "The Economic Collapse Blog wrote that governments may know something they are not telling the public and that it may surface after the midterms. It offers no evidence for the timing.",
+  "status": "speculation",
+  "theory": "midterms",
+  "sourceIds": [
+   "economic-collapse-blog"
+  ],
+  "urls": [
+   "https://theeconomiccollapseblog.com/why-are-so-many-countries-suddenly-warning-their-citizens-to-prepare-for-an-emergency-and-stockpile-essential-survival-supplies/"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "theory-false-flag",
+  "date": "2026-10-28",
+  "headline": "Theory: staged attacks on the grid, then water, are coming",
+  "summary": "An Instagram carousel cites the 1962 Operation Northwoods proposal and predicts attacks on the power grid and water supply followed by a story that grants authorities more power. It gives no evidence that any attack is planned.",
+  "status": "speculation",
+  "theory": "false-flag",
+  "sourceIds": [
+   "instagram",
+   "instagram-imzephyy"
+  ],
+  "urls": [
+   "https://www.instagram.com/p/DfDH0VDln34/",
+   "https://www.instagram.com/p/DfDH0VDln34/?img_index=4"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "theory-russia-europe",
+  "date": "2026-10-28",
+  "headline": "Theory: Europe's stock-up advice means war with Russia is close",
+  "summary": "Facebook threads and blogs read the European advice as a sign of imminent war with Russia. Officials name Russia as a top threat, but the UK and EU say the advice covers everyday emergencies and is not a war warning.",
+  "status": "speculation",
+  "theory": "russia",
+  "sourceIds": [
+   "facebook",
+   "economic-collapse-blog"
+  ],
+  "urls": [
+   "https://www.facebook.com/MzoeSeven/posts/why-are-other-countries-telling-their-citizens-to-stock-up-food-water-ermegency-/28085561501119236/",
+   "https://theeconomiccollapseblog.com/why-are-so-many-countries-suddenly-warning-their-citizens-to-prepare-for-an-emergency-and-stockpile-essential-survival-supplies/"
+  ],
+  "region": "Global",
+  "geo": null
+ },
+ {
+  "id": "theory-china-grid",
+  "date": "2026-10-26",
+  "headline": "Theory: bases are hardening for a China conflict over Taiwan",
+  "summary": "Commentary links FORTRESS to US warnings that Chinese hackers have tried to plant themselves in US infrastructure and to a possible Taiwan crisis. US officials say China aims to be able to invade Taiwan by 2027 but stress that does not mean it will.",
+  "status": "speculation",
+  "theory": "china",
+  "sourceIds": [
+   "newsweek",
+   "instagram-imzephyy"
+  ],
+  "urls": [
+   "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804",
+   "https://www.instagram.com/p/DfDH0VDln34/"
+  ],
+  "region": "Global",
+  "geo": null
+ },
+ {
+  "id": "theory-ai-cyber",
+  "date": "2026-10-27",
+  "headline": "Theory: AI-found software flaws are the real reason for stock-up advice",
+  "summary": "Some coverage and posts tie the UK and Japan warnings to the PHP2Shell flaw and AI-powered hacking. Business Today wrote that the UK renewed its message after the PHP glitch, but no official has linked the advice to it.",
+  "status": "speculation",
+  "theory": "ai-cyber",
+  "sourceIds": [
+   "business-today",
+   "ibtimes"
+  ],
+  "urls": [
+   "https://www.businesstoday.in/world/story/japan-and-uk-urge-citizens-to-keep-emergency-supplies-ready-for-3-days-to-a-week-563963-2026-10-27",
+   "https://www.ibtimes.co.uk/japan-plans-emergency-request-three-day-food-water-stockpiles-amid-reports-online-war-1828362"
+  ],
+  "region": "Global",
+  "geo": null
+ },
+ {
+  "id": "civilians-on-their-own",
+  "date": "2026-10-26",
+  "headline": "Claim: the plan shows civilians will be left on their own",
+  "summary": "A Facebook video cited by Snopes argued that FORTRESS means civilians will be left to fend for themselves. Snopes said how FORTRESS affects civilian disaster preparedness is unclear.",
+  "status": "rumor",
+  "theory": null,
+  "sourceIds": [
+   "snopes",
+   "facebook"
+  ],
+  "urls": [
+   "https://www.snopes.com/fact-check/pentagon-fortress-initiative-90-days/"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "simpsons-nov17-claim",
+  "date": "2026-10-26",
+  "headline": "Viral claim: The Simpsons predicted a great blackout on November 17",
+  "summary": "Posts on X, Reddit's r/conspiracy and YouTube Shorts claim a Simpsons episode foretold a blackout on November 17, the date of the FEMA alert test. The same claim circulated for November 17, 2025, and a forum user then could not find the date in episode transcripts.",
+  "status": "rumor",
+  "theory": "other",
+  "simpsons": true,
+  "sourceIds": [
+   "x",
+   "reddit",
+   "youtube",
+   "great-awakening"
+  ],
+  "urls": [
+   "https://x.com/ElTrompudo2022/status/2114539375925108836",
+   "https://www.reddit.com/r/conspiracy/comments/1xgz8z6/predictive_programming_in_the_simpsons_about_a/",
+   "https://www.youtube.com/shorts/m2I7iulzlFQ",
+   "https://www.youtube.com/watch?v=h0p8A-JbYJc",
+   "https://greatawakening.win/p/1ARKEVBLlZ/according-to-the-simpsons-tomorr/c/"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "simpsons-episode-check",
+  "date": "2026-10-29",
+  "headline": "The cited Simpsons episode aired in 2023 and shows no November 17 date",
+  "summary": "The claim points to It's a Blunderful Life (season 35, episode 7), which aired November 19, 2023. In it Mr. Burns overloads an outlet, causing a meltdown and town blackout that Homer is blamed for; the plot summary gives no calendar date, and no fact-checker has yet addressed the 2026 version.",
+  "status": "rumor",
+  "theory": "other",
+  "simpsons": true,
+  "sourceIds": [
+   "wikipedia",
+   "otaku-oddballs"
+  ],
+  "urls": [
+   "https://en.wikipedia.org/wiki/It%27s_a_Blunderful_Life",
+   "https://otakuandoddballs.com/is-the-simpsons-predicting-a-disaster-on-november-17/"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "simpsons-solar-debunked",
+  "date": "2024-01-02",
+  "headline": "Earlier claim that The Simpsons predicted a solar superstorm was debunked",
+  "summary": "Lead Stories found the 2013 episode Homer Goes to Prep School shows a blackout caused by Homer neglecting the power plant, not a solar storm. A real Carrington-scale storm, like the one in 1859, could cause wide blackouts, but no official has cited one as a reason for the 2026 warnings.",
+  "status": "debunked",
+  "theory": "solar",
+  "simpsons": true,
+  "sourceIds": [
+   "lead-stories",
+   "wikipedia"
+  ],
+  "urls": [
+   "https://leadstories.com/hoax-alert/2024/01/fact-check-episode-9-of-season-24-of-the-simpsons-did-not-predict-a-solar-superstorm.html",
+   "https://en.wikipedia.org/wiki/Carrington_Event"
+  ],
+  "region": "Global",
+  "geo": null
+ },
+ {
+  "id": "viral-blackout-chain-post",
+  "date": "2026-10-28",
+  "headline": "Chain post: stock-up warnings mean a national blackout is coming",
+  "summary": "A widely shared post argues that governments telling citizens to stock up means a national blackout is near, citing Simpsons predictive programming and the November 17 FEMA test. The FEMA test is a routine broadcast-only check, and no official source predicts a blackout.",
+  "status": "rumor",
+  "theory": "other",
+  "simpsons": true,
+  "sourceIds": [
+   "viral-social-post",
+   "fema"
+  ],
+  "urls": [
+   "https://www.fema.gov/fact-sheet/2026-national-test-faqs"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "fox-factories-wartime-production",
+  "date": "2026-10-25",
+  "headline": "Fox: FORTRESS also readies US factories to switch to defense production on short notice",
+  "summary": "Fox News Digital's October 25 report says the plan lays groundwork for American factories to shift to wartime defense production on short notice. Fox's own social post attributes this to Pentagon spokesperson Sean Parnell, but no public Pentagon document states it.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "fox-news"
+  ],
+  "urls": [
+   "https://www.foxnews.com/politics/inside-pentagons-doomsday-plan-keep-america-fighting-global-war-erupts"
+  ],
+  "region": "US",
+  "geo": {
+   "lat": 40.76,
+   "lng": -73.98,
+   "place": "Fox News, New York",
+   "kind": "outlet"
+  }
+ },
+ {
+  "id": "northwoods-1962-real",
+  "date": "1962-03-13",
+  "headline": "Operation Northwoods was a real 1962 false-flag proposal, and it was never carried out",
+  "summary": "On March 13, 1962 the Joint Chiefs of Staff sent Defense Secretary Robert McNamara a memo proposing staged incidents to justify intervention in Cuba. The Kennedy administration rejected it, and it was made public on November 18, 1997 by the JFK Assassination Records Review Board. It is cited online as proof that a 2026 attack will be staged, but it says nothing about 2026.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "nsarchive",
+   "wikipedia",
+   "instagram-imzephyy"
+  ],
+  "urls": [
+   "https://nsarchive2.gwu.edu/news/20010430/northwoods.pdf",
+   "https://en.wikipedia.org/wiki/Operation_Northwoods",
+   "https://www.instagram.com/p/DfDH0VDln34/"
+  ],
+  "region": "US",
+  "geo": {
+   "lat": 38.87,
+   "lng": -77.06,
+   "place": "Pentagon, Arlington VA",
+   "kind": "event"
+  }
+ },
+ {
+  "id": "epa-water-cyber-2024",
+  "date": "2024-05-20",
+  "headline": "EPA in 2024: over 70% of water systems it inspected broke basic security rules",
+  "summary": "A May 20, 2024 EPA enforcement alert said over 70 percent of drinking water systems it inspected since September 2023 violated basic Safe Drinking Water Act Section 1433 requirements, such as default passwords and shared logins. An Instagram carousel cites it as a sign that water systems will be attacked next; the alert predicts no attack.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "epa",
+   "instagram-imzephyy"
+  ],
+  "urls": [
+   "https://www.epa.gov/enforcement/enforcement-alert-drinking-water-systems-address-cybersecurity-vulnerabilities",
+   "https://www.instagram.com/p/DfDH0VDln34/"
+  ],
+  "quote": "Over 70% of the systems inspected by EPA since September 2023 are in violation of basic SDWA Section 1433 requirements (EPA enforcement alert)",
+  "region": "US",
+  "geo": {
+   "lat": 38.89,
+   "lng": -77.03,
+   "place": "EPA HQ, Washington DC",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "ready-gov-kit",
+  "date": "2026-10-29",
+  "headline": "US advice on Ready.gov: one gallon of water per person per day for several days",
+  "summary": "Ready.gov's basic kit lists one gallon of water per person per day for several days, a several-day supply of non-perishable food, a battery or hand-crank radio, a flashlight, a first aid kit and a phone backup battery. Social posts call it a 72-hour kit, but the page itself says several days and gives no hour figure.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "ready-gov",
+   "instagram-imzephyy"
+  ],
+  "urls": [
+   "https://www.ready.gov/kit",
+   "https://www.instagram.com/p/DfDH0VDln34/"
+  ],
+  "quote": "one gallon per person per day for several days, for drinking and sanitation (Ready.gov)",
+  "region": "US",
+  "geo": {
+   "lat": 38.89,
+   "lng": -77.02,
+   "place": "FEMA HQ, Washington DC",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "korea-safe-korea-2026",
+  "date": "2026-10-19",
+  "headline": "South Korea runs its Safe Korea disaster drill Oct 19 to 30 with 236 agencies",
+  "summary": "South Korea's Ministry of the Interior and Safety announced the second-half 2026 Safe Korea disaster response training, run October 19 to 30 by 236 central, local and public agencies. Safe Korea is a recurring national drill, and this round covers disasters such as wildfires and crowd crushes.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "kr-mois",
+   "x-thedebriefing17"
+  ],
+  "urls": [
+   "https://eiec.kdi.re.kr/policy/materialView.do?num=288253"
+  ],
+  "region": "Asia",
+  "geo": {
+   "lat": 37.57,
+   "lng": 126.98,
+   "place": "Seoul",
+   "kind": "event"
+  }
+ },
+ {
+  "id": "nz-shakeout-2026",
+  "date": "2026-10-21",
+  "headline": "New Zealand held its national ShakeOut earthquake and tsunami drill on October 21",
+  "summary": "New Zealand ShakeOut 2026, the national earthquake drill and tsunami evacuation practice, was set for 1:30 pm on Wednesday, October 21, run by the National Emergency Management Agency. ShakeOut is a recurring national drill, also held in earlier years.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "nz-nema",
+   "x-thedebriefing17"
+  ],
+  "urls": [
+   "https://getready.govt.nz/involved/shakeout"
+  ],
+  "region": "Global",
+  "geo": {
+   "lat": -41.29,
+   "lng": 174.78,
+   "place": "Wellington",
+   "kind": "event"
+  }
+ },
+ {
+  "id": "eu-integrated-resolve-2026",
+  "date": "2026-10-19",
+  "headline": "EU runs its Integrated Resolve 2026 crisis exercise from October 19 to November 20",
+  "summary": "The EU's External Action Service announced EU Integrated Resolve 2026 on October 19, an exercise testing how the EU responds to a complex crisis of a hybrid nature inside and outside the Union. Planning documents for it date back to 2025.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "eeas",
+   "x-thedebriefing17"
+  ],
+  "urls": [
+   "https://www.eeas.europa.eu/eeas/stronger-eu-crisis-response-exercise-eu-integrated-resolve-2026_en"
+  ],
+  "region": "EU",
+  "geo": {
+   "lat": 50.84,
+   "lng": 4.38,
+   "place": "Brussels",
+   "kind": "event"
+  }
+ },
+ {
+  "id": "ausalert-launch",
+  "date": "2026-10-01",
+  "headline": "Australia's new AusAlert phone warning system was set to start on October 1, 2026",
+  "summary": "AusAlert, a cell broadcast system that sends emergency warnings straight to phones, was scheduled to replace the SMS-based Emergency Alert on October 1, 2026 after a national test on July 27. States and territories can choose to run it alongside the old system.",
+  "status": "fact",
+  "theory": null,
+  "sourceIds": [
+   "ausalert",
+   "abc-au",
+   "x-thedebriefing17"
+  ],
+  "urls": [
+   "https://www.ausalert.gov.au/alerts-explained/ausalert-launch",
+   "https://www.abc.net.au/news/2026-07-22/emergency-warning-system-in-doubt-as-states-raise-concerns/106942870"
+  ],
+  "region": "Global",
+  "geo": {
+   "lat": -35.28,
+   "lng": 149.13,
+   "place": "Canberra",
+   "kind": "event"
+  }
+ },
+ {
+  "id": "theory-coordinated-timing",
+  "date": "2026-10-27",
+  "headline": "Theory: governments preparing at the same time means they expect the same event",
+  "summary": "An October 27 X post by TheDebriefing17 lines up preparedness steps in Japan, the UK, Australia, South Korea, New Zealand and the EU and asks why they are happening at once. The steps it lists check out, but several are recurring drills or launches scheduled months in advance, and no government links them.",
+  "status": "speculation",
+  "theory": "other",
+  "sourceIds": [
+   "x-thedebriefing17",
+   "kr-mois",
+   "eeas",
+   "nz-nema",
+   "ausalert"
+  ],
+  "urls": [
+   "https://eiec.kdi.re.kr/policy/materialView.do?num=288253",
+   "https://www.eeas.europa.eu/eeas/stronger-eu-crisis-response-exercise-eu-integrated-resolve-2026_en",
+   "https://getready.govt.nz/involved/shakeout",
+   "https://www.ausalert.gov.au/alerts-explained/ausalert-launch"
+  ],
+  "region": "Global",
+  "geo": null
+ },
+ {
+  "id": "commissary-freezer-outages",
+  "date": "2026-08-28",
+  "headline": "Freezers fail at military commissaries across several states in late August",
+  "summary": "Between about August 26 and 28, refrigeration units at commissaries on at least six bases, including Fort Huachuca, Fort Irwin and F.E. Warren, went into defrost mode and food spoiled. The Defense Department acknowledged a possible refrigeration disruption, and Army, Air Force and defense criminal investigators opened probes without naming a cause.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "military-times",
+   "stars-and-stripes"
+  ],
+  "urls": [
+   "https://militarytimes.com/news/your-military/2026/08/28/dod-confirms-refrigeration-disruption-at-military-commissaries/",
+   "https://www.stripes.com/theaters/us/2026-08-28/refrigeration-outages-multiple-us-commissaries-22684428.html",
+   "https://www.stripes.com/theaters/us/2026-09-01/army-cid-investigates-commissary-refrigerator-outages-22721718.html"
+  ],
+  "region": "US",
+  "geo": {
+   "lat": 31.55,
+   "lng": -110.35,
+   "place": "Fort Huachuca AZ",
+   "kind": "event"
+  },
+  "geoAlso": [
+   {
+    "lat": 35.26,
+    "lng": -116.68,
+    "place": "Fort Irwin CA"
+   },
+   {
+    "lat": 41.13,
+    "lng": -104.87,
+    "place": "F.E. Warren AFB WY"
+   }
+  ]
+ },
+ {
+  "id": "freezer-suspected-cyberattack",
+  "date": "2026-10-29",
+  "headline": "Pentagon treating base freezer failures as a suspected hack, Reuters reports",
+  "summary": "Four officials told Reuters the Pentagon now treats the August commissary freezer failures as a suspected cyberattack, with a Cyber Command unit and Army CID involved and in contact with French police over a similar attack on 350+ French shops. Reuters could not determine whether investigators have reached any conclusion or identified a culprit. NY Post, Insider Paper and Mario Nawfal reposted the same Reuters exclusive on October 29, so it remains a single-source report.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "reuters",
+   "the-independent",
+   "aol",
+   "ny-post",
+   "insider-paper",
+   "x-marionawfal",
+   "x-theinsiderpaper",
+   "x"
+  ],
+  "urls": [
+   "https://www.reuters.com/technology/pentagon-treating-military-base-freezer-malfunctions-suspected-cyberattack-2026-10-29/",
+   "https://www.tbsnews.net/world/pentagon-treating-military-base-freezer-malfunctions-suspected-cyberattack-officials-say",
+   "https://srnnews.com/exclusive-pentagon-treating-military-base-freezer-malfunctions-as-suspected-cyberattack-officials-say/",
+   "https://x.com/Reuters/status/2115841126854705204",
+   "https://nypost.com/2026/10/29/us-news/pentagon-treating-military-base-freezer-malfunctions-as-suspected-cyberattack-officials-say/",
+   "https://x.com/nypost/status/2115765732671701035",
+   "https://insiderpaper.com/pentagon-cyberattack-freezer-military-bases/",
+   "https://x.com/TheInsiderPaper/status/2115775893985800394",
+   "https://x.com/MarioNawfal/status/2115823471158776180"
+  ],
+  "quote": "working in close coordination with interagency and law enforcement partners (Pentagon statement on the Cyber Command unit)",
+  "region": "US",
+  "geo": {
+   "lat": 38.87,
+   "lng": -77.06,
+   "place": "Pentagon, Arlington VA",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "freezer-fortress-timing",
+  "date": "2026-10-29",
+  "headline": "Theory: base freezer failures are connected to the 90-day FORTRESS plan",
+  "summary": "Headlines saying the freezers failed days before the 90-day plan imply a link. The outages were in late August, about a month before the September 30 memo and two months before the October 25 Fox report, and no official has connected them to FORTRESS.",
+  "status": "speculation",
+  "theory": "cyberattack",
+  "sourceIds": [
+   "economic-times",
+   "the-independent"
+  ],
+  "urls": [
+   "https://militarytimes.com/news/your-military/2026/08/28/dod-confirms-refrigeration-disruption-at-military-commissaries/",
+   "https://media.defense.gov/2026/Sep/30/2004009303/-1/-1/1/ESTABLISHMENT-OF-FORTRESS-AMERICA-AS-A-DEPARTMENT-OF-WAR-PROGRAM-FOR-THE-DEFENSE-OF-THE-AMERICAN-HOMELAND.PDF"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "sylvia-fired-leak-probe",
+  "date": "2026-10-29",
+  "headline": "Hegseth fires the Joint Staff's top planner, Lt. Gen. Brett Sylvia, in a leak probe",
+  "summary": "Officials say Sylvia, director of strategy, plans and policy (J5), is accused of leaking classified information on the Iran and Russia-Ukraine wars and the case was referred to the Justice Department. Two Pentagon sources told CBS the accusations are not true, and no report ties the leaks to the FORTRESS or 90-day documents.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "military-com",
+   "washington-times",
+   "fox-news",
+   "cbs-news",
+   "turkiye-today"
+  ],
+  "urls": [
+   "https://www.military.com/pete-hegseth-fires-pentagons-top-military-planner-over-what-official-says-were-classified-leaks-to-media",
+   "https://www.washingtontimes.com/news/2026/oct/29/pete-hegseth-fires-top-military-planner-pentagon/",
+   "https://www.foxnews.com/politics/hegseth-fires-top-pentagon-strategist-accused-leaking-classified-iran-ukraine-war-information"
+  ],
+  "quote": "zero tolerance (Sean Parnell, Pentagon chief spokesperson, on unauthorized disclosures)",
+  "region": "US",
+  "geo": {
+   "lat": 38.87,
+   "lng": -77.06,
+   "place": "Pentagon, Arlington VA",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "uk-preparedness-buying",
+  "date": "2026-10-28",
+  "headline": "UK shoppers buy torches, generators and water after Be Ready launch",
+  "summary": "Retailers told the Daily Mail that sales jumped after the campaign, with Toolstation reporting rises of up to 172 percent for generators and torches. The British Retail Consortium said food supplies are fine, and the Evening Standard ran a guide to buying kit items.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "daily-mail",
+   "insider-paper",
+   "evening-standard"
+  ],
+  "urls": [
+   "https://insiderpaper.com/uk-shoppers-stockpile-toilet-paper-water-after-government-emergency-warning"
+  ],
+  "region": "UK",
+  "geo": {
+   "lat": 51.51,
+   "lng": -0.13,
+   "place": "London",
+   "kind": "outlet"
+  }
+ }
 ]

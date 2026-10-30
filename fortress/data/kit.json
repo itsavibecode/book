@@ -1,0 +1,310 @@
+{
+  "updated": "2026-10-30",
+  "affiliateTag": "",
+  "disclosureNoTag": "Links open an Amazon search for the item. We earn nothing from them.",
+  "disclosureWithTag": "Links open an Amazon search for the item. As an Amazon Associate, BookHockeys earns from qualifying purchases.",
+  "sources": [
+    {
+      "id": "ready-gov",
+      "label": "Ready.gov basic kit",
+      "url": "https://www.ready.gov/kit"
+    },
+    {
+      "id": "be-ready",
+      "label": "UK Be Ready",
+      "url": "https://beready.campaign.gov.uk/be-ready-for-emergencies/"
+    }
+  ],
+  "items": [
+    {
+      "id": "water",
+      "name": "Water",
+      "quantity": "One gallon per person per day for several days, for drinking and sanitation (Ready.gov). Bottled water for 3 days: 3 litres per person per day for drinking, more for cooking and washing (Be Ready).",
+      "why": "After an emergency, you may need to survive on your own for several days (Ready.gov).",
+      "priority": "core",
+      "amazonQuery": "emergency water storage container",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "food",
+      "name": "Non-perishable food",
+      "quantity": "At least a several-day supply of non-perishable food (Ready.gov). Non-perishable food for 3 days that doesn't need refrigeration or cooking, such as tinned meat, fish or vegetables, dried fruit and nuts (Be Ready).",
+      "why": "Be Ready says it is best to buy long-life food you would usually eat.",
+      "priority": "core",
+      "amazonQuery": "non perishable emergency food supply",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "radio",
+      "name": "Battery or hand-crank radio",
+      "quantity": "Battery-powered or hand crank radio and a NOAA Weather Radio with tone alert (Ready.gov). FM radio, battery or wind up (Be Ready).",
+      "why": "For updates during outages; Be Ready suggests writing down the frequencies of stations you use for news.",
+      "priority": "core",
+      "amazonQuery": "hand crank emergency weather radio",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "flashlight",
+      "name": "Flashlight or torch",
+      "quantity": "Flashlight (Ready.gov). Torch (Be Ready).",
+      "why": "Torches are safer than candles (Be Ready).",
+      "priority": "core",
+      "amazonQuery": "LED flashlight",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "batteries",
+      "name": "Spare batteries",
+      "quantity": "Extra batteries (Ready.gov). Spare batteries for the torch (Be Ready).",
+      "why": "Both lists pair spare batteries with the light and radio so they keep working during an outage.",
+      "priority": "core",
+      "amazonQuery": "AA AAA batteries bulk pack",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "first-aid",
+      "name": "First aid kit",
+      "quantity": "First aid kit (Ready.gov). First aid kit or items such as waterproof plasters, bandages, a thermometer, antiseptic, eyewash solution, sterile dressings, gloves, medical tape and tweezers (Be Ready).",
+      "why": "Both lists treat basic first aid supplies as part of the core kit.",
+      "priority": "core",
+      "amazonQuery": "home first aid kit",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "power-bank",
+      "name": "Phone charger and power bank",
+      "quantity": "Cell phone with chargers and a backup battery (Ready.gov). Charged power bank (Be Ready).",
+      "why": "To charge phones or compatible medical devices (Be Ready).",
+      "priority": "core",
+      "amazonQuery": "portable power bank",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "medications",
+      "name": "Medications and eyeglasses",
+      "quantity": "Prescription medications; non-prescription medications such as pain relievers, anti-diarrhea medication, antacids or laxatives; prescription eyeglasses and contact lens solution (Ready.gov). Essential medication and medical supplies (Be Ready).",
+      "why": "An emergency can make it difficult to refill a prescription or find an open pharmacy (Ready.gov); Be Ready advises requesting repeats up to 5 working days ahead.",
+      "priority": "core",
+      "amazonQuery": "weekly pill organizer travel medicine case",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "sanitation",
+      "name": "Hygiene and sanitation supplies",
+      "quantity": "Moist towelettes, garbage bags and plastic ties for personal sanitation; soap, hand sanitizer and disinfecting wipes; feminine supplies and personal hygiene items (Ready.gov). Hand sanitiser, wet wipes and bathroom products (Be Ready).",
+      "why": "Ready.gov lists these for personal sanitation when water and services are disrupted.",
+      "priority": "core",
+      "amazonQuery": "emergency hygiene kit wet wipes hand sanitizer",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "warmth",
+      "name": "Blankets and warm clothing",
+      "quantity": "Sleeping bag or warm blanket for each person; complete change of clothing appropriate for your climate and sturdy shoes (Ready.gov). Blankets, sleeping bags and warm clothing (Be Ready).",
+      "why": "Homes can become cold very quickly when the heating goes off (Be Ready).",
+      "priority": "core",
+      "amazonQuery": "emergency blanket sleeping bag",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "cash",
+      "name": "Cash",
+      "quantity": "Cash or traveler's checks (Ready.gov). Cash, a mix of coins and notes, and cards (Be Ready).",
+      "why": "In case electronic payments or ATMs are disrupted (Be Ready).",
+      "priority": "core",
+      "amazonQuery": "waterproof cash document pouch",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "documents",
+      "name": "Copies of important documents",
+      "quantity": "Important family documents such as copies of insurance policies, identification and bank account records saved electronically or in a waterproof, portable container (Ready.gov). Printed copies of IDs and documents such as passports, birth certificates and insurance policy details (Be Ready).",
+      "why": "Both lists say to keep copies you can reach without power or internet.",
+      "priority": "core",
+      "amazonQuery": "waterproof document bag",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "pet-supplies",
+      "name": "Pet food and water",
+      "quantity": "Pet food and extra water for your pet (Ready.gov). Pet food and bottled water (Be Ready).",
+      "why": "Both lists include pets in the household's supply plan.",
+      "priority": "core",
+      "amazonQuery": "pet food storage container",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "baby-supplies",
+      "name": "Baby supplies",
+      "quantity": "Infant formula, bottles, diapers, wipes and diaper rash cream (Ready.gov). Baby formula, nappies and wipes (Be Ready).",
+      "why": "Ready-made formula is best as you may not be able to boil water to make up powdered formula safely (Be Ready).",
+      "priority": "core",
+      "amazonQuery": "ready to feed infant formula",
+      "officialSources": [
+        "ready-gov",
+        "be-ready"
+      ]
+    },
+    {
+      "id": "whistle",
+      "name": "Whistle",
+      "quantity": "Whistle (Ready.gov).",
+      "why": "To signal for help (Ready.gov).",
+      "priority": "core",
+      "amazonQuery": "emergency whistle",
+      "officialSources": [
+        "ready-gov"
+      ]
+    },
+    {
+      "id": "dust-mask",
+      "name": "Dust mask",
+      "quantity": "Dust mask (Ready.gov).",
+      "why": "To help filter contaminated air (Ready.gov).",
+      "priority": "core",
+      "amazonQuery": "dust mask",
+      "officialSources": [
+        "ready-gov"
+      ]
+    },
+    {
+      "id": "shelter-in-place",
+      "name": "Plastic sheeting, scissors and duct tape",
+      "quantity": "Plastic sheeting, scissors and duct tape (Ready.gov).",
+      "why": "To shelter in place (Ready.gov).",
+      "priority": "core",
+      "amazonQuery": "plastic sheeting and duct tape",
+      "officialSources": [
+        "ready-gov"
+      ]
+    },
+    {
+      "id": "wrench-pliers",
+      "name": "Wrench or pliers",
+      "quantity": "Wrench or pliers (Ready.gov).",
+      "why": "To turn off utilities (Ready.gov).",
+      "priority": "core",
+      "amazonQuery": "adjustable wrench and pliers set",
+      "officialSources": [
+        "ready-gov"
+      ]
+    },
+    {
+      "id": "can-opener",
+      "name": "Manual can opener",
+      "quantity": "Manual can opener (Ready.gov).",
+      "why": "For food (Ready.gov).",
+      "priority": "core",
+      "amazonQuery": "manual can opener",
+      "officialSources": [
+        "ready-gov"
+      ]
+    },
+    {
+      "id": "local-maps",
+      "name": "Local maps",
+      "quantity": "Local maps (Ready.gov).",
+      "why": "Ready.gov lists paper maps in the basic kit for when phones and navigation are down.",
+      "priority": "core",
+      "amazonQuery": "local road map atlas",
+      "officialSources": [
+        "ready-gov"
+      ]
+    },
+    {
+      "id": "contacts-list",
+      "name": "Written contacts and notes",
+      "quantity": "Important phone numbers and information, including a list of regular medication and doses (Be Ready). Paper and pencil (Ready.gov).",
+      "why": "Be Ready says to write down contact details of who you would need to reach in an emergency.",
+      "priority": "recommended",
+      "amazonQuery": "waterproof notebook and pencil",
+      "officialSources": [
+        "be-ready",
+        "ready-gov"
+      ]
+    },
+    {
+      "id": "fire-extinguisher",
+      "name": "Fire extinguisher",
+      "quantity": "Fire extinguisher (Ready.gov).",
+      "why": "Listed by Ready.gov among additional emergency supplies.",
+      "priority": "recommended",
+      "amazonQuery": "home fire extinguisher",
+      "officialSources": [
+        "ready-gov"
+      ]
+    },
+    {
+      "id": "matches",
+      "name": "Matches in a waterproof container",
+      "quantity": "Matches in a waterproof container (Ready.gov).",
+      "why": "Listed by Ready.gov among additional emergency supplies.",
+      "priority": "recommended",
+      "amazonQuery": "waterproof matches container",
+      "officialSources": [
+        "ready-gov"
+      ]
+    },
+    {
+      "id": "mess-kit",
+      "name": "Plates, cups and utensils",
+      "quantity": "Mess kits, paper cups, plates, paper towels and plastic utensils (Ready.gov).",
+      "why": "Listed by Ready.gov among additional emergency supplies.",
+      "priority": "recommended",
+      "amazonQuery": "disposable plates cups utensils",
+      "officialSources": [
+        "ready-gov"
+      ]
+    },
+    {
+      "id": "kids-activities",
+      "name": "Activities for children",
+      "quantity": "Books, games, puzzles or other activities for children (Ready.gov).",
+      "why": "Listed by Ready.gov among additional emergency supplies.",
+      "priority": "recommended",
+      "amazonQuery": "travel board games for kids",
+      "officialSources": [
+        "ready-gov"
+      ]
+    }
+  ]
+}
