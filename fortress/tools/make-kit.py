@@ -1,6 +1,12 @@
-"""Draw the Fortress Watch site kit: favicon PNGs, favicon.ico, apple-touch-icon
-and the 1200x630 og-card.png. Needs Pillow. Run by hand when the motif or the
-status line changes:  python tools/make-kit.py
+"""Draw the Fortress Watch site kit: favicon PNGs, favicon.ico, apple-touch-icon,
+the 1200x630 og-card.png and the 1200x630 og-kit.png. Needs Pillow. Run by hand
+when the motif, the status line or the kit changes:
+    python tools/make-kit.py            everything
+    python tools/make-kit.py og-kit     only og-kit.png
+
+og-kit.png draws the pictograms from kit-icons.svg with a small renderer below
+(path M L H V Z, line, polyline, polygon, rect, circle; square caps), so the
+share card and the page use the same drawings.
 
 The motif is the FACT rubber stamp: an ink block, rotated a few degrees, with
 paper-coloured lettering. Small icons carry only the F (the full word is not
@@ -12,6 +18,9 @@ which one it used.
 """
 import json
 import os
+import re
+import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -146,7 +155,180 @@ def og_card(confirmed, not_true):
     return im.convert('RGB')
 
 
+SVG_NS = '{http://www.w3.org/2000/svg}'
+LAY = [('water', -2), ('food', 1), ('radio', -1), ('flashlight', 2),
+       ('batteries', 0.5), ('first-aid', -1.5), ('power-bank', 1.5), ('cash', -0.5)]
+
+
+def load_symbols():
+    root = ET.parse(ROOT / 'kit-icons.svg').getroot()
+    return {sym.get('id')[3:]: sym for sym in root.iter(SVG_NS + 'symbol')}
+
+
+def path_subpaths(d):
+    """M L H V Z only, absolute. Returns [(points, closed)]."""
+    toks = re.findall(r'[MLHVZ]|-?\d*\.?\d+', d)
+    subs, pts, cmd, i = [], [], None, 0
+    x = y = 0.0
+    while i < len(toks):
+        t = toks[i]
+        if t in 'MLHVZ':
+            cmd = t
+            i += 1
+            if t == 'Z':
+                subs.append((pts, True))
+                pts = []
+            continue
+        if cmd == 'M':
+            if pts:
+                subs.append((pts, False))
+            x, y = float(toks[i]), float(toks[i + 1]); i += 2
+            pts = [(x, y)]
+            cmd = 'L'
+        elif cmd == 'L':
+            x, y = float(toks[i]), float(toks[i + 1]); i += 2
+            pts.append((x, y))
+        elif cmd == 'H':
+            x = float(t); i += 1
+            pts.append((x, y))
+        elif cmd == 'V':
+            y = float(t); i += 1
+            pts.append((x, y))
+        else:
+            i += 1
+    if pts:
+        subs.append((pts, False))
+    return subs
+
+
+def draw_symbol(sym, size, color):
+    """Render one <symbol> to an RGBA tile of size x size (drawn at 4x, then reduced)."""
+    S = size * 4
+    k = S / 24.0
+    sw = 2 * k
+    tile = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(tile)
+    col = color + (255,)
+
+    def seg(p, q):
+        (x1, y1), (x2, y2) = p, q
+        dx, dy = x2 - x1, y2 - y1
+        n = (dx * dx + dy * dy) ** 0.5 or 1.0
+        ux, uy = dx / n * sw / 2, dy / n * sw / 2
+        px, py = -uy, ux
+        a = (x1 - ux, y1 - uy); b = (x2 + ux, y2 + uy)
+        d.polygon([(a[0] + px, a[1] + py), (b[0] + px, b[1] + py), (b[0] - px, b[1] - py), (a[0] - px, a[1] - py)], fill=col)
+
+    def stroke_pts(pts, closed):
+        pts = [(px * k, py * k) for px, py in pts]
+        for i in range(len(pts) - 1):
+            seg(pts[i], pts[i + 1])
+        if closed and len(pts) > 2:
+            seg(pts[-1], pts[0])
+
+    for el in sym:
+        tag = el.tag.replace(SVG_NS, '')
+        filled = el.get('fill') == 'currentColor'
+        stroked = el.get('stroke') != 'none'
+        if tag == 'rect':
+            x, y, w, h = (float(el.get(a)) for a in ('x', 'y', 'width', 'height'))
+            pts = [(x, y), (x + w, y), (x + w, y + h), (x, y + h)]
+            if filled:
+                d.rectangle([x * k, y * k, (x + w) * k, (y + h) * k], fill=col)
+            if stroked:
+                stroke_pts(pts, True)
+        elif tag == 'circle':
+            cx, cy, r = (float(el.get(a)) for a in ('cx', 'cy', 'r'))
+            if filled:
+                d.ellipse([(cx - r) * k, (cy - r) * k, (cx + r) * k, (cy + r) * k], fill=col)
+            if stroked:
+                ro = r + 1
+                d.ellipse([(cx - ro) * k, (cy - ro) * k, (cx + ro) * k, (cy + ro) * k], outline=col, width=int(round(sw)))
+        elif tag == 'line':
+            stroke_pts([(float(el.get('x1')), float(el.get('y1'))), (float(el.get('x2')), float(el.get('y2')))], False)
+        elif tag in ('polyline', 'polygon'):
+            nums = [float(v) for v in re.findall(r'-?\d*\.?\d+', el.get('points'))]
+            pts = list(zip(nums[0::2], nums[1::2]))
+            if filled:
+                d.polygon([(px * k, py * k) for px, py in pts], fill=col)
+            if stroked:
+                stroke_pts(pts, tag == 'polygon')
+        elif tag == 'path':
+            for pts, closed in path_subpaths(el.get('d')):
+                if filled and len(pts) > 2:
+                    d.polygon([(px * k, py * k) for px, py in pts], fill=col)
+                if stroked:
+                    stroke_pts(pts, closed)
+    return tile.resize((size, size), Image.LANCZOS)
+
+
+def serif(size):
+    for p in (Path('C:/Windows/Fonts/georgia.ttf'), Path('/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf')):
+        if p.is_file():
+            return ImageFont.truetype(str(p), size)
+    return font(size)
+
+
+def og_kit():
+    """1200x630 poster band: headline, stamp, count and the eight flat-lay pictograms."""
+    W, H, M = 1200, 630, 64
+    im = Image.new('RGBA', (W, H), INK + (255,))
+    d = ImageDraw.Draw(im)
+    kit = {}
+    try:
+        kit = json.loads((ROOT / 'data' / 'kit.json').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        pass
+    items = [k for k in kit.get('items', []) if isinstance(k, dict) and k.get('name')]
+    core = sum(1 for k in items if k.get('priority') != 'recommended')
+    rec = len(items) - core
+    left_w = 560
+    size = 132
+    while size > 60 and max(font(size).getlength(t) for t in ('BLACKOUT', 'STARTER KIT')) > left_w:
+        size -= 2
+    f = font(size)
+    y = 56
+    for line in ('BLACKOUT', 'STARTER KIT'):
+        d.text((M, y), line, font=f, fill=PAPER)
+        y += int(size * 0.9)
+    y += 40
+    lede = serif(30)
+    for line in wrap_px('Every item is on the Ready.gov or UK Be Ready list. Nothing else.', lede, left_w):
+        d.text((M, y), line, font=lede, fill=PAPER)
+        y += 40
+    y += 24
+    st = stamp_image('OFFICIAL LISTS ONLY', 34, PAPER, None, PAPER)
+    w, h = paste_rotated(im, st, (M, y), 2)
+    if items:
+        d.text((M, y + h + 18), '%d core items, %d recommended' % (core, rec), font=font(30), fill=PAPER, anchor='lt')
+    d.text((M, H - 44), 'bookhockeys.com/fortress/kit.html', font=font(26), fill=(176, 168, 152), anchor='ls')
+
+    # Paper card with a 1 px frame offset behind it, as on the page.
+    cx0, cy0, cx1, cy1 = 664, 120, 1126, 480
+    d.rectangle([cx0 + 12, cy0 + 12, cx1 + 12, cy1 + 12], outline=PAPER, width=1)
+    d.rectangle([cx0, cy0, cx1, cy1], fill=PAPER)
+    d.rectangle([cx0 + 9, cy0 + 9, cx1 - 9, cy1 - 9], outline=INK, width=1)
+    syms = load_symbols()
+    cell_w = (cx1 - cx0 - 40) / 4
+    cell_h = (cy1 - cy0 - 40) / 2
+    isz = 104
+    for i, (sid, deg) in enumerate(LAY):
+        if sid not in syms:
+            continue
+        tile = draw_symbol(syms[sid], isz, INK).rotate(-deg, resample=Image.BICUBIC, expand=True)
+        col, row = i % 4, i // 4
+        x = cx0 + 20 + col * cell_w + (cell_w - tile.width) / 2
+        y2 = cy0 + 20 + row * cell_h + (cell_h - tile.height) / 2
+        im.alpha_composite(tile, (int(x), int(y2)))
+    return im.convert('RGB')
+
+
 def main():
+    if sys.argv[1:] == ['og-kit']:
+        print('font:', FONT_PATH or 'Pillow default')
+        og_kit().save(ROOT / 'og-kit.png', optimize=True)
+        print('wrote og-kit.png')
+        return
     print('font:', FONT_PATH or "Pillow default (no Barlow Condensed or Arial Narrow found)")
     for size, name, word in ((16, 'favicon-16.png', 'F'), (32, 'favicon-32.png', 'F'),
                              (180, 'apple-touch-icon.png', 'FACT'), (192, 'favicon-192.png', 'FACT'),
@@ -164,6 +346,8 @@ def main():
             meta.get('statusNotTrue', 'the UK told people to stock 30 days. The official figure is 3 days.')
             ).save(ROOT / 'og-card.png', optimize=True)
     print('wrote og-card.png')
+    og_kit().save(ROOT / 'og-kit.png', optimize=True)
+    print('wrote og-kit.png')
 
 
 if __name__ == '__main__':

@@ -60,10 +60,10 @@ TOPIC_WORDS = ['fortress', '90 day', '90-day', 'off-grid', 'stockpile', 'stock u
 # Second-level suffixes where the registrable domain has three labels (bbc.co.uk).
 SECOND_LEVEL = {'co.uk', 'org.uk', 'ac.uk', 'gov.uk', 'com.au', 'net.au', 'org.au', 'gov.au',
                 'co.nz', 'govt.nz', 'co.in', 'co.jp', 'or.jp', 'go.jp', 'com.br', 'co.za', 'go.kr', 'co.kr'}
-UA = 'FortressWatch/0.2 (+https://bookhockeys.com/fortress/)'
+UA = 'FortressWatch/0.3 (+https://bookhockeys.com/fortress/)'
 
 DEFAULT_META = {
-    'version': '0.2.0',
+    'version': '0.3.0',
     'statusConfirmed': 'the Pentagon has ordered its bases to stop depending on the civilian grid.',
     'statusNotTrue': 'the UK told people to stock 30 days. The official figure is 3 days.',
 }

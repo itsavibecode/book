@@ -1,4 +1,4 @@
-/* Fortress Watch v0.2.0, map page. Vanilla JS + Leaflet 1.9.4, no build step.
+/* Fortress Watch v0.3.0, map page. Vanilla JS + Leaflet 1.9.4, no build step.
    Pins every claim in data/items.json that has a `geo` (and smaller pins for
    `geoAlso`), coloured by its label, sized by how recent it is. The list under
    the map carries the same claims for keyboard and screen-reader users. */
