@@ -14,8 +14,8 @@
   /* The first instagram.com link in the text (Instagram's share often puts
      a sentence around it). Returns { shortcode, url } or { error }:
      'link' when there is no post link, 'share' for instagram.com/share/
-     links, which need a redirect lookup that arrives in M2. Same rules as
-     the Worker's parseLink. */
+     links come back with share: true and are expanded by the Worker. Same
+     rules as the Worker's parseLink. */
   function parseLink(input) {
     var s = String(input == null ? '' : input).trim();
     if (!s) return { error: 'empty' };
@@ -24,7 +24,8 @@
     var u;
     try { u = new URL(/^https?:/i.test(found[0]) ? found[0] : 'https://' + found[0]); } catch (e) { return { error: 'link' }; }
     if (!HOSTS.test(u.hostname)) return { error: 'link' };
-    if (/^\/share\//.test(u.pathname)) return { error: 'share' };
+    // The Worker follows /share/ links to the post they point at.
+    if (/^\/share\//.test(u.pathname)) return { shortcode: null, share: true, url: u.toString() };
     var m = u.pathname.match(/^\/(?:[A-Za-z0-9._]+\/)?(?:p|reel|reels|tv)\/([A-Za-z0-9_-]{5,})/);
     if (!m) return { error: 'link' };
     return { shortcode: m[1], url: u.toString() };
@@ -67,7 +68,7 @@
 
   var ERRORS = {
     link: ['That is not an Instagram post link.', 'Links look like instagram.com/p/... or instagram.com/reel/...'],
-    share: ['Share links do not work here yet.', 'In Instagram tap Share, then Copy link, and paste that link instead.'],
+    share: ['Instagram did not say which post this share link opens.', 'Open it in the Instagram app, tap Share, then Copy link, and paste that link instead.'],
     private: ['Instagram will not show this post without a login.', 'It is private, deleted, or age-gated. Keepsake only works on public posts.'],
     login: ['Instagram is asking us to log in right now.', 'This usually passes in a few minutes. Try again, or open the post on instagram.com to confirm it is public.'],
     ratelimit: ['Instagram is slowing us down.', 'Wait a minute and try again.'],

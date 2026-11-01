@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="version" content="0.2.0" />
-<title>Keepsake v0.2.0 - Instagram post downloader | BookHockeys</title>
+<meta name="version" content="0.3.0" />
+<title>Keepsake v0.3.0 - Instagram post downloader | BookHockeys</title>
 
 <meta name="description" content="Save a public Instagram post, reel or carousel at the size Instagram stores it, with sound. Paste the link, see every photo and video uncropped, then save one or all. No sign-in, no ads, not affiliated with Instagram." />
 <meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)" />
@@ -297,6 +297,27 @@ button{font:inherit;cursor:pointer}
 .foot a,.foot .linkish{display:inline-flex;align-items:center;min-height:44px;min-width:44px}
 
 /* consent banner (site-wide `greenline-consent` key) */
+/* recent posts (this device only) */
+.recent{margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}
+.recent-h{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.recent h2{font-size:16px;margin:0}
+.recent .hint{margin:2px 0 10px;font-size:13px;color:var(--muted)}
+.recent ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ritem{width:100%;min-height:56px;display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;align-items:center;padding:6px;background:transparent;color:var(--text);border:1px solid var(--line);border-radius:var(--r-btn);text-align:left}
+.ritem:hover{background:var(--sel)}
+.ritem .box{width:48px;height:48px;display:grid;place-items:center;background:var(--plate);border:1px solid var(--plate-bd)}
+.ritem .box img{max-width:42px;max-height:42px;display:block}
+.ritem b{display:block;font-weight:650;overflow-wrap:anywhere}
+.ritem .m{display:block;font-size:13px;color:var(--muted)}
+.status{margin:20px 0 0;font-size:13px;color:var(--muted)}
+
+/* confirm dialog: closes only through its buttons or Esc */
+.confirm{max-width:min(420px,calc(100vw - 32px));border:1px solid var(--line-strong);border-radius:var(--r-btn);background:var(--card);color:var(--text);padding:20px}
+.confirm::backdrop{background:rgba(0,0,0,.45)}
+.confirm h2{font-size:17px;margin:0 0 6px}
+.confirm p{margin:0 0 16px;font-size:14px;color:var(--muted)}
+.confirm .row{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+
 .consent{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-top:1px solid var(--line-strong);padding:14px 16px calc(14px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
 .consent-text{max-width:640px;font-size:13px;color:var(--muted)}
 .consent-text strong{display:block;color:var(--text);font-size:14px}
@@ -403,10 +424,20 @@ button{font:inherit;cursor:pointer}
     <div class="narrow" id="guideBox">
       <h2 class="sr">How to use Keepsake</h2>
       <dl class="guide">
-        <dt>iPhone</dt><dd>In Instagram tap Share under the post, then Copy link. Come back here and press Paste.</dd>
-        <dt>Android</dt><dd>In Instagram tap Share, then Copy link. Come back here and press Paste.</dd>
+        <dt>iPhone</dt><dd>In Instagram tap Share under the post, then Copy link. Come back here and press Paste. iPhone does not let web pages join the Share list, so copying is the way.</dd>
+        <dt>Android</dt><dd>Add Keepsake to your home screen once (Chrome menu, then Add to Home screen). After that, tap Share in Instagram and pick Keepsake from the list. Copying the link and pasting it here works too.</dd>
         <dt>Saving</dt><dd>On iPhone, Save to Photos opens the share sheet; pick Save Image or Save Video. On Android and desktop the file goes to your Downloads folder.</dd>
       </dl>
+      <section class="recent" id="recent" hidden aria-labelledby="recentTitle">
+        <div class="recent-h">
+          <h2 id="recentTitle">Recent</h2>
+          <button type="button" class="btn btn-ghost" id="recentClear" title="Remove this list from this device. Saved files are not touched.">Clear</button>
+        </div>
+        <p class="hint">Kept on this device only. Tap one to fetch it again.</p>
+        <ul id="recentList"></ul>
+        <button type="button" class="linkish more" id="recentMore" hidden></button>
+      </section>
+      <p class="status" id="status" hidden></p>
     </div>
   </main>
 
@@ -414,7 +445,7 @@ button{font:inherit;cursor:pointer}
     <a href="terms.html" title="Read the terms of use">Terms</a>
     <button type="button" class="linkish" id="themeBtn" title="Switch between the light and dark page"></button>
     <button type="button" class="linkish" id="cookieReset" title="Change your analytics cookie choice">Cookies</button>
-    <span>Keepsake v0.2.0</span>
+    <span>Keepsake v0.3.0</span>
     <span>Files pass through our server as a pipe and are never stored.</span>
   </footer>
 </div>
@@ -430,6 +461,15 @@ button{font:inherit;cursor:pointer}
     <button type="button" class="btn btn-ghost" id="lbClose" title="Close (Esc)">Close</button>
   </div>
   <div class="lb-scroll" id="lbScroll"><img id="lbImg" alt="" crossorigin="anonymous" /></div>
+</dialog>
+
+<dialog class="confirm" id="clearDialog" aria-labelledby="clearTitle" aria-describedby="clearDesc">
+  <h2 id="clearTitle">Clear the recent list?</h2>
+  <p id="clearDesc">This removes the list from this device. Files you saved are not touched.</p>
+  <div class="row">
+    <button type="button" class="btn btn-ghost" id="clearCancel">Cancel</button>
+    <button type="button" class="btn btn-ink" id="clearYes">Clear list</button>
+  </div>
 </dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
@@ -464,6 +504,8 @@ button{font:inherit;cursor:pointer}
     user: $('user'), spec: $('spec'), captBox: $('captBox'), capt: $('capt'), more: $('more'),
     save: $('save'), saveSub: $('saveSub'), fname: $('fname'), allBox: $('allBox'), saveAll: $('saveAll'), allNote: $('allNote'),
     copyCap: $('copyCap'), openIg: $('openIg'), guide: $('guideBox'),
+    recent: $('recent'), recentList: $('recentList'), recentMore: $('recentMore'), recentClear: $('recentClear'),
+    clearDialog: $('clearDialog'), status: $('status'),
     qualityBox: $('qualityBox'), qBest: $('qBest'), qSd: $('qSd'), qBestLabel: $('qBestLabel'), qSdLabel: $('qSdLabel'), qnote: $('qnote'),
     pbar: $('pbar'), pcnt: $('pcnt'), psave: $('psave'), psub: $('psub'),
     lb: $('lightbox'), lbImg: $('lbImg'), lbScroll: $('lbScroll'), lbActual: $('lbActual'), lbClose: $('lbClose'),
@@ -512,6 +554,7 @@ button{font:inherit;cursor:pointer}
     el.error.hidden = v !== 'error';
     el.result.hidden = v !== 'done';
     el.guide.hidden = v === 'done' || v === 'working';
+    renderRecent();
     el.pbar.hidden = v !== 'done';
     document.body.classList.toggle('has-bar', v === 'done');
     var busy = v === 'working';
@@ -572,6 +615,7 @@ button{font:inherit;cursor:pointer}
         step(3, 'done');
         render();
         track('keepsake_resolve', { method: p.method });
+        recentAdd(p);
       });
     }).catch(function (err) {
       if (run === null || run.ctrl !== ctrl) return;
@@ -1126,6 +1170,149 @@ button{font:inherit;cursor:pointer}
     else if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1, el.rail.contains(t)); }
   });
 
+  /* ---------- recent posts (PLAN 2.8: this device only) ---------- */
+
+  var RECENT_KEY = 'keepsake-recent';
+  var RECENT_MAX = 20;
+  var RECENT_SHOWN = 5;
+  var recentAll = false;
+
+  // null when storage is blocked: the list then stays hidden.
+  function recentLoad() {
+    try {
+      var list = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+      return Array.isArray(list) ? list : [];
+    } catch (e) { return null; }
+  }
+  function recentStore(list) {
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); return true; } catch (e) { return false; }
+  }
+
+  /* A small JPEG of the first item kept with the entry, because the
+     proxied thumbnail link expires after 90 minutes. */
+  function makeThumb(url) {
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () {
+        try {
+          var scale = Math.min(1, 96 / Math.max(img.naturalWidth, img.naturalHeight));
+          var c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(img.naturalWidth * scale));
+          c.height = Math.max(1, Math.round(img.naturalHeight * scale));
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL('image/jpeg', 0.7));
+        } catch (e) { resolve(null); }
+      };
+      img.onerror = function () { resolve(null); };
+      img.src = url;
+    });
+  }
+
+  function recentAdd(p) {
+    var list = recentLoad();
+    if (!list) return;
+    var first = p.items[0];
+    var entry = {
+      code: p.shortcode, url: p.url, user: p.username || '', takenAt: p.takenAt || null,
+      type: p.type, count: p.items.length, duration: first.video ? first.video.duration : null, thumb: null
+    };
+    var old = list.filter(function (e) { return e.code === p.shortcode; })[0];
+    if (old && old.thumb) entry.thumb = old.thumb;
+    list = [entry].concat(list.filter(function (e) { return e.code !== p.shortcode; })).slice(0, RECENT_MAX);
+    recentStore(list);
+    if (entry.thumb) return;
+    makeThumb(first.image.thumb).then(function (data) {
+      if (!data) return;
+      var now = recentLoad() || [];
+      now.forEach(function (e) { if (e.code === p.shortcode) e.thumb = data; });
+      recentStore(now);
+    });
+  }
+
+  function recentMeta(e) {
+    var what = e.type === 'carousel' ? 'Carousel, ' + e.count + ' items'
+      : e.type === 'video' ? 'Video' + (e.duration ? ' ' + IG.duration(e.duration) : '') : 'Photo';
+    if (e.takenAt) what += ', ' + new Date(e.takenAt * 1000).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    return what;
+  }
+
+  function renderRecent() {
+    var list = view === 'idle' ? recentLoad() : null;
+    el.recent.hidden = !list || !list.length;
+    if (el.recent.hidden) return;
+    var shown = recentAll ? list : list.slice(0, RECENT_SHOWN);
+    el.recentList.innerHTML = '';
+    shown.forEach(function (e) {
+      var li = document.createElement('li');
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'ritem';
+      b.title = 'Fetch this post again';
+      var box = document.createElement('span');
+      box.className = 'box';
+      box.setAttribute('aria-hidden', 'true');
+      if (e.thumb) {
+        var img = document.createElement('img');
+        img.src = e.thumb;
+        img.alt = '';
+        box.appendChild(img);
+      }
+      var txt = document.createElement('span');
+      var name = document.createElement('b');
+      name.textContent = e.user ? '@' + e.user : 'Instagram post';
+      var meta = document.createElement('span');
+      meta.className = 'm num';
+      meta.textContent = recentMeta(e);
+      txt.appendChild(name);
+      txt.appendChild(meta);
+      b.appendChild(box);
+      b.appendChild(txt);
+      b.addEventListener('click', function () { el.url.value = e.url; start(e.url); });
+      li.appendChild(b);
+      el.recentList.appendChild(li);
+    });
+    el.recentMore.hidden = list.length <= RECENT_SHOWN;
+    el.recentMore.textContent = recentAll ? 'Show fewer' : 'Show all ' + list.length;
+    el.recentMore.setAttribute('aria-expanded', String(recentAll));
+  }
+
+  el.recentMore.addEventListener('click', function () { recentAll = !recentAll; renderRecent(); });
+  el.recentClear.addEventListener('click', function () {
+    if (el.clearDialog.showModal) el.clearDialog.showModal(); else el.clearDialog.setAttribute('open', '');
+    $('clearCancel').focus();
+  });
+  function closeClear() { if (el.clearDialog.close) el.clearDialog.close(); else el.clearDialog.removeAttribute('open'); }
+  $('clearCancel').addEventListener('click', closeClear);
+  $('clearYes').addEventListener('click', function () {
+    try { localStorage.removeItem(RECENT_KEY); } catch (e) {}
+    closeClear();
+    recentAll = false;
+    renderRecent();
+    toast('Recent list cleared');
+    el.url.focus();
+  });
+
+  /* ---------- status line from the Worker's /health ---------- */
+
+  function ago(iso) {
+    var s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
+    if (s < 90) return 'just now';
+    if (s < 3600) return Math.round(s / 60) + ' minutes ago';
+    if (s < 172800) { var h = Math.round(s / 3600); return h + (h === 1 ? ' hour ago' : ' hours ago'); }
+    return Math.round(s / 86400) + ' days ago';
+  }
+
+  function loadStatus() {
+    fetch(IG.API + '/health', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (h) {
+      var text = '';
+      if (h.status === 'working' && h.lastSuccess) text = 'Instagram lookups are working. The last one was ' + ago(h.lastSuccess.at) + '.';
+      else if (h.status === 'failing' && h.lastFailure) text = 'Instagram lookups are failing right now. The last one failed ' + ago(h.lastFailure.at) + '.';
+      el.status.textContent = text;
+      el.status.hidden = !text;
+    }).catch(function () { el.status.hidden = true; });
+  }
+
   /* ---------- theme ---------- */
 
   function effectiveTheme() {
@@ -1170,13 +1357,22 @@ button{font:inherit;cursor:pointer}
 
   setView('idle');
 
-  // ?url= resolves on load (PLAN 2.1); `text` is read too, for the share
-  // target that arrives in M2.
+  // ?url= resolves on load (PLAN 2.1). The Android share target lands here
+  // too, and Instagram usually puts the link in `text`, sometimes inside a
+  // sentence, so both are read (parseLink finds the link in the text).
   try {
     var q = new URLSearchParams(location.search);
     var given = q.get('url') || q.get('text');
     if (given) { el.url.value = given; start(given); }
   } catch (e) {}
+
+  setTimeout(loadStatus, 1200);
+
+  // App-shell cache for the page's own files (sw.js). Only on the real site,
+  // so local edits are never served from a cache; ?sw=1 turns it on for a test.
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || /[?&]sw=1\b/.test(location.search))) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
 })();
 </script>
 </body>
