@@ -110,6 +110,12 @@ with one label and never a link, shortcode, username or caption:
 
 ## Changelog
 
+- **0.3.1** (2026-11-06): opened from the iPhone home screen, the top of the
+  page, the full-screen photo bar and the "copied" message could sit under
+  the clock and notch, because the page asks to fill the whole screen. Every
+  edge-pinned part now keeps clear of them (nothing changes on desktop or in
+  the browser). The iPhone guide also says how to add Keepsake to the home
+  screen.
 - **0.3.0** (2026-10-31): made for the phone. On Android, Keepsake now shows
   up in Instagram's Share menu once it is on the home screen, so saving a post
   no longer needs a copy and paste. `instagram.com/share/...` links work. The

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="version" content="0.3.0" />
-<title>Keepsake v0.3.0 - Instagram post downloader | BookHockeys</title>
+<meta name="version" content="0.3.1" />
+<title>Keepsake v0.3.1 - Instagram post downloader | BookHockeys</title>
 
 <meta name="description" content="Save a public Instagram post, reel or carousel at the size Instagram stores it, with sound. Paste the link, see every photo and video uncropped, then save one or all. No sign-in, no ads, not affiliated with Instagram." />
 <meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)" />
@@ -158,7 +158,12 @@ button{font:inherit;cursor:pointer}
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .ico{width:16px;height:16px;flex:0 0 auto}
 
-.wrap{max-width:1040px;margin:0 auto;padding:28px 28px 40px}
+/* Home-screen app: viewport-fit=cover lets the page run under the iPhone
+   status bar, notch and home bar, so everything pinned to an edge adds the
+   safe-area inset back. The ", 0px" fallback keeps desktop and in-browser
+   rendering unchanged. */
+.wrap{max-width:1040px;margin:0 auto;
+  padding:calc(28px + env(safe-area-inset-top, 0px)) calc(28px + env(safe-area-inset-right, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px))}
 .narrow{max-width:640px}
 
 /* wordmark: the frame motif at its smallest */
@@ -274,7 +279,8 @@ button{font:inherit;cursor:pointer}
 .sec .btn-ghost{flex:1 1 140px}
 
 /* phone save bar */
-.pbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bg);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.pbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bg);border-top:1px solid var(--line);
+  padding:10px calc(16px + env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) calc(16px + env(safe-area-inset-left, 0px))}
 .pbar .row{display:flex;align-items:center;gap:12px}
 .pbar .cnt{font-size:14px;white-space:nowrap}
 .pbar .btn-save{flex:1 1 auto;width:auto;height:48px}
@@ -282,15 +288,17 @@ button{font:inherit;cursor:pointer}
 
 /* lightbox: native zoom inside a scrollable full-screen layer */
 .lb{width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--bg);color:var(--text)}
+.lb[open]{display:flex;flex-direction:column}
 .lb::backdrop{background:var(--bg)}
-.lb-bar{position:sticky;top:0;left:0;z-index:1;display:flex;justify-content:flex-end;gap:8px;padding:8px 12px;background:var(--bg);border-bottom:1px solid var(--line)}
-.lb-scroll{height:calc(100dvh - 61px);overflow:auto;display:grid;place-items:center}
+.lb-bar{flex:0 0 auto;display:flex;justify-content:flex-end;gap:8px;background:var(--bg);border-bottom:1px solid var(--line);
+  padding:calc(8px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-right, 0px)) 8px calc(12px + env(safe-area-inset-left, 0px))}
+.lb-scroll{flex:1 1 auto;min-height:0;overflow:auto;display:grid;place-items:center;padding-bottom:env(safe-area-inset-bottom, 0px)}
 .lb-scroll img{max-width:100%;max-height:100%;display:block}
 .lb-scroll.actual{place-items:start}
 .lb-scroll.actual img{max-width:none;max-height:none}
 
 /* toast: passive confirmations only, top centre */
-.toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:40;background:var(--text);color:var(--bg);padding:8px 14px;border-radius:var(--r-btn);font-size:14px;max-width:calc(100vw - 32px)}
+.toast{position:fixed;top:calc(12px + env(safe-area-inset-top, 0px));left:50%;transform:translateX(-50%);z-index:40;background:var(--text);color:var(--bg);padding:8px 14px;border-radius:var(--r-btn);font-size:14px;max-width:calc(100vw - 32px)}
 
 /* footer */
 .foot{margin-top:36px;padding-top:10px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:0 18px;font-size:13px;color:var(--muted)}
@@ -318,7 +326,8 @@ button{font:inherit;cursor:pointer}
 .confirm p{margin:0 0 16px;font-size:14px;color:var(--muted)}
 .confirm .row{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
 
-.consent{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-top:1px solid var(--line-strong);padding:14px 16px calc(14px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
+.consent{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-top:1px solid var(--line-strong);
+  padding:14px calc(16px + env(safe-area-inset-right, 0px)) calc(14px + env(safe-area-inset-bottom, 0px)) calc(16px + env(safe-area-inset-left, 0px));display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
 .consent-text{max-width:640px;font-size:13px;color:var(--muted)}
 .consent-text strong{display:block;color:var(--text);font-size:14px}
 .consent-text p{margin:0}
@@ -327,7 +336,7 @@ button{font:inherit;cursor:pointer}
 /* phones: stacked controls, the save button moves to the bar at the bottom */
 @media (max-width: 640px){
   :root{--plate-pad:12px}
-  .wrap{padding:16px 16px 28px}
+  .wrap{padding:calc(16px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) calc(16px + env(safe-area-inset-left, 0px))}
   .top{margin-bottom:16px}
   .field-row{flex-direction:column}
   .field-row .btn{width:100%}
@@ -340,7 +349,7 @@ button{font:inherit;cursor:pointer}
   .seg{grid-template-columns:minmax(0,1fr)}
   .opt + .opt{border-left:0;border-top:1px solid var(--line-strong)}
   body.has-bar .save{display:none}
-  body.has-bar .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+  body.has-bar .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom, 0px))}
 }
 @media (min-width: 641px){.pbar{display:none !important}}
 </style>
@@ -424,7 +433,7 @@ button{font:inherit;cursor:pointer}
     <div class="narrow" id="guideBox">
       <h2 class="sr">How to use Keepsake</h2>
       <dl class="guide">
-        <dt>iPhone</dt><dd>In Instagram tap Share under the post, then Copy link. Come back here and press Paste. iPhone does not let web pages join the Share list, so copying is the way.</dd>
+        <dt>iPhone</dt><dd>In Instagram tap Share under the post, then Copy link. Come back here and press Paste. iPhone does not let web pages join the Share list, so copying is the way. To keep Keepsake on your home screen, open it in Safari, tap Share, then Add to Home Screen.</dd>
         <dt>Android</dt><dd>Add Keepsake to your home screen once (Chrome menu, then Add to Home screen). After that, tap Share in Instagram and pick Keepsake from the list. Copying the link and pasting it here works too.</dd>
         <dt>Saving</dt><dd>On iPhone, Save to Photos opens the share sheet; pick Save Image or Save Video. On Android and desktop the file goes to your Downloads folder.</dd>
       </dl>
@@ -445,7 +454,7 @@ button{font:inherit;cursor:pointer}
     <a href="terms.html" title="Read the terms of use">Terms</a>
     <button type="button" class="linkish" id="themeBtn" title="Switch between the light and dark page"></button>
     <button type="button" class="linkish" id="cookieReset" title="Change your analytics cookie choice">Cookies</button>
-    <span>Keepsake v0.3.0</span>
+    <span>Keepsake v0.3.1</span>
     <span>Files pass through our server as a pipe and are never stored.</span>
   </footer>
 </div>
