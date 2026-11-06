@@ -25,6 +25,11 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.2.11 — 2026-11-06
+- **Full iOS Add-to-Home-Screen support**, matching the home-screen-apps-need-safe-area-insets rule set after lights v0.11.1. Added `apple-mobile-web-app-capable=yes`, `apple-mobile-web-app-status-bar-style=black-translucent`, `apple-mobile-web-app-title=BigText`, `mobile-web-app-capable=yes`, and `viewport-fit=cover`. Tapping an iPhone home-screen icon now launches BigText standalone with no Safari chrome.
+- **Safe-area insets on every fixed element** so the toolbar doesn't sit under the home indicator, the toast doesn't sit under the status bar / notch, the theme + caption popups track the toolbar correctly, and the display-area padding keeps the big text out of the notch and home-indicator regions. CSS vars `--safe-top/right/bottom/left` expose `env(safe-area-inset-*)` so `autoSizeText` can subtract them from the usable viewport.
+- **Fix antislop R-02 em-dashes in user-visible copy.** Replaced em-dashes in the browser tab title, OG title, Twitter title, OG and Twitter image alt text, dynamic `document.title`, the "Copy failed" toast, the editor tip line, and the first-visit caption hint. Code comments were left alone (developer text, not UI).
+
 ### v0.2.10 — 2026-06-23
 - **Editor actions row fits on mobile** — four buttons in a single right-justified flex row overflowed off-screen on iPhone-width viewports. Now switches to a 2×2 CSS grid below 640 px: `[ALL CAPS] [Clear]` on top, `[Cancel] [Display]` on the bottom. Full-width touch targets, deterministic layout regardless of button text width.
 
