@@ -13,7 +13,15 @@ index.html                 the page (single file; Graphite Calm look, same as th
 kick-gif-clipper.user.js   the add-on itself - Install points here, and so does its @updateURL
 favicon.svg / favicon-*.png, apple-touch-icon.png   lime GIF badge
 og-card.png                1200x630 share card
+img/editor.webp            the real editor, captured on a drawn test scene (no real stream)
+img/pill.webp              the real launcher with the rewind buffer full
+img/snapshot.webp          a PNG exactly as the add-on saved it (info bar included)
 ```
+
+The three `img/` captures come from the real add-on running in headless Chrome on a
+temporary local page that plays a drawn stand-in scene into a `<video>` (channel shown
+as `your-channel`). Never use footage from a real stream for these. To refresh them
+after a UI change, rebuild that harness page, re-run the capture, and convert to WebP.
 
 ## The script copy
 
@@ -36,6 +44,18 @@ per-device opt-out: visit `/gifclipper/?ga=off` once (`?ga=on` undoes it). The
 Install button also sends a `gifclipper_install_click` event.
 
 ## Changelog
+
+### 0.6.0 page refresh (2026-11-06)
+- The page now shows the real product: the editor, the launcher and an actual saved
+  PNG, all captured from the add-on on a drawn test scene, instead of a hand-drawn
+  mock that no longer matched the launcher.
+- Features are grouped the way you use them (catch it, shape it, save it) instead of
+  ten identical cards, and the opening line now mentions WebM and PNG.
+- "New in 0.6" listed changes from 0.2 to 0.5 as new; it is now a short version list.
+- Dropped the size claims we had no measurement for ("10 to 20 times smaller",
+  "well under 1 MB").
+- Added an "Already have it? Click Install again to update" line, and 44 px tap
+  targets for the header and footer links and the Cookies button.
 
 ### 0.6.0
 - Serves add-on v0.6.0 (runs inside Kick's embed player too, so it works on bookhockeys.com/stumble).

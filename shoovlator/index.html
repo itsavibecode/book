@@ -2,33 +2,40 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="version" content="0.6.0" />
-<title>Shoovlator — talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="version" content="0.7.0" />
+<title>Shoovlator: talk like Shoovy, just much more enough confused than usually | BookHockeys</title>
 
-<meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy — stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
+<meta name="description" content="Type any English. Shoovlator rewrites it in the voice of Shoovy, with stacked comparatives, redundant fillers, and confidently wrong grammar that sounds just much more enough funny than usually. Runs entirely in your browser." />
 <meta name="theme-color" content="#ffd166" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <link rel="canonical" href="https://bookhockeys.com/shoovlator/" />
 
+<!-- Add to Home Screen -->
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Shoovlator" />
+<link rel="manifest" href="manifest.webmanifest" />
+
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="BookHockeys" />
-<meta property="og:title" content="Shoovlator — talk like Shoovy, just much more enough confused than usually" />
+<meta property="og:title" content="Shoovlator: talk like Shoovy, just much more enough confused than usually" />
 <meta property="og:description" content="Rewrites your sentence in the voice of Shoovy with stacked comparatives and redundant fillers. Much more enough funny than usually." />
 <meta property="og:url" content="https://bookhockeys.com/shoovlator/" />
 <meta property="og:image" content="https://bookhockeys.com/shoovlator/og-card.png" />
 <meta property="og:image:secure_url" content="https://bookhockeys.com/shoovlator/og-card.png" />
 <meta property="og:image:type" content="image/png" />
-<meta property="og:image:alt" content="Shoovlator — talk like Shoovy. Type English, get it back just much more enough confused than usually." />
+<meta property="og:image:alt" content="Shoovlator: talk like Shoovy. Type English, get it back just much more enough confused than usually." />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:locale" content="en_US" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Shoovlator — talk like Shoovy" />
+<meta name="twitter:title" content="Shoovlator: talk like Shoovy" />
 <meta name="twitter:description" content="Type English. Get it back just much more enough confused than usually." />
 <meta name="twitter:image" content="https://bookhockeys.com/shoovlator/og-card.png" />
-<meta name="twitter:image:alt" content="Shoovlator — talk like Shoovy" />
+<meta name="twitter:image:alt" content="Shoovlator: talk like Shoovy" />
 
 <link rel="icon" href="favicon.ico" />
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
@@ -54,7 +61,7 @@
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "publisher": { "@type": "Organization", "name": "BookHockeys", "url": "https://bookhockeys.com/" },
       "image": "https://bookhockeys.com/shoovlator/og-card.png",
-      "softwareVersion": "0.6.0"
+      "softwareVersion": "0.7.0"
     }
   ]
 }
@@ -74,7 +81,8 @@
   }
 
   header {
-    padding: 36px 24px 12px;
+    padding: calc(36px + env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+             12px max(24px, env(safe-area-inset-left));
     text-align: center;
   }
   .brand {
@@ -110,7 +118,7 @@
   }
   .credit {
     margin: 4px 0 0;
-    color: #777;
+    color: #8f8f8f;
     font-size: 12px;
     letter-spacing: 0.04em;
   }
@@ -120,7 +128,7 @@
     width: 100%;
     max-width: 1100px;
     margin: 0 auto;
-    padding: 16px 20px 32px;
+    padding: 16px max(20px, env(safe-area-inset-right)) 32px max(20px, env(safe-area-inset-left));
   }
 
   .panes {
@@ -130,6 +138,11 @@
   }
   @media (max-width: 760px) {
     .panes { grid-template-columns: 1fr; }
+    /* Comfortable 44px tap targets on touch (R-03). */
+    .pane-head button { min-height: 44px; padding: 6px 14px; }
+    .pane-head .head-buttons { gap: 8px; }
+    .examples li { margin: 2px 0; }
+    .examples li button { display: inline-flex; align-items: center; min-height: 44px; }
   }
 
   .pane {
@@ -176,10 +189,16 @@
     color: inherit;
     font-size: 16px;
     line-height: 1.55;
-    outline: none;
     font-family: inherit;
   }
-  textarea { resize: vertical; }
+  textarea { resize: vertical; outline: none; }
+  /* Visible focus for the main input (R-32): inset ring so it reads inside the pane. */
+  textarea:focus-visible { box-shadow: inset 0 0 0 2px #ffd166; }
+  /* Consistent keyboard-focus ring on every control; white reads on dark and on gold. */
+  button:focus-visible, a:focus-visible, input:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
   .output {
     white-space: pre-wrap;
     overflow-y: auto;
@@ -298,12 +317,13 @@
   .examples li button:hover { color: #ffe8a8; }
 
   footer {
-    padding: 16px 24px 24px;
+    padding: 16px max(24px, env(safe-area-inset-right))
+             calc(24px + env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
     text-align: center;
-    color: #666;
+    color: #8f8f8f;
     font-size: 12px;
   }
-  footer a { color: #888; text-decoration: none; }
+  footer a { color: #8f8f8f; text-decoration: none; }
   footer a:hover { color: #ccc; }
 </style>
 </head>
@@ -350,7 +370,7 @@
       <span class="pct" id="intensityLabel">65%</span>
     </label>
     <button class="action forward-only" id="rerollBtn" type="button">Re-roll</button>
-    <button class="action secondary" id="swapBtn" type="button" title="Swap direction — translate Shoovy back to English">&harr; Swap direction</button>
+    <button class="action secondary" id="swapBtn" type="button" title="Swap direction: translate Shoovy back to English">&harr; Swap direction</button>
     <button class="action secondary" id="shareBtn" type="button" title="Copy a link to this exact input">Share link</button>
   </div>
 
@@ -362,7 +382,7 @@
       <li><button type="button" data-ex="People want better information about new products.">People want better information about new products.</button></li>
       <li><button type="button" data-ex="This is the best advice I have ever received.">This is the best advice I have ever received.</button></li>
       <li><button type="button" data-ex="They are very smart and very fast at solving hard problems.">They are very smart and very fast at solving hard problems.</button></li>
-      <li><button type="button" data-ex="Do not run faster than the others — they don't want to be left behind.">Do not run faster than the others — they don't want to be left behind.</button></li>
+      <li><button type="button" data-ex="Do not run faster than the others, they don't want to be left behind.">Do not run faster than the others, they don't want to be left behind.</button></li>
       <li><button type="button" data-ex="Move quickly and don't make it harder than it needs to be.">Move quickly and don't make it harder than it needs to be.</button></li>
       <li><button type="button" data-ex="I don't know what to do about this.">I don't know what to do about this.</button></li>
       <li><button type="button" data-ex="Wow that is faster than I expected!">Wow that is faster than I expected!</button></li>
@@ -386,7 +406,7 @@
 </main>
 
 <footer>
-  <a href="/">BookHockeys</a> &middot; v0.6.0 &middot; runs entirely in your browser
+  <a href="/">BookHockeys</a> &middot; v0.7.0 &middot; runs entirely in your browser
 </footer>
 
 <script>

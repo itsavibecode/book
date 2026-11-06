@@ -6,7 +6,7 @@
 <meta name="version" content="0.6.0" />
 <title>GIF Clipper v0.6.0 - Clip live Kick moments to GIF | BookHockeys</title>
 
-<meta name="description" content="A free browser add-on for kick.com: record a live stream (or grab the last 15 seconds), trim, crop and caption it, and download a GIF or a small WebM. Runs in your browser; nothing is uploaded." />
+<meta name="description" content="A free browser add-on for kick.com: record a live stream (or grab the last 15 seconds), trim, crop and caption it, and save a GIF, a WebM video, or a PNG of a single frame. Runs in your browser; nothing is uploaded." />
 <meta name="theme-color" content="#1b1d20" />
 <meta name="color-scheme" content="dark" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
@@ -90,7 +90,13 @@
 </script>
 
 <style>
-/* Design direction B "Graphite Calm" - same tokens as the userscript's panels. */
+/* Design read: install page for a Kick add-on, for viewers who clip moments; the
+   add-on's own "Graphite Calm" look; dial ENERGY 2 / RHYTHM 2 / MOTION 1.
+   Why dark: the page matches the add-on's panels and the Kick site people arrive from.
+   Why lime: the one accent, used for the install button, links and the key words;
+   it is the add-on's own accent, so the page and the tool read as one product.
+   Why these images: real captures of the add-on (editor, launcher, a saved PNG) on a
+   drawn test scene, so the page shows the product working without real streamers. */
 :root{
   --bg:#1b1d20;--surface:#1f2124;--raised:#26292d;--border:#34383d;--text:#eceef0;--muted:#9aa2aa;
   --accent:#c6ff3d;--ink:#131509;--rec:#ff4d4d;--sel:rgba(198,255,61,.16);--r:12px;--rs:8px;
@@ -101,95 +107,117 @@ html{-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.55;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
 a{color:var(--accent)}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img{display:block;max-width:100%;height:auto}
 :focus-visible{outline:2px solid rgba(198,255,61,.7);outline-offset:2px}
-.wrap{width:100%;max-width:1040px;margin:0 auto;padding:0 20px}
+.wrap{width:100%;max-width:1080px;margin:0 auto;padding:0 20px}
 
 .site-head{border-bottom:1px solid var(--border)}
-.site-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;padding-bottom:16px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);min-width:0}
+.site-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:8px;padding-bottom:8px}
+.brand{display:flex;align-items:center;gap:10px;min-height:44px;text-decoration:none;color:var(--text);min-width:0}
 .brand svg{width:30px;height:30px;flex:none}
 .brand b{font-size:20px;letter-spacing:-.02em}
 .ver{font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:2px 9px;white-space:nowrap}
-.home{font-size:13px;color:var(--muted);text-decoration:none;white-space:nowrap}
+.home{display:inline-flex;align-items:center;min-height:44px;padding:0 4px;font-size:13px;color:var(--muted);text-decoration:none;white-space:nowrap}
 .home:hover{color:var(--text)}
 
 main{flex:1}
-.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:40px;align-items:center;padding:56px 0 40px}
-.hero h1{font-size:clamp(30px,4.6vw,46px);line-height:1.08;letter-spacing:-.03em;margin-bottom:14px}
+.hero{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:44px;align-items:center;padding:52px 0 44px}
+.hero h1{font-size:clamp(30px,4.4vw,46px);line-height:1.08;letter-spacing:-.03em;margin-bottom:14px}
 .hero h1 em{font-style:normal;color:var(--accent)}
 .lede{color:var(--muted);font-size:17px;max-width:46ch;margin-bottom:24px}
+.lede b{color:var(--text);font-weight:600}
 .cta{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:8px;height:46px;padding:0 20px;border-radius:var(--rs);font-weight:700;font-size:15px;text-decoration:none;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:var(--rs);font-weight:700;font-size:15px;text-decoration:none;white-space:nowrap}
 .btn.acc{background:var(--accent);color:var(--ink)}
 .btn.acc:hover{filter:brightness(1.06)}
 .btn.ol{border:1px solid var(--border);color:var(--text);background:var(--surface)}
 .btn.ol:hover{border-color:var(--accent)}
-.fine{font-size:13px;color:var(--muted);margin-top:12px;max-width:52ch}
+.fine{font-size:13px;color:var(--muted);margin-top:14px;max-width:52ch}
+.fine + .fine{margin-top:6px}
+/* Screenshots: one elevation shadow on the hero shot only, so it reads as the product window. */
+figure{margin:0}
+.shot{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:#0b0e0f}
+.hero .shot{box-shadow:0 18px 50px rgba(0,0,0,.45)}
+figcaption{font-size:13px;color:var(--muted);margin-top:10px}
 
-/* mock player with the launcher pill (drawn, not a screenshot) */
-.mock{position:relative;aspect-ratio:16/10;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);
-  background:radial-gradient(60% 55% at 62% 42%,rgba(255,196,120,.28),transparent 60%),radial-gradient(45% 60% at 22% 70%,rgba(80,140,255,.22),transparent 60%),linear-gradient(180deg,#1a1c22,#0e1014)}
-.mock .live{position:absolute;left:12px;top:12px;font-size:10px;font-weight:800;background:#e03131;color:#fff;border-radius:4px;padding:2px 6px;letter-spacing:.04em}
-.mock .cap{position:absolute;left:0;right:0;top:9%;text-align:center;font:900 clamp(16px,3.2vw,26px)/1 Impact,"Arial Black",sans-serif;color:#fff;
-  text-shadow:-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,2px 2px 0 #000,0 2px 0 #000,2px 0 0 #000,-2px 0 0 #000,0 -2px 0 #000;letter-spacing:.01em}
-.mock .figure{position:absolute;left:48%;top:30%;width:20%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 40% 35%,#d9b08c,#8a5e42 70%)}
-.mock .body{position:absolute;left:40%;top:56%;width:36%;height:50%;border-radius:40% 40% 0 0;background:linear-gradient(180deg,#2d2f36,#15161a)}
-.mock .bar{position:absolute;left:0;right:0;bottom:0;height:12%;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55))}
-.pill{position:absolute;right:12px;bottom:15%;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:5px 6px;max-width:calc(100% - 24px);
-  background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 14px 40px rgba(0,0,0,.5);font-size:12px}
-.pill .grip{width:10px;height:18px;border-left:2px dotted var(--muted);border-right:2px dotted var(--muted);opacity:.7;margin:0 2px}
-.pill span.b{height:28px;padding:0 10px;border-radius:7px;display:inline-flex;align-items:center;gap:6px;font-weight:600;background:var(--raised);border:1px solid var(--border);white-space:nowrap}
-.pill span.b.rec{background:var(--rec);border-color:var(--rec);color:#fff}
-.pill span.b.go{background:var(--accent);border-color:var(--accent);color:var(--ink)}
-.pill .dot{width:8px;height:8px;border-radius:50%;background:#fff}
-.pill .chip{height:22px;padding:0 8px;border-radius:999px;display:inline-flex;align-items:center;font-size:11px;font-weight:600;background:var(--sel);color:var(--accent);border:1px solid var(--accent);white-space:nowrap}
+section{padding:40px 0}
+h2{font-size:26px;letter-spacing:-.02em;margin-bottom:8px}
+.sub{color:var(--muted);margin-bottom:26px;max-width:62ch}
 
-section{padding:36px 0}
-h2{font-size:24px;letter-spacing:-.02em;margin-bottom:6px}
-.sub{color:var(--muted);margin-bottom:22px;max-width:60ch}
-.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;counter-reset:s}
-.step{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;position:relative}
-.step::before{counter-increment:s;content:counter(s);display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;
-  background:var(--accent);color:var(--ink);font-weight:800;margin-bottom:10px}
-.step h3{font-size:16px;margin-bottom:4px}
-.step p{color:var(--muted);font-size:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px}
-.card h3{font-size:15px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
-.card h3 i{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);flex:none}
-.card p{color:var(--muted);font-size:14px}
+/* "From stream to file": three stages, each composed for its own content. */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:36px;align-items:center;padding:26px 0;border-top:1px solid var(--border)}
+.stage:first-of-type{border-top:0;padding-top:4px}
+.stage h3{font-size:20px;margin-bottom:8px}
+.stage h3 span{color:var(--accent)}
+.stage p{color:var(--muted);margin-bottom:10px;max-width:52ch}
+.stage p b{color:var(--text);font-weight:600;white-space:nowrap}
+/* One-column stages: the launcher shot is wide and short, so it gets the full width; the tool list spans too. */
+.stage.one{display:block}
+.stage.one .media{margin-top:16px;max-width:720px}
+.stage.one h3{margin-bottom:14px}
+.pillshot{border-radius:10px;border:1px solid var(--border);background:#0b0e0f;padding:14px}
+.tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 28px}
+.tools dt{font-weight:600;margin-bottom:2px}
+.tools dd{color:var(--muted);font-size:14px}
+.save-list{list-style:none;display:grid;gap:12px}
+.save-list li{color:var(--muted);font-size:14px}
+.save-list b{display:block;color:var(--text);font-size:15px;font-weight:600}
+
+.setup{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--surface);counter-reset:s}
+.setup li{padding:18px 20px;border-left:1px solid var(--border)}
+.setup li:first-child{border-left:0}
+.setup li::before{counter-increment:s;content:counter(s) ".";display:block;font-weight:800;font-size:13px;color:var(--accent);margin-bottom:6px}
+.setup h3{font-size:16px;margin-bottom:4px}
+.setup p{color:var(--muted);font-size:14px}
+
 table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top}
-th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+th{color:var(--muted);font-weight:600;font-size:13px}
 tr:last-child td{border-bottom:0}
 kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:1px 6px;background:var(--bg);white-space:nowrap}
 details{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:0 18px;margin-bottom:10px}
-summary{cursor:pointer;padding:14px 0;font-weight:600;list-style-position:outside}
+summary{cursor:pointer;padding:14px 0;font-weight:600;list-style-position:outside;min-height:44px}
 details p{color:var(--muted);padding:0 0 14px;font-size:14px}
-.new{background:var(--sel);border:1px solid rgba(198,255,61,.4);border-radius:var(--r);padding:16px 18px}
-.new ul{padding-left:18px;color:var(--text)}
-.new li{margin:4px 0}
+.versions{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 18px;align-items:baseline}
+.versions dt{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}
+.versions dd{color:var(--muted);font-size:14px}
+.versions dd b{color:var(--text);font-weight:600}
 
 footer{border-top:1px solid var(--border);margin-top:20px}
-footer .wrap{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:22px;font-size:13px;color:var(--muted)}
-footer a,footer button{color:var(--muted);text-decoration:underline}
+footer .wrap{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;justify-content:space-between;padding-top:10px;padding-bottom:14px;font-size:13px;color:var(--muted)}
+footer nav{display:flex;flex-wrap:wrap;gap:4px 14px}
+footer a,footer button{display:inline-flex;align-items:center;min-height:44px;color:var(--muted);text-decoration:underline}
 .consent{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--surface);border-top:1px solid var(--accent);padding:14px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
 .consent[hidden]{display:none}
 .consent-text{max-width:640px;font-size:13px;color:var(--muted)}
 .consent-text strong{display:block;color:var(--text);font-size:14px}
 .consent-btns{display:flex;gap:8px}
-.consent-btns .btn{height:36px;font-size:14px}
+.consent-btns .btn{min-height:44px;font-size:14px}
 
-@media (max-width:820px){
-  .hero{grid-template-columns:minmax(0,1fr);padding-top:36px;gap:28px}
-  .steps{grid-template-columns:minmax(0,1fr)}
+/* Tablet: hero stacks, stages keep two columns until the text gets too narrow. */
+@media (max-width:900px){
+  .hero{grid-template-columns:minmax(0,1fr);padding-top:36px;gap:30px}
+  .hero .shot{max-width:680px}
+}
+@media (max-width:720px){
+  .stage{grid-template-columns:minmax(0,1fr);gap:18px}
+  .stage .media{order:2}
+  .tools{grid-template-columns:minmax(0,1fr)}
+  .setup{grid-template-columns:minmax(0,1fr)}
+  .setup li{border-left:0;border-top:1px solid var(--border)}
+  .setup li:first-child{border-top:0}
+  section{padding:30px 0}
 }
 @media (max-width:640px){
   table,thead,tbody,tr,th,td{display:block}
   thead{display:none}
   tr{border-bottom:1px solid var(--border);padding:8px 0}
+  tr:last-child{border-bottom:0}
   td{border:0;padding:4px 14px}
   td:first-child{font-weight:600}
+  .versions{grid-template-columns:minmax(0,1fr);gap:2px}
+  .versions dd{margin-bottom:10px}
+  .cta .btn{flex:1 1 auto}
 }
 </style>
 </head>
@@ -210,62 +238,82 @@ footer a,footer button{color:var(--muted);text-decoration:underline}
     <div class="hero">
       <div>
         <h1>Clip the moment <em>while it's still live.</em></h1>
-        <p class="lede">A free add-on for kick.com. Hit record, or grab the last 15 seconds after something happens, then trim, crop and caption it and download a GIF. Everything happens in your browser.</p>
+        <p class="lede">A free add-on for kick.com. Record, or grab the last 15 seconds after something happens. Trim, crop and caption it, then save a <b>GIF</b>, a <b>WebM</b> video, or a single frame as a <b>PNG</b>. Nothing leaves your computer.</p>
         <div class="cta">
           <a class="btn acc" id="install" href="kick-gif-clipper.user.js" title="Opens the Tampermonkey install screen for GIF Clipper">Install GIF Clipper</a>
           <a class="btn ol" href="https://www.tampermonkey.net/" target="_blank" rel="noopener" title="GIF Clipper runs inside the free Tampermonkey extension">Get Tampermonkey first</a>
         </div>
-        <p class="fine">Needs a desktop browser with the free <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener">Tampermonkey</a> extension. If clicking Install shows a page of code instead of an install screen, Tampermonkey isn't installed yet.</p>
+        <p class="fine">Needs a desktop browser with the free Tampermonkey extension. If Install shows a page of code instead of an install screen, Tampermonkey isn't installed yet.</p>
+        <p class="fine">Already have it? Click Install again and Tampermonkey offers the update to <span id="ver2">v0.6.0</span>.</p>
       </div>
-      <div class="mock" role="img" aria-label="Drawing of a Kick stream with the GIF Clipper launcher in the corner: Record, Last 15 s and a green 15 s ready badge.">
-        <span class="live">LIVE</span>
-        <div class="figure"></div><div class="body"></div><div class="bar"></div>
-        <div class="cap">WHEN THE STREAM HITS</div>
-        <div class="pill" aria-hidden="true">
-          <span class="grip"></span>
-          <span class="b rec"><span class="dot"></span>Record</span>
-          <span class="b go">&#10226; Last 15 s</span>
-          <span class="chip">&#10226; 15 s ready</span>
-        </div>
-      </div>
+      <figure>
+        <div class="shot"><img src="img/editor.webp" width="1400" height="987" fetchpriority="high" alt="The GIF Clipper editor: a preview with a top caption reading WHEN THE STREAM HITS and a bottom caption reading DAY 82, a timeline with green trim handles, and Crop, Trim, Caption and Output settings on the right."></div>
+        <figcaption>The real editor, running on a drawn test scene (not a real stream).</figcaption>
+      </figure>
     </div>
   </div>
 
-  <section>
+  <section aria-labelledby="flow">
     <div class="wrap">
-      <h2>Set up in a minute</h2>
+      <h2 id="flow">From stream to file</h2>
+      <p class="sub">Everything happens on the Kick page you're already watching. The stream keeps playing while you work.</p>
+
+      <div class="stage one">
+        <div>
+          <h3><span>Catch</span> the moment</h3>
+          <p>A small launcher sits in the corner of the player. Press <b>Record</b>, then <b>Stop</b>, and the editor opens with your clip.</p>
+          <p>Missed it? Turn on the rewind buffer once, and <b>Last 15 s</b> grabs what already happened. It holds the last 10, 15 or 30 seconds, your pick.</p>
+        </div>
+        <figure class="media">
+          <div class="pillshot"><img src="img/pill.webp" width="1000" height="127" loading="lazy" alt="The launcher: Record, PNG, Last 15 s, a green badge reading 15 s ready, 820 KB, then Recent clips, settings and collapse buttons."></div>
+          <figcaption>The launcher with the rewind buffer full.</figcaption>
+        </figure>
+      </div>
+
+      <div class="stage one">
+        <h3><span>Shape</span> it</h3>
+        <dl class="tools">
+          <div><dt>Trim and cut</dt><dd>Drag the green handles to keep the good part, or cut a slow bit out of the middle.</dd></div>
+          <div><dt>Crop</dt><dd>Draw a box on the preview, or lock it to 16:9, square, 4:5 or 9:16.</dd></div>
+          <div><dt>Captions</dt><dd>Top and bottom text, meme style or subtitles. The preview shows exactly what you'll get.</dd></div>
+          <div><dt>Boomerang</dt><dd>Plays forward, then backward, so the loop never jumps.</dd></div>
+        </dl>
+      </div>
+
+      <div class="stage">
+        <div>
+          <h3><span>Save</span> it</h3>
+          <ul class="save-list">
+            <li><b>GIF, WebM, or both</b>GIF plays anywhere. WebM is a real video file with full colour and a much smaller size.</li>
+            <li><b>A size limit</b>Pick 5, 8, 10 or 25 MB and the export shrinks the file until it fits your chat app.</li>
+            <li><b>A single frame as PNG</b>One click or Alt + Shift + S. A slim bar under the picture records where it came from: the time, the date and the stream title.</li>
+            <li><b>Recent clips</b>Your last 5 clips stay in your browser with their edits, so a reload doesn't lose one.</li>
+          </ul>
+        </div>
+        <figure class="media">
+          <div class="shot"><img src="img/snapshot.webp" width="1280" height="816" loading="lazy" alt="A saved PNG of the test scene with a black bar underneath reading 1:22:15 / LIVE, Fri, Nov 6, 2026, Late night desk stream, and kick.com/your-channel."></div>
+          <figcaption>A PNG exactly as the add-on saved it. On a VOD the bar reads like 5:00:03 / 8:00:02.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="setup">
+    <div class="wrap">
+      <h2 id="setup">Set up</h2>
       <p class="sub">GIF Clipper is a userscript: a small add-on that runs on kick.com inside the Tampermonkey extension.</p>
-      <div class="steps">
-        <div class="step"><h3>Add Tampermonkey</h3><p>Install the free Tampermonkey extension for Chrome, Edge, Firefox or Brave.</p></div>
-        <div class="step"><h3>Install GIF Clipper</h3><p>Click <b>Install GIF Clipper</b> above, then <b>Install</b> on the screen Tampermonkey opens.</p></div>
-        <div class="step"><h3>Open a live channel</h3><p>The launcher shows up in the corner of the player. Press <b>Record</b>, then <b>Stop</b>, and the editor opens.</p></div>
-      </div>
+      <ol class="setup">
+        <li><h3>Add Tampermonkey</h3><p>The free extension for Chrome, Edge, Firefox or Brave.</p></li>
+        <li><h3>Install GIF Clipper</h3><p>Click <b>Install GIF Clipper</b> above, then <b>Install</b> on the screen Tampermonkey opens.</p></li>
+        <li><h3>Open a live channel</h3><p>The launcher appears in the corner of the player once the video plays.</p></li>
+      </ol>
     </div>
   </section>
 
-  <section>
+  <section aria-labelledby="keys">
     <div class="wrap">
-      <h2>What it does</h2>
-      <p class="sub">Everything you need to turn a moment into something you can post, without leaving the stream.</p>
-      <div class="grid">
-        <div class="card"><h3><i></i>Record or rewind</h3><p>Record until you stop, or turn on the rewind buffer and grab the last 10, 15 or 30 seconds after the moment already happened.</p></div>
-        <div class="card"><h3><i></i>Trim and cut</h3><p>Drag the handles to keep just the good part, or cut a boring bit out of the middle.</p></div>
-        <div class="card"><h3><i></i>Crop</h3><p>Draw a box on the preview, or lock it to 16:9, square, 4:5 or 9:16.</p></div>
-        <div class="card"><h3><i></i>Captions</h3><p>Top and bottom text in classic meme style or as subtitles. What you see in the preview is what you get.</p></div>
-        <div class="card"><h3><i></i>Save a frame as PNG</h3><p>One click (or Alt + Shift + S) saves the current frame at full resolution straight to your downloads, with a slim info bar underneath: time, date and stream title. No prompts.</p></div>
-        <div class="card"><h3><i></i>Boomerang</h3><p>Plays forward then backward, so the loop never jumps.</p></div>
-        <div class="card"><h3><i></i>GIF or WebM</h3><p>GIF by default. WebM is a real video, usually 10 to 20 times smaller with full colour. Or get both.</p></div>
-        <div class="card"><h3><i></i>Fits your upload limit</h3><p>Pick 5, 8, 10 or 25 MB and the export shrinks the file until it fits.</p></div>
-        <div class="card"><h3><i></i>Never lose a clip</h3><p>Your last 5 clips are kept in your browser, edits and all, so a reload or crash doesn't eat your capture.</p></div>
-        <div class="card"><h3><i></i>Private</h3><p>No account, no uploads, no servers. The stream's frames never leave your computer.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap">
-      <h2>Shortcuts</h2>
-      <p class="sub">They need Alt, so they never fire while you're typing in chat. You can change them in the gear menu.</p>
+      <h2 id="keys">Shortcuts</h2>
+      <p class="sub">They all need Alt, so they never fire while you're typing in chat. Change them in the launcher's gear menu.</p>
       <table>
         <thead><tr><th>Keys</th><th>What it does</th></tr></thead>
         <tbody>
@@ -273,37 +321,34 @@ footer a,footer button{color:var(--muted);text-decoration:underline}
           <tr><td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd></td><td>Clip the last 15 seconds (turns the rewind buffer on the first time)</td></tr>
           <tr><td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td><td>Save the current frame as a PNG</td></tr>
           <tr><td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>G</kbd></td><td>Show or hide the launcher</td></tr>
-          <tr><td><kbd>Space</kbd>, <kbd>&larr;</kbd> <kbd>&rarr;</kbd>, <kbd>I</kbd> / <kbd>O</kbd></td><td>In the editor: play / pause, step a frame, set the start / end at the playhead</td></tr>
+          <tr><td><kbd>Space</kbd>, <kbd>&larr;</kbd> <kbd>&rarr;</kbd>, <kbd>I</kbd> / <kbd>O</kbd></td><td>In the editor: play or pause, step one frame, set the start or end at the playhead</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <section>
+  <section aria-labelledby="faq">
     <div class="wrap">
-      <h2>Questions</h2>
-      <details><summary>Is it free? Does it upload anything?</summary><p>Free, and nothing is uploaded. The add-on reads the video that's already playing in your tab, and builds the GIF or WebM on your computer. There's no account and no server.</p></details>
+      <h2 id="faq">Questions</h2>
+      <details><summary>Is it free? Does it upload anything?</summary><p>Free, and nothing is uploaded. The add-on reads the video already playing in your tab and builds the file on your computer. There's no account and no server.</p></details>
       <details><summary>Does it work on my phone?</summary><p>No. Tampermonkey is a desktop browser extension, so you need Chrome, Edge, Firefox or Brave on a computer.</p></details>
-      <details><summary>Why is my GIF so big?</summary><p>GIFs are an old format and moving camera footage is hard to squeeze. Set a size limit, lower the width or fps, crop tighter, or switch to WebM, which is usually well under 1 MB for the same clip.</p></details>
+      <details><summary>Why is my GIF so big?</summary><p>GIF is an old format, and moving camera footage is hard to squeeze into it. Set a size limit, lower the width or fps, crop tighter, or save a WebM instead, which is a fraction of the size for the same clip.</p></details>
       <details><summary>The launcher says "no player on this page"</summary><p>The stream hasn't started in your tab yet. That's usually an offline channel, or a mature channel still showing its "I am 18+" screen. Once the video plays, the launcher wakes up.</p></details>
-      <details><summary>Keep the tab visible while recording</summary><p>Browsers slow down tabs you aren't looking at. If you switch away mid-recording, the launcher says so and those seconds are missing from the clip.</p></details>
-      <details><summary>How do updates work?</summary><p>Tampermonkey checks this page's copy of the script and updates GIF Clipper by itself. You can also click Install again at any time.</p></details>
+      <details><summary>Why are a few seconds missing from my clip?</summary><p>Browsers slow down tabs you aren't looking at. Keep the tab visible while recording; if you switch away, the launcher tells you and those seconds are skipped.</p></details>
+      <details><summary>How do updates work?</summary><p>Tampermonkey checks this page's copy of the add-on and updates it by itself, usually within a day. To update right away, click Install again.</p></details>
     </div>
   </section>
 
-  <section>
+  <section aria-labelledby="news">
     <div class="wrap">
-      <div class="new">
-        <h2 style="font-size:18px">New in 0.6</h2>
-        <ul>
-          <li>Works inside embedded Kick players too (player.kick.com), so the pill, Record and PNG are there on pages such as <a href="/stumble/">Stumble</a>. Click the player once so keyboard shortcuts reach it.</li>
-          <li>PNG snapshots get a black info bar under the picture: 5:00:03 / 8:00:02 on VODs or 1:22:15 / LIVE, plus the date and stream title.</li>
-          <li>Save the current frame as a PNG with one click or Alt + Shift + S, no prompts.</li>
-          <li>WebM export (or GIF + WebM), set in the gear menu or per clip.</li>
-          <li>Size limit: the file shrinks until it fits.</li>
-          <li>Captions, boomerang loops, and Recent clips that survive a reload.</li>
-        </ul>
-      </div>
+      <h2 id="news">What's new</h2>
+      <dl class="versions">
+        <dt>0.6</dt><dd><b>Works inside embedded Kick players</b> (player.kick.com), so the launcher shows up on pages such as <a href="/stumble/">Stumble</a>. Click the player once so the shortcuts reach it.</dd>
+        <dt>0.5</dt><dd><b>PNG info bar</b> under each snapshot with the time, date and stream title. The launcher also stopped changing width while recording.</dd>
+        <dt>0.3 &amp; 0.4</dt><dd><b>Save a frame as a PNG</b> with one click or Alt + Shift + S, stamped with the stream time.</dd>
+        <dt>0.2</dt><dd><b>WebM export</b>, size limits, captions, boomerang loops and Recent clips.</dd>
+        <dt>0.1</dt><dd><b>First release</b>: record or rewind, trim, cut, crop and GIF export.</dd>
+      </dl>
     </div>
   </section>
 </main>
@@ -311,7 +356,7 @@ footer a,footer button{color:var(--muted);text-decoration:underline}
 <footer>
   <div class="wrap">
     <span>GIF Clipper <span id="fver">v0.6.0</span> · Not affiliated with Kick.</span>
-    <span><a href="/" title="BookHockeys home">BookHockeys</a> · <button type="button" id="cookieReset" title="Change your analytics cookie choice">Cookies</button></span>
+    <nav aria-label="Footer"><a href="/" title="BookHockeys home">BookHockeys</a><button type="button" id="cookieReset" title="Change your analytics cookie choice">Cookies</button></nav>
   </div>
 </footer>
 
@@ -330,8 +375,7 @@ footer a,footer button{color:var(--muted);text-decoration:underline}
 (function () {
   var VERSION = '0.6.0';
   document.title = 'GIF Clipper v' + VERSION + ' - Clip live Kick moments to GIF | BookHockeys';
-  document.getElementById('ver').textContent = 'v' + VERSION;
-  document.getElementById('fver').textContent = 'v' + VERSION;
+  ['ver', 'fver', 'ver2'].forEach(function (id) { document.getElementById(id).textContent = 'v' + VERSION; });
 
   // Count install clicks (no-op when analytics is off or declined).
   document.getElementById('install').addEventListener('click', function () {

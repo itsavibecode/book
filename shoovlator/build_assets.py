@@ -69,6 +69,28 @@ def cover_fit_disc(diameter, mascot_full, y_pos=0.30):
     return final.resize((diameter, diameter), Image.LANCZOS)
 
 
+def maskable_square(size, mascot_full, y_pos=0.30, safe=0.80):
+    """Full-bleed gold square with the mascot cover-fit inside the maskable safe
+    zone (centre `safe` fraction). For PWA manifest icons: Android masks the icon
+    to its own shape (circle, squircle, rounded square), so the gold must bleed to
+    every edge and the face must sit inside the safe zone to survive any mask."""
+    s = size * 4
+    canvas = Image.new("RGBA", (s, s), GOLD + (255,))
+
+    inner = int(s * safe)
+    w, h = mascot_full.size
+    scale = inner / min(w, h)
+    nw, nh = int(w * scale), int(h * scale)
+    scaled = mascot_full.resize((nw, nh), Image.LANCZOS)
+    left = max(0, (nw - inner) // 2)
+    top = max(0, int((nh - inner) * y_pos))
+    cropped = scaled.crop((left, top, left + inner, top + inner))
+
+    offset = (s - inner) // 2
+    canvas.alpha_composite(cropped, (offset, offset))
+    return canvas.resize((size, size), Image.LANCZOS)
+
+
 def make_og(mascot_full, squeeze):
     """1200x630 share card. Squeeze frame as background, gold mascot disc + wordmark left."""
     W, H = 1200, 630
@@ -146,6 +168,13 @@ def main():
     ico_path = os.path.join(HERE, "favicon.ico")
     ico_src.save(ico_path, sizes=[(16, 16), (32, 32), (48, 48)])
     print(f"  wrote favicon.ico (16/32/48)")
+
+    # Maskable PWA manifest icons — full-bleed squares, not the disc.
+    for size in (192, 512):
+        out = maskable_square(size, mascot)
+        name = f"icon-{size}-maskable.png"
+        out.save(os.path.join(HERE, name), optimize=True)
+        print(f"  wrote {name} ({size}x{size})")
 
     # OG card
     og = make_og(mascot, squeeze)
