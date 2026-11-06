@@ -104,7 +104,8 @@ def og_card():
 
 def main():
     for px, fname in [(16, "favicon-16.png"), (32, "favicon-32.png"),
-                      (192, "favicon-192.png"), (180, "apple-touch-icon.png")]:
+                      (192, "favicon-192.png"), (512, "favicon-512.png"),
+                      (180, "apple-touch-icon.png")]:
         icon(px).save(os.path.join(HERE, fname))
         print("wrote", fname)
     og_card().save(os.path.join(HERE, "og-card.png"))

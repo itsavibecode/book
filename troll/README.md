@@ -144,6 +144,26 @@ art and all the code are ours.
 
 ## Changelog
 
+### v0.1.5 — 2026-11-06
+
+An antislop pass, plus the iOS home-screen bug that pass turned up.
+
+- **iOS home screen was broken.** The page declares `apple-mobile-web-app-capable`
+  with a `black-translucent` status bar but had no `env(safe-area-inset-*)`, so from
+  the home screen the header sat under the iPhone clock. Added `viewport-fit=cover`
+  and safe-area padding on the header, main, footer, consent banner and toast.
+- **Added `manifest.webmanifest`** plus a 512px icon, so Android gets a real install
+  instead of a bookmark. iOS was always driven by the `apple-*` tags.
+- **Input and outline-button borders failed non-text contrast.** `#33383e` measured
+  1.56:1 against the field fill and 1.37:1 against the card, so a field had no findable
+  edge. Both border tokens are now `#6a7179` (3.74:1 and 3.27:1). This is a deliberate
+  change to two design-B tokens; everything else in the palette already passed.
+- **Tap targets.** The 15px tooltip dots, the 28px switches and the small footer link
+  now carry 44px touch areas behind their unchanged visuals, with extra label clearance
+  so those areas never overlap the control underneath.
+- **Removed em dashes from user-facing text** (title, meta, tooltips, error messages,
+  preview separators). Code comments still have them.
+
 ### v0.1.4 — 2026-10-10
 
 Added analytics, because there was no way to tell whether anyone was using the thing.

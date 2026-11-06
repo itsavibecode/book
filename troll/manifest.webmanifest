@@ -1,0 +1,17 @@
+{
+  "name": "Baited",
+  "short_name": "Baited",
+  "description": "Make a troll video in your browser. Bait, a sound or a clip, a length, and an 854x480 MP4. Nothing is uploaded.",
+  "id": "/troll/",
+  "start_url": "/troll/",
+  "scope": "/troll/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#17191c",
+  "theme_color": "#17191c",
+  "icons": [
+    { "src": "favicon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
