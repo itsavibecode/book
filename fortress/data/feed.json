@@ -116,8 +116,8 @@
   "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNeVp4b0ZWY2xUZW10a2toaXpCc0JsWlc1QmRQSWZXVTdrVTJXaU14cWkwTmRwMXI2bzdKd2JkRGJKTnFhUndvZGRsQXhvN3Q2RDRuVmpQSEpwck1PN1NXaWsyOUZ4V2puMUZYS1d4MTR0Y19pdDdRUzR0WnVobmh5VDlDTm0xVTh0NVVya2ItRDJHb3lYUkdRdzMyTHE4YU5RWEdxUHBLemxtZzlQazh1R0IyVm40VnFXeXIxdNIB0AFBVV95cUxOamZEV29kQ0ZxNWxmdDYtSU1jbFVaOWFzMTNla2x3WVhuZWZIeU03aGZnWURSQkQ0TVRVeWJsalhtYmVzbGhMOUlLS2JuLWJLN1plSWczYjRyTXhSbW5zbzNEMFJMQWh2VVVzb3RqT2d4NHRJZEZNWFl3cW9nX2V3QzBmb1Ewa0t4V1R2OWpXZ09vS3ljbzdUR0tiN3UzRzduM093RDUyZlVJMzhCNlk2M0loMEZiU1Z2aklHUG9kdDI4bFB4UGI2aFgxdnhWNEJK?oc=5",
   "domain": "azfamily.com",
   "outlet": "AZ Family",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "gray-news",
+  "trust": 3
  },
  {
   "fetched": "2026-11-06T06:36:53Z",
@@ -126,8 +126,8 @@
   "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOajZTazFLbTY5SENmR3ROVVNHOGdTM19qNDdoN0NsTWxteVd0X2lreFJ2eHV1NVpsS3E2TjlkejJrWmo3VnVoZ1pnMEpPaEpXYlBYaFFCUDZLWXRBbjlTNnhLS2xxbmhZUXRMZk51aFI4OExQMVNrb2hGSE16eU44UGU2djVCTURIbmlhM3ZnMy1ES1YteGVoRzlvbG1LdUhSOXpVTzJKc0pvZXNmeE5jOW9EUy0xaFXSAcsBQVVfeXFMUEdIZTBPak9DM3UtNFJqUFEtdi1aSVhIWE15bEI1N3ZJUTJzT0V1dmg3WWFVaEFPN0lHdi05TzM2bEE5RE9LYUlBUzh3UkpYYmp1ZS1FNXRmdWx6dU5ta0dLdEUyQkc5UTZXM2JpYUVCVWRWRDZvWGVDMkNUMDFXWVB5RjdicDJWWFotaThvZFZSbkZXUGhGbmJlaWV2V1J5cjVSeHotVmUzV3h0aUUzcFNvRGNHTklIQUhGLXcyYnVOczJMUlR6Mk8tUzQ?oc=5",
   "domain": "wsmv.com",
   "outlet": "WSMV",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "gray-news",
+  "trust": 3
  },
  {
   "fetched": "2026-11-06T06:36:53Z",
@@ -156,8 +156,8 @@
   "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQNkdHOEJHWmlQMHVjV2pGem5SV2JlWm9pbEZmN1dFemNoN3Y0QVVGTnZwRTFjUW1aLTZIUDIxckRQS0VTYTNWNUlhczlfLWZ3aFhHY0xjVFFrYXlxWENGUlp4RGxMRGRmUjRIM3JKUko2ekMzdVBVZ2ROQlg1SEEtYmtpX0dQYTFybXJISE91RHhZZURaN2xkUUF4cUR6X1hteFl0clZSRURYM3BPVkRVNFdvUTdXd9IBygFBVV95cUxQbWQ5ZnM3aDdxWFd6UEhkVks1T1lrV3ZyUzl4YkljTU1lSDZYaGlHbnppalZmZ0FmaTVheVJRT204ZjN5US1nNXlfQk1CcTZEb0k2b1l6YndaQVUtLW1iMk5ZOVdVcDJMZ055NXlXanVmWnk0VzZOZW82TkJVUEpLaGJEQjNJN1FMUVludjFKejVtbEtpU0V4MTZPb245Q2hqdV9DYXRDT3JENE85YmJIMU01a1FpR2hmOGhVTFFVQm14bXhEdkxNcVBn?oc=5",
   "domain": "wvlt.tv",
   "outlet": "WVLT",
-  "sourceId": null,
-  "trust": null
+  "sourceId": "gray-news",
+  "trust": 3
  },
  {
   "fetched": "2026-11-05T19:54:08Z",
@@ -216,16 +216,6 @@
   "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOMVdlejVRMVFmUnJXbTFtQzZUNF9PZHhMUmVCNGI2Y215bE1admVBNEZ3c2dLYWk0TGZNTnRKRjNxMkhraV9jQjRCbURoNVFHSzBsdldYN05UWDNHdU9ibFdsRkpDT1JBcVIwQ2piRnNIdjExYlFRRmljV2VVdWw2S3ZxdkVFN1k3RmdnR1lva2NsUjhIN25GRnJNaTJzRktIQjFhWnpSZ0VRM093VzBNeHNOSnc0SUp1Wnc?oc=5",
   "domain": "news.laodong.vn",
   "outlet": "Laodong.vn",
-  "sourceId": null,
-  "trust": null
- },
- {
-  "fetched": "2026-11-05T06:40:39Z",
-  "published": "2026-11-04T20:31:37Z",
-  "title": "Emergency Stockpile Oil Coming Soon to Iran-Wracked Markets, IEA Says",
-  "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxObnppOUpYUXVnT2w5MXBja1FfSS01OHV3ODBxUjdqdVVJNFYxT0Vod1Y5Z0VpOXNBTnN3b3g0SmFfSV8zS3EwSlVzSVhnZ3BfdzQyWjNWWThBdmhWY0tsT2p5Qi1SVVowRk1WU0hTdTNHUnh6ZExrSFRyZDA5QlNmMzBBd3Y5VXJsVEs4c2VBU0JTMzBkY2lYOHVnVmV5TGg0?oc=5",
-  "domain": "energynow.com",
-  "outlet": "EnergyNow.com",
   "sourceId": null,
   "trust": null
  }

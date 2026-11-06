@@ -60,12 +60,14 @@
   "sourceIds": [
    "us-dow",
    "twz",
-   "newsweek"
+   "newsweek",
+   "defensescoop"
   ],
   "urls": [
    "https://media.defense.gov/2026/Sep/30/2004009303/-1/-1/1/ESTABLISHMENT-OF-FORTRESS-AMERICA-AS-A-DEPARTMENT-OF-WAR-PROGRAM-FOR-THE-DEFENSE-OF-THE-AMERICAN-HOMELAND.PDF",
    "https://www.twz.com/nuclear/90-days-no-help-fortress-americas-goal-to-make-bases-resilient-bastions-in-a-crisis",
-   "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804"
+   "https://www.newsweek.com/what-is-fortress-pentagon-90-day-plan-12617804",
+   "https://defensescoop.com/2026/10/07/pentagon-memo-operationalize-fortress-america-program-office/"
   ],
   "quote": "stand up the FORTRESS America Program Office within thirty (30) days (FORTRESS memo)",
   "region": "US",
@@ -74,7 +76,14 @@
    "lng": -77.06,
    "place": "Pentagon, Arlington VA",
    "kind": "statement"
-  }
+  },
+  "history": [
+   {
+    "date": "2026-11-06",
+    "status": "fact",
+    "note": "Deadline passed Oct 30. An Oct 6 memo named Matt O'Malley interim director; no DoD release confirms the office was formally stood up."
+   }
+  ]
  },
  {
   "id": "hegseth-quantico-own-power",
@@ -193,7 +202,14 @@
    "https://www.twz.com/nuclear/90-days-no-help-fortress-americas-goal-to-make-bases-resilient-bastions-in-a-crisis"
   ],
   "region": "US",
-  "geo": null
+  "geo": null,
+  "history": [
+   {
+    "date": "2026-11-06",
+    "status": "confirmed",
+    "note": "As of Nov 6 the Pentagon still has not confirmed 90 days on the record; a syndicated Gray TV explainer repeats it as settled."
+   }
+  ]
  },
  {
   "id": "parnell-two-oceans",
@@ -456,7 +472,14 @@
    "lng": -74.01,
    "place": "Mediaite, New York",
    "kind": "outlet"
-  }
+  },
+  "history": [
+   {
+    "date": "2026-11-06",
+    "status": "debunked",
+    "note": "Still 3 days on GOV.UK as of Nov 6; Canada (72 hours) and Japan (3 days, ideally a week) also fall well short of 30."
+   }
+  ]
  },
  {
   "id": "bongino-30-days",
@@ -527,7 +550,14 @@
    "lng": 139.76,
    "place": "Tokyo",
    "kind": "statement"
-  }
+  },
+  "history": [
+   {
+    "date": "2026-11-06",
+    "status": "confirmed",
+    "note": "Request issued as planned on Nov 2 at the agency launch; see japan-agency-launch-request."
+   }
+  ]
  },
  {
   "id": "europe-national-guidance",
@@ -574,11 +604,19 @@
   ],
   "urls": [
    "https://www.aljazeera.com/news/2026/10/9/is-trump-signalling-a-return-to-war-with-iran-after-the-midterms",
-   "https://northeasttimes.com/2026/10/01/trump-says-u-s-could-resume-bombing-iran-after-november-midterms/"
+   "https://northeasttimes.com/2026/10/01/trump-says-u-s-could-resume-bombing-iran-after-november-midterms/",
+   "https://www.aljazeera.com/news/2026/11/4/iran-says-us-reply-to-hormuz-plan-unconvincing-trump-confirms-strikes"
   ],
   "quote": "we will not be attacking Iran at any time prior to the Midterm Elections (Donald Trump, Truth Social)",
   "region": "US",
-  "geo": null
+  "geo": null,
+  "history": [
+   {
+    "date": "2026-11-06",
+    "status": "confirmed",
+    "note": "Limited US strikes came on the eve of the Nov 3 vote (Nov 2 US time, early Nov 3 in Iran); Trump called it a minor attack."
+   }
+  ]
  },
  {
   "id": "fema-eas-test-nov17",
@@ -605,7 +643,14 @@
    "lng": -77.02,
    "place": "FEMA HQ, Washington DC",
    "kind": "statement"
-  }
+  },
+  "history": [
+   {
+    "date": "2026-11-06",
+    "status": "fact",
+    "note": "No change as of Nov 6: still Nov 17 about 2:20 p.m. ET, broadcast only, backup Dec 3."
+   }
+  ]
  },
  {
   "id": "fema-test-routine",
@@ -703,14 +748,23 @@
   "status": "speculation",
   "theory": "iran",
   "sourceIds": [
-   "al-jazeera"
+   "al-jazeera",
+   "pbs"
   ],
   "urls": [
    "https://www.aljazeera.com/news/2026/10/9/is-trump-signalling-a-return-to-war-with-iran-after-the-midterms",
-   "https://www.benzinga.com/news/politics/26/10/62648925/marjorie-taylor-greene-pentagon-fortress-plan"
+   "https://www.benzinga.com/news/politics/26/10/62648925/marjorie-taylor-greene-pentagon-fortress-plan",
+   "https://www.pbs.org/newshour/world/u-s-launches-new-attacks-on-iranian-targets-days-after-netanyahu-pressed-trump-for-more-strikes"
   ],
   "region": "US",
-  "geo": null
+  "geo": null,
+  "history": [
+   {
+    "date": "2026-11-06",
+    "status": "speculation",
+    "note": "US hit Iranian sites near Hormuz on the eve of the vote, then Trump said there was no rush for more; still no official link to FORTRESS."
+   }
+  ]
  },
  {
   "id": "theory-midterms",
@@ -726,7 +780,14 @@
    "https://theeconomiccollapseblog.com/why-are-so-many-countries-suddenly-warning-their-citizens-to-prepare-for-an-emergency-and-stockpile-essential-survival-supplies/"
   ],
   "region": "US",
-  "geo": null
+  "geo": null,
+  "history": [
+   {
+    "date": "2026-11-06",
+    "status": "speculation",
+    "note": "Midterms held Nov 3 with Democrats winning both chambers and no major cyber or grid incident; nothing hidden was revealed as of Nov 6."
+   }
+  ]
  },
  {
   "id": "theory-false-flag",
@@ -829,17 +890,28 @@
    "x",
    "reddit",
    "youtube",
-   "great-awakening"
+   "great-awakening",
+   "ibtimes",
+   "gadget-review"
   ],
   "urls": [
    "https://x.com/ElTrompudo2022/status/2114539375925108836",
    "https://www.reddit.com/r/conspiracy/comments/1xgz8z6/predictive_programming_in_the_simpsons_about_a/",
    "https://www.youtube.com/shorts/m2I7iulzlFQ",
    "https://www.youtube.com/watch?v=h0p8A-JbYJc",
-   "https://greatawakening.win/p/1ARKEVBLlZ/according-to-the-simpsons-tomorr/c/"
+   "https://greatawakening.win/p/1ARKEVBLlZ/according-to-the-simpsons-tomorr/c/",
+   "https://www.ibtimes.co.uk/simpsons-blackout-us-alert-test-uk-preparedness-campaign-1829514",
+   "https://www.yahoo.com/news/us/articles/did-simpsons-predict-blackout-ahead-151934303.html"
   ],
   "region": "US",
-  "geo": null
+  "geo": null,
+  "history": [
+   {
+    "date": "2026-11-06",
+    "status": "rumor",
+    "note": "A Nov 1 X post urging viewers to watch the episode's final 15 seconds spread widely; IBTimes and Gadget Review found no date in the episode; no IFCN fact-check yet."
+   }
+  ]
  },
  {
   "id": "simpsons-episode-check",
@@ -1118,7 +1190,8 @@
   "urls": [
    "https://militarytimes.com/news/your-military/2026/08/28/dod-confirms-refrigeration-disruption-at-military-commissaries/",
    "https://www.stripes.com/theaters/us/2026-08-28/refrigeration-outages-multiple-us-commissaries-22684428.html",
-   "https://www.stripes.com/theaters/us/2026-09-01/army-cid-investigates-commissary-refrigerator-outages-22721718.html"
+   "https://www.stripes.com/theaters/us/2026-09-01/army-cid-investigates-commissary-refrigerator-outages-22721718.html",
+   "https://www.stripes.com/theaters/us/2026-11-04/cyber-attacks-commissary-freezers-23362522.html"
   ],
   "region": "US",
   "geo": {
@@ -1138,6 +1211,13 @@
     "lng": -104.87,
     "place": "F.E. Warren AFB WY"
    }
+  ],
+  "history": [
+   {
+    "date": "2026-11-06",
+    "status": "confirmed",
+    "note": "Nov 4: Pentagon still investigating with no stated cause; DeCA says late-September outages in Germany and England were unrelated equipment failures."
+   }
   ]
  },
  {
@@ -1145,7 +1225,7 @@
   "date": "2026-10-29",
   "headline": "Pentagon treating base freezer failures as a suspected hack, Reuters reports",
   "summary": "Four officials told Reuters the Pentagon now treats the August commissary freezer failures as a suspected cyberattack, with a Cyber Command unit and Army CID involved and in contact with French police over a similar attack on 350+ French shops. Reuters could not determine whether investigators have reached any conclusion or identified a culprit. NY Post, Insider Paper and Mario Nawfal reposted the same Reuters exclusive on October 29, so it remains a single-source report.",
-  "status": "reported",
+  "status": "confirmed",
   "theory": null,
   "sourceIds": [
    "reuters",
@@ -1155,7 +1235,9 @@
    "insider-paper",
    "x-marionawfal",
    "x-theinsiderpaper",
-   "x"
+   "x",
+   "stars-and-stripes",
+   "nextgov"
   ],
   "urls": [
    "https://www.reuters.com/technology/pentagon-treating-military-base-freezer-malfunctions-suspected-cyberattack-2026-10-29/",
@@ -1166,7 +1248,9 @@
    "https://x.com/nypost/status/2115765732671701035",
    "https://insiderpaper.com/pentagon-cyberattack-freezer-military-bases/",
    "https://x.com/TheInsiderPaper/status/2115775893985800394",
-   "https://x.com/MarioNawfal/status/2115823471158776180"
+   "https://x.com/MarioNawfal/status/2115823471158776180",
+   "https://www.stripes.com/theaters/us/2026-11-04/cyber-attacks-commissary-freezers-23362522.html",
+   "https://www.nextgov.com/cybersecurity/2026/10/pentagon-investigates-suspected-cyberattack-behind-military-freezer-failures/416926/"
   ],
   "quote": "working in close coordination with interagency and law enforcement partners (Pentagon statement on the Cyber Command unit)",
   "region": "US",
@@ -1175,7 +1259,14 @@
    "lng": -77.06,
    "place": "Pentagon, Arlington VA",
    "kind": "statement"
-  }
+  },
+  "history": [
+   {
+    "date": "2026-11-06",
+    "status": "confirmed",
+    "note": "Upgraded: Stars and Stripes and Nextgov independently confirm cyber investigators are probing the outages; as of Nov 4 no cause found."
+   }
+  ]
  },
  {
   "id": "freezer-fortress-timing",
@@ -1245,5 +1336,310 @@
    "place": "London",
    "kind": "outlet"
   }
+ },
+ {
+  "id": "fortress-interim-director",
+  "date": "2026-10-07",
+  "headline": "Pentagon names Matt O'Malley interim director of the FORTRESS program office",
+  "summary": "An October 6 implementation memo from Under Secretary Michael Duffey, obtained by DefenseScoop, named Richard \"Matt\" O'Malley interim director of the FORTRESS America Program Office. No Pentagon release has announced the office as formally stood up by the October 30 deadline.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "defensescoop"
+  ],
+  "urls": [
+   "https://defensescoop.com/2026/10/07/pentagon-memo-operationalize-fortress-america-program-office/"
+  ],
+  "region": "US",
+  "geo": {
+   "lat": 38.87,
+   "lng": -77.06,
+   "place": "Pentagon, Arlington VA",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "midterms-democrats-win-congress",
+  "date": "2026-11-04",
+  "headline": "Democrats win control of the House and Senate in the November 3 midterms",
+  "summary": "Networks and the AP called both chambers for Democrats, with a few races still open. The new Congress takes over in January.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "cbs-news",
+   "nbc-news",
+   "ap"
+  ],
+  "urls": [
+   "https://www.cbsnews.com/live-updates/senate-election-results-2026/",
+   "https://www.nbcwashington.com/elections/election-day-after-2026-midterms-congress-results-live-updates/4177248/"
+  ],
+  "region": "US",
+  "geo": {
+   "lat": 38.89,
+   "lng": -77.01,
+   "place": "US Capitol, Washington DC",
+   "kind": "event"
+  }
+ },
+ {
+  "id": "election-day-no-major-cyber",
+  "date": "2026-11-04",
+  "headline": "Election Day passed with no major cyberattack or grid failure",
+  "summary": "Reporting found only scattered problems: probing and a few denial-of-service attempts on election offices, bomb threats the FBI deemed not credible, and weather-related power outages in Maricopa County, Arizona. No grid attack was reported.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "govtech",
+   "propublica",
+   "axios"
+  ],
+  "urls": [
+   "https://govtech.com/security/just-another-tuesday-election-day-sees-no-major-cyber-incidents",
+   "https://propublica.org/article/five-voting-disruptions-midterm-election",
+   "https://www.axios.com/2026/11/03/2026-election-security-states"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "us-strikes-iran-eve-of-midterms",
+  "date": "2026-11-03",
+  "headline": "US carries out limited strikes on Iranian sites near Hormuz on the eve of the midterms",
+  "summary": "AP reported strikes on Iranian targets tied to attacks on US forces, with explosions reported on Qeshm and Hengam islands and near Bandar Abbas. Trump confirmed them to Fox News and called it a minor attack; ceasefire talks continued.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "pbs",
+   "ap",
+   "al-jazeera"
+  ],
+  "urls": [
+   "https://www.pbs.org/newshour/world/u-s-launches-new-attacks-on-iranian-targets-days-after-netanyahu-pressed-trump-for-more-strikes",
+   "https://www.aljazeera.com/news/2026/11/4/iran-says-us-reply-to-hormuz-plan-unconvincing-trump-confirms-strikes"
+  ],
+  "region": "Global",
+  "geo": {
+   "lat": 26.96,
+   "lng": 56.27,
+   "place": "Qeshm Island, Iran",
+   "kind": "event"
+  }
+ },
+ {
+  "id": "trump-no-rush-iran",
+  "date": "2026-11-02",
+  "headline": "Trump plays down new Iran strikes after the election, saying there is no rush",
+  "summary": "Asked whether he was considering strikes after the midterms, Trump said no and pointed to progress in talks, according to Axios and Bloomberg. Nothing official ties the Iran talks to FORTRESS or the stock-up advice.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "axios",
+   "bloomberg"
+  ],
+  "urls": [
+   "https://www.bloomberg.com/news/articles/2026-11-04/trump-plays-down-prospect-of-strikes-on-iran-after-midterm-rout",
+   "https://www.bernama.com/en/world/news.php?id=2629235"
+  ],
+  "region": "US",
+  "geo": {
+   "lat": 38.9,
+   "lng": -77.04,
+   "place": "White House, Washington DC",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "japan-agency-launch-request",
+  "date": "2026-11-02",
+  "headline": "Japan launches its Disaster Management Agency and asks households to stock 3 days, ideally a week",
+  "summary": "The new agency opened November 2 with Goshi Hosono as minister and issued the planned request: food, water and portable toilets for at least three days, preferably a week, plus securing furniture and checking shelters. The stated focus is megaquakes, and the advice matches existing guidance.",
+  "status": "confirmed",
+  "theory": null,
+  "sourceIds": [
+   "japan-times",
+   "the-standard-hk",
+   "manila-bulletin"
+  ],
+  "urls": [
+   "https://www.japantimes.co.jp/news/2026/11/02/japan/new-disaster-agency-public-prepare/",
+   "https://www.thestandard.com.hk/world/article/347258/Japan-launches-disaster-agency-urges-public-to-prep-for-megaquakes",
+   "https://mb.com.ph/2026/11/03/japan-new-disaster-agency-calls-on-public-to-prepare-for-disasters"
+  ],
+  "region": "Asia",
+  "geo": {
+   "lat": 35.68,
+   "lng": 139.76,
+   "place": "Tokyo",
+   "kind": "event"
+  }
+ },
+ {
+  "id": "canada-72-hours-unchanged",
+  "date": "2026-11-03",
+  "headline": "Canada repeats its long-standing advice: be ready for at least 72 hours",
+  "summary": "Public Safety Canada told CBC that its 72-hour minimum has not changed and that restoring services can take longer. The reminder followed the UK campaign and drew suspicion online.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "cbc",
+   "yahoo"
+  ],
+  "urls": [
+   "https://ca.news.yahoo.com/ottawa-wants-us-emergency-supplies-090000730.html",
+   "https://ca.news.yahoo.com/canadas-3-day-emergency-preparedness-advice-sparked-suspicion-and-questions-online-heres-why-155758932.html"
+  ],
+  "quote": "be ready to take care of themselves and their households for a minimum of 72 hours (Public Safety Canada)",
+  "region": "Global",
+  "geo": {
+   "lat": 45.42,
+   "lng": -75.7,
+   "place": "Ottawa",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "ireland-emergency-booklet",
+  "date": "2026-09-17",
+  "headline": "Ireland mails a Be Emergency Ready booklet to 2.2 million homes",
+  "summary": "An Post began delivering the booklet from September 21, advising 2 to 3 litres of water per person, a battery or wind-up radio and documents in a waterproof bag. No new November statement from the Taoiseach was found.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "irish-times"
+  ],
+  "urls": [
+   "https://www.irishtimes.com/life-style/2026/09/17/governments-emergency-booklet-what-is-in-it-and-how-does-it-compare-to-eu-countries/"
+  ],
+  "region": "EU",
+  "geo": {
+   "lat": 53.35,
+   "lng": -6.26,
+   "place": "Dublin",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "seven-to-ten-days-framing",
+  "date": "2026-10-29",
+  "headline": "Headline saying governments urge 7 to 10 days of supplies overstates the advice",
+  "summary": "An Economic Times headline grouped the US, Europe and Japan under 7 to 10 days. The UK and France say 3 days, the EU and Canada 72 hours, Japan at least 3 days and ideally a week; only a few countries such as Germany suggest around 10 days.",
+  "status": "debunked",
+  "theory": null,
+  "sourceIds": [
+   "economic-times",
+   "uk-gov-beready",
+   "eu-commission"
+  ],
+  "urls": [
+   "https://beready.campaign.gov.uk/be-ready-for-emergencies/",
+   "https://newsweek.com/map-shows-countries-urging-residents-to-stockpile-food-12629524"
+  ],
+  "region": "Global",
+  "geo": {
+   "lat": 19.08,
+   "lng": 72.88,
+   "place": "Economic Times, Mumbai",
+   "kind": "outlet"
+  }
+ },
+ {
+  "id": "gray-90-day-blackout-explainer",
+  "date": "2026-11-05",
+  "headline": "Local TV explainer: no 90-day blackout is coming",
+  "summary": "A WBBJ explainer syndicated across Gray stations concludes FORTRESS is a military readiness plan, not a coming blackout or attack. It states the 90-day ability as settled, though the Pentagon has still not confirmed that figure on the record.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "gray-news"
+  ],
+  "urls": [
+   "https://www.wkyt.com/2026/11/05/is-90-day-blackout-coming-what-us-militarys-new-readiness-initiative-actually-means/",
+   "https://www.wbbjtv.com/2026/11/03/is-90-day-blackout-coming-what-us-militarys-new-readiness-initiative-actually-means/"
+  ],
+  "region": "US",
+  "geo": {
+   "lat": 35.61,
+   "lng": -88.81,
+   "place": "WBBJ, Jackson TN",
+   "kind": "outlet"
+  }
+ },
+ {
+  "id": "ncsc-annual-review-warning",
+  "date": "2026-11-03",
+  "headline": "UK cyber chief warns AI-aided attacks could hit power, water and food supply",
+  "summary": "Launching the NCSC annual review, Richard Horne warned of a possible unprecedented rise in cyber incidents and attacks that could disrupt electricity and food distribution. The same review reported a fall in the most serious incidents.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "nationalworld",
+   "the-next-web"
+  ],
+  "urls": [
+   "https://www.nationalworld.com/news/uk-cyber-attack-warning-power-blackouts-emergency-kit-three-days-9326226",
+   "https://thenextweb.com/news/ncsc-annual-review-2026-ai-malware-critical-infrastructure"
+  ],
+  "region": "UK",
+  "geo": {
+   "lat": 51.5,
+   "lng": -0.14,
+   "place": "NCSC, London",
+   "kind": "statement"
+  }
+ },
+ {
+  "id": "barclays-stockpiling-survey",
+  "date": "2026-11-05",
+  "headline": "Barclays survey: 27 percent of UK adults stockpiling or considering it",
+  "summary": "A Barclays survey released November 5 found 27 percent of UK adults are stockpiling or considering stockpiling food and drink, while only 44 percent said their household has three days of food and water.",
+  "status": "reported",
+  "theory": null,
+  "sourceIds": [
+   "convenience-store"
+  ],
+  "urls": [
+   "https://www.conveniencestore.co.uk/news/a-quarter-of-uk-adults-are-now-stockpiling-food-and-drink-but-slowly/725542.article"
+  ],
+  "region": "UK",
+  "geo": {
+   "lat": 51.51,
+   "lng": -0.13,
+   "place": "London",
+   "kind": "outlet"
+  }
+ },
+ {
+  "id": "nov17-bank-cyberattack-rumor",
+  "date": "2026-11-05",
+  "headline": "Rumor: a cyberattack will empty bank accounts on November 17",
+  "summary": "Posts tie the November 17 alert test to a coming attack on banks. No authority has warned of it, and checkers note scam sites exploiting the panic are the bigger risk.",
+  "status": "rumor",
+  "theory": "cyberattack",
+  "sourceIds": [
+   "prepared-states",
+   "x"
+  ],
+  "urls": [
+   "https://www.preparedstates.com/guides/november-17-blackout"
+  ],
+  "region": "US",
+  "geo": null
+ },
+ {
+  "id": "nov13-doomsday-date-rumor",
+  "date": "2026-11-03",
+  "headline": "Rumor: November 13, 2026 is a scientifically set end-of-the-world date",
+  "summary": "Clickbait posts link the stock-up advice to a 1960 Science paper by Heinz von Foerster that projected population growth would hit infinity on November 13, 2026. That was a satirical warning about population models, not a prediction of collapse.",
+  "status": "rumor",
+  "theory": "other",
+  "sourceIds": [
+   "todaypress"
+  ],
+  "urls": [
+   "https://todaypress.tv/en/world/food-supplies-being-stockpiled-power-and-internet-to-be-cut-date-set-for-the-end-of-the-world"
+  ],
+  "region": "Global",
+  "geo": null
  }
 ]

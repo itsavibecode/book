@@ -1327,5 +1327,177 @@
     "trust": 2,
     "trustReason": "Breaking-news repost account that summarizes wire reports, usually Reuters, without original reporting.",
     "url": "https://x.com/TheInsiderPaper"
+  },
+  {
+    "id": "defensescoop",
+    "name": "DefenseScoop",
+    "domain": "defensescoop.com",
+    "type": "magazine",
+    "trust": 4,
+    "trustReason": "Defense technology trade outlet that obtained and quoted the October 6 FORTRESS implementation memo.",
+    "url": "https://defensescoop.com/"
+  },
+  {
+    "id": "nextgov",
+    "name": "Nextgov/FCW",
+    "domain": "nextgov.com",
+    "type": "magazine",
+    "trust": 4,
+    "trustReason": "Federal technology trade outlet with government cyber sourcing.",
+    "url": "https://www.nextgov.com/"
+  },
+  {
+    "id": "propublica",
+    "name": "ProPublica",
+    "domain": "propublica.org",
+    "type": "magazine",
+    "trust": 5,
+    "trustReason": "Nonprofit investigative newsroom with rigorous fact-checking.",
+    "url": "https://www.propublica.org/"
+  },
+  {
+    "id": "govtech",
+    "name": "Government Technology",
+    "domain": "govtech.com",
+    "type": "magazine",
+    "trust": 3,
+    "trustReason": "State and local government tech publication; solid on election IT, light on independent sourcing.",
+    "url": "https://www.govtech.com/"
+  },
+  {
+    "id": "bloomberg",
+    "name": "Bloomberg",
+    "domain": "bloomberg.com",
+    "type": "wire",
+    "trust": 5,
+    "trustReason": "Major financial wire and news service with strict sourcing standards.",
+    "url": "https://www.bloomberg.com/"
+  },
+  {
+    "id": "pbs",
+    "name": "PBS NewsHour",
+    "domain": "pbs.org",
+    "type": "broadcast",
+    "trust": 5,
+    "trustReason": "US public broadcaster; ran the AP report on the eve-of-midterms Iran strikes.",
+    "url": "https://www.pbs.org/newshour/"
+  },
+  {
+    "id": "cbc",
+    "name": "CBC News",
+    "domain": "cbc.ca",
+    "type": "broadcast",
+    "trust": 5,
+    "trustReason": "Canada's public broadcaster; quoted Public Safety Canada directly on the 72-hour advice.",
+    "url": "https://www.cbc.ca/news"
+  },
+  {
+    "id": "japan-times",
+    "name": "The Japan Times",
+    "domain": "japantimes.co.jp",
+    "type": "national-paper",
+    "trust": 4,
+    "trustReason": "Japan's leading English-language daily, covering the Disaster Management Agency launch.",
+    "url": "https://www.japantimes.co.jp/"
+  },
+  {
+    "id": "the-standard-hk",
+    "name": "The Standard (Hong Kong)",
+    "domain": "thestandard.com.hk",
+    "type": "national-paper",
+    "trust": 3,
+    "trustReason": "Hong Kong English daily that relies on wire copy for Japan coverage.",
+    "url": "https://www.thestandard.com.hk/"
+  },
+  {
+    "id": "manila-bulletin",
+    "name": "Manila Bulletin",
+    "domain": "mb.com.ph",
+    "type": "national-paper",
+    "trust": 3,
+    "trustReason": "Major Philippine daily; its Japan story is wire-based.",
+    "url": "https://mb.com.ph/"
+  },
+  {
+    "id": "irish-times",
+    "name": "The Irish Times",
+    "domain": "irishtimes.com",
+    "type": "national-paper",
+    "trust": 4,
+    "trustReason": "Ireland's paper of record; detailed the Be Emergency Ready booklet.",
+    "url": "https://www.irishtimes.com/"
+  },
+  {
+    "id": "gray-news",
+    "name": "Gray News (syndicated local TV)",
+    "domain": "gray.tv",
+    "type": "local-tv",
+    "trust": 3,
+    "trustReason": "Syndication desk for Gray and partner stations; one explainer republished on dozens of station sites counts as one source.",
+    "url": "https://gray.tv/",
+    "altDomains": [
+      "wbbjtv.com",
+      "wkyt.com",
+      "wsmv.com",
+      "azfamily.com",
+      "kptv.com",
+      "kctv5.com",
+      "wvlt.tv",
+      "hometownstations.com"
+    ]
+  },
+  {
+    "id": "gadget-review",
+    "name": "Gadget Review",
+    "domain": "gadgetreview.com",
+    "type": "blog",
+    "trust": 2,
+    "trustReason": "Consumer tech site whose explainer on the Simpsons claim relies on secondary reporting.",
+    "url": "https://www.gadgetreview.com/"
+  },
+  {
+    "id": "convenience-store",
+    "name": "Convenience Store (UK trade)",
+    "domain": "conveniencestore.co.uk",
+    "type": "magazine",
+    "trust": 3,
+    "trustReason": "UK retail trade publication reporting Barclays survey data.",
+    "url": "https://www.conveniencestore.co.uk/"
+  },
+  {
+    "id": "nationalworld",
+    "name": "NationalWorld",
+    "domain": "nationalworld.com",
+    "type": "national-paper",
+    "trust": 3,
+    "trustReason": "UK digital news site; reported the NCSC chief's warnings at the annual review launch.",
+    "url": "https://www.nationalworld.com/"
+  },
+  {
+    "id": "the-next-web",
+    "name": "The Next Web",
+    "domain": "thenextweb.com",
+    "type": "magazine",
+    "trust": 3,
+    "trustReason": "Tech news site that summarizes official reports and other outlets.",
+    "url": "https://thenextweb.com/"
+  },
+  {
+    "id": "prepared-states",
+    "name": "Prepared States",
+    "domain": "preparedstates.com",
+    "type": "blog",
+    "trust": 2,
+    "trustReason": "Preparedness guide site that checks viral date rumors; small and unvetted.",
+    "url": "https://www.preparedstates.com/"
+  },
+  {
+    "id": "todaypress",
+    "name": "TodayPress",
+    "domain": "todaypress.tv",
+    "type": "blog",
+    "trust": 1,
+    "trustReason": "Clickbait aggregator pushing end-of-the-world date headlines.",
+    "url": "https://todaypress.tv/"
   }
 ]
