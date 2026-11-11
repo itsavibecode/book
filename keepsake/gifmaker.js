@@ -27,7 +27,7 @@
     track: $('gifTrack'), span: $('gifSpan'), head: $('gifHead'), start: $('gifStart'), stop: $('gifStop'),
     startLab: $('gifStartLab'), stopLab: $('gifStopLab'),
     startIn: $('gifStartIn'), stopIn: $('gifStopIn'), setStart: $('gifSetStart'), setStop: $('gifSetStop'),
-    len: $('gifLen'), preview: $('gifPreview'), width: $('gifWidth'), fps: $('gifFps'), loop: $('gifLoop'),
+    len: $('gifLen'), preview: $('gifPreview'), loopTag: $('gifLoopTag'), loopText: $('gifLoopText'), width: $('gifWidth'), fps: $('gifFps'), loop: $('gifLoop'),
     make: $('gifMake'), work: $('gifWork'), bar: $('gifBar'), workText: $('gifWorkText'), cancel: $('gifCancel'),
     out: $('gifOut'), img: $('gifImg'), outInfo: $('gifOutInfo'), save: $('gifSave'), saveNote: $('gifSaveNote')
   };
@@ -154,6 +154,7 @@
         fitView(true);
         paint();
         startTicker();
+        startLoop();
         return;
       }
       if (++tries < 40) setTimeout(again, 250);
@@ -182,8 +183,11 @@
 
   el.play.addEventListener('click', function () {
     if (!player || !player.getPlayerState) return;
-    stopPreview();
-    if (player.getPlayerState() === window.YT.PlayerState.PLAYING) player.pauseVideo(); else player.playVideo();
+    var playing = player.getPlayerState() === window.YT.PlayerState.PLAYING;
+    if (previewing) { stopPreview(false); playing = false; }
+    if (playing) { player.pauseVideo(); return; }
+    if (player.isMuted()) player.unMute();
+    player.playVideo();
   });
 
   /* ---------- the start and stop markers ---------- */
@@ -266,6 +270,7 @@
     el.startLab.textContent = 'Start ' + clock(a);
     el.stopLab.textContent = 'Stop ' + clock(b);
     placeLabels(pa, pb);
+    paintLoop();
     var size = outSize();
     el.len.textContent = 'Length ' + (b - a).toFixed(1) + ' s, ' + frames() + ' frames, ' + size.w + ' x ' + size.h;
     paintHead();
@@ -319,7 +324,7 @@
         if (which === 'a') setRange(t, b, 'drag-a'); else setRange(a, t, 'drag-b');
       };
       var up = function () {
-        seek(which === 'a' ? a : b);
+        showMark(which);
         handle.removeEventListener('pointermove', move);
         handle.removeEventListener('pointerup', up);
         handle.removeEventListener('pointercancel', up);
@@ -340,7 +345,7 @@
       e.preventDefault();
       e.stopPropagation();
       if (which === 'a') setRange(t, b, 'a'); else setRange(a, t, 'b');
-      seek(which === 'a' ? a : b);
+      showMark(which);
     });
   }
   dragMarker(el.start, 'a');
@@ -349,37 +354,66 @@
   // A tap on the strip (not on a marker) moves the player there.
   el.track.addEventListener('pointerdown', function (e) {
     if (!dur || e.target === el.start || e.target === el.stop || job) return;
-    seek(timeAt(e.clientX));
+    var t = timeAt(e.clientX);
+    if (previewing && (t < a || t >= b)) stopPreview(false);
+    seek(t);
   });
 
   el.earlier.addEventListener('click', function () { pan(-1); });
   el.later.addEventListener('click', function () { pan(1); });
-  el.startIn.addEventListener('change', function () { setRange(Number(el.startIn.value) || 0, b, 'a'); });
-  el.stopIn.addEventListener('change', function () { setRange(a, Number(el.stopIn.value) || 0, 'b'); });
-  el.setStart.addEventListener('click', function () { setRange(now(), b, 'a'); });
-  el.setStop.addEventListener('click', function () { setRange(a, now(), 'b'); });
+  el.startIn.addEventListener('change', function () { setRange(Number(el.startIn.value) || 0, b, 'a'); showMark('a'); });
+  el.stopIn.addEventListener('change', function () { setRange(a, Number(el.stopIn.value) || 0, 'b'); showMark('b'); });
+  el.setStart.addEventListener('click', function () { setRange(now(), b, 'a'); showMark('a'); });
+  el.setStop.addEventListener('click', function () { setRange(a, now(), 'b'); showMark('b'); });
   el.fps.addEventListener('change', paint);
   el.width.addEventListener('change', function () { clearResult(); paint(); });
   el.loop.addEventListener('change', clearResult);
   window.addEventListener('resize', function () { if (!el.edit.hidden) paint(); });
 
-  /* ---------- preview: play only the marked part, on a loop ---------- */
+  /* ---------- the GIF part on repeat ----------
+     Once a video loads, the player plays only the marked part, over and
+     over and without sound, the way the GIF will look. Play leaves the
+     loop to watch the rest of the video; Repeat the GIF part comes back. */
 
-  function stopPreview() {
+  function paintLoop() {
+    el.loopTag.hidden = !previewing || !!job;
+    el.track.classList.toggle('looping', previewing && !job);
+    el.loopText.textContent = clock(a) + ' to ' + clock(b);
+  }
+  function startLoop() {
+    if (!player || !dur || job) return;
+    previewing = true;
+    el.preview.textContent = 'Stop repeating';
+    el.preview.setAttribute('aria-pressed', 'true');
+    if (player.mute) player.mute();
+    seek(a);
+    player.playVideo();
+    paintLoop();
+    // Some browsers will not start a video without a tap; then the button
+    // offers the loop instead of claiming it is on.
+    setTimeout(function () {
+      if (!previewing || job || !player.getPlayerState) return;
+      var st = player.getPlayerState();
+      if (st !== window.YT.PlayerState.PLAYING && st !== window.YT.PlayerState.BUFFERING) stopPreview(false);
+    }, 3000);
+  }
+  function stopPreview(pause) {
     if (!previewing) return;
     previewing = false;
-    if (player && player.pauseVideo) player.pauseVideo();
-    el.preview.textContent = 'Play the GIF part';
+    if (pause !== false && player && player.pauseVideo) player.pauseVideo();
+    el.preview.textContent = 'Repeat the GIF part';
     el.preview.setAttribute('aria-pressed', 'false');
+    paintLoop();
+  }
+  // After a marker moves: from the start for the start marker, from a
+  // second before the end for the stop marker, so the change is seen at once.
+  function showMark(which) {
+    if (previewing) seek(which === 'a' ? a : Math.max(a, b - 1));
+    else seek(which === 'a' ? a : b);
   }
   el.preview.addEventListener('click', function () {
     if (!player || !dur) return;
-    if (previewing) { stopPreview(); return; }
-    previewing = true;
-    el.preview.textContent = 'Stop playing';
-    el.preview.setAttribute('aria-pressed', 'true');
-    seek(a);
-    player.playVideo();
+    if (previewing) stopPreview(); else startLoop();
   });
 
   /* ---------- recording ---------- */
@@ -628,6 +662,7 @@
       if (!wasMuted && player.unMute) player.unMute();
       job = null;
       working(false);
+      startLoop();
     });
   });
 

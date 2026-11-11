@@ -106,7 +106,15 @@ and selection line at least 3.3:1, both themes):
   video is not a sliver. Markers drag, nudge with the arrow keys (Shift for
   whole seconds), take typed times (a start typed past the stop carries the
   stop along), or jump to the playing position with "Start here" / "Stop
-  here". "Play the GIF part" loops only that part. Width 320 to 800 px, 10 to
+  here". **The marked part plays on repeat** in the player as soon as the
+  video loads (muted, since a GIF has no sound and browsers only start
+  muted video on their own), with an "On repeat: start to stop" label in the
+  player's top-right corner and the part on the timeline shaded darker. A
+  moved start marker replays from the start; a moved stop marker replays
+  from a second before the stop, so the change shows at once. "Play" leaves
+  the loop and plays the whole video with sound (a tap on the timeline
+  outside the part does too); "Repeat the GIF part" goes back. The label is
+  hidden while recording, so it never ends up in the GIF. Width 320 to 800 px, 10 to
   20 frames a second, plays over and over or once; up to 30 s and 600
   frames. Checked in Edge: a 2.5 s part at 6:40 of a 10:35 video gave 30 of
   30 frames, 480 x 270, no YouTube overlay in any frame.
@@ -170,6 +178,11 @@ with one label and never a link, shortcode, username or caption:
 
 ## Changelog
 
+- **0.5.1** (2026-11-11): the YouTube GIF tab now shows the marked part on
+  repeat in the player as soon as the video loads, labelled with its start
+  and stop times, so you see what the GIF will look like while you move the
+  markers, without pressing anything. Play still plays the whole video with
+  sound when you want to look around.
 - **0.5.0** (2026-11-11): the YouTube GIF tab takes a YouTube link instead of
   a video file, as asked. The video plays in YouTube's own player, you set
   the start and stop markers (now on a timeline that zooms to the part you

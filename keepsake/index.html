@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="version" content="0.5.0" />
-<title>Keepsake v0.5.0 - Instagram, Snapchat and X downloader | BookHockeys</title>
+<meta name="version" content="0.5.1" />
+<title>Keepsake v0.5.1 - Instagram, Snapchat and X downloader | BookHockeys</title>
 
 <meta name="description" content="Save public Instagram posts, Snapchat stories and highlights, and X photos and videos at the size they were posted, with sound. Or turn part of a video into a GIF. No sign-in, no ads, not affiliated with any of them." />
 <meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)" />
@@ -211,6 +211,8 @@ button{font:inherit;cursor:pointer}
 .ytframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 /* While recording: a ring around the player (outside what is recorded) and a
    clear cover so a stray mouse cannot bring up YouTube's overlays. */
+.loop-tag{position:absolute;right:8px;top:8px;margin:0;padding:4px 8px;background:rgba(0,0,0,.74);color:#fff;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;border-radius:4px;pointer-events:none;max-width:calc(100% - 16px)}
+.ytframe.recording .loop-tag{display:none}
 .ytframe.recording{outline:3px solid var(--accent-line,var(--accent));outline-offset:3px}
 .ytframe.recording::after{content:"";position:absolute;inset:0}
 .marks{display:grid;gap:10px}
@@ -222,6 +224,7 @@ button{font:inherit;cursor:pointer}
 .track::before{top:4px}
 .track::after{bottom:4px}
 .track .span{position:absolute;top:0;bottom:0;background:var(--accent-line,var(--accent));opacity:.28;pointer-events:none}
+.track.looping .span{opacity:.42}
 .track .head{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--text);opacity:.55;pointer-events:none}
 .mark{position:absolute;top:-1px;bottom:-1px;width:44px;margin-left:-22px;padding:0;background:transparent;border:0;cursor:ew-resize;touch-action:none}
 .mark::before{content:"";position:absolute;left:19px;top:0;bottom:0;width:6px;background:var(--accent-line,var(--accent));border:1px solid var(--plate)}
@@ -527,7 +530,7 @@ button{font:inherit;cursor:pointer}
         <p class="note" id="gifNote" role="status" hidden></p>
       </div>
       <div class="gif-edit" id="gifEdit" hidden>
-        <div class="viewer"><div class="ytframe" id="gifFrame"><div id="gifPlayer"></div></div></div>
+        <div class="viewer"><div class="ytframe" id="gifFrame"><div id="gifPlayer"></div><p class="loop-tag" id="gifLoopTag" hidden>On repeat: <span id="gifLoopText"></span></p></div></div>
         <div class="marks">
           <div class="labels" aria-hidden="true"><span id="gifStartLab"></span><span id="gifStopLab"></span></div>
           <div class="track" id="gifTrack" title="The shaded part between the two markers becomes the GIF. Tap the strip to move the video there.">
@@ -548,8 +551,8 @@ button{font:inherit;cursor:pointer}
             <button type="button" class="btn btn-ghost" id="gifSetStop" title="Put the stop marker where the video is now">Stop here</button>
           </div>
           <div class="mark-row">
-            <button type="button" class="btn btn-ghost" id="gifPlay" aria-pressed="false" title="Play or pause the video">Play</button>
-            <button type="button" class="btn btn-ghost" id="gifPreview" aria-pressed="false" title="Play only the marked part, over and over, the way the GIF will look">Play the GIF part</button>
+            <button type="button" class="btn btn-ghost" id="gifPlay" aria-pressed="false" title="Play the whole video with sound, to find the moment you want">Play</button>
+            <button type="button" class="btn btn-ghost" id="gifPreview" aria-pressed="false" title="Play only the marked part, over and over and without sound, the way the GIF will look">Repeat the GIF part</button>
             <span class="len" id="gifLen"></span>
           </div>
         </div>
@@ -613,7 +616,7 @@ button{font:inherit;cursor:pointer}
     <a href="terms.html" title="Read the terms of use">Terms</a>
     <button type="button" class="linkish" id="themeBtn" title="Switch between the light and dark page"></button>
     <button type="button" class="linkish" id="cookieReset" title="Change your analytics cookie choice">Cookies</button>
-    <span>Keepsake v0.5.0</span>
+    <span>Keepsake v0.5.1</span>
     <span>Files pass through our server as a pipe and are never stored.</span>
   </footer>
 </div>
