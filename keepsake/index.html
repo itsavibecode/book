@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="version" content="0.4.0" />
-<title>Keepsake v0.4.0 - Instagram, Snapchat and X downloader | BookHockeys</title>
+<meta name="version" content="0.5.0" />
+<title>Keepsake v0.5.0 - Instagram, Snapchat and X downloader | BookHockeys</title>
 
 <meta name="description" content="Save public Instagram posts, Snapchat stories and highlights, and X photos and videos at the size they were posted, with sound. Or turn part of a video into a GIF. No sign-in, no ads, not affiliated with any of them." />
 <meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)" />
@@ -205,11 +205,14 @@ button{font:inherit;cursor:pointer}
 .chip .c{color:var(--muted);font-variant-numeric:tabular-nums}
 
 /* YouTube GIF tab */
-.drop{border:1px dashed var(--line-strong);border-radius:var(--r-btn);background:var(--card);padding:28px 18px;display:grid;justify-items:start;gap:10px}
-.drop.over{border-style:solid;background:var(--sel)}
-.drop p{margin:0;font-size:14px;color:var(--muted)}
 .gif-edit{display:grid;gap:16px}
-.gif-edit .viewer video{display:block;width:100%;max-height:min(60dvh,560px);background:var(--media)}
+.ytframe{position:relative;width:100%;aspect-ratio:16 / 9;max-height:min(62dvh,560px);margin:0 auto;background:#000}
+.ytframe.tall{aspect-ratio:9 / 16;width:auto;height:min(62dvh,560px);max-width:100%}
+.ytframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+/* While recording: a ring around the player (outside what is recorded) and a
+   clear cover so a stray mouse cannot bring up YouTube's overlays. */
+.ytframe.recording{outline:3px solid var(--accent-line,var(--accent));outline-offset:3px}
+.ytframe.recording::after{content:"";position:absolute;inset:0}
 .marks{display:grid;gap:10px}
 .labels{position:relative;height:20px;font-size:13px}
 .labels span{position:absolute;top:0;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--text);font-weight:600}
@@ -230,6 +233,9 @@ button{font:inherit;cursor:pointer}
 .mark-row input{width:6.5em;font-variant-numeric:tabular-nums}
 .mark-row .btn-ghost{height:44px}
 .len{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.view-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px}
+.view-row .len{text-align:center;font-size:13px}
+.btn[disabled]{opacity:.6;cursor:not-allowed}
 .gif-opts{display:flex;flex-wrap:wrap;gap:10px 16px}
 .gif-opts label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
 .gif-opts select{min-width:9em}
@@ -433,7 +439,7 @@ button{font:inherit;cursor:pointer}
     <button type="button" class="tab" role="tab" id="tab-instagram" data-p="instagram" aria-selected="true" aria-controls="main" title="Save Instagram posts, reels and carousels">Instagram</button>
     <button type="button" class="tab" role="tab" id="tab-snapchat" data-p="snapchat" aria-selected="false" aria-controls="main" tabindex="-1" title="Save a public Snapchat story, highlights and Spotlight videos">Snapchat</button>
     <button type="button" class="tab" role="tab" id="tab-x" data-p="x" aria-selected="false" aria-controls="main" tabindex="-1" title="Save photos and videos from X posts">X</button>
-    <button type="button" class="tab" role="tab" id="tab-youtube" data-p="youtube" aria-selected="false" aria-controls="main" tabindex="-1" title="Turn part of a video into a GIF">YouTube GIF</button>
+    <button type="button" class="tab" role="tab" id="tab-youtube" data-p="youtube" aria-selected="false" aria-controls="main" tabindex="-1" title="Turn part of a YouTube video into a GIF">YouTube GIF</button>
   </nav>
 
   <main id="main">
@@ -510,31 +516,39 @@ button{font:inherit;cursor:pointer}
     <section id="gifTool" hidden aria-labelledby="gifTitle">
       <h2 class="sr" id="gifTitle">Turn part of a video into a GIF</h2>
       <div class="narrow">
-        <div class="drop" id="gifDrop">
-          <input type="file" id="gifFile" accept="video/*" class="sr" />
-          <label for="gifFile" class="btn btn-ink" title="Pick a video saved on this device">Choose a video file</label>
-          <p>Or drop one here. The video stays on this device; nothing is uploaded.</p>
-          <p>YouTube does not let other sites read its videos, so a YouTube link cannot be turned into a GIF here. Use a video you have saved or recorded.</p>
-        </div>
+        <form class="field-row" id="gifForm" novalidate>
+          <div class="field">
+            <input id="gifUrl" type="url" inputmode="url" enterkeyhint="go" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"
+                   aria-label="YouTube video link" placeholder="youtube.com/watch?v=... or youtu.be/..." />
+          </div>
+          <button type="submit" class="btn btn-ink" id="gifLoad" title="Open the video in YouTube's player below">Load video</button>
+        </form>
+        <p class="note" id="gifSupport">Making the GIF records this tab while the marked part plays, so it needs Chrome or Edge on a computer. Phones and Safari cannot record a tab.</p>
         <p class="note" id="gifNote" role="status" hidden></p>
       </div>
       <div class="gif-edit" id="gifEdit" hidden>
-        <div class="viewer"><video id="gifVideo" playsinline controls preload="auto" aria-label="The chosen video"></video></div>
+        <div class="viewer"><div class="ytframe" id="gifFrame"><div id="gifPlayer"></div></div></div>
         <div class="marks">
           <div class="labels" aria-hidden="true"><span id="gifStartLab"></span><span id="gifStopLab"></span></div>
-          <div class="track" id="gifTrack" title="The shaded part between the two markers becomes the GIF. Tap the strip to move the playing position.">
+          <div class="track" id="gifTrack" title="The shaded part between the two markers becomes the GIF. Tap the strip to move the video there.">
             <div class="span" id="gifSpan"></div>
             <div class="head" id="gifHead"></div>
             <button type="button" class="mark" id="gifStart" role="slider" aria-label="GIF start marker" aria-valuemin="0" title="Drag, or use the arrow keys (Shift for whole seconds)"></button>
             <button type="button" class="mark" id="gifStop" role="slider" aria-label="GIF stop marker" aria-valuemin="0" title="Drag, or use the arrow keys (Shift for whole seconds)"></button>
           </div>
-          <div class="mark-row">
-            <label>Start <input id="gifStartIn" type="number" step="0.1" min="0" inputmode="decimal" title="Start of the GIF, in seconds into the video" /> s</label>
-            <button type="button" class="btn btn-ghost" id="gifSetStart" title="Put the start marker at the frame the video is on now">Start here</button>
-            <label>Stop <input id="gifStopIn" type="number" step="0.1" min="0" inputmode="decimal" title="End of the GIF, in seconds into the video" /> s</label>
-            <button type="button" class="btn btn-ghost" id="gifSetStop" title="Put the stop marker at the frame the video is on now">Stop here</button>
+          <div class="mark-row view-row">
+            <button type="button" class="btn btn-ghost" id="gifEarlier" title="Show an earlier stretch of the video on the timeline">Earlier</button>
+            <span class="len" id="gifView" aria-live="polite"></span>
+            <button type="button" class="btn btn-ghost" id="gifLater" title="Show a later stretch of the video on the timeline">Later</button>
           </div>
           <div class="mark-row">
+            <label>Start <input id="gifStartIn" type="number" step="0.1" min="0" inputmode="decimal" title="Start of the GIF, in seconds into the video" /> s</label>
+            <button type="button" class="btn btn-ghost" id="gifSetStart" title="Put the start marker where the video is now">Start here</button>
+            <label>Stop <input id="gifStopIn" type="number" step="0.1" min="0" inputmode="decimal" title="End of the GIF, in seconds into the video" /> s</label>
+            <button type="button" class="btn btn-ghost" id="gifSetStop" title="Put the stop marker where the video is now">Stop here</button>
+          </div>
+          <div class="mark-row">
+            <button type="button" class="btn btn-ghost" id="gifPlay" aria-pressed="false" title="Play or pause the video">Play</button>
             <button type="button" class="btn btn-ghost" id="gifPreview" aria-pressed="false" title="Play only the marked part, over and over, the way the GIF will look">Play the GIF part</button>
             <span class="len" id="gifLen"></span>
           </div>
@@ -548,11 +562,12 @@ button{font:inherit;cursor:pointer}
             <option value="forever" selected>Over and over</option><option value="once">Once</option></select></label>
         </div>
         <div class="narrow">
-          <button type="button" class="btn btn-save" id="gifMake" title="Up to 30 seconds and 600 frames">Make GIF</button>
+          <button type="button" class="btn btn-save" id="gifMake" title="Records the marked part as it plays, up to 30 seconds. Your browser asks once to allow recording this tab.">Record the GIF</button>
+          <p class="subl">Your browser asks to record this tab; pick This tab. The marked part plays once while it records, and the GIF is made on this device.</p>
           <div class="panel" id="gifWork" role="status" hidden>
             <b id="gifWorkText"></b>
             <div class="progress"><i id="gifBar"></i></div>
-            <div class="prow"><span>Made on this device.</span><button type="button" class="linkish r" id="gifCancel">Stop</button></div>
+            <div class="prow"><span>Keep this tab in front while it records.</span><button type="button" class="linkish r" id="gifCancel">Stop</button></div>
           </div>
         </div>
         <div class="gif-out" id="gifOut" hidden>
@@ -561,7 +576,6 @@ button{font:inherit;cursor:pointer}
           <button type="button" class="btn btn-save" id="gifSave"></button>
           <p class="subl" id="gifSaveNote" aria-live="polite"></p>
         </div>
-        <button type="button" class="linkish more" id="gifAnother">Use a different video</button>
       </div>
     </section>
 
@@ -599,7 +613,7 @@ button{font:inherit;cursor:pointer}
     <a href="terms.html" title="Read the terms of use">Terms</a>
     <button type="button" class="linkish" id="themeBtn" title="Switch between the light and dark page"></button>
     <button type="button" class="linkish" id="cookieReset" title="Change your analytics cookie choice">Cookies</button>
-    <span>Keepsake v0.4.0</span>
+    <span>Keepsake v0.5.0</span>
     <span>Files pass through our server as a pipe and are never stored.</span>
   </footer>
 </div>
@@ -749,6 +763,11 @@ button{font:inherit;cursor:pointer}
 
   function start(text) {
     var raw = text != null ? text : el.url.value;
+    if (window.KeepsakeGif && window.KeepsakeGif.parse(raw)) {
+      switchTab('youtube', true);
+      window.KeepsakeGif.open(String(raw).trim());
+      return;
+    }
     var link = IG.parseLink(raw, platform);
     note('');
     if (link.error === 'empty') { el.url.focus(); return; }
@@ -1315,7 +1334,7 @@ button{font:inherit;cursor:pointer}
   // A pasted post link starts on its own; typed text still needs Fetch.
   el.url.addEventListener('paste', function (e) {
     var text = (e.clipboardData || window.clipboardData).getData('text');
-    if (IG.parseLink(text).error) return;
+    if (IG.parseLink(text, platform).error && !(window.KeepsakeGif && window.KeepsakeGif.parse(text))) return;
     e.preventDefault();
     el.url.value = text.trim();
     start();
@@ -1528,7 +1547,7 @@ button{font:inherit;cursor:pointer}
       placeholder: 'x.com/name/status/...', label: 'X post link', type: 'url'
     },
     youtube: {
-      sub: 'Pick a video file, mark the start and the stop, and turn that part into a GIF.'
+      sub: 'Paste a YouTube link, mark the start and the stop, and turn that part into a GIF.'
     }
   };
 

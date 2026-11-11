@@ -2,7 +2,7 @@
 
 Paste a public Instagram, Snapchat or X link (or type a Snapchat username),
 see every photo and video uncropped at the size it was posted, and save one
-item or all of them. The YouTube GIF tab turns part of a video file into a
+item or all of them. The YouTube GIF tab turns part of a YouTube video into a
 GIF, between a start and a stop marker. Phone first: the save button sits in
 a bar at the bottom, and on iPhone it goes through the share sheet so files
 land in Photos.
@@ -84,17 +84,32 @@ and selection line at least 3.3:1, both themes):
 - **X:** a post link brings back its photos at their original size (up to
   8192 px seen) and videos at the highest bitrate X keeps (up to 3840 x 2160
   seen), with sound. GIFs are saved as the MP4 X stores them as.
-- **YouTube GIF:** YouTube does not let other sites read its videos, so this
-  tab works on a video file on the device (PLAN 12.5); nothing is uploaded.
-  Pick or drop a file, then set the part: a **start marker and a stop marker
-  on a film-strip timeline** with the part between them shaded and their
-  times written above them, which can be dragged, nudged with the arrow keys
-  (Shift for whole seconds), typed, or set with "Start here" / "Stop here" at
-  the playing frame. "Play the GIF part" loops only that part. Width 320 to
-  800 px, 10 to 20 frames a second, plays over and over or once; up to 30 s
-  and 600 frames. Encoded in the browser with gifenc (`vendor/gifenc.js`,
-  loaded on the first Make GIF). Recordings without a length in their header
-  (browser WebM) are measured by seeking to the end first.
+- **YouTube GIF (0.5.0):** paste a YouTube link (watch, youtu.be, shorts,
+  embed or live; a `t=` time becomes the start marker). A page cannot read
+  the pixels of YouTube's player and downloading is against YouTube's terms
+  (PLAN 12.5; gifrun.com downloads on its server, checked 2026-11-11), so
+  Keepsake **records the player**: the video plays in YouTube's own embedded
+  player (`youtube-nocookie.com`, IFrame API, controls hidden so they never
+  end up in the GIF), and "Record the GIF" asks the browser to record this
+  tab (`getDisplayMedia`, `preferCurrentTab`), plays the marked part (muted,
+  from 6 s before the start marker so YouTube's title and pause sign have
+  faded), records it as a video (MediaRecorder), then steps through that
+  recording at the chosen frame rate into a GIF with gifenc. Chrome and Edge
+  crop the recording to the player exactly (Region Capture, `cropTo`); other
+  browsers cut the player's place out of the tab. Phones and Safari cannot
+  record a tab: the player and markers still work, and the record button
+  says "Recording needs a computer".
+  The part is set with a **start marker and a stop marker on a film-strip
+  timeline**, the part between them shaded and both times written above
+  them. The timeline shows a 40 s stretch around the markers (Earlier /
+  Later move it, and a line says which stretch), so a short part on a long
+  video is not a sliver. Markers drag, nudge with the arrow keys (Shift for
+  whole seconds), take typed times (a start typed past the stop carries the
+  stop along), or jump to the playing position with "Start here" / "Stop
+  here". "Play the GIF part" loops only that part. Width 320 to 800 px, 10 to
+  20 frames a second, plays over and over or once; up to 30 s and 600
+  frames. Checked in Edge: a 2.5 s part at 6:40 of a 10:35 video gave 30 of
+  30 frames, 480 x 270, no YouTube overlay in any frame.
 
 ## Phone extras (0.3.0)
 
@@ -124,7 +139,7 @@ and selection line at least 3.3:1, both themes):
 ```
 index.html             page + CSS + app JS (views, viewer, film strip, details, saving, theme)
 ig.js                  link parsing for all three sites, /resolve client, error copy per site, file names (no DOM)
-gifmaker.js            YouTube GIF tab: file in, start/stop markers, preview loop, GIF encode
+gifmaker.js            YouTube GIF tab: link in, YouTube player, start/stop markers, tab recording, GIF encode
 save.js                iOS detection, share-sheet save, blob download, store-only zip (no DOM state)
 mux.js                 joins the best video file and its sound file into one MP4 (ES module, lazy)
 sw.js                  app-shell cache for the installed app (page files only)
@@ -155,6 +170,13 @@ with one label and never a link, shortcode, username or caption:
 
 ## Changelog
 
+- **0.5.0** (2026-11-11): the YouTube GIF tab takes a YouTube link instead of
+  a video file, as asked. The video plays in YouTube's own player, you set
+  the start and stop markers (now on a timeline that zooms to the part you
+  are working on), and Record the GIF records that part of the player as it
+  plays, after asking once to record the tab. Nothing is downloaded from
+  YouTube. It needs Chrome or Edge on a computer, because phones and Safari
+  cannot record a tab; there the tab says so.
 - **0.4.0** (2026-11-11): Keepsake grows from an Instagram tool into four
   tabs, each in its own colours. Snapchat: type a username to save someone's
   public story, highlights and Spotlight videos. X: paste a post to save its

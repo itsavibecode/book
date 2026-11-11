@@ -4,7 +4,7 @@
    online; the cache is only the fallback. Never touches the Worker, Instagram
    or analytics: those are other origins, and this only answers same-origin
    GETs inside /keepsake/. Bump VERSION with the page's version. */
-var VERSION = '0.4.0';
+var VERSION = '0.5.0';
 var CACHE = 'keepsake-' + VERSION;
 var SHELL = [
   './', 'index.html', 'ig.js', 'save.js', 'terms.html', 'manifest.webmanifest',
