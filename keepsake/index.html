@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="version" content="0.3.1" />
-<title>Keepsake v0.3.1 - Instagram post downloader | BookHockeys</title>
+<meta name="version" content="0.4.0" />
+<title>Keepsake v0.4.0 - Instagram, Snapchat and X downloader | BookHockeys</title>
 
-<meta name="description" content="Save a public Instagram post, reel or carousel at the size Instagram stores it, with sound. Paste the link, see every photo and video uncropped, then save one or all. No sign-in, no ads, not affiliated with Instagram." />
+<meta name="description" content="Save public Instagram posts, Snapchat stories and highlights, and X photos and videos at the size they were posted, with sound. Or turn part of a video into a GIF. No sign-in, no ads, not affiliated with any of them." />
 <meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#1b1a17" media="(prefers-color-scheme: dark)" />
 <meta name="color-scheme" content="light dark" />
@@ -15,22 +15,22 @@
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="BookHockeys" />
-<meta property="og:title" content="Keepsake - Instagram post downloader" />
-<meta property="og:description" content="Paste a public Instagram link. Save the photos or video at the size Instagram stores them, with sound." />
+<meta property="og:title" content="Keepsake - save Instagram, Snapchat and X posts" />
+<meta property="og:description" content="Paste a public Instagram, Snapchat or X link. Save the photos or video at full size, with sound, or make a GIF." />
 <meta property="og:url" content="https://bookhockeys.com/keepsake/" />
 <meta property="og:image" content="https://bookhockeys.com/keepsake/og-card.png" />
 <meta property="og:image:secure_url" content="https://bookhockeys.com/keepsake/og-card.png" />
 <meta property="og:image:type" content="image/png" />
-<meta property="og:image:alt" content="Keepsake: a framed wordmark on off-white paper above a numbered film strip of five frames." />
+<meta property="og:image:alt" content="Keepsake: a framed wordmark on off-white paper, the line Save the post at the size it was posted, and a numbered film strip of five frames." />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:locale" content="en_US" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Keepsake - Instagram post downloader" />
-<meta name="twitter:description" content="Paste a public Instagram link. Save the photos or video at the size Instagram stores them, with sound." />
+<meta name="twitter:title" content="Keepsake - save Instagram, Snapchat and X posts" />
+<meta name="twitter:description" content="Paste a public Instagram, Snapchat or X link. Save the photos or video at full size, with sound, or make a GIF." />
 <meta name="twitter:image" content="https://bookhockeys.com/keepsake/og-card.png" />
-<meta name="twitter:image:alt" content="Keepsake - Instagram post downloader" />
+<meta name="twitter:image:alt" content="Keepsake - save Instagram, Snapchat and X posts" />
 
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
@@ -147,6 +147,24 @@
   color-scheme:dark;
 }
 
+/* Platform tabs (PLAN 12.1): each tab re-colours the whole page inside
+   Keepsake's own design; only the palette moves. Every pair is checked
+   with contrast-check.py in light and dark (README). Snapchat's yellow is
+   too light for text or a selected-frame line on paper, so it only fills
+   the save button (ink text, ink edge) and ink marks the selection. */
+:root[data-platform="instagram"]{--bg:#f8f1f4;--card:#fcf7f9;--plate:#ffffff;--plate-bd:#d9c4cd;--media:#ecdde3;--text:#1c1b19;--muted:#5e5057;--line:#e6d6dd;--line-strong:#8d7680;--sel:#f0e4e9;--accent:#b4246f;--accent-hover:#9a1d5e;--on-accent:#ffffff;--accent-line:#b4246f;--accent-edge:transparent;--strip:#ecdde3;--hole:#f8f1f4;--strip-bd:#1c1b19; color-scheme:light}
+:root[data-platform="snapchat"]{--bg:#fbf9e8;--card:#fdfcf2;--plate:#ffffff;--plate-bd:#d8d3b0;--media:#ece8c6;--text:#1c1b19;--muted:#5a5640;--line:#e5e0bf;--line-strong:#857f5a;--sel:#f3efd2;--accent:#fffc00;--accent-hover:#f2ef00;--on-accent:#1c1b19;--accent-line:#1c1b19;--accent-edge:#1c1b19;--strip:#ece8c6;--hole:#fbf9e8;--strip-bd:#1c1b19; color-scheme:light}
+:root[data-platform="x"]{--bg:#f4f5f6;--card:#fafafa;--plate:#ffffff;--plate-bd:#cfd4d9;--media:#e1e5e9;--text:#0f1419;--muted:#536471;--line:#e1e5e9;--line-strong:#6f7c88;--sel:#e9ecef;--accent:#0f1419;--accent-hover:#272c30;--on-accent:#ffffff;--accent-line:#0f1419;--accent-edge:transparent;--strip:#e1e5e9;--hole:#f4f5f6;--strip-bd:#0f1419; color-scheme:light}
+:root[data-platform="youtube"]{--bg:#faf3f2;--card:#fdf8f7;--plate:#ffffff;--plate-bd:#dcc6c3;--media:#eedcd9;--text:#1c1b19;--muted:#5e504d;--line:#e8d7d4;--line-strong:#8f7672;--sel:#f3e6e4;--accent:#cc0000;--accent-hover:#a80000;--on-accent:#ffffff;--accent-line:#cc0000;--accent-edge:transparent;--strip:#eedcd9;--hole:#faf3f2;--strip-bd:#1c1b19; color-scheme:light}
+@media (prefers-color-scheme: dark){:root[data-platform="instagram"]:not([data-theme="light"]){--bg:#1c1619;--card:#241c20;--plate:#2d2328;--plate-bd:#4d3d45;--media:#3b2f35;--text:#f1e6eb;--muted:#b5a3ab;--line:#3a2e34;--line-strong:#85707a;--sel:#33282d;--accent:#f06fae;--accent-hover:#f48bbd;--on-accent:#1c0c14;--accent-line:#f06fae;--accent-edge:transparent;--strip:#3b2f35;--hole:#1c1619;--strip-bd:#85707a; color-scheme:dark}}
+:root[data-platform="instagram"][data-theme="dark"]{--bg:#1c1619;--card:#241c20;--plate:#2d2328;--plate-bd:#4d3d45;--media:#3b2f35;--text:#f1e6eb;--muted:#b5a3ab;--line:#3a2e34;--line-strong:#85707a;--sel:#33282d;--accent:#f06fae;--accent-hover:#f48bbd;--on-accent:#1c0c14;--accent-line:#f06fae;--accent-edge:transparent;--strip:#3b2f35;--hole:#1c1619;--strip-bd:#85707a; color-scheme:dark}
+@media (prefers-color-scheme: dark){:root[data-platform="snapchat"]:not([data-theme="light"]){--bg:#19180f;--card:#212014;--plate:#2a2919;--plate-bd:#4a4830;--media:#38361f;--text:#f3f0d8;--muted:#b3ae8a;--line:#36341f;--line-strong:#7f7a55;--sel:#2f2d1b;--accent:#fffc00;--accent-hover:#fffd66;--on-accent:#1c1b19;--accent-line:#fffc00;--accent-edge:transparent;--strip:#38361f;--hole:#19180f;--strip-bd:#7f7a55; color-scheme:dark}}
+:root[data-platform="snapchat"][data-theme="dark"]{--bg:#19180f;--card:#212014;--plate:#2a2919;--plate-bd:#4a4830;--media:#38361f;--text:#f3f0d8;--muted:#b3ae8a;--line:#36341f;--line-strong:#7f7a55;--sel:#2f2d1b;--accent:#fffc00;--accent-hover:#fffd66;--on-accent:#1c1b19;--accent-line:#fffc00;--accent-edge:transparent;--strip:#38361f;--hole:#19180f;--strip-bd:#7f7a55; color-scheme:dark}
+@media (prefers-color-scheme: dark){:root[data-platform="x"]:not([data-theme="light"]){--bg:#0b0d0f;--card:#16181c;--plate:#1c1f23;--plate-bd:#3a3f45;--media:#2a2e33;--text:#e7e9ea;--muted:#8b98a5;--line:#2f3336;--line-strong:#6e767d;--sel:#1d1f23;--accent:#e7e9ea;--accent-hover:#ffffff;--on-accent:#0f1419;--accent-line:#e7e9ea;--accent-edge:transparent;--strip:#2a2e33;--hole:#0b0d0f;--strip-bd:#6e767d; color-scheme:dark}}
+:root[data-platform="x"][data-theme="dark"]{--bg:#0b0d0f;--card:#16181c;--plate:#1c1f23;--plate-bd:#3a3f45;--media:#2a2e33;--text:#e7e9ea;--muted:#8b98a5;--line:#2f3336;--line-strong:#6e767d;--sel:#1d1f23;--accent:#e7e9ea;--accent-hover:#ffffff;--on-accent:#0f1419;--accent-line:#e7e9ea;--accent-edge:transparent;--strip:#2a2e33;--hole:#0b0d0f;--strip-bd:#6e767d; color-scheme:dark}
+@media (prefers-color-scheme: dark){:root[data-platform="youtube"]:not([data-theme="light"]){--bg:#181212;--card:#201818;--plate:#291f1f;--plate-bd:#4a3a39;--media:#3a2c2b;--text:#f1e7e6;--muted:#b5a19f;--line:#382b2a;--line-strong:#846f6c;--sel:#2e2322;--accent:#ff6b63;--accent-hover:#ff8a84;--on-accent:#1a0605;--accent-line:#ff6b63;--accent-edge:transparent;--strip:#3a2c2b;--hole:#181212;--strip-bd:#846f6c; color-scheme:dark}}
+:root[data-platform="youtube"][data-theme="dark"]{--bg:#181212;--card:#201818;--plate:#291f1f;--plate-bd:#4a3a39;--media:#3a2c2b;--text:#f1e7e6;--muted:#b5a19f;--line:#382b2a;--line-strong:#846f6c;--sel:#2e2322;--accent:#ff6b63;--accent-hover:#ff8a84;--on-accent:#1a0605;--accent-line:#ff6b63;--accent-edge:transparent;--strip:#3a2c2b;--hole:#181212;--strip-bd:#846f6c; color-scheme:dark}
+
 *{box-sizing:border-box;min-width:0}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;overflow-x:hidden}
@@ -172,6 +190,55 @@ button{font:inherit;cursor:pointer}
 .wm-frame{display:inline-block;background:var(--plate);border:1px solid var(--plate-bd);padding:6px 14px}
 .top .sub{margin:0;color:var(--muted);font-size:14px}
 
+/* platform tabs */
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid var(--line);margin:0 0 20px}
+.tab{min-height:44px;padding:8px 6px;background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;color:var(--muted);font-size:15px;font-weight:600;line-height:1.2}
+.tab:hover{color:var(--text)}
+.tab[aria-selected="true"]{color:var(--text);border-bottom-color:var(--accent-line,var(--accent))}
+.tab:focus-visible{outline-offset:-3px}
+
+/* Snapchat: story, highlights and Spotlight as a row of choices */
+.sets{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
+.chip{min-height:44px;display:inline-flex;align-items:center;gap:6px;padding:0 14px;background:transparent;color:var(--text);border:1px solid var(--line-strong);border-radius:var(--r-btn);font-size:14px;text-align:left}
+.chip:hover{background:var(--sel)}
+.chip[aria-pressed="true"]{background:var(--sel);border-color:var(--accent-line,var(--accent));box-shadow:inset 0 0 0 1px var(--accent-line,var(--accent));font-weight:650}
+.chip .c{color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* YouTube GIF tab */
+.drop{border:1px dashed var(--line-strong);border-radius:var(--r-btn);background:var(--card);padding:28px 18px;display:grid;justify-items:start;gap:10px}
+.drop.over{border-style:solid;background:var(--sel)}
+.drop p{margin:0;font-size:14px;color:var(--muted)}
+.gif-edit{display:grid;gap:16px}
+.gif-edit .viewer video{display:block;width:100%;max-height:min(60dvh,560px);background:var(--media)}
+.marks{display:grid;gap:10px}
+.labels{position:relative;height:20px;font-size:13px}
+.labels span{position:absolute;top:0;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--text);font-weight:600}
+.track{position:relative;height:56px;background:var(--strip);border:1px solid var(--strip-bd);cursor:pointer;touch-action:none}
+.track::before,.track::after{content:"";position:absolute;left:6px;right:6px;height:5px;pointer-events:none;
+  background:repeating-linear-gradient(90deg,var(--hole) 0 5px,transparent 5px 11px)}
+.track::before{top:4px}
+.track::after{bottom:4px}
+.track .span{position:absolute;top:0;bottom:0;background:var(--accent-line,var(--accent));opacity:.28;pointer-events:none}
+.track .head{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--text);opacity:.55;pointer-events:none}
+.mark{position:absolute;top:-1px;bottom:-1px;width:44px;margin-left:-22px;padding:0;background:transparent;border:0;cursor:ew-resize;touch-action:none}
+.mark::before{content:"";position:absolute;left:19px;top:0;bottom:0;width:6px;background:var(--accent-line,var(--accent));border:1px solid var(--plate)}
+.mark:focus-visible{outline:2px solid var(--text);outline-offset:0}
+.mark[disabled]{cursor:default}
+.mark-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.mark-row label{display:inline-flex;align-items:center;gap:6px;font-size:14px}
+.mark-row input,.gif-opts select{height:44px;border:1px solid var(--line-strong);border-radius:var(--r-btn);background:var(--field);color:var(--text);font:inherit;font-size:15px;padding:0 10px}
+.mark-row input{width:6.5em;font-variant-numeric:tabular-nums}
+.mark-row .btn-ghost{height:44px}
+.len{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.gif-opts{display:flex;flex-wrap:wrap;gap:10px 16px}
+.gif-opts label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.gif-opts select{min-width:9em}
+.progress{height:6px;margin-top:12px;background:var(--line);border-radius:3px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--accent-line,var(--accent))}
+.gif-out{display:grid;gap:10px;justify-items:start}
+.gif-out .viewer{justify-self:stretch;display:grid;place-items:center}
+.gif-out img{display:block;max-width:100%;max-height:60dvh}
+
 /* link field */
 .field-row{display:flex;gap:8px}
 .field{flex:1 1 auto;display:flex;align-items:center;height:52px;background:var(--field);border:1px solid var(--line-strong);border-radius:var(--r-btn);padding:0 3px 0 14px}
@@ -186,7 +253,7 @@ button{font:inherit;cursor:pointer}
 .btn-ink:hover{opacity:.88}
 .btn-ghost{height:44px;background:transparent;color:var(--text);border-color:var(--line-strong);font-size:14px;font-weight:500}
 .btn-ghost:hover{background:var(--sel)}
-.btn-save{width:100%;background:var(--accent);color:var(--on-accent);font-size:16px;font-weight:700}
+.btn-save{width:100%;background:var(--accent);color:var(--on-accent);font-size:16px;font-weight:700;border-color:var(--accent-edge,transparent)}
 .btn-save:hover{background:var(--accent-hover)}
 .btn[aria-disabled="true"]{opacity:.6;cursor:progress}
 .linkish{background:none;border:0;padding:0;color:var(--text);text-decoration:underline;text-underline-offset:3px;font-size:inherit}
@@ -245,7 +312,7 @@ button{font:inherit;cursor:pointer}
 .th img{max-width:48px;max-height:48px;display:block;background:var(--media)}
 .th .play{position:absolute;width:16px;height:16px;color:var(--plate);filter:drop-shadow(0 0 1px var(--text))}
 .th .n{font-size:11px;line-height:1.3;color:var(--text)}
-.th[aria-current="true"] .box{outline:2px solid var(--accent);outline-offset:2px}
+.th[aria-current="true"] .box{outline:2px solid var(--accent-line,var(--accent));outline-offset:2px}
 
 /* details */
 .who{display:flex;flex-wrap:wrap;align-items:center;gap:0 12px;margin:-6px 0 8px}
@@ -346,6 +413,7 @@ button{font:inherit;cursor:pointer}
   .th img{max-width:86%;max-height:86%}
   .guide{grid-template-columns:minmax(0,1fr);gap:2px}
   .guide dd{margin-bottom:10px}
+  .tab{font-size:14px;padding:8px 2px}
   .seg{grid-template-columns:minmax(0,1fr)}
   .opt + .opt{border-left:0;border-top:1px solid var(--line-strong)}
   body.has-bar .save{display:none}
@@ -358,16 +426,23 @@ button{font:inherit;cursor:pointer}
 <div class="wrap">
   <header class="top">
     <a class="wm" href="./" title="Keepsake home"><span class="wm-frame">Keepsake</span></a>
-    <p class="sub">Paste a public Instagram link. Save the photos or video at the size Instagram stores them.</p>
+    <p class="sub" id="sub">Paste a public Instagram link. Save the photos or video at the size Instagram stores them.</p>
   </header>
 
-  <main>
+  <nav class="tabs" role="tablist" aria-label="Which site">
+    <button type="button" class="tab" role="tab" id="tab-instagram" data-p="instagram" aria-selected="true" aria-controls="main" title="Save Instagram posts, reels and carousels">Instagram</button>
+    <button type="button" class="tab" role="tab" id="tab-snapchat" data-p="snapchat" aria-selected="false" aria-controls="main" tabindex="-1" title="Save a public Snapchat story, highlights and Spotlight videos">Snapchat</button>
+    <button type="button" class="tab" role="tab" id="tab-x" data-p="x" aria-selected="false" aria-controls="main" tabindex="-1" title="Save photos and videos from X posts">X</button>
+    <button type="button" class="tab" role="tab" id="tab-youtube" data-p="youtube" aria-selected="false" aria-controls="main" tabindex="-1" title="Turn part of a video into a GIF">YouTube GIF</button>
+  </nav>
+
+  <main id="main">
     <div class="narrow" id="entry">
       <form class="field-row" id="form" novalidate>
         <div class="field">
           <input id="url" type="url" inputmode="url" enterkeyhint="go" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"
                  aria-label="Instagram post link" placeholder="instagram.com/p/... or /reel/..." />
-          <button type="button" class="paste" id="paste" title="Paste the link you copied in Instagram">
+          <button type="button" class="paste" id="paste" title="Paste the link you copied">
             <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M9 3.5h6v3.5H9zM9 5H5.5v15.5h13V5H15"/></svg>Paste</button>
         </div>
         <button type="submit" class="btn btn-ink" id="go" title="Look up the post">Fetch</button>
@@ -376,7 +451,7 @@ button{font:inherit;cursor:pointer}
 
       <section class="panel" id="working" role="status" hidden>
         <ol class="steps">
-          <li id="st1"><span class="mk"></span><span><b>Reading post</b><span class="d">Asking Instagram for the post</span></span></li>
+          <li id="st1"><span class="mk"></span><span><b>Reading post</b><span class="d"></span></span></li>
           <li id="st2"><span class="mk"></span><span><b>Fetching media</b><span class="d num"></span></span></li>
           <li id="st3"><span class="mk"></span><span><b>Ready</b></span></li>
         </ol>
@@ -385,9 +460,11 @@ button{font:inherit;cursor:pointer}
 
       <section class="err" id="error" role="alert" hidden>
         <p><b id="errHead"></b><span id="errBody"></span><small id="errDetail" hidden></small></p>
-        <button type="button" class="btn btn-ink" id="retry" title="Ask Instagram for the post again">Retry</button>
+        <button type="button" class="btn btn-ink" id="retry" title="Ask again">Retry</button>
       </section>
     </div>
+
+    <div class="sets" id="sets" role="group" aria-label="Story, highlights and Spotlight" hidden></div>
 
     <section class="result" id="result" hidden aria-label="Post">
       <div class="col-media">
@@ -425,16 +502,84 @@ button{font:inherit;cursor:pointer}
         </div>
         <div class="sec">
           <button type="button" class="btn btn-ghost" id="copyCap" title="Copy the caption text">Copy caption</button>
-          <a class="btn btn-ghost" id="openIg" href="#" target="_blank" rel="noopener" title="Open the post on instagram.com">Open on Instagram</a>
+          <a class="btn btn-ghost" id="openIg" href="#" target="_blank" rel="noopener" title="Open it on the site it came from">Open on Instagram</a>
         </div>
+      </div>
+    </section>
+
+    <section id="gifTool" hidden aria-labelledby="gifTitle">
+      <h2 class="sr" id="gifTitle">Turn part of a video into a GIF</h2>
+      <div class="narrow">
+        <div class="drop" id="gifDrop">
+          <input type="file" id="gifFile" accept="video/*" class="sr" />
+          <label for="gifFile" class="btn btn-ink" title="Pick a video saved on this device">Choose a video file</label>
+          <p>Or drop one here. The video stays on this device; nothing is uploaded.</p>
+          <p>YouTube does not let other sites read its videos, so a YouTube link cannot be turned into a GIF here. Use a video you have saved or recorded.</p>
+        </div>
+        <p class="note" id="gifNote" role="status" hidden></p>
+      </div>
+      <div class="gif-edit" id="gifEdit" hidden>
+        <div class="viewer"><video id="gifVideo" playsinline controls preload="auto" aria-label="The chosen video"></video></div>
+        <div class="marks">
+          <div class="labels" aria-hidden="true"><span id="gifStartLab"></span><span id="gifStopLab"></span></div>
+          <div class="track" id="gifTrack" title="The shaded part between the two markers becomes the GIF. Tap the strip to move the playing position.">
+            <div class="span" id="gifSpan"></div>
+            <div class="head" id="gifHead"></div>
+            <button type="button" class="mark" id="gifStart" role="slider" aria-label="GIF start marker" aria-valuemin="0" title="Drag, or use the arrow keys (Shift for whole seconds)"></button>
+            <button type="button" class="mark" id="gifStop" role="slider" aria-label="GIF stop marker" aria-valuemin="0" title="Drag, or use the arrow keys (Shift for whole seconds)"></button>
+          </div>
+          <div class="mark-row">
+            <label>Start <input id="gifStartIn" type="number" step="0.1" min="0" inputmode="decimal" title="Start of the GIF, in seconds into the video" /> s</label>
+            <button type="button" class="btn btn-ghost" id="gifSetStart" title="Put the start marker at the frame the video is on now">Start here</button>
+            <label>Stop <input id="gifStopIn" type="number" step="0.1" min="0" inputmode="decimal" title="End of the GIF, in seconds into the video" /> s</label>
+            <button type="button" class="btn btn-ghost" id="gifSetStop" title="Put the stop marker at the frame the video is on now">Stop here</button>
+          </div>
+          <div class="mark-row">
+            <button type="button" class="btn btn-ghost" id="gifPreview" aria-pressed="false" title="Play only the marked part, over and over, the way the GIF will look">Play the GIF part</button>
+            <span class="len" id="gifLen"></span>
+          </div>
+        </div>
+        <div class="gif-opts">
+          <label>Width <select id="gifWidth" title="Wider looks sharper but makes a bigger file">
+            <option value="320">320 px</option><option value="480" selected>480 px</option><option value="640">640 px</option><option value="800">800 px</option></select></label>
+          <label>Frames per second <select id="gifFps" title="More frames move more smoothly but make a bigger file">
+            <option value="10">10</option><option value="12" selected>12</option><option value="15">15</option><option value="20">20</option></select></label>
+          <label>Plays <select id="gifLoop" title="Whether the GIF repeats forever or plays once and stops">
+            <option value="forever" selected>Over and over</option><option value="once">Once</option></select></label>
+        </div>
+        <div class="narrow">
+          <button type="button" class="btn btn-save" id="gifMake" title="Up to 30 seconds and 600 frames">Make GIF</button>
+          <div class="panel" id="gifWork" role="status" hidden>
+            <b id="gifWorkText"></b>
+            <div class="progress"><i id="gifBar"></i></div>
+            <div class="prow"><span>Made on this device.</span><button type="button" class="linkish r" id="gifCancel">Stop</button></div>
+          </div>
+        </div>
+        <div class="gif-out" id="gifOut" hidden>
+          <div class="viewer"><img id="gifImg" alt="" /></div>
+          <p class="len" id="gifOutInfo"></p>
+          <button type="button" class="btn btn-save" id="gifSave"></button>
+          <p class="subl" id="gifSaveNote" aria-live="polite"></p>
+        </div>
+        <button type="button" class="linkish more" id="gifAnother">Use a different video</button>
       </div>
     </section>
 
     <div class="narrow" id="guideBox">
       <h2 class="sr">How to use Keepsake</h2>
-      <dl class="guide">
+      <dl class="guide" data-for="instagram">
         <dt>iPhone</dt><dd>In Instagram tap Share under the post, then Copy link. Come back here and press Paste. iPhone does not let web pages join the Share list, so copying is the way. To keep Keepsake on your home screen, open it in Safari, tap Share, then Add to Home Screen.</dd>
         <dt>Android</dt><dd>Add Keepsake to your home screen once (Chrome menu, then Add to Home screen). After that, tap Share in Instagram and pick Keepsake from the list. Copying the link and pasting it here works too.</dd>
+        <dt>Saving</dt><dd>On iPhone, Save to Photos opens the share sheet; pick Save Image or Save Video. On Android and desktop the file goes to your Downloads folder.</dd>
+      </dl>
+      <dl class="guide" data-for="snapchat" hidden>
+        <dt>Find them</dt><dd>Type a public username (like nasa), or in Snapchat open the profile, tap Share, then Copy Link, and paste it here.</dd>
+        <dt>What you get</dt><dd>Their current story when there is one, every highlight, and their Spotlight videos. Pick one above the viewer to see its snaps.</dd>
+        <dt>Saving</dt><dd>On iPhone, Save to Photos opens the share sheet; pick Save Image or Save Video. On Android and desktop the file goes to your Downloads folder.</dd>
+      </dl>
+      <dl class="guide" data-for="x" hidden>
+        <dt>Copy the link</dt><dd>Under the post tap Share, then Copy link, come back here and press Paste. x.com and twitter.com links both work.</dd>
+        <dt>What you get</dt><dd>Photos at the size they were posted and videos at the highest quality X keeps, with sound. GIFs save as MP4, the way X stores them.</dd>
         <dt>Saving</dt><dd>On iPhone, Save to Photos opens the share sheet; pick Save Image or Save Video. On Android and desktop the file goes to your Downloads folder.</dd>
       </dl>
       <section class="recent" id="recent" hidden aria-labelledby="recentTitle">
@@ -454,7 +599,7 @@ button{font:inherit;cursor:pointer}
     <a href="terms.html" title="Read the terms of use">Terms</a>
     <button type="button" class="linkish" id="themeBtn" title="Switch between the light and dark page"></button>
     <button type="button" class="linkish" id="cookieReset" title="Change your analytics cookie choice">Cookies</button>
-    <span>Keepsake v0.3.1</span>
+    <span>Keepsake v0.4.0</span>
     <span>Files pass through our server as a pipe and are never stored.</span>
   </footer>
 </div>
@@ -496,6 +641,7 @@ button{font:inherit;cursor:pointer}
 
 <script src="ig.js"></script>
 <script src="save.js"></script>
+<script src="gifmaker.js"></script>
 <script>
 (function () {
   'use strict';
@@ -515,6 +661,7 @@ button{font:inherit;cursor:pointer}
     copyCap: $('copyCap'), openIg: $('openIg'), guide: $('guideBox'),
     recent: $('recent'), recentList: $('recentList'), recentMore: $('recentMore'), recentClear: $('recentClear'),
     clearDialog: $('clearDialog'), status: $('status'),
+    sets: $('sets'), sub: $('sub'), gifTool: $('gifTool'),
     qualityBox: $('qualityBox'), qBest: $('qBest'), qSd: $('qSd'), qBestLabel: $('qBestLabel'), qSdLabel: $('qSdLabel'), qnote: $('qnote'),
     pbar: $('pbar'), pcnt: $('pcnt'), psave: $('psave'), psub: $('psub'),
     lb: $('lightbox'), lbImg: $('lbImg'), lbScroll: $('lbScroll'), lbActual: $('lbActual'), lbClose: $('lbClose'),
@@ -522,6 +669,9 @@ button{font:inherit;cursor:pointer}
   };
 
   var view = 'idle';
+  var platform = 'instagram'; // the open tab
+  var profile = null;         // a Snapchat profile, when the result is one
+  var setIndex = 0;           // which of its story / highlights / Spotlight is shown
   var run = null;      // { ctrl } while resolving
   var post = null;     // the resolved post
   var cur = 0;         // current item, 0-based
@@ -562,7 +712,8 @@ button{font:inherit;cursor:pointer}
     el.working.hidden = v !== 'working';
     el.error.hidden = v !== 'error';
     el.result.hidden = v !== 'done';
-    el.guide.hidden = v === 'done' || v === 'working';
+    el.guide.hidden = v === 'done' || v === 'working' || platform === 'youtube';
+    el.sets.hidden = v !== 'done' || !profile;
     renderRecent();
     el.pbar.hidden = v !== 'done';
     document.body.classList.toggle('has-bar', v === 'done');
@@ -582,8 +733,8 @@ button{font:inherit;cursor:pointer}
     if (d && detail != null) d.textContent = detail;
   }
 
-  function showError(cause, detail) {
-    var copy = IG.ERRORS[cause] || IG.ERRORS.changed;
+  function showError(cause, detail, plat) {
+    var copy = IG.errorCopy(cause, plat || platform);
     el.errHead.textContent = copy[0];
     el.errBody.textContent = ' ' + copy[1];
     el.errDetail.textContent = cause === 'changed' && detail ? 'Tried: ' + detail : '';
@@ -591,29 +742,42 @@ button{font:inherit;cursor:pointer}
     // Retrying a link that is not a post link changes nothing.
     el.retry.hidden = cause === 'link' || cause === 'share';
     setView('error');
-    track('keepsake_error', { cause: cause });
+    track('keepsake_error', { cause: cause, platform: plat || platform });
   }
 
   /* ---------- resolve ---------- */
 
   function start(text) {
     var raw = text != null ? text : el.url.value;
-    var link = IG.parseLink(raw);
+    var link = IG.parseLink(raw, platform);
     note('');
     if (link.error === 'empty') { el.url.focus(); return; }
-    if (link.error) { showError(link.error); return; }
+    // A link from another site opens that site's tab.
+    if (link.platform && link.platform !== platform) switchTab(link.platform, true);
+    if (link.error) { showError(link.error, null, link.platform); return; }
     if (run) cancel();
-    lastLink = link.url;
+    lastLink = link.url || link.user;
     files = {};
     sizes = {};
     var ctrl = new AbortController();
     run = { ctrl: ctrl };
     setView('working');
-    step(1, 'on', 'Asking Instagram for the post');
+    step(1, 'on', link.platform === 'snapchat' ? 'Asking Snapchat for the profile' : 'Asking ' + IG.NAMES[link.platform] + ' for the post');
     step(2, 'todo', '');
     step(3, 'todo');
-    IG.resolve(link.url, ctrl.signal).then(function (p) {
+    IG.resolve(link, ctrl.signal).then(function (r) {
       if (run === null || run.ctrl !== ctrl) return;
+      var p;
+      profile = null;
+      if (r.profile) {
+        if (!r.profile.sets.length) { var e = new Error('empty'); e.cause = 'empty'; throw e; }
+        profile = r.profile;
+        setIndex = 0;
+        p = setPost(0);
+      } else {
+        p = r.post;
+        p.platform = r.platform;
+      }
       step(1, 'done', (p.username ? '@' + p.username + ', ' : '') + describeType(p));
       step(2, 'on', 'Loading item 1 of ' + p.items.length);
       return preloadFirst(p, ctrl.signal).then(function () {
@@ -623,14 +787,14 @@ button{font:inherit;cursor:pointer}
         step(2, 'done');
         step(3, 'done');
         render();
-        track('keepsake_resolve', { method: p.method });
+        track('keepsake_resolve', { method: p.method || r.platform, platform: r.platform });
         recentAdd(p);
       });
     }).catch(function (err) {
       if (run === null || run.ctrl !== ctrl) return;
       run = null;
       if (err.cause === 'cancelled') { setView('idle'); return; }
-      showError(err.cause || 'network', err.detail);
+      showError(err.cause || 'network', err.detail, link.platform);
     });
   }
 
@@ -657,7 +821,8 @@ button{font:inherit;cursor:pointer}
   }
 
   function describeType(p) {
-    if (p.type === 'carousel') return 'carousel of ' + p.items.length;
+    if (profile) return profile.sets.length + (profile.sets.length === 1 ? ' set of snaps' : ' sets of snaps');
+    if (p.type === 'carousel') return (p.platform === 'x' ? 'post with ' : 'carousel of ') + p.items.length;
     return p.type;
   }
 
@@ -686,6 +851,14 @@ button{font:inherit;cursor:pointer}
         v.poster = it.image.url;
         v.dataset.src = it.video.url;
         v.setAttribute('aria-label', 'Video ' + (i + 1));
+        // Snapchat gives no size or length up front: read them off the file.
+        v.addEventListener('loadedmetadata', function () {
+          var changed = false;
+          if (!it.width && v.videoWidth) { it.width = v.videoWidth; it.height = v.videoHeight; changed = true; }
+          if (!it.video.width && v.videoWidth) { it.video.width = v.videoWidth; it.video.height = v.videoHeight; changed = true; }
+          if (!it.video.duration && isFinite(v.duration)) { it.video.duration = v.duration; changed = true; }
+          if (changed) { fit(); if (i === cur) details(); }
+        });
         s.appendChild(v);
       } else {
         var b = document.createElement('button');
@@ -728,9 +901,11 @@ button{font:inherit;cursor:pointer}
     });
     el.rail.hidden = !many;
 
-    el.user.textContent = post.username ? '@' + post.username : 'Instagram post';
+    el.user.textContent = post.username ? '@' + post.username : IG.NAMES[post.platform] + ' post';
     el.user.href = post.userUrl || post.url;
     el.openIg.href = post.url;
+    el.openIg.textContent = 'Open on ' + IG.NAMES[post.platform];
+    renderSets();
     el.capt.textContent = post.caption || '';
     el.captBox.hidden = !post.caption;
     el.copyCap.hidden = !post.caption;
@@ -823,7 +998,8 @@ button{font:inherit;cursor:pointer}
     var it = post.items[cur];
     var many = post.items.length > 1;
     var rows = [];
-    rows.push(['Type', many ? 'Carousel, ' + post.items.length + ' items' : it.kind === 'video' ? 'Video' : 'Photo']);
+    if (profile) rows.push(['Type', post.setLabel + ', ' + post.items.length + (post.items.length === 1 ? ' snap' : ' snaps')]);
+    else rows.push(['Type', many ? (post.platform === 'x' ? 'Post, ' : 'Carousel, ') + post.items.length + ' items' : it.kind === 'video' ? (it.video.gif ? 'GIF (saved as MP4)' : 'Video') : 'Photo']);
     if (it.kind === 'photo') {
       rows.push([many ? 'This item' : 'Pixels', (many ? 'Photo, ' : '') + dims(it.width, it.height), true]);
     } else {
@@ -831,15 +1007,16 @@ button{font:inherit;cursor:pointer}
       var len = IG.duration(v.duration);
       var px = wantsBest(it) ? dims(v.best.width, v.best.height) : (dims(v.width, v.height) || dims(it.width, it.height));
       rows.push([many ? 'This item' : 'File', (many ? 'Video, ' : 'MP4, ') + px + (len ? ', ' + len : ''), true]);
-      rows.push(['Sound', v.hasAudio === true ? 'With sound' : v.hasAudio === false ? 'No sound on this video' : 'Not stated by Instagram']);
+      rows.push(['Sound', v.hasAudio === true ? 'With sound' : v.hasAudio === false ? 'No sound on this video' : post.platform === 'x' ? 'Kept as posted' : 'Not stated']);
     }
     if (wantsBest(it)) {
       if (it.video.best.bytes) rows.push(['Size', IG.bytes(it.video.best.bytes), true]);
     } else {
       rows.push(['Size', sizes[cur] != null ? IG.bytes(sizes[cur]) : 'Checking', true, '', 'size']);
     }
-    if (post.takenAt) {
-      var d = new Date(post.takenAt * 1000);
+    var when = it.takenAt || post.takenAt;
+    if (when) {
+      var d = new Date(when * 1000);
       rows.push(['Posted', d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }), false,
         d.toISOString().slice(0, 16).replace('T', ' ') + ' UTC']);
     }
@@ -1167,8 +1344,16 @@ button{font:inherit;cursor:pointer}
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && run) { e.preventDefault(); cancel(); return; }
-    if (view !== 'done' || el.lb.open) return;
     var t = e.target;
+    if (t && t.getAttribute && t.getAttribute('role') === 'tab' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+      e.preventDefault();
+      var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+      var k = (tabs.indexOf(t) + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+      tabs[k].focus();
+      switchTab(tabs[k].dataset.p);
+      return;
+    }
+    if (view !== 'done' || el.lb.open) return;
     if (t && t.getAttribute && t.getAttribute('role') === 'radio' && /^Arrow/.test(e.key)) {
       e.preventDefault();
       setQuality(quality === 'best' ? 'sd' : 'best', true);
@@ -1222,32 +1407,37 @@ button{font:inherit;cursor:pointer}
     var list = recentLoad();
     if (!list) return;
     var first = p.items[0];
+    // A Snapchat profile is one entry, whichever set was open.
+    var code = profile ? 'snapchat:' + profile.username : p.platform === 'instagram' ? p.shortcode : p.platform + ':' + p.shortcode;
     var entry = {
-      code: p.shortcode, url: p.url, user: p.username || '', takenAt: p.takenAt || null,
-      type: p.type, count: p.items.length, duration: first.video ? first.video.duration : null, thumb: null
+      code: code, platform: p.platform, url: profile ? profile.url : p.url, user: p.username || '',
+      takenAt: profile ? null : p.takenAt || null, type: profile ? 'profile' : p.type,
+      count: profile ? profile.sets.length : p.items.length, duration: first.video ? first.video.duration : null, thumb: null
     };
-    var old = list.filter(function (e) { return e.code === p.shortcode; })[0];
+    var old = list.filter(function (e) { return e.code === code; })[0];
     if (old && old.thumb) entry.thumb = old.thumb;
-    list = [entry].concat(list.filter(function (e) { return e.code !== p.shortcode; })).slice(0, RECENT_MAX);
+    list = [entry].concat(list.filter(function (e) { return e.code !== code; })).slice(0, RECENT_MAX);
     recentStore(list);
     if (entry.thumb) return;
     makeThumb(first.image.thumb).then(function (data) {
       if (!data) return;
       var now = recentLoad() || [];
-      now.forEach(function (e) { if (e.code === p.shortcode) e.thumb = data; });
+      now.forEach(function (e) { if (e.code === code) e.thumb = data; });
       recentStore(now);
     });
   }
 
   function recentMeta(e) {
-    var what = e.type === 'carousel' ? 'Carousel, ' + e.count + ' items'
+    var what = e.type === 'profile' ? 'Profile, ' + e.count + (e.count === 1 ? ' set' : ' sets')
+      : e.type === 'carousel' ? (e.platform === 'x' ? 'Post, ' : 'Carousel, ') + e.count + ' items'
       : e.type === 'video' ? 'Video' + (e.duration ? ' ' + IG.duration(e.duration) : '') : 'Photo';
+    if (e.platform && e.platform !== 'instagram') what = IG.NAMES[e.platform] + ', ' + what.charAt(0).toLowerCase() + what.slice(1);
     if (e.takenAt) what += ', ' + new Date(e.takenAt * 1000).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
     return what;
   }
 
   function renderRecent() {
-    var list = view === 'idle' ? recentLoad() : null;
+    var list = view === 'idle' && platform !== 'youtube' ? recentLoad() : null;
     el.recent.hidden = !list || !list.length;
     if (el.recent.hidden) return;
     var shown = recentAll ? list : list.slice(0, RECENT_SHOWN);
@@ -1269,7 +1459,7 @@ button{font:inherit;cursor:pointer}
       }
       var txt = document.createElement('span');
       var name = document.createElement('b');
-      name.textContent = e.user ? '@' + e.user : 'Instagram post';
+      name.textContent = e.user ? '@' + e.user : IG.NAMES[e.platform || 'instagram'] + ' post';
       var meta = document.createElement('span');
       meta.className = 'm num';
       meta.textContent = recentMeta(e);
@@ -1318,8 +1508,127 @@ button{font:inherit;cursor:pointer}
       if (h.status === 'working' && h.lastSuccess) text = 'Instagram lookups are working. The last one was ' + ago(h.lastSuccess.at) + '.';
       else if (h.status === 'failing' && h.lastFailure) text = 'Instagram lookups are failing right now. The last one failed ' + ago(h.lastFailure.at) + '.';
       el.status.textContent = text;
-      el.status.hidden = !text;
+      el.status.hidden = !text || platform !== 'instagram';
     }).catch(function () { el.status.hidden = true; });
+  }
+
+  /* ---------- platform tabs (PLAN 12.1) ---------- */
+
+  var TABS = {
+    instagram: {
+      sub: 'Paste a public Instagram link. Save the photos or video at the size Instagram stores them.',
+      placeholder: 'instagram.com/p/... or /reel/...', label: 'Instagram post link', type: 'url'
+    },
+    snapchat: {
+      sub: 'Type a public Snapchat username or paste a profile link. Save their story, highlights and Spotlight videos.',
+      placeholder: 'Username, or snapchat.com/add/...', label: 'Snapchat username or profile link', type: 'text'
+    },
+    x: {
+      sub: 'Paste an X post link. Save the photos at full size and the video at the best quality X keeps.',
+      placeholder: 'x.com/name/status/...', label: 'X post link', type: 'url'
+    },
+    youtube: {
+      sub: 'Pick a video file, mark the start and the stop, and turn that part into a GIF.'
+    }
+  };
+
+  /* auto: the tab follows a pasted link or the saved choice, so the result
+     on screen (if any) stays; a tap on a tab goes back to that tab's start. */
+  function switchTab(p, auto) {
+    if (!TABS[p]) return;
+    var was = platform;
+    platform = p;
+    document.documentElement.setAttribute('data-platform', p);
+    document.querySelectorAll('.tab').forEach(function (t) {
+      var on = t.dataset.p === p;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+    });
+    var cfg = TABS[p];
+    el.sub.textContent = cfg.sub;
+    var gif = p === 'youtube';
+    el.gifTool.hidden = !gif;
+    $('entry').hidden = gif;
+    if (!gif) {
+      el.url.placeholder = cfg.placeholder;
+      el.url.setAttribute('aria-label', cfg.label);
+      el.url.type = cfg.type;
+      el.url.inputMode = cfg.type === 'url' ? 'url' : 'text';
+    } else if (window.KeepsakeGif) {
+      // nothing to stop yet; leaving the tab stops a preview or encode
+    }
+    if (was === 'youtube' && !gif && window.KeepsakeGif) window.KeepsakeGif.leave();
+    document.querySelectorAll('.guide').forEach(function (g) { g.hidden = g.dataset.for !== p; });
+    lsSet('keepsake-tab', p);
+    try {
+      var u = new URL(location.href);
+      u.searchParams.set('p', p);
+      history.replaceState(null, '', u.toString());
+    } catch (e) {}
+    if (!auto || gif) {
+      if (run) cancel();
+      note('');
+      setView('idle');
+    }
+    el.status.hidden = p !== 'instagram' || !el.status.textContent;
+    paintThemeButton();
+  }
+
+  document.querySelectorAll('.tab').forEach(function (t) {
+    t.addEventListener('click', function () { if (t.dataset.p !== platform) switchTab(t.dataset.p); });
+  });
+
+  /* ---------- Snapchat: story, highlights and Spotlight ---------- */
+
+  var SET_KIND = { story: 'Story', highlight: 'Highlight', spotlight: 'Spotlight' };
+
+  // One of the profile's sets, shaped like a post so the viewer, strip,
+  // details and saving all work unchanged.
+  function setPost(i) {
+    var set = profile.sets[i];
+    return {
+      platform: 'snapchat',
+      shortcode: set.key,
+      url: profile.url,
+      userUrl: profile.url,
+      username: profile.username,
+      takenAt: set.takenAt,
+      caption: '',
+      type: set.items.length > 1 ? 'carousel' : set.items[0].kind,
+      items: set.items,
+      setLabel: set.kind === 'highlight' ? 'Highlight: ' + set.title : SET_KIND[set.kind] || set.title,
+      method: 'snapchat'
+    };
+  }
+
+  function renderSets() {
+    el.sets.hidden = !profile;
+    if (!profile) return;
+    el.sets.innerHTML = '';
+    profile.sets.forEach(function (set, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.setAttribute('aria-pressed', String(i === setIndex));
+      b.title = SET_KIND[set.kind] + (set.kind === 'highlight' ? ': ' + set.title : '') + ', ' + set.items.length + (set.items.length === 1 ? ' snap' : ' snaps');
+      var name = document.createElement('span');
+      name.textContent = set.kind === 'highlight' ? set.title : SET_KIND[set.kind];
+      var count = document.createElement('span');
+      count.className = 'c';
+      count.textContent = set.items.length;
+      b.appendChild(name);
+      b.appendChild(count);
+      b.addEventListener('click', function () {
+        if (i === setIndex) return;
+        setIndex = i;
+        files = {};
+        sizes = {};
+        post = setPost(i);
+        render();
+        el.sets.children[i] && el.sets.children[i].focus();
+      });
+      el.sets.appendChild(b);
+    });
   }
 
   /* ---------- theme ---------- */
@@ -1332,7 +1641,7 @@ button{font:inherit;cursor:pointer}
   function paintThemeButton() {
     var dark = effectiveTheme() === 'dark';
     el.themeBtn.textContent = dark ? 'Light page' : 'Dark page';
-    var color = dark ? '#1b1a17' : '#f6f3ee';
+    var color = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || (dark ? '#1b1a17' : '#f6f3ee');
     document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.setAttribute('content', color); });
   }
   el.themeBtn.addEventListener('click', function () {
@@ -1364,6 +1673,13 @@ button{font:inherit;cursor:pointer}
     if (window.__needsConsent) banner.hidden = false;
   })();
 
+  // The tab: ?p= in the address, else the one used last, else Instagram.
+  (function () {
+    var p = null;
+    try { p = new URLSearchParams(location.search).get('p'); } catch (e) {}
+    if (!TABS[p]) p = lsGet('keepsake-tab');
+    switchTab(TABS[p] ? p : 'instagram', true);
+  })();
   setView('idle');
 
   // ?url= resolves on load (PLAN 2.1). The Android share target lands here

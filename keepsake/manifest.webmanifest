@@ -1,7 +1,7 @@
 {
-  "name": "Keepsake - Instagram post downloader",
+  "name": "Keepsake - save Instagram, Snapchat and X posts",
   "short_name": "Keepsake",
-  "description": "Paste a public Instagram link. Save the photos or video at the size Instagram stores them.",
+  "description": "Paste a public Instagram, Snapchat or X link. Save the photos or video at full size, with sound, or make a GIF.",
   "id": "/keepsake/",
   "start_url": "/keepsake/",
   "scope": "/keepsake/",

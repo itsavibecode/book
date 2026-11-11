@@ -4,11 +4,13 @@
    online; the cache is only the fallback. Never touches the Worker, Instagram
    or analytics: those are other origins, and this only answers same-origin
    GETs inside /keepsake/. Bump VERSION with the page's version. */
-var VERSION = '0.3.1';
+var VERSION = '0.4.0';
 var CACHE = 'keepsake-' + VERSION;
 var SHELL = [
   './', 'index.html', 'ig.js', 'save.js', 'terms.html', 'manifest.webmanifest',
-  'favicon.svg', 'favicon-32.png', 'favicon-192.png', 'apple-touch-icon.png'
+  'favicon.svg', 'favicon-32.png', 'favicon-192.png', 'apple-touch-icon.png',
+  // The GIF maker works offline too: it never needs the network.
+  'gifmaker.js', 'vendor/gifenc.js'
 ];
 
 self.addEventListener('install', function (event) {

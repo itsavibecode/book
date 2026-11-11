@@ -85,8 +85,8 @@ def og_card():
 
     big = font(FONT_B, S(60))
     d.text((S(72), S(222)), "Save the post at the size", font=big, fill=INK, anchor="ls")
-    d.text((S(72), S(296)), "Instagram stores it.", font=big, fill=INK, anchor="ls")
-    d.text((S(74), S(346)), "Photos, reels and carousels, uncropped, with sound.",
+    d.text((S(72), S(296)), "it was posted.", font=big, fill=INK, anchor="ls")
+    d.text((S(74), S(346)), "Instagram, Snapchat and X, uncropped, with sound. Or make a GIF.",
            font=font(FONT_R, S(28)), fill=MUTED, anchor="ls")
 
     # the numbered film strip

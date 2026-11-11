@@ -1,15 +1,17 @@
-# Keepsake - Instagram post downloader
+# Keepsake - Instagram, Snapchat and X downloader, and a GIF maker
 
-Paste a public Instagram link, see every photo and video uncropped at the size
-Instagram stores it, and save one item or all of them. Phone first: the save
-button sits in a bar at the bottom, and on iPhone it goes through the share
-sheet so files land in Photos.
+Paste a public Instagram, Snapchat or X link (or type a Snapchat username),
+see every photo and video uncropped at the size it was posted, and save one
+item or all of them. The YouTube GIF tab turns part of a video file into a
+GIF, between a start and a stop marker. Phone first: the save button sits in
+a bar at the bottom, and on iPhone it goes through the share sheet so files
+land in Photos.
 
 Will live at **https://bookhockeys.com/keepsake/**, terms at
 **https://bookhockeys.com/keepsake/terms.html**. Not linked from the home page
 yet: the iPhone save path needs a check on a real device first (PLAN 11).
 
-Not affiliated with Instagram or Meta. The plan and the decisions behind it are
+Not affiliated with Instagram, Meta, Snap, X or YouTube. The plan and the decisions behind it are
 in `T:\ClaudeCodeRepo\future\instagram-downloader\PLAN.md`.
 
 ---
@@ -53,6 +55,47 @@ page says so and offers the ready-made file. A video with no audio track says
 File names: `<username>_<YYYY-MM-DD>_<shortcode>[_<n>].<ext>`, so a folder of
 saves sorts by account, then date. The date is the post's local calendar day.
 
+## Tabs (0.4.0)
+
+A row of tabs under the wordmark: **Instagram | Snapchat | X | YouTube GIF**
+(PLAN 12). Each tab re-colours the whole page from its own token set
+(`:root[data-platform=...]` in index.html, light and dark), keeps Keepsake's
+layout, and swaps the line under the wordmark, the field's hint and the guide.
+Pasting a link from another site switches the tab on its own. The tab is
+remembered on the device and shows in the address as `?p=`, so a home-screen
+icon or a shared link opens on the right one. Arrow keys move between tabs.
+
+Colours (light / dark accent; every text pair at least 5.6:1, every border
+and selection line at least 3.3:1, both themes):
+
+| Tab | Accent | Note |
+|---|---|---|
+| Instagram | #b4246f / #f06fae | pink-paper page |
+| Snapchat | #fffc00 / #fffc00 | yellow only fills the save button (ink text, ink edge on light); ink marks the selected frame |
+| X | #0f1419 / #e7e9ea | black and white, cool grey paper |
+| YouTube GIF | #cc0000 / #ff6b63 | warm paper |
+
+- **Snapchat:** a username or profile link brings back the profile's current
+  story (when there is one), every highlight and its Spotlight videos, shown
+  as a row of choices above the viewer; picking one shows its snaps on the
+  usual strip. Snapchat gives no size or length up front, so the page reads
+  them off each file as it loads. File names use the set:
+  `nasa_2026-04-10_highlight-moon-joy_3.mp4`.
+- **X:** a post link brings back its photos at their original size (up to
+  8192 px seen) and videos at the highest bitrate X keeps (up to 3840 x 2160
+  seen), with sound. GIFs are saved as the MP4 X stores them as.
+- **YouTube GIF:** YouTube does not let other sites read its videos, so this
+  tab works on a video file on the device (PLAN 12.5); nothing is uploaded.
+  Pick or drop a file, then set the part: a **start marker and a stop marker
+  on a film-strip timeline** with the part between them shaded and their
+  times written above them, which can be dragged, nudged with the arrow keys
+  (Shift for whole seconds), typed, or set with "Start here" / "Stop here" at
+  the playing frame. "Play the GIF part" loops only that part. Width 320 to
+  800 px, 10 to 20 frames a second, plays over and over or once; up to 30 s
+  and 600 frames. Encoded in the browser with gifenc (`vendor/gifenc.js`,
+  loaded on the first Make GIF). Recordings without a length in their header
+  (browser WebM) are measured by seeking to the end first.
+
 ## Phone extras (0.3.0)
 
 - **Android Share menu.** `manifest.webmanifest` has a `share_target`
@@ -80,12 +123,14 @@ saves sorts by account, then date. The date is the post's local calendar day.
 
 ```
 index.html             page + CSS + app JS (views, viewer, film strip, details, saving, theme)
-ig.js                  link parsing, /resolve client, error copy, file names (no DOM)
+ig.js                  link parsing for all three sites, /resolve client, error copy per site, file names (no DOM)
+gifmaker.js            YouTube GIF tab: file in, start/stop markers, preview loop, GIF encode
 save.js                iOS detection, share-sheet save, blob download, store-only zip (no DOM state)
 mux.js                 joins the best video file and its sound file into one MP4 (ES module, lazy)
 sw.js                  app-shell cache for the installed app (page files only)
 vendor/mediabunny.min.mjs        mediabunny 1.61.0, unmodified (MPL-2.0; licence beside it)
 vendor/mediabunny.LICENSE.txt    sha256 of the .mjs: fa696c53494b6b09a8b310ec51e3c44a59e79513234fb832255a38c686162009
+vendor/gifenc.js       gifenc 1.0.3 (MIT, licence in the file), copied from Kick GIF Clipper
 terms.html             terms of use
 manifest.webmanifest   add to home screen + Android share target
 favicon.svg            ink frame with a K on paper
@@ -104,12 +149,20 @@ on localhost the page talks to the local Worker.
 GA4 as on Clip Yoink, with the `?ga=off` / `?ga=on` per-device opt-out and the
 site-wide consent key (visitors in Europe are asked first). Three events, each
 with one label and never a link, shortcode, username or caption:
-`keepsake_resolve` (`method`: which Instagram route answered),
-`keepsake_save` (`method`: download, download-best, share, share-best, zip),
-`keepsake_error` (`cause`).
+`keepsake_resolve` (`method`: which route answered, `platform`),
+`keepsake_save` (`method`: download, download-best, share, share-best, zip, gif, gif-share),
+`keepsake_error` (`cause`, `platform`).
 
 ## Changelog
 
+- **0.4.0** (2026-11-11): Keepsake grows from an Instagram tool into four
+  tabs, each in its own colours. Snapchat: type a username to save someone's
+  public story, highlights and Spotlight videos. X: paste a post to save its
+  photos at full size and its video at the best quality X keeps, with sound.
+  YouTube GIF: pick a video file, set a start and a stop marker on the
+  timeline, watch that part loop, and turn it into a GIF on your device.
+  A YouTube link itself cannot be used, because YouTube does not let other
+  sites read its videos.
 - **0.3.1** (2026-11-06): opened from the iPhone home screen, the top of the
   page, the full-screen photo bar and the "copied" message could sit under
   the clock and notch, because the page asks to fill the whole screen. Every
