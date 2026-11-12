@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="0.2.1">
+<meta name="app-version" content="0.3.0">
 <meta name="description" content="Track the average cost of an options position across every buy and trim, and see how many contracts at today's price would bring your average down to a target.">
-<title>Basis v0.2.1 - options cost averager | BookHockeys</title>
+<title>Basis v0.3.0 - options cost averager | BookHockeys</title>
 <link rel="canonical" href="https://bookhockeys.com/basis/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20width=%2264%22%20height=%2264%22%20rx=%2212%22%20fill=%22%23b45309%22/%3E%3Crect%20x=%2214%22%20y=%2216%22%20width=%2236%22%20height=%2232%22%20rx=%223%22%20fill=%22%23f5f1ea%22/%3E%3Crect%20x=%2220%22%20y=%2222%22%20width=%2216%22%20height=%225%22%20rx=%221%22%20fill=%22%231f1a14%22/%3E%3Cpath%20d=%22M18%2034h28%22%20stroke=%22%23b45309%22%20stroke-width=%222.5%22%20stroke-dasharray=%223.5%203%22/%3E%3Crect%20x=%2220%22%20y=%2239%22%20width=%2224%22%20height=%223%22%20rx=%221%22%20fill=%22%235a5248%22/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20x=%222%22%20y=%222%22%20width=%2260%22%20height=%2260%22%20fill=%22%23ffffff%22%20stroke=%22%23111111%22%20stroke-width=%224%22/%3E%3Ctext%20x=%2232%22%20y=%2244%22%20text-anchor=%22middle%22%20font-family=%22Segoe%20UI,Arial,Helvetica,sans-serif%22%20font-size=%2238%22%20font-weight=%22800%22%20fill=%22%23111111%22%3EB%3C/text%3E%3Crect%20x=%2218%22%20y=%2249%22%20width=%2228%22%20height=%226%22%20fill=%22%23e11d48%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f1ea">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#15120e">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,7 +24,7 @@
 <meta property="og:image" content="https://bookhockeys.com/basis/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Basis: an options cost-basis averager drawn as a trade ticket">
+<meta property="og:image:alt" content="Basis: options cost averager, a bold black wordmark with a rose underline">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Basis: what did your options really cost?">
 <meta name="twitter:description" content="Average cost across every fill, and how many contracts it takes to bring it down.">
@@ -81,27 +81,25 @@
 <style>
 :root{
   color-scheme:light;
-  --bg:#f5f1ea; --card:#ffffff; --ink:#1f1a14; --muted:#5a5248; --line:#ddd5c8;
-  --field:#8a7f72; --accent:#b45309; --on-accent:#ffffff;
-  --gain:#166534; --loss:#b91c1c; --on-loss:#ffffff;
-  --shadow:0 6px 18px rgba(31,26,20,.10);
+  --bg:#ffffff; --card:#ffffff; --ink:#111111; --muted:#4a4a4a; --line:#111111;
+  --field:#111111; --accent:#e11d48; --on-accent:#ffffff;
+  --gain:#047857; --loss:#be123c; --on-loss:#ffffff;
+  --bw:2px;
   --hdr-h:72px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     color-scheme:dark;
-    --bg:#15120e; --card:#201b15; --ink:#f3ede4; --muted:#b5aa9a; --line:#3a332b;
-    --field:#7d7264; --accent:#f5a623; --on-accent:#15120e;
-    --gain:#4ade80; --loss:#f87171; --on-loss:#15120e;
-    --shadow:0 6px 18px rgba(0,0,0,.45);
+    --bg:#0a0a0a; --card:#0a0a0a; --ink:#f5f5f5; --muted:#bdbdbd; --line:#f5f5f5;
+    --field:#f5f5f5; --accent:#fb7185; --on-accent:#0a0a0a;
+    --gain:#4ade80; --loss:#f87171; --on-loss:#0a0a0a;
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#15120e; --card:#201b15; --ink:#f3ede4; --muted:#b5aa9a; --line:#3a332b;
-  --field:#7d7264; --accent:#f5a623; --on-accent:#15120e;
-  --gain:#4ade80; --loss:#f87171; --on-loss:#15120e;
-  --shadow:0 6px 18px rgba(0,0,0,.45);
+  --bg:#0a0a0a; --card:#0a0a0a; --ink:#f5f5f5; --muted:#bdbdbd; --line:#f5f5f5;
+  --field:#f5f5f5; --accent:#fb7185; --on-accent:#0a0a0a;
+  --gain:#4ade80; --loss:#f87171; --on-loss:#0a0a0a;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -120,12 +118,12 @@ button,input,select{font:inherit;color:inherit}
 [hidden]{display:none !important}
 
 /* Safe-area insets keep content clear of the notch, rounded corners and home bar when launched from the home screen. */
-.hdr{background:var(--bg);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top);z-index:20}
+.hdr{background:var(--bg);border-bottom:var(--bw) solid var(--line);padding-top:env(safe-area-inset-top);z-index:20}
 .hdr-in{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;
   padding:12px max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left))}
 .brand{display:flex;align-items:baseline;gap:8px;margin-right:auto}
-.wordmark{font-size:24px;font-weight:700;letter-spacing:-.3px}
-.ver{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px;background:var(--card)}
+.wordmark{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.ver{font-size:12px;font-weight:600;color:var(--ink);border:var(--bw) solid var(--line);border-radius:0;padding:0 6px;background:var(--card)}
 .pos-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-width:0}
 .pos-ctl select{width:16rem;max-width:100%}
 @media (min-width:640px){.hdr{position:sticky;top:0}}
@@ -137,27 +135,27 @@ button,input,select{font:inherit;color:inherit}
 }
 
 .wrap{max-width:1200px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;min-width:0}
-.card>h2{font-size:17px;margin-bottom:12px}
+.card{background:var(--card);border:var(--bw) solid var(--line);border-radius:0;padding:18px 20px;min-width:0}
+/* The one repeated motif: a short, thick rule under every section heading. */
+.card>h2{font-size:17px;font-weight:800;margin-bottom:12px}
+.card>h2::after,.tk-head::after{content:"";display:block;width:40px;height:6px;background:var(--ink);margin-top:6px}
 .stack>*+*{margin-top:16px}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:6px 14px;
-  border:1px solid var(--field);border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer;
+  border:var(--bw) solid var(--field);border-radius:0;background:var(--card);color:var(--ink);cursor:pointer;font-weight:600;
   transition:background-color 120ms,border-color 120ms,color 120ms;white-space:normal;text-align:center;line-height:1.2}
-.btn:hover{border-color:var(--ink)}
+.btn:hover{background:var(--ink);color:var(--card)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
-.btn.primary:hover{border-color:var(--ink)}
-.btn.danger{background:var(--loss);border-color:var(--loss);color:var(--on-loss);font-weight:600}
-.btn.danger:hover{border-color:var(--ink)}
+.btn:disabled:hover{background:var(--card);color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--ink);color:var(--on-accent);font-weight:700}
+.btn.primary:hover{background:var(--ink);color:var(--card)}
+.btn.danger{background:var(--loss);border-color:var(--ink);color:var(--on-loss);font-weight:700}
+.btn.danger:hover{background:var(--ink);color:var(--card)}
 .btn.icon{min-width:38px;padding:4px;font-size:20px;line-height:1}
 
-input,select{min-height:38px;padding:6px 10px;border:1px solid var(--field);border-radius:6px;background:var(--card);width:100%;min-width:0;
-  transition:border-color 120ms}
-input:hover,select:hover{border-color:var(--ink)}
-input:focus-visible,select:focus-visible{border-color:var(--accent)}
+input,select{min-height:38px;padding:6px 10px;border:var(--bw) solid var(--field);border-radius:0;background:var(--card);width:100%;min-width:0}
 input::placeholder{color:var(--muted);opacity:1}
-input[aria-invalid="true"]{border-color:var(--loss)}
+input[aria-invalid="true"]{border-color:var(--loss);outline:1px solid var(--loss)}
 .money{position:relative;min-width:0}
 .money>span{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
 .money>input{padding-left:22px}
@@ -165,18 +163,18 @@ input[aria-invalid="true"]{border-color:var(--loss)}
 .field{display:flex;flex-direction:column;gap:4px;min-width:0}
 .lab{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);min-height:24px}
 .lab label{color:var(--muted)}
-.hint{position:relative;width:20px;height:20px;padding:0;border:1px solid var(--field);border-radius:50%;background:var(--card);
-  color:var(--muted);font-size:12px;font-weight:700;line-height:1;cursor:help;flex:none;transition:border-color 120ms,color 120ms}
-.hint:hover,.hint[aria-expanded="true"]{border-color:var(--ink);color:var(--ink)}
+.hint{position:relative;width:20px;height:20px;padding:0;border:var(--bw) solid var(--field);border-radius:0;background:var(--card);
+  color:var(--ink);font-size:12px;font-weight:800;line-height:1;cursor:help;flex:none;transition:background-color 120ms,color 120ms}
+.hint:hover,.hint[aria-expanded="true"]{background:var(--ink);color:var(--card)}
 .hint::after{content:"";position:absolute;inset:-12px}
-.tipline{font-size:13px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-top:10px}
+.tipline{font-size:13px;color:var(--ink);background:var(--card);border:var(--bw) solid var(--line);border-radius:0;padding:8px 10px;margin-top:10px}
 
-.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--field);border-radius:6px;overflow:hidden;min-height:38px}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:var(--bw) solid var(--field);border-radius:0;overflow:hidden;min-height:38px}
 .seg label{position:relative;display:flex;cursor:pointer}
 .seg input{position:absolute;opacity:0;width:1px;height:1px;min-height:0;margin:0}
 .seg span{flex:1;display:flex;align-items:center;justify-content:center;padding:4px 12px;transition:background-color 120ms,color 120ms}
-.seg label+label span{border-left:1px solid var(--field)}
-.seg input:checked+span{background:var(--ink);color:var(--card);font-weight:600}
+.seg label+label span{border-left:var(--bw) solid var(--field)}
+.seg input:checked+span{background:var(--ink);color:var(--card);font-weight:700}
 .seg:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
 .seg input:focus-visible+span{text-decoration:underline;text-underline-offset:3px}
 
@@ -193,12 +191,12 @@ input[aria-invalid="true"]{border-color:var(--loss)}
     overflow-y:auto;overflow-x:hidden;padding:4px 10px 16px;margin:-4px -10px 0}
 }
 
-.ticket{box-shadow:var(--shadow);padding:20px 22px}
-.tk-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
-.tk-head h2{font-size:16px;overflow-wrap:anywhere}
-.big{font-size:clamp(2rem,1.6rem + 1.2vw,2.5rem);font-weight:700;letter-spacing:-.5px;line-height:1.1;margin-top:14px}
-.big.empty{font-size:22px;letter-spacing:0}
-.dash{border:0;border-top:1px dashed var(--field);margin:16px 0}
+.ticket{border-top:3px solid var(--accent);padding:20px 22px}
+.tk-head{display:flex;flex-direction:column;align-items:flex-start;gap:4px 10px}
+.tk-head h2{font-size:16px;font-weight:800;overflow-wrap:anywhere}
+.big{font-size:clamp(40px,32px + 2.5vw,56px);font-weight:800;letter-spacing:-.02em;line-height:1.05;margin-top:14px}
+.big.empty{font-size:22px;font-weight:700;letter-spacing:0}
+.dash{border:0;border-top:var(--bw) solid var(--line);margin:16px 0}
 .rows{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;margin:0}
 .rows dt{color:var(--muted);display:flex;align-items:center;gap:6px}
 .rows dd{margin:0;text-align:right;font-weight:600}
@@ -206,10 +204,10 @@ input[aria-invalid="true"]{border-color:var(--loss)}
 .tk-price .money{max-width:10rem}
 .statement{margin-top:12px;font-size:14px}
 .warn{margin-top:12px;font-size:14px;color:var(--loss)}
-.rule-short{width:72px;border-top:1px dashed var(--field);margin:4px 0 0 2px}
+.rule-short{display:none}
 
 .wi-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.wi-out{margin-top:14px;font-size:15px;font-weight:600;min-height:1.5em}
+.wi-out{margin-top:14px;font-size:15px;font-weight:700;min-height:1.5em}
 .wi-note{margin-top:4px;font-size:13px;color:var(--muted)}
 
 .fills{container-type:inline-size}
@@ -229,14 +227,16 @@ input[aria-invalid="true"]{border-color:var(--loss)}
 
 table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
 th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-th{font-weight:600;color:var(--muted);font-size:13px}
+thead th{border-bottom:var(--bw) solid var(--line)}
+th{font-weight:700;color:var(--ink);font-size:13px}
 th.r,td.r{text-align:right}
 td.r{white-space:nowrap}
-.sort{background:none;border:0;padding:4px 2px;margin:-4px -2px;color:inherit;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:4px;border-radius:4px;text-align:inherit}
-.sort:hover{color:var(--ink)}
+td[data-label="Running avg"]:not(.errcell){color:var(--accent);font-weight:700}
+.sort{background:none;border:0;padding:4px 2px;margin:-4px -2px;color:inherit;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:4px;border-radius:0;text-align:inherit}
+.sort:hover{text-decoration:underline;text-underline-offset:3px}
 .caret{font-size:10px;color:var(--muted)}
 .caret.on{color:var(--accent)}
-td .sub{display:block;font-size:12px;color:var(--muted)}
+td .sub{display:block;font-size:12px;font-weight:400;color:var(--muted)}
 tr.err td{color:var(--muted)}
 tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
 .empty-row td{text-align:center;color:var(--muted);padding:22px 8px}
@@ -244,22 +244,22 @@ tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
   /* rows become cards so the table never scrolls sideways */
   thead{display:none}
   table,tbody{display:block}
-  tbody tr{display:block;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;padding:6px 12px}
+  tbody tr{display:block;border:var(--bw) solid var(--line);border-radius:0;margin-bottom:10px;padding:6px 12px}
   td{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:none;padding:5px 0;white-space:normal;text-align:right}
   td.r{white-space:normal}
   td::before{content:attr(data-label);color:var(--muted);font-weight:400;font-size:12px;text-align:left;flex:none}
   td.act{justify-content:flex-end}
   td.act::before{display:none}
   tr.err td.errcell{min-width:0}
-  .empty-row{border-style:dashed}
   .empty-row td{display:block}
   .empty-row td::before{display:none}
 }
 
 .empty-state{max-width:560px;margin:40px auto;text-align:left}
-.empty-state h1{font-size:24px;margin-bottom:10px}
+.empty-state h1{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+.empty-state h1::after{content:"";display:block;width:40px;height:6px;background:var(--ink);margin-top:6px}
 .empty-state p{margin-bottom:18px;color:var(--muted)}
-.banner{border:1px solid var(--loss);background:var(--card);color:var(--ink);border-radius:10px;padding:12px 16px;margin-bottom:16px}
+.banner{border:var(--bw) solid var(--loss);background:var(--card);color:var(--ink);border-radius:0;padding:12px 16px;margin-bottom:16px}
 .banner b{color:var(--loss)}
 .tip-card{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:16px}
 .tip-card p{flex:1 1 14rem}
@@ -267,14 +267,14 @@ tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
 .data .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
 
 .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 12px);transform:translateX(-50%);z-index:60;
-  max-width:calc(100vw - 32px);background:var(--ink);color:var(--card);border-radius:6px;padding:10px 16px;font-size:14px;
-  box-shadow:var(--shadow);transition:opacity 120ms}
-.toast.bad{background:var(--loss);color:var(--on-loss)}
-.overlay{position:fixed;inset:0;z-index:50;background:rgba(15,12,9,.55);display:grid;place-items:center;
+  max-width:calc(100vw - 32px);background:var(--ink);color:var(--card);border:var(--bw) solid var(--ink);border-radius:0;padding:10px 16px;font-size:14px;font-weight:600;
+  transition:opacity 120ms}
+.toast.bad{background:var(--loss);border-color:var(--loss);color:var(--on-loss)}
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:grid;place-items:center;
   padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
-.modal{width:100%;max-width:440px;max-height:100%;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.modal{width:100%;max-width:440px;max-height:100%;overflow-y:auto;background:var(--card);border:var(--bw) solid var(--line);border-radius:0;padding:18px 20px}
 .m-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.m-head h2{font-size:18px}
+.m-head h2{font-size:18px;font-weight:800}
 .m-body>*+*{margin-top:12px}
 .m-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:20px}
 
@@ -295,7 +295,7 @@ tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
 <div id="page">
 <header class="hdr" id="hdr">
   <div class="hdr-in">
-    <div class="brand"><span class="wordmark">Basis</span><span class="ver num">v<span id="ver">0.2.1</span></span></div>
+    <div class="brand"><span class="wordmark">Basis</span><span class="ver num">v<span id="ver">0.3.0</span></span></div>
     <div class="pos-ctl" id="posCtl">
       <label class="sr-only" for="posSelect">Position</label>
       <select id="posSelect" title="Switch between the positions you are tracking."></select>
@@ -441,7 +441,7 @@ tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
 </div>
 
 <script>
-const APP_VERSION = "0.2.1";
+const APP_VERSION = "0.3.0";
 (function () {
   "use strict";
   document.title = "Basis v" + APP_VERSION + " - options cost averager | BookHockeys";
@@ -811,8 +811,8 @@ const APP_VERSION = "0.2.1";
     else document.documentElement.removeAttribute("data-theme");
     const eff = effectiveTheme();
     document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
-      if (ui.theme) m.setAttribute("content", ui.theme === "dark" ? "#15120e" : "#f5f1ea");
-      else m.setAttribute("content", /dark/.test(m.media) ? "#15120e" : "#f5f1ea");
+      if (ui.theme) m.setAttribute("content", ui.theme === "dark" ? "#0a0a0a" : "#ffffff");
+      else m.setAttribute("content", /dark/.test(m.media) ? "#0a0a0a" : "#ffffff");
     });
     const btn = $("btnTheme");
     btn.textContent = eff === "dark" ? "Light theme" : "Dark theme";

@@ -18,6 +18,16 @@ as realized profit or loss.
 
 ## Changelog
 
+### 0.3.0
+
+A new look. The first design, warm paper with an amber accent, did not land
+with the owner, so it is gone. Basis now looks like a high-contrast calculator:
+plain white, thick black rules, no rounded corners and no shadows. The one
+splash of color is rose, and it marks only what matters: your average and the
+button that adds a fill. Dark mode keeps the same shapes, just inverted. The
+home-screen icon and the share card match. Nothing about the math or your
+saved fills changed.
+
 ### 0.2.1
 
 Basis moved from dev.rizzo.cc to bookhockeys.com, so the trading tools live
