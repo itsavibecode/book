@@ -22,6 +22,25 @@ as realized profit or loss.
 
 ## Changelog
 
+### 0.5.0
+
+A new arrangement on wide screens. Your average and the "Since your first
+fill" chart now sit side by side at the top, the two what-if calculators sit
+under them, and the fills table runs the full width below. The chart needed the
+room, and the old layout had a right column that scrolled on its own while the
+left side sat mostly empty under a short table. On a tablet the average and the
+chart stack, with the two what-ifs side by side. Phones keep the same order as
+before. The chart now draws at the card's real width, so a wide screen gets a
+wider chart with more dates along the bottom.
+
+If you named a position like "NVDA $215 Call 12/18" and never filled in the
+contract, Basis can now read the ticker, strike, call or put and expiry from
+the name. The chart card offers a button like "Use NVDA $215.00 call, Dec 18
+2026" that saves them in one click, and Rename shows them already filled in for
+you to check. A date without a year means the next time that day comes round.
+Nothing is saved until you press one of those buttons, and your name stays as
+you typed it.
+
 ### 0.4.0
 
 A position can now carry its contract: ticker, call or put, strike and expiry.

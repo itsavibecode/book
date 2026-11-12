@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="0.4.0">
+<meta name="app-version" content="0.5.0">
 <meta name="description" content="Track the average cost of an options position across every buy and trim, and see how many contracts at today's price would bring your average down to a target.">
-<title>Basis v0.4.0 - options cost averager | BookHockeys</title>
+<title>Basis v0.5.0 - options cost averager | BookHockeys</title>
 <link rel="canonical" href="https://bookhockeys.com/basis/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20x=%222%22%20y=%222%22%20width=%2260%22%20height=%2260%22%20fill=%22%23ffffff%22%20stroke=%22%23111111%22%20stroke-width=%224%22/%3E%3Ctext%20x=%2232%22%20y=%2244%22%20text-anchor=%22middle%22%20font-family=%22Segoe%20UI,Arial,Helvetica,sans-serif%22%20font-size=%2238%22%20font-weight=%22800%22%20fill=%22%23111111%22%3EB%3C/text%3E%3Crect%20x=%2218%22%20y=%2249%22%20width=%2228%22%20height=%226%22%20fill=%22%23e11d48%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -85,7 +85,6 @@
   --field:#111111; --accent:#e11d48; --on-accent:#ffffff;
   --gain:#047857; --loss:#be123c; --on-loss:#ffffff;
   --bw:2px;
-  --hdr-h:72px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -178,17 +177,15 @@ input[aria-invalid="true"]{border-color:var(--loss);outline:1px solid var(--loss
 .seg:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
 .seg input:focus-visible+span{text-decoration:underline;text-underline-offset:3px}
 
-.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}
-.main-col{min-width:0}
-.side{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0;order:-1}
-@media (min-width:640px) and (max-width:959.98px){
-  .side{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
-  .side .ticket{grid-row:span 3}
+/* Reading order is the source order: summary + chart, the two what-ifs, then the fills. */
+.layout,.top,.wis{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.layout>*,.top>*,.wis>*{min-width:0}
+@media (min-width:640px){
+  .layout,.top,.wis{gap:20px}
+  .wis{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 }
 @media (min-width:960px){
-  .layout{grid-template-columns:minmax(0,1fr) 360px}
-  .side{order:0;position:sticky;top:calc(var(--hdr-h) + 16px);max-height:calc(100vh - var(--hdr-h) - 32px);
-    overflow-y:auto;overflow-x:hidden;padding:4px 10px 16px;margin:-4px -10px 0}
+  .top{grid-template-columns:minmax(280px,1fr) minmax(0,2fr)}
 }
 
 .ticket{border-top:3px solid var(--accent);padding:20px 22px}
@@ -205,7 +202,6 @@ input[aria-invalid="true"]{border-color:var(--loss);outline:1px solid var(--loss
 .tk-price .money{max-width:10rem;flex:1 1 7rem}
 .statement{margin-top:12px;font-size:14px}
 .warn{margin-top:12px;font-size:14px;color:var(--loss)}
-.rule-short{display:none}
 
 .wi-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .wi-out{margin-top:14px;font-size:15px;font-weight:700;min-height:1.5em}
@@ -317,7 +313,7 @@ tr.pending .tag{display:block;font-size:12px;font-weight:700;color:var(--ink);te
 <div id="page">
 <header class="hdr" id="hdr">
   <div class="hdr-in">
-    <div class="brand"><span class="wordmark">Basis</span><span class="ver num">v<span id="ver">0.4.0</span></span></div>
+    <div class="brand"><span class="wordmark">Basis</span><span class="ver num">v<span id="ver">0.5.0</span></span></div>
     <div class="pos-ctl" id="posCtl">
       <label class="sr-only" for="posSelect">Position</label>
       <select id="posSelect" title="Switch between the positions you are tracking."></select>
@@ -344,53 +340,7 @@ tr.pending .tag{display:block;font-size:12px;font-weight:700;color:var(--ink);te
   </section>
 
   <div class="layout" id="app" hidden>
-    <div class="main-col">
-      <section class="card fills" aria-labelledby="fillsH" data-tipzone>
-        <h2 id="fillsH">Fills</h2>
-        <form class="fill-form" id="fillForm" novalidate>
-          <div class="field f-date">
-            <div class="lab"><label for="fDate">Date</label><button type="button" class="hint" aria-label="About the date" data-tip="The trade date. Fills are averaged in date order, so a sell only counts against what you held on that day.">?</button></div>
-            <input type="date" id="fDate" required>
-          </div>
-          <div class="field f-side">
-            <div class="lab"><span id="sideLab">Side</span><button type="button" class="hint" aria-label="About buy and sell" data-tip="Buy adds contracts to your average. Sell trims them and books a realized gain or loss without changing the average of what is left.">?</button></div>
-            <div class="seg" role="radiogroup" aria-labelledby="sideLab">
-              <label><input type="radio" name="side" value="buy" checked><span>Buy</span></label>
-              <label><input type="radio" name="side" value="sell"><span>Sell</span></label>
-            </div>
-          </div>
-          <div class="field f-qty">
-            <div class="lab"><label for="fQty">Contracts</label></div>
-            <input id="fQty" inputmode="numeric" autocomplete="off" placeholder="1" title="How many contracts this fill was for. Whole numbers only.">
-          </div>
-          <div class="field f-price">
-            <div class="lab"><label for="fPrice">Price</label><button type="button" class="hint" aria-label="About the price" data-tip="Premium per share as your broker shows it. 1.25 means $125.00 per contract at the standard 100 multiplier.">?</button></div>
-            <div class="money"><span aria-hidden="true">$</span><input id="fPrice" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
-          </div>
-          <div class="field f-fee">
-            <div class="lab"><label for="fFee">Fee</label><button type="button" class="hint" aria-label="About the fee" data-tip="Commission and exchange fees for this fill. Added to your cost basis so your break-even is honest.">?</button></div>
-            <div class="money"><span aria-hidden="true">$</span><input id="fFee" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
-          </div>
-          <div class="f-add"><button type="submit" class="btn primary" style="width:100%">Add fill</button></div>
-        </form>
-        <p class="form-msg" id="fillMsg" aria-live="polite" hidden></p>
-        <p class="tipline" aria-live="polite" hidden></p>
-        <table id="fillsTable">
-          <thead><tr>
-            <th scope="col" data-key="date"><button type="button" class="sort" data-key="date">Date<span class="caret" aria-hidden="true"></span></button></th>
-            <th scope="col" data-key="side"><button type="button" class="sort" data-key="side">Side<span class="caret" aria-hidden="true"></span></button></th>
-            <th scope="col" class="r" data-key="qty"><button type="button" class="sort" data-key="qty">Contracts<span class="caret" aria-hidden="true"></span></button></th>
-            <th scope="col" class="r" data-key="price"><button type="button" class="sort" data-key="price">Price<span class="caret" aria-hidden="true"></span></button></th>
-            <th scope="col" class="r" data-key="cost"><button type="button" class="sort" data-key="cost" title="Buys: what you paid including the fee. Sells: what you received after the fee.">Cost<span class="caret" aria-hidden="true"></span></button></th>
-            <th scope="col" class="r" data-key="avg"><button type="button" class="sort" data-key="avg" title="Average premium per share after this fill. Basis uses the average-cost method: a sell removes contracts at your average cost, so it does not move the average.">Running avg<span class="caret" aria-hidden="true"></span></button></th>
-            <th scope="col"><span class="sr-only">Remove</span></th>
-          </tr></thead>
-          <tbody id="fillsBody"></tbody>
-        </table>
-      </section>
-    </div>
-
-    <aside class="side" aria-label="Summary, price chart and what-if calculators">
+    <div class="top">
       <section class="card ticket" aria-labelledby="tkName" data-tipzone>
         <div class="tk-head"><h2 id="tkName"></h2><span class="muted small num" id="tkMult"></span></div>
         <div class="big num" id="tkAvg"></div>
@@ -421,7 +371,8 @@ tr.pending .tag{display:block;font-size:12px;font-weight:700;color:var(--ink);te
         <h2 id="chH" tabindex="-1">Since your first fill</h2>
         <div class="ch-box" id="chBody" aria-live="polite"></div>
       </section>
-      <div class="rule-short" aria-hidden="true"></div>
+    </div>
+    <div class="wis">
       <section class="card" aria-labelledby="wi1H" data-tipzone>
         <h2 id="wi1H">If I add more</h2>
         <div class="wi-grid">
@@ -444,7 +395,50 @@ tr.pending .tag{display:block;font-size:12px;font-weight:700;color:var(--ink);te
         <p class="wi-note num" id="w2Note"></p>
         <p class="tipline" aria-live="polite" hidden></p>
       </section>
-    </aside>
+    </div>
+    <section class="card fills" aria-labelledby="fillsH" data-tipzone>
+      <h2 id="fillsH">Fills</h2>
+      <form class="fill-form" id="fillForm" novalidate>
+        <div class="field f-date">
+          <div class="lab"><label for="fDate">Date</label><button type="button" class="hint" aria-label="About the date" data-tip="The trade date. Fills are averaged in date order, so a sell only counts against what you held on that day.">?</button></div>
+          <input type="date" id="fDate" required>
+        </div>
+        <div class="field f-side">
+          <div class="lab"><span id="sideLab">Side</span><button type="button" class="hint" aria-label="About buy and sell" data-tip="Buy adds contracts to your average. Sell trims them and books a realized gain or loss without changing the average of what is left.">?</button></div>
+          <div class="seg" role="radiogroup" aria-labelledby="sideLab">
+            <label><input type="radio" name="side" value="buy" checked><span>Buy</span></label>
+            <label><input type="radio" name="side" value="sell"><span>Sell</span></label>
+          </div>
+        </div>
+        <div class="field f-qty">
+          <div class="lab"><label for="fQty">Contracts</label></div>
+          <input id="fQty" inputmode="numeric" autocomplete="off" placeholder="1" title="How many contracts this fill was for. Whole numbers only.">
+        </div>
+        <div class="field f-price">
+          <div class="lab"><label for="fPrice">Price</label><button type="button" class="hint" aria-label="About the price" data-tip="Premium per share as your broker shows it. 1.25 means $125.00 per contract at the standard 100 multiplier.">?</button></div>
+          <div class="money"><span aria-hidden="true">$</span><input id="fPrice" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+        </div>
+        <div class="field f-fee">
+          <div class="lab"><label for="fFee">Fee</label><button type="button" class="hint" aria-label="About the fee" data-tip="Commission and exchange fees for this fill. Added to your cost basis so your break-even is honest.">?</button></div>
+          <div class="money"><span aria-hidden="true">$</span><input id="fFee" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+        </div>
+        <div class="f-add"><button type="submit" class="btn primary" style="width:100%">Add fill</button></div>
+      </form>
+      <p class="form-msg" id="fillMsg" aria-live="polite" hidden></p>
+      <p class="tipline" aria-live="polite" hidden></p>
+      <table id="fillsTable">
+        <thead><tr>
+          <th scope="col" data-key="date"><button type="button" class="sort" data-key="date">Date<span class="caret" aria-hidden="true"></span></button></th>
+          <th scope="col" data-key="side"><button type="button" class="sort" data-key="side">Side<span class="caret" aria-hidden="true"></span></button></th>
+          <th scope="col" class="r" data-key="qty"><button type="button" class="sort" data-key="qty">Contracts<span class="caret" aria-hidden="true"></span></button></th>
+          <th scope="col" class="r" data-key="price"><button type="button" class="sort" data-key="price">Price<span class="caret" aria-hidden="true"></span></button></th>
+          <th scope="col" class="r" data-key="cost"><button type="button" class="sort" data-key="cost" title="Buys: what you paid including the fee. Sells: what you received after the fee.">Cost<span class="caret" aria-hidden="true"></span></button></th>
+          <th scope="col" class="r" data-key="avg"><button type="button" class="sort" data-key="avg" title="Average premium per share after this fill. Basis uses the average-cost method: a sell removes contracts at your average cost, so it does not move the average.">Running avg<span class="caret" aria-hidden="true"></span></button></th>
+          <th scope="col"><span class="sr-only">Remove</span></th>
+        </tr></thead>
+        <tbody id="fillsBody"></tbody>
+      </table>
+    </section>
   </div>
 
   <section class="card data" aria-labelledby="dataH">
@@ -470,7 +464,7 @@ tr.pending .tag{display:block;font-size:12px;font-weight:700;color:var(--ink);te
 </div>
 
 <script>
-const APP_VERSION = "0.4.0";
+const APP_VERSION = "0.5.0";
 (function () {
   "use strict";
   document.title = "Basis v" + APP_VERSION + " - options cost averager | BookHockeys";
@@ -608,7 +602,67 @@ const APP_VERSION = "0.4.0";
     }).join(" ");
   }
 
-  window.Basis = { compute, whatIfAdd, contractsToReach, occSymbol, pendingRows, chartPath, version: APP_VERSION };
+  // Reads a contract out of a free-text name like "NVDA $215 Call 12/18" or "SPY $600P 2026-12-19".
+  // Returns {ticker, kind, strike, expiry}; anything it cannot read is null. Never writes anything.
+  const MONTH_RE = "(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)";
+  const NAME_STOP = ["a", "an", "i", "my", "the", "and", "or", "of", "on", "in", "at", "for", "to", "play", "long", "short", "buy", "bought", "sold", "position", "trade", "lotto", "yolo"];
+  const KIND_WORDS = ["c", "p", "call", "calls", "put", "puts"];
+  function parseName(name, today) {
+    const out = { ticker: null, kind: null, strike: null, expiry: null };
+    const s = String(name == null ? "" : name);
+    if (!s.trim()) return out;
+    const now = today instanceof Date ? todayISOOf(today) : (validISODate(today) ? today : todayISO());
+    const pad = (n) => String(n).padStart(2, "0");
+    // A date with no year is the next time that day comes round, counting today.
+    const nextOn = (mo, d) => {
+      let y = Number(now.slice(0, 4));
+      if (pad(mo) + "-" + pad(d) < now.slice(5)) y++;
+      return y + "-" + pad(mo) + "-" + pad(d);
+    };
+    const monthNum = (w) => ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(w.slice(0, 3).toLowerCase()) + 1;
+    const pats = [
+      [/\b(\d{4})-(\d{1,2})-(\d{1,2})\b/g, (m) => m[1] + "-" + pad(m[2]) + "-" + pad(m[3])],
+      [/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{4}|\d{2}))?\b/g, (m) => m[3] ? (m[3].length === 2 ? "20" + m[3] : m[3]) + "-" + pad(m[1]) + "-" + pad(m[2]) : nextOn(m[1], m[2])],
+      [new RegExp("\\b" + MONTH_RE + "\\.?\\s+(\\d{1,2})(?:st|nd|rd|th)?\\b(?:,?\\s+(\\d{4})\\b)?", "gi"), (m) => m[3] ? m[3] + "-" + pad(monthNum(m[1])) + "-" + pad(m[2]) : nextOn(monthNum(m[1]), m[2])],
+      [new RegExp("\\b(\\d{1,2})\\s+" + MONTH_RE + "\\.?,?\\s+(\\d{4})\\b", "gi"), (m) => m[3] + "-" + pad(monthNum(m[2])) + "-" + pad(m[1])]
+    ];
+    let first = null, masked = s;
+    pats.forEach(([re, toIso]) => {
+      let m;
+      re.lastIndex = 0;
+      while ((m = re.exec(s))) {
+        if (!first || m.index < first.index) first = { index: m.index, iso: toIso(m) };
+        masked = masked.slice(0, m.index) + " ".repeat(m[0].length) + masked.slice(m.index + m[0].length);
+      }
+    });
+    if (first && validISODate(first.iso)) out.expiry = first.iso;
+
+    const kindOf = (w) => (/^c/i.test(w) ? "call" : "put");
+    const NUM = "(\\d+(?:\\.\\d+)?)";
+    const withKind = new RegExp("(?<![\\w.])\\$?\\s*" + NUM + "\\s*(calls?|puts?|c|p)\\b", "i").exec(masked);
+    let strike = null;
+    if (withKind) { strike = Number(withKind[1]); out.kind = kindOf(withKind[2]); }
+    else {
+      const dollar = new RegExp("\\$\\s*" + NUM + "(?![\\w.])").exec(masked);
+      const plain = new RegExp("(?<![\\w.\\/-])" + NUM + "(?![\\w.\\/-])").exec(masked);
+      if (dollar) strike = Number(dollar[1]);
+      else if (plain) strike = Number(plain[1]);
+    }
+    if (strike != null && isFinite(strike) && strike > 0) out.strike = Math.round(strike * 100) / 100;
+
+    const words = masked.split(/[\s,;:()]+/).map((w) => w.replace(/^\$/, "")).filter((w) => /^[A-Za-z]{1,6}$/.test(w));
+    if (!out.kind) {
+      const kw = words.find((w, i) => /^(calls?|puts?)$/i.test(w) || (i > 0 && /^[cp]$/i.test(w)));
+      if (kw) out.kind = kindOf(kw);
+    }
+    const cands = words.filter((w) => KIND_WORDS.indexOf(w.toLowerCase()) === -1 && NAME_STOP.indexOf(w.toLowerCase()) === -1);
+    // Prefer a word typed in capitals; a lone C or P counts only when nothing else could be the ticker.
+    const t = cands.find((w) => w === w.toUpperCase()) || cands[0] || words.find((w) => /^[cp]$/i.test(w));
+    if (t) out.ticker = t.toUpperCase();
+    return out;
+  }
+
+  window.Basis = { compute, whatIfAdd, contractsToReach, occSymbol, pendingRows, chartPath, parseName, version: APP_VERSION };
 
   /* ---------- formatting ---------- */
   const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -812,7 +866,9 @@ const APP_VERSION = "0.4.0";
     }
     return wrap;
   }
-  function positionForm(p) {
+  // pre: contract fields read from the name, shown in place of the empty ones until the user saves.
+  function positionForm(p, pre) {
+    const src = pre || p;
     const frag = document.createElement("div");
     frag.style.display = "grid"; frag.style.gap = "12px";
     const grid = document.createElement("div");
@@ -821,7 +877,7 @@ const APP_VERSION = "0.4.0";
     const ticker = document.createElement("input");
     ticker.id = "mTicker"; ticker.autocomplete = "off"; ticker.maxLength = 6; ticker.placeholder = "AAPL";
     ticker.setAttribute("autocapitalize", "characters"); ticker.spellcheck = false;
-    ticker.value = p && p.ticker ? p.ticker : "";
+    ticker.value = src && src.ticker ? src.ticker : "";
     ticker.addEventListener("input", () => {
       const up = ticker.value.toUpperCase();
       if (up !== ticker.value) ticker.value = up;
@@ -838,7 +894,7 @@ const APP_VERSION = "0.4.0";
     ["call", "put"].forEach((k) => {
       const l = document.createElement("label");
       const r = document.createElement("input");
-      r.type = "radio"; r.name = "mKind"; r.value = k; r.checked = !!(p && p.kind === k);
+      r.type = "radio"; r.name = "mKind"; r.value = k; r.checked = !!(src && src.kind === k);
       const s = document.createElement("span");
       s.textContent = k === "call" ? "Call" : "Put";
       l.appendChild(r); l.appendChild(s); seg.appendChild(l);
@@ -851,7 +907,7 @@ const APP_VERSION = "0.4.0";
 
     const strike = document.createElement("input");
     strike.id = "mStrike"; strike.className = "money-in"; strike.inputMode = "decimal"; strike.autocomplete = "off"; strike.placeholder = "0.00";
-    strike.value = p && p.strike != null ? p.strike.toFixed(2) : "";
+    strike.value = src && src.strike != null ? src.strike.toFixed(2) : "";
     const strikeMoney = document.createElement("div");
     strikeMoney.className = "money";
     const dollar = document.createElement("span");
@@ -861,9 +917,15 @@ const APP_VERSION = "0.4.0";
 
     const expiry = document.createElement("input");
     expiry.id = "mExpiry"; expiry.type = "date";
-    expiry.value = p && p.expiry ? p.expiry : "";
+    expiry.value = src && src.expiry ? src.expiry : "";
     grid.appendChild(fieldEl("Expiry", expiry, "The expiration date. Options with the same strike but a different expiry are different contracts."));
     frag.appendChild(grid);
+    if (pre && (pre.ticker || pre.kind || pre.strike != null || pre.expiry)) {
+      const read = document.createElement("p");
+      read.className = "small"; read.id = "mRead";
+      read.textContent = "Read from the name. Check them before saving.";
+      frag.appendChild(read);
+    }
 
     const name = document.createElement("input");
     name.id = "mName"; name.autocomplete = "off"; name.maxLength = 80;
@@ -924,11 +986,12 @@ const APP_VERSION = "0.4.0";
       }
     });
   }
+  const hasContract = (p) => !!(p.ticker || p.kind || p.strike != null || p.expiry);
   function renamePosition() {
     const p = active();
     if (!p) return;
     openModal({
-      title: "Rename position", confirmText: "Save", body: positionForm(p), focus: occSymbol(p) ? "#mName" : "#mTicker",
+      title: "Rename position", confirmText: "Save", body: positionForm(p, hasContract(p) ? null : parseName(p.name, todayISO())), focus: occSymbol(p) ? "#mName" : "#mTicker",
       onConfirm() {
         const v = readPositionForm();
         if (!v) return false;
@@ -1255,7 +1318,7 @@ const APP_VERSION = "0.4.0";
   const CH_NODATA = "Yahoo has no data for this contract. Expired contracts are not available.";
   const CH_NET = "Could not reach the price service.";
   const CH_RANGE = "The first fill is dated in the future, so there is nothing to chart yet.";
-  const chart = { key: null, status: "idle", points: null, at: 0, asOf: 0, error: "", token: 0 };
+  const chart = { key: null, status: "idle", points: null, at: 0, asOf: 0, error: "", token: 0, drawnW: 0 };
   const SVG_NS = "http://www.w3.org/2000/svg";
 
   // The worker serves up to three years back, so an older first fill charts from that limit.
@@ -1338,7 +1401,21 @@ const APP_VERSION = "0.4.0";
       chart.token++; chart.key = null; chart.status = "idle";
       if (!sym) {
         msg("Add the ticker, strike and expiry to this position and Basis will chart the contract's daily close since your first fill.");
-        action("Add contract details", renamePosition);
+        const guess = hasContract(p) ? null : parseName(p.name, todayISO());
+        if (guess && occSymbol(guess)) {
+          // Saved only when this button is pressed; the name itself is left alone.
+          action("Use " + displayName({ name: "", ticker: guess.ticker, kind: guess.kind, strike: guess.strike, expiry: guess.expiry }), () => {
+            const cur = active();
+            if (!cur || cur.id !== p.id || hasContract(cur)) return;
+            cur.ticker = guess.ticker; cur.kind = guess.kind; cur.strike = guess.strike; cur.expiry = guess.expiry;
+            save();
+            renderAll();
+            toast("Contract details saved");
+            $("chH").focus();
+          });
+        } else {
+          action("Add contract details", renamePosition);
+        }
       } else {
         msg("Add your first fill and Basis will chart the contract's daily close from that day.");
       }
@@ -1373,7 +1450,10 @@ const APP_VERSION = "0.4.0";
     let lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
     const pad = (hi - lo) * 0.08 || Math.max(hi * 0.05, 0.05);
     lo = Math.max(0, lo - pad); hi += pad;
-    const W = 300, H = 190;
+    // The viewBox matches the card's real width so text stays at its true size; wide cards get a 16:7 chart.
+    const avail = Math.round(body.clientWidth) || 300;
+    chart.drawnW = avail;
+    const W = Math.max(280, avail), H = Math.min(360, Math.max(190, Math.round(W * 7 / 16)));
     const box = { left: 52, top: 14, width: W - 52 - 10, height: H - 14 - 28, t0, t1, min: lo, max: hi };
     const d0 = dayNum(t0), span = dayNum(t1) - d0;
     const xAt = (iso) => box.left + (span > 0 ? (dayNum(iso) - d0) / span : 0.5) * box.width;
@@ -1385,16 +1465,18 @@ const APP_VERSION = "0.4.0";
       ". Latest close " + money(lastPt.close) + "." + (c.avgPremium != null ? " Your average is " + money(c.avgPremium) + "." : "") +
       " Use the left and right arrow keys to read each day.");
 
-    // y axis: four evenly spaced dollar values
-    for (let i = 0; i < 4; i++) {
-      const v = lo + (hi - lo) * i / 3, y = yAt(v);
+    // y axis: four or five evenly spaced dollar values
+    const nY = H >= 260 ? 5 : 4;
+    for (let i = 0; i < nY; i++) {
+      const v = lo + (hi - lo) * i / (nY - 1), y = yAt(v);
       sv("line", { class: "ch-axis", x1: box.left - 4, x2: box.left, y1: y, y2: y }, svg);
       const t = sv("text", { class: "ch-tick", x: box.left - 7, y: y + 4, "text-anchor": "end" }, svg);
       t.textContent = money(v);
     }
-    // x axis: 3 or 4 dates, with the year when the range crosses one
+    // x axis: 3 or 4 dates on a phone, up to 7 on a wide card, with the year when the range crosses one
     const multiYear = t0.slice(0, 4) !== t1.slice(0, 4);
-    const n = span < 1 ? 1 : span < 3 ? span + 1 : multiYear ? 3 : 4;
+    const maxX = W >= 760 ? 7 : W >= 520 ? 6 : multiYear ? 3 : 4;
+    const n = span < 1 ? 1 : span + 1 <= maxX ? span + 1 : maxX;
     const seen = new Set();
     for (let i = 0; i < n; i++) {
       const day = n === 1 ? d0 : Math.round(d0 + span * i / (n - 1));
@@ -1677,10 +1759,17 @@ const APP_VERSION = "0.4.0";
     saveUi();
   });
 
-  /* ---------- header height for the sticky summary ---------- */
-  const hdr = $("hdr");
-  const setHdr = () => document.documentElement.style.setProperty("--hdr-h", hdr.offsetHeight + "px");
-  if (window.ResizeObserver) new ResizeObserver(setHdr).observe(hdr); else window.addEventListener("resize", setHdr);
+  /* ---------- redraw the chart when its card changes width ---------- */
+  let chartTimer = 0;
+  const chartResized = () => {
+    clearTimeout(chartTimer);
+    chartTimer = setTimeout(() => {
+      const w = Math.round($("chBody").clientWidth);
+      if (chart.status === "ok" && chart.drawnW && w && Math.abs(w - chart.drawnW) > 16) renderChart();
+    }, 120);
+  };
+  if (window.ResizeObserver) new ResizeObserver(chartResized).observe($("chBody"));
+  window.addEventListener("resize", chartResized);
 
   /* ---------- boot ---------- */
   load();
@@ -1689,7 +1778,6 @@ const APP_VERSION = "0.4.0";
   loadPositionInputs();
   renderAll();
   setupA2HS();
-  setHdr();
 })();
 </script>
 </body>
