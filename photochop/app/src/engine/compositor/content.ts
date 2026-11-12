@@ -1,7 +1,7 @@
 // Rasterised text and shape content, cached per node. The cache key is a signature of every
 // prop that changes the pixels, so moving a node (x/y) never re-rasterises it.
 import type { NodeId, ShapeNode, TextNode } from '../types';
-import { measureText, rasterizeText } from '../text';
+import { fracOffset, isIdentityMatrix, measureText, rasterizeText } from '../text';
 import { rasterizeShape, shapeBounds } from '../shape';
 
 /** A straight-alpha RGBA buffer placed in document space. */
@@ -25,6 +25,14 @@ export interface ContentEntry {
 }
 
 export function contentSignature(n: TextNode | ShapeNode): string {
+  const base = baseSignature(n);
+  if (isIdentityMatrix(n.matrix)) return base;
+  // A transformed raster also depends on the sub-pixel part of x/y (baked in for accuracy).
+  const { fx, fy } = fracOffset(n);
+  return `${base}|m${n.matrix.join(',')}|${fx.toFixed(4)},${fy.toFixed(4)}`;
+}
+
+function baseSignature(n: TextNode | ShapeNode): string {
   if (n.type === 'text') {
     return ['t', n.text, n.font, n.size, n.weight, n.italic, n.color.join(','), n.align, n.lineHeight,
       n.letterSpacing, n.width].join('|');

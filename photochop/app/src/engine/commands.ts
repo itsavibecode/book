@@ -2,8 +2,10 @@
 // commands (rasterise, merge down, flatten, clear) live in commands-raster.ts.
 import type { Command, CommandFactory, DocumentLike } from './contract';
 import type { AnyNode, GroupNode, Mask, NodeId, Selection } from './types';
-import { cloneMask, createGroupNode, newId } from './document';
+import { cloneMask, copyMatrix, createGroupNode, newId } from './document';
 import { clearPixels, flattenDocument, mergeDown, rasterizeNode } from './commands-raster';
+import { selectionCommands } from './commands-selection';
+import { transformCommands } from './commands-transform';
 import { requireNode, restoreActive, setActive, snapshotActive, type ActiveState } from './command-util';
 
 function parentFor(doc: DocumentLike, parentId: NodeId | null): GroupNode {
@@ -28,8 +30,8 @@ export function cloneNode(n: AnyNode, rename = true): AnyNode {
   const common = { id: newId(), name, mask: cloneMask(n.mask), effects: [...n.effects] };
   switch (n.type) {
     case 'raster': return { ...n, ...common, tiles: n.tiles.clone() };
-    case 'text': return { ...n, ...common, color: [...n.color] };
-    case 'shape': return { ...n, ...common, fill: n.fill ? [...n.fill] : null, stroke: n.stroke ? [...n.stroke] : null };
+    case 'text': return { ...n, ...common, color: [...n.color], matrix: copyMatrix(n.matrix) };
+    case 'shape': return { ...n, ...common, fill: n.fill ? [...n.fill] : null, stroke: n.stroke ? [...n.stroke] : null, matrix: copyMatrix(n.matrix) };
     case 'group': return { ...n, ...common, children: n.children.map((c) => cloneNode(c, false)) };
   }
 }
@@ -325,4 +327,9 @@ export const commands: CommandFactory = {
       },
     };
   },
+
+  // 0.2.0: saved selections, stroke, layer via cut/copy (commands-selection.ts) and guides,
+  // layer transforms, document operations (commands-transform.ts).
+  ...selectionCommands,
+  ...transformCommands,
 };

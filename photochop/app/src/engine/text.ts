@@ -5,8 +5,35 @@
 // their bounds extend to the left of 0 (negative x). Box text (width != null) lays out inside
 // 0..width. Ink that overhangs the box (italics, wide glyphs) widens the bounds so nothing clips;
 // nodeBounds() is built from these bounds and is what the UI should hit-test against.
+//
+// Matrix (0.2.0): a non-identity `matrix` maps layout space through [a, b, c, d] plus the
+// fractional part of (x, y); measureText then returns the axis-aligned bounds of the transformed
+// layout box and rasterizeText draws through the matrix (vector quality). Identity keeps the
+// 0.1.0 output byte for byte.
 import type { Rect, TextNode } from './types';
 import { createCanvas, get2d, makeImageData, type Ctx2D } from './util';
+
+type Lin = readonly [number, number, number, number];
+
+export function isIdentityMatrix(m: Lin | undefined | null): boolean {
+  return !m || (m[0] === 1 && m[1] === 0 && m[2] === 0 && m[3] === 1);
+}
+
+/** Sub-pixel offset baked into transformed rasters (the compositor places them at round(x), round(y)). */
+export function fracOffset(n: { x: number; y: number }): { fx: number; fy: number } {
+  return { fx: n.x - Math.round(n.x), fy: n.y - Math.round(n.y) };
+}
+
+/** Integer axis-aligned bounds of r mapped through m plus (fx, fy). */
+export function mapBounds(r: Rect, m: Lin, fx: number, fy: number): Rect {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const [px, py] of [[r.x, r.y], [r.x + r.w, r.y], [r.x, r.y + r.h], [r.x + r.w, r.y + r.h]]) {
+    const X = m[0] * px + m[2] * py + fx, Y = m[1] * px + m[3] * py + fy;
+    x0 = Math.min(x0, X); y0 = Math.min(y0, Y); x1 = Math.max(x1, X); y1 = Math.max(y1, Y);
+  }
+  const bx = Math.floor(x0 + 1e-9), by = Math.floor(y0 + 1e-9);
+  return { x: bx, y: by, w: Math.max(0, Math.ceil(x1 - 1e-9) - bx), h: Math.max(0, Math.ceil(y1 - 1e-9) - by) };
+}
 
 interface Line { text: string; x: number; baseline: number; width: number }
 interface Layout { lines: Line[]; bounds: Rect; native: boolean }
@@ -108,20 +135,36 @@ function isEmpty(n: TextNode): boolean {
   return n.text.trim().length === 0;
 }
 
-export function measureText(node: TextNode): Rect {
+function layoutBounds(node: TextNode): Rect {
   if (isEmpty(node) && node.width === null) {
     return { x: 0, y: 0, w: 0, h: Math.ceil(node.size * node.lineHeight) };
   }
   return layout(mctx(), node).bounds;
 }
 
+export function measureText(node: TextNode): Rect {
+  const b = layoutBounds(node);
+  if (isIdentityMatrix(node.matrix)) return b;
+  const { fx, fy } = fracOffset(node);
+  return mapBounds(b, node.matrix, fx, fy);
+}
+
 export function rasterizeText(node: TextNode): ImageData | null {
   if (isEmpty(node) || node.size <= 0) return null;
   const L = layout(mctx(), node);
-  const b = L.bounds;
+  const lb = L.bounds;
+  if (lb.w <= 0 || lb.h <= 0) return null;
+  const identity = isIdentityMatrix(node.matrix);
+  const { fx, fy } = identity ? { fx: 0, fy: 0 } : fracOffset(node);
+  const b = identity ? lb : mapBounds(lb, node.matrix, fx, fy);
   if (b.w <= 0 || b.h <= 0) return null;
   const canvas = createCanvas(b.w, b.h);
   const ctx = get2d(canvas);
+  if (!identity) {
+    const m = node.matrix;
+    // Layout coordinates go straight through the matrix; offsets below are relative to lb.
+    ctx.setTransform(m[0], m[1], m[2], m[3], fx - b.x + m[0] * lb.x + m[2] * lb.y, fy - b.y + m[1] * lb.x + m[3] * lb.y);
+  }
   const native = applyFont(ctx, node);
   const [r, g, bl, a] = node.color;
   // Draw opaque and apply alpha afterwards: canvas premultiplies, so painting translucent colour
@@ -129,7 +172,7 @@ export function rasterizeText(node: TextNode): ImageData | null {
   ctx.fillStyle = `rgb(${r}, ${g}, ${bl})`;
   for (const line of L.lines) {
     if (!line.text) continue;
-    const px = line.x - b.x, py = line.baseline - b.y;
+    const px = line.x - lb.x, py = line.baseline - lb.y;
     if (native) {
       ctx.fillText(line.text, px, py);
     } else {

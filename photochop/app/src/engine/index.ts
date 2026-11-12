@@ -16,6 +16,10 @@ import { store as idbStore } from './store';
 import { createAutosave as makeAutosave } from './autosave';
 import { deserializeDocument as deser, serializeDocument as ser } from './serialize';
 import { colorToCss as toCss, cssToColor as fromCss } from './color';
+import * as mat from './transform';
+import * as select from './select';
+import * as maskEdit from './maskedit';
+import { copyPixels as copyPx } from './pixels';
 
 export * from './types';
 export type * from './contract';
@@ -55,3 +59,35 @@ export const serializeDocument: EngineApi['serializeDocument'] = ser;
 export const deserializeDocument: EngineApi['deserializeDocument'] = deser;
 export const colorToCss: EngineApi['colorToCss'] = toCss;
 export const cssToColor: EngineApi['cssToColor'] = fromCss;
+
+// 0.2.0: matrices and warp (transform/), selection building and modification (select/),
+// mask painting (maskedit.ts), pixel copies (pixels.ts).
+export const mat3Identity: EngineApi['mat3Identity'] = mat.mat3Identity;
+export const mat3Multiply: EngineApi['mat3Multiply'] = mat.mat3Multiply;
+export const mat3Translate: EngineApi['mat3Translate'] = mat.mat3Translate;
+export const mat3Scale: EngineApi['mat3Scale'] = mat.mat3Scale;
+export const mat3Rotate: EngineApi['mat3Rotate'] = mat.mat3Rotate;
+export const mat3Skew: EngineApi['mat3Skew'] = mat.mat3Skew;
+export const mat3FromQuad: EngineApi['mat3FromQuad'] = mat.mat3FromQuad;
+export const mat3Invert: EngineApi['mat3Invert'] = mat.mat3Invert;
+export const mat3Apply: EngineApi['mat3Apply'] = mat.mat3Apply;
+export const mat3IsAffine: EngineApi['mat3IsAffine'] = mat.mat3IsAffine;
+export const warpGridFor: EngineApi['warpGridFor'] = mat.warpGridFor;
+export const polygonMask: EngineApi['polygonMask'] = select.polygonMask;
+export const magicWand: EngineApi['magicWand'] = select.magicWand;
+export const createQuickSelect: EngineApi['createQuickSelect'] = select.createQuickSelect;
+export const createMagneticLasso: EngineApi['createMagneticLasso'] = select.createMagneticLasso;
+export const colorRange: EngineApi['colorRange'] = select.colorRange;
+export const featherMask: EngineApi['featherMask'] = select.featherMask;
+export const expandMask: EngineApi['expandMask'] = select.expandMask;
+export const contractMask: EngineApi['contractMask'] = select.contractMask;
+export const smoothMask: EngineApi['smoothMask'] = select.smoothMask;
+export const borderMask: EngineApi['borderMask'] = select.borderMask;
+export const growSelection: EngineApi['growSelection'] = select.growSelection;
+export const similarSelection: EngineApi['similarSelection'] = select.similarSelection;
+export const refineMask: EngineApi['refineMask'] = select.refineMask;
+export const transformMask: EngineApi['transformMask'] = select.transformMask;
+export const beginMaskEdit: EngineApi['beginMaskEdit'] = maskEdit.beginMaskEdit;
+export const createMaskStroke: EngineApi['createMaskStroke'] = maskEdit.createMaskStroke;
+export const fillMask: EngineApi['fillMask'] = maskEdit.fillMask;
+export const copyPixels: EngineApi['copyPixels'] = copyPx;

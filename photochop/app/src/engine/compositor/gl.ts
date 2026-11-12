@@ -5,90 +5,20 @@
 // Row convention: texel row y == document row y in every texture and framebuffer. Only the final
 // copy to the visible canvas flips, because the default framebuffer's origin is bottom-left.
 import type { CompositeOptions, CompositorLike, DocumentLike } from '../contract';
-import { TILE, type AnyNode, type ChangeEvent, type NodeId, type RasterNode, type Rect, type ShapeNode, type TextNode } from '../types';
-import { makeImageData, rectContains, rectOuter, rectUnion } from '../util';
-import { blendIndex, GLSL_BLEND } from './blend';
+import type { AnyNode, ChangeEvent, NodeId, Rect, ShapeNode, TextNode } from '../types';
+import { makeImageData, rectOuter } from '../util';
+import { blendIndex } from './blend';
+import { compile, FS_BLEND, FS_COPY, VS } from './gl-shaders';
+import { GlPreview } from './gl-preview';
+import { createTexture, GlRasterCache } from './gl-raster';
 import { ContentCache } from './content';
 
-const VS = `#version 300 es
-void main() {
-  vec2 p = vec2(gl_VertexID == 1 ? 3.0 : -1.0, gl_VertexID == 2 ? 3.0 : -1.0);
-  gl_Position = vec4(p, 0.0, 1.0);
-}`;
-
-const FS_BLEND = `#version 300 es
-precision highp float;
-precision highp int;
-precision highp sampler2D;
-uniform sampler2D u_back;
-uniform sampler2D u_src;
-uniform sampler2D u_mask;
-uniform ivec2 u_srcOff;
-uniform ivec2 u_srcSize;
-uniform int u_hasMask;
-uniform float u_opacity;
-uniform int u_mode;
-out vec4 o;
-${GLSL_BLEND}
-void main() {
-  ivec2 p = ivec2(gl_FragCoord.xy);
-  vec4 back = texelFetch(u_back, p, 0);
-  ivec2 sp = p - u_srcOff;
-  if (sp.x < 0 || sp.y < 0 || sp.x >= u_srcSize.x || sp.y >= u_srcSize.y) { o = back; return; }
-  vec4 src = texelFetch(u_src, sp, 0);
-  if (src.a == 0.0) { o = back; return; }
-  float sa = src.a * u_opacity;
-  if (u_hasMask == 1) {
-    float m = texelFetch(u_mask, p, 0).r;
-    if (m == 0.0) { o = back; return; }
-    sa *= m;
-  }
-  o = blendPixel(back, src.rgb, sa, u_mode);
-}`;
-
-const FS_COPY = `#version 300 es
-precision highp float;
-precision highp sampler2D;
-uniform sampler2D u_tex;
-uniform int u_h;
-out vec4 o;
-void main() {
-  ivec2 p = ivec2(gl_FragCoord.xy);
-  o = texelFetch(u_tex, ivec2(p.x, u_h - 1 - p.y), 0);
-}`;
+type CompositorPreview = Parameters<CompositorLike['setPreview']>[0];
 
 interface Target { tex: WebGLTexture; fbo: WebGLFramebuffer }
 interface Src { tex: WebGLTexture; x: number; y: number; w: number; h: number; temp?: Target }
-interface RasterEntry {
-  node: RasterNode;
-  tiles: RasterNode['tiles'];
-  tex: WebGLTexture;
-  /** Node-space rect the texture covers (tile aligned). */
-  rect: Rect;
-  dirty: Set<string> | 'all';
-}
 interface ContentTex { rev: number; tex: WebGLTexture | null; w: number; h: number }
 interface MaskTex { mask: AnyNode['mask']; tex: WebGLTexture; stale: boolean }
-
-const ZERO_TILE = new Uint8Array(TILE * TILE * 4);
-
-function compile(gl: WebGL2RenderingContext, vs: string, fs: string): WebGLProgram {
-  const mk = (type: number, src: string) => {
-    const s = gl.createShader(type);
-    if (!s) throw new Error('WebGL2 shader creation failed');
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(`WebGL2 shader error: ${gl.getShaderInfoLog(s)}`);
-    return s;
-  };
-  const p = gl.createProgram();
-  if (!p) throw new Error('WebGL2 program creation failed');
-  gl.attachShader(p, mk(gl.VERTEX_SHADER, vs));
-  gl.attachShader(p, mk(gl.FRAGMENT_SHADER, fs));
-  gl.linkProgram(p);
-  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(`WebGL2 link error: ${gl.getProgramInfoLog(p)}`);
-  return p;
-}
 
 export class GlCompositor implements CompositorLike {
   readonly kind = 'gl' as const;
@@ -105,13 +35,22 @@ export class GlCompositor implements CompositorLike {
   private all: Target[] = [];
   private result: Target | null = null;
   private dummyMask: WebGLTexture;
-  private raster = new Map<NodeId, RasterEntry>();
+  private raster: GlRasterCache;
   private content = new Map<NodeId, ContentTex>();
   private masks = new Map<NodeId, MaskTex>();
   private cache = new ContentCache();
   private doc: DocumentLike | null = null;
   private unsub: (() => void) | null = null;
   private sweepPending = false;
+  /** Transform-gesture preview: the node is drawn through the matrix or warp at composite time. */
+  preview: CompositorPreview = null;
+  private previewer: GlPreview | null = null;
+  /** Set when the context is lost; every later call throws so the auto wrapper can switch to the CPU. */
+  lost = false;
+  /** Called once when the WebGL context is lost (the auto wrapper listens). */
+  onContextLost: (() => void) | null = null;
+  /** Test hook: pretend MAX_TEXTURE_SIZE is this small (applies to compositors created afterwards). */
+  static maxTextureOverride: number | null = null;
 
   constructor() {
     this.canvas = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(1, 1) : document.createElement('canvas');
@@ -120,7 +59,14 @@ export class GlCompositor implements CompositorLike {
     }) as WebGL2RenderingContext | null;
     if (!gl) throw new Error('WebGL2 is not available');
     this.gl = gl;
-    this.maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
+    this.maxTex = GlCompositor.maxTextureOverride ?? (gl.getParameter(gl.MAX_TEXTURE_SIZE) as number);
+    this.raster = new GlRasterCache(gl, this.maxTex);
+    (this.canvas as EventTarget).addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      if (this.lost) return;
+      this.lost = true;
+      this.onContextLost?.();
+    });
     this.blendProg = compile(gl, VS, FS_BLEND);
     this.copyProg = compile(gl, VS, FS_COPY);
     for (const n of ['u_back', 'u_src', 'u_mask', 'u_srcOff', 'u_srcSize', 'u_hasMask', 'u_opacity', 'u_mode']) {
@@ -134,7 +80,7 @@ export class GlCompositor implements CompositorLike {
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
-    this.dummyMask = this.texture(1, 1, gl.R8);
+    this.dummyMask = createTexture(this.gl, 1, 1, gl.R8);
     gl.disable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.SCISSOR_TEST);
@@ -142,24 +88,11 @@ export class GlCompositor implements CompositorLike {
 
   // ----- resources -----
 
-  private texture(w: number, h: number, internal: number): WebGLTexture {
-    const gl = this.gl;
-    const t = gl.createTexture();
-    if (!t) throw new Error('WebGL2 texture creation failed');
-    gl.bindTexture(gl.TEXTURE_2D, t);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texStorage2D(gl.TEXTURE_2D, 1, internal, Math.max(1, w), Math.max(1, h));
-    return t;
-  }
-
   private acquire(): Target {
     const t = this.free.pop();
     if (t) return t;
     const gl = this.gl;
-    const tex = this.texture(this.W, this.H, gl.RGBA8);
+    const tex = createTexture(this.gl, this.W, this.H, gl.RGBA8);
     const fbo = gl.createFramebuffer();
     if (!fbo) throw new Error('WebGL2 framebuffer creation failed');
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
@@ -194,7 +127,6 @@ export class GlCompositor implements CompositorLike {
 
   private dropNodeCaches(): void {
     const gl = this.gl;
-    for (const e of this.raster.values()) gl.deleteTexture(e.tex);
     for (const e of this.content.values()) if (e.tex) gl.deleteTexture(e.tex);
     for (const e of this.masks.values()) gl.deleteTexture(e.tex);
     this.raster.clear();
@@ -227,19 +159,15 @@ export class GlCompositor implements CompositorLike {
 
   private onChange(ev: ChangeEvent): void {
     if (ev.kind === 'pixels') {
-      const e = this.raster.get(ev.nodeId);
-      if (!e || e.dirty === 'all') return;
-      const nx = Math.round(e.node.x), ny = Math.round(e.node.y);
-      const r = rectOuter(ev.rect);
-      const tx0 = Math.floor((r.x - nx) / TILE), tx1 = Math.floor((r.x + r.w - 1 - nx) / TILE);
-      const ty0 = Math.floor((r.y - ny) / TILE), ty1 = Math.floor((r.y + r.h - 1 - ny) / TILE);
-      if ((tx1 - tx0 + 1) * (ty1 - ty0 + 1) > 4096) { e.dirty = 'all'; return; }
-      for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) e.dirty.add(`${tx},${ty}`);
+      this.raster.onPixels(ev.nodeId, ev.rect);
     } else if (ev.kind === 'node') {
       const m = this.masks.get(ev.nodeId);
       if (m) m.stale = true;
     } else if (ev.kind === 'tree') {
       this.sweepPending = true;
+    } else if (ev.kind === 'document' && this.doc && (this.doc.width !== this.W || this.doc.height !== this.H)) {
+      // Document resize: drop size-bound buffers now; a size beyond MAX_TEXTURE_SIZE throws at the next composite.
+      try { this.resize(this.doc.width, this.doc.height); } catch { /* composite reports it */ }
     }
   }
 
@@ -254,79 +182,12 @@ export class GlCompositor implements CompositorLike {
     };
     walk(doc.root.children);
     const gl = this.gl;
-    for (const [id, e] of this.raster) if (!live.has(id)) { gl.deleteTexture(e.tex); this.raster.delete(id); }
+    this.raster.sweep(live);
     for (const [id, e] of this.content) if (!live.has(id)) { if (e.tex) gl.deleteTexture(e.tex); this.content.delete(id); this.cache.delete(id); }
     for (const [id, e] of this.masks) if (!live.has(id)) { gl.deleteTexture(e.tex); this.masks.delete(id); }
   }
 
   // ----- node sources -----
-
-  private uploadTile(e: RasterEntry, tx: number, ty: number): void {
-    const gl = this.gl;
-    const x = tx * TILE - e.rect.x, y = ty * TILE - e.rect.y;
-    if (x < 0 || y < 0 || x + TILE > e.rect.w || y + TILE > e.rect.h) return;
-    const buf = e.tiles.get(tx, ty);
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, TILE, TILE, gl.RGBA, gl.UNSIGNED_BYTE,
-      (buf ?? ZERO_TILE) as ArrayBufferView<ArrayBuffer>);
-  }
-
-  private rasterSource(node: RasterNode): Src | null {
-    const tb = node.tiles.bounds();
-    if (!tb) return null;
-    const gl = this.gl;
-    let e = this.raster.get(node.id);
-    if (e && (e.node !== node || e.tiles !== node.tiles || !rectContains(e.rect, tb))) {
-      const grow = e.node === node && e.tiles === node.tiles ? e.rect : null;
-      gl.deleteTexture(e.tex);
-      this.raster.delete(node.id);
-      e = undefined;
-      if (grow) return this.createRaster(node, tb, grow);
-    }
-    if (!e) return this.createRaster(node, tb, null);
-    gl.bindTexture(gl.TEXTURE_2D, e.tex);
-    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
-    if (e.dirty === 'all') {
-      const r = e.rect;
-      for (let ty = r.y / TILE; ty < (r.y + r.h) / TILE; ty++) for (let tx = r.x / TILE; tx < (r.x + r.w) / TILE; tx++) this.uploadTile(e, tx, ty);
-    } else {
-      for (const k of e.dirty) {
-        const c = k.indexOf(',');
-        this.uploadTile(e, +k.slice(0, c), +k.slice(c + 1));
-      }
-    }
-    e.dirty = new Set();
-    return this.rasterSrc(e);
-  }
-
-  private rasterSrc(e: RasterEntry): Src {
-    return { tex: e.tex, x: Math.round(e.node.x) + e.rect.x, y: Math.round(e.node.y) + e.rect.y, w: e.rect.w, h: e.rect.h };
-  }
-
-  private createRaster(node: RasterNode, tb: Rect, previous: Rect | null): Src {
-    const nx = Math.round(node.x), ny = Math.round(node.y);
-    // Cover the document area too (with slack when growing) so painting rarely forces a reallocation.
-    const docArea = { x: Math.floor(-nx / TILE) * TILE, y: Math.floor(-ny / TILE) * TILE, w: 0, h: 0 };
-    docArea.w = Math.ceil((this.W - nx) / TILE) * TILE - docArea.x;
-    docArea.h = Math.ceil((this.H - ny) / TILE) * TILE - docArea.y;
-    let rect = rectUnion(tb, previous) as Rect;
-    if (previous) rect = { x: rect.x - 2 * TILE, y: rect.y - 2 * TILE, w: rect.w + 4 * TILE, h: rect.h + 4 * TILE };
-    const wanted = rectUnion(rect, docArea) as Rect;
-    if (wanted.w <= this.maxTex && wanted.h <= this.maxTex) rect = wanted;
-    if (rect.w > this.maxTex || rect.h > this.maxTex) {
-      rect = tb.w <= this.maxTex && tb.h <= this.maxTex ? tb
-        : { x: tb.x, y: tb.y, w: Math.min(tb.w, Math.floor(this.maxTex / TILE) * TILE), h: Math.min(tb.h, Math.floor(this.maxTex / TILE) * TILE) };
-    }
-    const gl = this.gl;
-    const tex = this.texture(rect.w, rect.h, gl.RGBA8);
-    const e: RasterEntry = { node, tiles: node.tiles, tex, rect, dirty: new Set() };
-    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
-    // texStorage2D leaves contents undefined in some drivers; zero everything not covered by a tile.
-    const zeros = new Uint8Array(rect.w * TILE * 4);
-    for (let y = 0; y < rect.h; y += TILE) gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, y, rect.w, TILE, gl.RGBA, gl.UNSIGNED_BYTE, zeros);
-    node.tiles.forEach((_b, tx, ty) => this.uploadTile(e, tx, ty));
-    this.raster.set(node.id, e);
-    return this.rasterSrc(e);
-  }
 
   private contentSource(node: TextNode | ShapeNode): Src | null {
     const ce = this.cache.entry(node);
@@ -335,8 +196,9 @@ export class GlCompositor implements CompositorLike {
     let t = this.content.get(node.id);
     if (!t || t.rev !== ce.rev) {
       if (t?.tex) gl.deleteTexture(t.tex);
-      const w = Math.min(ce.w, this.maxTex), h = Math.min(ce.h, this.maxTex);
-      const tex = this.texture(w, h, gl.RGBA8);
+      if (ce.w > this.maxTex || ce.h > this.maxTex) throw new Error(`A layer larger than ${this.maxTex} px needs the CPU compositor`);
+      const w = ce.w, h = ce.h;
+      const tex = createTexture(this.gl, w, h, gl.RGBA8);
       gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
       gl.pixelStorei(gl.UNPACK_ROW_LENGTH, ce.w);
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, ce.data as ArrayBufferView<ArrayBuffer>);
@@ -354,7 +216,7 @@ export class GlCompositor implements CompositorLike {
     const gl = this.gl;
     let e = this.masks.get(node.id);
     if (!e || e.mask !== mask || e.stale) {
-      const tex = e ? e.tex : this.texture(this.W, this.H, gl.R8);
+      const tex = e ? e.tex : createTexture(this.gl, this.W, this.H, gl.R8);
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.W, this.H, gl.RED, gl.UNSIGNED_BYTE, mask.data as ArrayBufferView<ArrayBuffer>);
@@ -366,7 +228,7 @@ export class GlCompositor implements CompositorLike {
   }
 
   private source(node: AnyNode): Src | null {
-    if (node.type === 'raster') return this.rasterSource(node);
+    if (node.type === 'raster') return this.raster.source(node, this.W, this.H);
     if (node.type === 'group') {
       const t = this.compositeGroup(node.children);
       return { tex: t.tex, x: 0, y: 0, w: this.W, h: this.H, temp: t };
@@ -405,11 +267,19 @@ export class GlCompositor implements CompositorLike {
     let a = this.acquire();
     this.clearTarget(a);
     let b = this.acquire();
+    const pv = this.preview;
     for (const child of children) {
       if (!child.visible || child.opacity <= 0) continue;
-      const src = this.source(child);
+      let src = this.source(child);
       if (!src) continue;
-      this.drawBlend(b, a.tex, src, child.opacity, this.maskTexture(child), blendIndex(child.blend));
+      let mask = this.maskTexture(child);
+      if (pv && child.id === pv.nodeId) {
+        const t = this.previewTarget(src, mask, this.doc?.contentBounds(child.id) ?? null);
+        if (src.temp) this.release(src.temp);
+        src = { tex: t.tex, x: 0, y: 0, w: this.W, h: this.H, temp: t };
+        mask = null;
+      }
+      this.drawBlend(b, a.tex, src, child.opacity, mask, blendIndex(child.blend));
       const t = a; a = b; b = t;
       if (src.temp) this.release(src.temp);
     }
@@ -417,15 +287,36 @@ export class GlCompositor implements CompositorLike {
     return a;
   }
 
+  /** The preview node's source drawn through the preview matrix or warp into a fresh target. */
+  private previewTarget(src: Src, mask: WebGLTexture | null, bounds: Rect | null): Target {
+    const t = this.acquire();
+    if (!this.previewer) this.previewer = new GlPreview(this.gl);
+    this.previewer.draw(t.fbo, this.W, this.H, src, mask, this.dummyMask, this.preview ?? {}, bounds);
+    return t;
+  }
+
+  private checkAlive(): void {
+    if (this.lost || this.gl.isContextLost()) {
+      this.lost = true;
+      throw new Error('The WebGL context was lost');
+    }
+  }
+
   composite(doc: DocumentLike, _opts?: CompositeOptions): void {
     // The dirty rect is ignored: a full pass per layer is cheap on the GPU.
+    this.checkAlive();
     if (doc.width !== this.W || doc.height !== this.H) this.resize(doc.width, doc.height);
     this.attach(doc);
     if (this.sweepPending) this.sweep(doc);
     const prev = this.result;
     this.result = null;
     if (prev) this.release(prev);
-    const res = this.compositeGroup(doc.root.children);
+    let res = this.compositeGroup(doc.root.children);
+    if (this.preview && this.preview.nodeId === doc.root.id) {
+      const t = this.previewTarget({ tex: res.tex, x: 0, y: 0, w: this.W, h: this.H }, null, { x: 0, y: 0, w: this.W, h: this.H });
+      this.release(res);
+      res = t;
+    }
     this.result = res;
     const gl = this.gl;
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -451,12 +342,24 @@ export class GlCompositor implements CompositorLike {
   }
 
   readImageData(rect?: Rect): ImageData {
+    this.checkAlive();
     const r = rect ? rectOuter(rect) : { x: 0, y: 0, w: this.W, h: this.H };
     return this.readTarget(this.result, r);
   }
 
   /** Content of one node alone at document size, without its own opacity, blend or mask. */
   renderNode(doc: DocumentLike, id: NodeId): ImageData {
+    this.checkAlive();
+    const pv = this.preview;
+    this.preview = null;
+    try {
+      return this.renderNodeNow(doc, id);
+    } finally {
+      this.preview = pv;
+    }
+  }
+
+  private renderNodeNow(doc: DocumentLike, id: NodeId): ImageData {
     if (doc.width !== this.W || doc.height !== this.H) this.resize(doc.width, doc.height);
     this.attach(doc);
     const node = doc.getNode(id);
@@ -480,13 +383,22 @@ export class GlCompositor implements CompositorLike {
     return img;
   }
 
+  /** Takes effect at the next composite(): the node, group or 'root' is drawn through the matrix or warp. */
+  setPreview(preview: CompositorPreview): void {
+    this.preview = preview;
+  }
+
   dispose(): void {
+    this.onContextLost = null;
+    this.lost = true;
     this.unsub?.();
     this.unsub = null;
     this.doc = null;
     this.dropTargets();
     this.dropNodeCaches();
     const gl = this.gl;
+    this.previewer?.dispose();
+    this.previewer = null;
     gl.deleteProgram(this.blendProg);
     gl.deleteProgram(this.copyProg);
     gl.deleteVertexArray(this.vao);

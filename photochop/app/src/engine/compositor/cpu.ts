@@ -5,8 +5,11 @@ import { TILE, type AnyNode, type Mask, type NodeId, type Rect } from '../types'
 import { canCreateCanvas, createCanvas, get2d, makeImageData, rectIntersect, rectOuter, type Canvas } from '../util';
 import { blendIndex, blendPixel } from './blend';
 import { ContentCache, sharedContentCache, type Surface } from './content';
+import { CpuPreview } from './preview-cpu';
 
 export type { Surface } from './content';
+
+type CompositorPreview = Parameters<CompositorLike['setPreview']>[0];
 
 /** Scratch buffers for group isolation, one per nesting depth, reused between composites. */
 class ScratchPool {
@@ -145,10 +148,23 @@ export class CpuCompositor implements CompositorLike {
   private _canvas: Canvas | null = null;
   private ctx2d: ReturnType<typeof get2d> | null = null;
   private ctx: CpuContext = createCpuContext(new ContentCache());
+  /** Transform-gesture preview, drawn with Canvas2D at composite time (see preview-cpu.ts). */
+  preview: CompositorPreview = null;
+  private pv = new CpuPreview();
+  /** The canvas currently shows a preview frame, so the next normal composite must be full. */
+  private previewShown = false;
+  private doc: DocumentLike | null = null;
+  private unsub: (() => void) | null = null;
+
+  /** canvas: draw into this canvas instead of creating one (the auto wrapper's stable canvas). */
+  constructor(canvas?: Canvas) {
+    if (canvas) this._canvas = canvas;
+  }
 
   get canvas(): HTMLCanvasElement | OffscreenCanvas {
-    if (!this._canvas) {
-      this._canvas = createCanvas(Math.max(1, this.W), Math.max(1, this.H));
+    if (!this._canvas || !this.ctx2d) {
+      if (!this._canvas) this._canvas = createCanvas(Math.max(1, this.W), Math.max(1, this.H));
+      else if (this.W > 0 && this.H > 0) { this._canvas.width = this.W; this._canvas.height = this.H; }
       this.ctx2d = get2d(this._canvas);
       if (this.W > 0 && this.H > 0) this.ctx2d.putImageData(this.image, 0, 0);
     }
@@ -170,10 +186,30 @@ export class CpuCompositor implements CompositorLike {
     }
   }
 
+  /** Follows the document so a resize ({ kind: 'document' }) resizes the buffers straight away. */
+  private attach(doc: DocumentLike): void {
+    if (this.doc === doc) return;
+    this.unsub?.();
+    this.doc = doc;
+    this.unsub = doc.subscribe((ev) => {
+      if (ev.kind === 'document' && (doc.width !== this.W || doc.height !== this.H)) this.resize(doc.width, doc.height);
+    });
+  }
+
   composite(doc: DocumentLike, opts: CompositeOptions = {}): void {
+    this.attach(doc);
     if (doc.width !== this.W || doc.height !== this.H) this.resize(doc.width, doc.height);
+    if (this.preview && canCreateCanvas()) {
+      void this.canvas;
+      if (this.ctx2d) {
+        this.pv.draw(doc, this.preview, this.ctx, this.ctx2d);
+        this.previewShown = true;
+        return;
+      }
+    }
     const full = { x: 0, y: 0, w: this.W, h: this.H };
-    const region = opts.dirty ? rectIntersect(rectOuter(opts.dirty), full) : full;
+    const region = opts.dirty && !this.previewShown ? rectIntersect(rectOuter(opts.dirty), full) : full;
+    this.previewShown = false;
     if (!region) return;
     clearRegion(this.surf, region);
     compositeChildren(doc.root.children, this.surf, region, this.ctx, 0);
@@ -183,6 +219,7 @@ export class CpuCompositor implements CompositorLike {
 
   readImageData(rect?: Rect): ImageData {
     const r = rect ? rectOuter(rect) : { x: 0, y: 0, w: this.W, h: this.H };
+    if (this.previewShown && this.ctx2d && r.w > 0 && r.h > 0) return this.ctx2d.getImageData(r.x, r.y, r.w, r.h);
     const out = new Uint8ClampedArray(r.w * r.h * 4);
     const ix = rectIntersect(r, { x: 0, y: 0, w: this.W, h: this.H });
     if (ix) {
@@ -203,7 +240,17 @@ export class CpuCompositor implements CompositorLike {
     return makeImageData(doc.width, doc.height, s.data);
   }
 
+  /** Takes effect at the next composite(). */
+  setPreview(preview: CompositorPreview): void {
+    if (!preview || !this.preview || preview.nodeId !== this.preview.nodeId) this.pv.reset();
+    this.preview = preview;
+  }
+
   dispose(): void {
+    this.unsub?.();
+    this.unsub = null;
+    this.doc = null;
+    this.pv.reset();
     this.ctx.cache.clear();
     this.ctx.pool.clear();
     this._canvas = null;

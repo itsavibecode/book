@@ -3,6 +3,7 @@
 import type { Rect, ShapeNode } from './types';
 import { colorToCss } from './color';
 import { createCanvas, get2d, type Ctx2D } from './util';
+import { fracOffset, isIdentityMatrix, mapBounds } from './text';
 
 function geometry(n: ShapeNode) {
   const sx = Math.min(0, n.w), sy = Math.min(0, n.h);
@@ -13,8 +14,15 @@ function hasStroke(n: ShapeNode): boolean {
   return !!n.stroke && n.strokeWidth > 0;
 }
 
-/** Integer node-space bounds including the stroke. */
+/** Integer node-space bounds including the stroke; with a matrix, the axis-aligned bounds of the transformed box. */
 export function shapeBounds(n: ShapeNode): Rect {
+  const b = untransformedBounds(n);
+  if (isIdentityMatrix(n.matrix)) return b;
+  const { fx, fy } = fracOffset(n);
+  return mapBounds(b, n.matrix, fx, fy);
+}
+
+function untransformedBounds(n: ShapeNode): Rect {
   const { sx, sy, sw, sh } = geometry(n);
   const half = hasStroke(n) ? n.strokeWidth / 2 : 0;
   const x0 = Math.floor(sx - half), y0 = Math.floor(sy - half);
@@ -50,9 +58,15 @@ export function rasterizeShape(node: ShapeNode): ImageData | null {
   if (sw <= 0 || sh <= 0) return null;
   if (!node.fill && !hasStroke(node)) return null;
   const b = shapeBounds(node);
+  if (b.w <= 0 || b.h <= 0) return null;
   const canvas = createCanvas(b.w, b.h);
   const ctx = get2d(canvas);
-  ctx.translate(-b.x, -b.y);
+  if (isIdentityMatrix(node.matrix)) {
+    ctx.translate(-b.x, -b.y);
+  } else {
+    const m = node.matrix, { fx, fy } = fracOffset(node);
+    ctx.setTransform(m[0], m[1], m[2], m[3], fx - b.x, fy - b.y);
+  }
   path(ctx, node);
   if (node.fill) {
     ctx.fillStyle = colorToCss(node.fill);

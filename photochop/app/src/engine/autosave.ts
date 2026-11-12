@@ -2,7 +2,7 @@
 // that changed since the last successful write; clean ones keep their stored blob.
 import { AUTOSAVE_DEBOUNCE_MS } from '@/app/constants';
 import type { AutosaveLike, DocumentLike, SaveState } from './contract';
-import type { AnyNode, ChangeEvent, Mask, NodeId, Selection, TileStore } from './types';
+import type { AnyNode, ChangeEvent, Mask, NodeId, SavedSelection, Selection, TileStore } from './types';
 import { readMeta, saveDocumentWith } from './store';
 
 /** Rebuilding the Recent-grid thumbnail needs a full CPU composite, so it is throttled. */
@@ -19,6 +19,8 @@ interface Written {
   tiles: Map<NodeId, TileStore>;
   masks: Map<NodeId, Mask>;
   selection: Selection | null | undefined;
+  /** Saved selection objects as last written; a blob is rewritten only when its object changed. */
+  saved: Map<string, SavedSelection>;
 }
 
 class Autosave implements AutosaveLike {
@@ -31,7 +33,7 @@ class Autosave implements AutosaveLike {
   private inflight: Promise<void> | null = null;
   private pending = false;
   private gen = 0;
-  private written: Written = { tiles: new Map(), masks: new Map(), selection: undefined };
+  private written: Written = { tiles: new Map(), masks: new Map(), selection: undefined, saved: new Map() };
   private dirtyLayers = new Set<NodeId>();
   private dirtyMasks = new Set<NodeId>();
   private selectionDirty = true;
@@ -57,7 +59,7 @@ class Autosave implements AutosaveLike {
   attach(doc: DocumentLike): void {
     this.detach();
     this.doc = doc;
-    this.written = { tiles: new Map(), masks: new Map(), selection: undefined };
+    this.written = { tiles: new Map(), masks: new Map(), selection: undefined, saved: new Map() };
     this.dirtyLayers.clear();
     this.dirtyMasks.clear();
     this.selectionDirty = true;
@@ -122,6 +124,7 @@ class Autosave implements AutosaveLike {
       if (n.mask) this.written.masks.set(n.id, n.mask);
     });
     this.written.selection = doc.selection;
+    for (const s of doc.savedSelections) this.written.saved.set(s.id, s);
     this.selectionDirty = false;
   }
 
@@ -163,6 +166,13 @@ class Autosave implements AutosaveLike {
         if (this.written.masks.get(n.id) === n.mask && !this.dirtyMasks.has(n.id)) skipMasks.add(n.id);
       }
     });
+    const savedNow = new Map<string, SavedSelection>();
+    const skipSaved = new Set<string>();
+    for (const s of doc.savedSelections) {
+      savedNow.set(s.id, s);
+      const w = this.written.saved.get(s.id);
+      if (w === s && w.mask === s.mask) skipSaved.add(s.id);
+    }
     const selectionNow = doc.selection;
     const skipSelection = !this.selectionDirty && this.written.selection === selectionNow;
     const dirtyLayers = new Set(this.dirtyLayers);
@@ -175,12 +185,12 @@ class Autosave implements AutosaveLike {
     const now = Date.now();
     const buildThumbnail = !this.thumb || now - this.thumbAt >= THUMB_INTERVAL_MS;
     const job = saveDocumentWith(doc, {
-      skip: { layers: skipLayers, masks: skipMasks, selection: skipSelection },
+      skip: { layers: skipLayers, masks: skipMasks, selection: skipSelection, saved: skipSaved },
       thumbnail: this.thumb,
       buildThumbnail,
     }).then((meta) => {
       if (doc !== this.doc) return;
-      this.written = { tiles: tilesNow, masks: masksNow, selection: selectionNow };
+      this.written = { tiles: tilesNow, masks: masksNow, selection: selectionNow, saved: savedNow };
       if (buildThumbnail) {
         this.thumb = meta.thumbnail;
         this.thumbAt = now;
@@ -202,7 +212,7 @@ class Autosave implements AutosaveLike {
       for (const id of dirtyMasks) this.dirtyMasks.add(id);
       if (selectionWasDirty) this.selectionDirty = true;
       // Nothing from this attempt counts as written; force full blobs next time.
-      this.written = { tiles: new Map(), masks: new Map(), selection: undefined };
+      this.written = { tiles: new Map(), masks: new Map(), selection: undefined, saved: new Map() };
       this.pending = true;
       this.setState('error');
     });

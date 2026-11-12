@@ -1,9 +1,10 @@
 // The live document: a node tree plus selection, active layer and history.
 import type { DocumentLike, HistoryLike, NewDocumentOptions } from './contract';
 import type {
-  AnyNode, ChangeEvent, DocId, GroupNode, Mask, NodeBase, NodeId, NodeType, RasterNode, Rect,
-  Selection, ShapeNode, TextNode,
+  AnyNode, ChangeEvent, DocId, GroupNode, Guide, Mask, NodeBase, NodeId, NodeType, RasterNode, Rect,
+  SavedSelection, Selection, ShapeNode, TextNode, TileStore,
 } from './types';
+import { tightTileBounds } from './transform/bounds';
 import { createTileStore, fillTilesRect } from './tiles';
 import { History } from './history';
 import { measureText } from './text';
@@ -34,27 +35,34 @@ export function createRasterNode(name: string): RasterNode {
   return { ...base('raster', name), type: 'raster', tiles: createTileStore() };
 }
 
+/** Copy of a text or shape node matrix; a missing one (0.1.0 data) becomes identity. */
+export function copyMatrix(m: readonly number[] | undefined | null): [number, number, number, number] {
+  return m && m.length === 4 ? [m[0], m[1], m[2], m[3]] : [1, 0, 0, 1];
+}
+
 export function createTextNode(name: string, props: Partial<TextNode> = {}): TextNode {
   const n: TextNode = {
     ...base('text', name),
     text: '', font: 'system-ui', size: 48, weight: 700, italic: false, color: [0, 0, 0, 255],
-    align: 'left', lineHeight: 1.2, letterSpacing: 0, width: null,
+    align: 'left', lineHeight: 1.2, letterSpacing: 0, width: null, matrix: [1, 0, 0, 1],
     ...props,
     type: 'text',
   };
   n.color = [...n.color];
+  n.matrix = copyMatrix(n.matrix);
   return n;
 }
 
 export function createShapeNode(name: string, props: Partial<ShapeNode> = {}): ShapeNode {
   const n: ShapeNode = {
     ...base('shape', name),
-    shape: 'rect', w: 100, h: 100, radius: 0, fill: [0, 0, 0, 255], stroke: null, strokeWidth: 2,
+    shape: 'rect', w: 100, h: 100, radius: 0, fill: [0, 0, 0, 255], stroke: null, strokeWidth: 2, matrix: [1, 0, 0, 1],
     ...props,
     type: 'shape',
   };
   if (n.fill) n.fill = [...n.fill];
   if (n.stroke) n.stroke = [...n.stroke];
+  n.matrix = copyMatrix(n.matrix);
   return n;
 }
 
@@ -78,8 +86,6 @@ interface DocInit {
 export class Document implements DocumentLike {
   readonly id: DocId;
   name: string;
-  readonly width: number;
-  readonly height: number;
   readonly root: GroupNode;
   selection: Selection | null = null;
   activeId: NodeId | null = null;
@@ -87,14 +93,24 @@ export class Document implements DocumentLike {
   readonly history: HistoryLike;
   readonly createdAt: number;
   updatedAt: number;
+  /** Pixels per inch, metadata only. */
+  dpi = 72;
+  /** Ruler guides in document space. Engine commands replace or mutate this array; the UI only reads it. */
+  guides: Guide[] = [];
+  /** Selections stored in the document. Engine commands replace or mutate this array; the UI only reads it. */
+  savedSelections: SavedSelection[] = [];
+  private _width: number;
+  private _height: number;
   private _version = 0;
   private listeners = new Set<(ev: ChangeEvent) => void>();
+  /** Tight raster bounds in node space, per tile store (null = no visible pixels). */
+  private tightCache = new WeakMap<TileStore, Rect | null>();
 
   constructor(init: DocInit) {
     this.id = init.id ?? newId();
     this.name = init.name;
-    this.width = Math.max(1, Math.round(init.width));
-    this.height = Math.max(1, Math.round(init.height));
+    this._width = Math.max(1, Math.round(init.width));
+    this._height = Math.max(1, Math.round(init.height));
     const now = Date.now();
     this.createdAt = init.createdAt ?? now;
     this.updatedAt = init.updatedAt ?? now;
@@ -104,6 +120,24 @@ export class Document implements DocumentLike {
 
   get version(): number {
     return this._version;
+  }
+
+  get width(): number {
+    return this._width;
+  }
+
+  get height(): number {
+    return this._height;
+  }
+
+  /**
+   * Engine only (document commands such as resizeCanvas and rotateDocument): changes the pixel
+   * size. Does not emit; the calling command emits { kind: 'document' } once it has moved
+   * everything else. DocumentLike keeps width and height readonly for the UI.
+   */
+  _setSize(width: number, height: number): void {
+    this._width = Math.max(1, Math.round(width));
+    this._height = Math.max(1, Math.round(height));
   }
 
   getNode(id: NodeId): AnyNode | undefined {
@@ -141,12 +175,54 @@ export class Document implements DocumentLike {
     return n ? nodeDocBounds(n) : null;
   }
 
+  contentBounds(id: NodeId): Rect | null {
+    const n = this.getNode(id);
+    return n ? this.contentOf(n) : null;
+  }
+
+  private contentOf(n: AnyNode): Rect | null {
+    switch (n.type) {
+      case 'raster': {
+        // Cached in node space per tile store, so moving a layer never rescans it.
+        let r = this.tightCache.get(n.tiles);
+        if (r === undefined) {
+          r = tightTileBounds(n.tiles);
+          this.tightCache.set(n.tiles, r);
+        }
+        return r ? { x: r.x + Math.round(n.x), y: r.y + Math.round(n.y), w: r.w, h: r.h } : null;
+      }
+      case 'text':
+      case 'shape':
+        return nodeDocBounds(n);
+      case 'group': {
+        let r: Rect | null = null;
+        for (const c of n.children) r = rectUnion(r, this.contentOf(c));
+        return r;
+      }
+    }
+  }
+
+  /**
+   * Drops cached raster bounds that an event may have changed. The cache is keyed by tile store
+   * in node space, so 'node' events (moves, props, a command swapping in a new store) need no
+   * rescan; 'pixels' drops that layer, 'tree' and 'document' drop everything.
+   */
+  private invalidateBounds(ev: ChangeEvent): void {
+    if (ev.kind === 'pixels') {
+      const n = this.getNode(ev.nodeId);
+      if (n?.type === 'raster') this.tightCache.delete(n.tiles);
+    } else if (ev.kind === 'tree' || ev.kind === 'document') {
+      this.tightCache = new WeakMap();
+    }
+  }
+
   subscribe(fn: (ev: ChangeEvent) => void): () => void {
     this.listeners.add(fn);
     return () => { this.listeners.delete(fn); };
   }
 
   emit(ev: ChangeEvent): void {
+    this.invalidateBounds(ev);
     this._version++;
     this.updatedAt = Date.now();
     for (const fn of [...this.listeners]) {

@@ -13,8 +13,9 @@
 //   screen space    : CSS pixels of the viewport canvas; the UI owns the view transform.
 
 import type {
-  AnyNode, BlendMode, ChangeEvent, DocId, DocumentMeta, GroupNode, Mask, NodeId, Point, RGBA,
-  RasterNode, Rect, Selection, ShapeNode, TextNode, TileStore,
+  AnyNode, BlendMode, ChangeEvent, DocId, DocumentMeta, GroupNode, Guide, Interpolation, Mask, Mat3,
+  NodeId, Point, RGBA, RasterNode, Rect, SavedSelection, Selection, ShapeNode, TextNode, TileStore,
+  WarpGrid, WarpPreset,
 } from './types';
 
 // ---------------------------------------------------------------------------------------------
@@ -24,6 +25,7 @@ import type {
 export interface DocumentLike {
   readonly id: DocId;
   name: string;
+  /** Readonly for the UI; changes only through the document commands (resizeCanvas, resizeImage, rotateDocument, ...). */
   readonly width: number;
   readonly height: number;
   /** Invisible root group; its children are the top-level layers, bottom to top. */
@@ -38,6 +40,12 @@ export interface DocumentLike {
   readonly version: number;
   readonly createdAt: number;
   updatedAt: number;
+  /** Pixels per inch, metadata only (Image size dialog, ruler units). Default 72. */
+  dpi: number;
+  /** Ruler guides, document space. Mutated only through commands. */
+  readonly guides: readonly Guide[];
+  /** Selections saved in the document. Mutated only through commands. */
+  readonly savedSelections: readonly SavedSelection[];
 
   getNode(id: NodeId): AnyNode | undefined;
   parentOf(id: NodeId): GroupNode | undefined;
@@ -49,6 +57,13 @@ export interface DocumentLike {
   activeNode(): AnyNode | undefined;
   /** Document-space bounds of a node's content (tiles bounds, text layout, shape rect). null when empty. */
   nodeBounds(id: NodeId): Rect | null;
+  /**
+   * Tight document-space bounds of what the node shows: rasters = box of pixels with alpha > 0
+   * (integers); text and shape = the same transformed bounds as nodeBounds; groups = union of the
+   * children's contentBounds. null when empty. Cached (per tile store), so it is cheap to call on
+   * every pointer move. Use it for transform boxes and as the warp grid's source rect.
+   */
+  contentBounds(id: NodeId): Rect | null;
 
   /** Subscribe to changes. Returns an unsubscribe function. Every mutation (command do/undo/redo) emits. */
   subscribe(fn: (ev: ChangeEvent) => void): () => void;
@@ -127,6 +142,43 @@ export interface CommandFactory {
   setDocumentName(doc: DocumentLike, name: string): Command;
   /** Group several commands into one undo step. */
   batch(label: string, cmds: Command[]): Command;
+
+  // saved selections
+  /** Stores a copy of doc.selection. */
+  saveSelection(doc: DocumentLike, name: string): Command;
+  deleteSavedSelection(doc: DocumentLike, id: string): Command;
+  renameSavedSelection(doc: DocumentLike, id: string, name: string): Command;
+  // guides (document space, undoable)
+  addGuide(doc: DocumentLike, axis: 'h' | 'v', pos: number): Command;
+  /** Mergeable per guide id. */
+  moveGuide(doc: DocumentLike, id: string, pos: number): Command;
+  removeGuide(doc: DocumentLike, id: string): Command;
+  clearGuides(doc: DocumentLike): Command;
+  // layer transforms
+  /** Applies m (document space to document space) to each node. Raster: pixels and linked mask are resampled. Text and shape: affine m is composed into matrix/x/y (stays editable); a projective m throws Error('Rasterise this layer first'). Group: recurses. */
+  transformNodes(doc: DocumentLike, ids: NodeId[], m: Mat3, interpolation: Interpolation): Command;
+  /** Raster only. Bicubic patch warp of the node's pixels and linked mask. */
+  warpNode(doc: DocumentLike, id: NodeId, grid: WarpGrid, interpolation: Interpolation): Command;
+  /** Cuts the selected pixels of a raster node into a new raster node directly above it ('Layer via cut') or copies them ('Layer via copy'). The new node becomes active. */
+  layerViaCut(doc: DocumentLike, id: NodeId): Command;
+  layerViaCopy(doc: DocumentLike, id: NodeId): Command;
+  /** Paints a band along the selection edge onto a raster node. */
+  strokeSelection(doc: DocumentLike, id: NodeId, color: RGBA, width: number, position: 'inside' | 'center' | 'outside'): Command;
+  // document transforms: all keep every layer, mask, text and shape (nothing flattens)
+  /** New canvas size; (offsetX, offsetY) is where the old origin lands in the new canvas. deletePixels trims raster pixels that fall outside (crop with 'Delete cropped pixels'). Masks, selection, saved selections and guides follow. */
+  resizeCanvas(doc: DocumentLike, width: number, height: number, offsetX: number, offsetY: number, opts?: { deletePixels?: boolean }): Command;
+  /** Resamples the whole document to a new pixel size (every raster, mask, selection; text and shapes scale through their matrix; guides scale). */
+  resizeImage(doc: DocumentLike, width: number, height: number, interpolation: Interpolation): Command;
+  /** Rotates the whole document. Multiples of 90 are exact (no resampling loss). Other angles resample rasters; expand grows the canvas to fit. */
+  rotateDocument(doc: DocumentLike, degrees: number, opts?: { interpolation?: Interpolation; expand?: boolean }): Command;
+  flipDocument(doc: DocumentLike, axis: 'h' | 'v'): Command;
+  /** Maps the quad (corners clockwise from top-left, document space) onto a new outW x outH canvas. Text and shape layers are rasterised by this command (the UI warns first). */
+  perspectiveCrop(doc: DocumentLike, corners: [Point, Point, Point, Point], outW: number, outH: number, interpolation: Interpolation): Command;
+  /** Crops to the bounds of non-transparent pixels ('transparent') or of pixels differing from the top-left / bottom-right colour. Returns null when nothing would change. */
+  trimDocument(doc: DocumentLike, mode: 'transparent' | 'top-left' | 'bottom-right'): Command | null;
+  /** Grows the canvas so that no layer content is clipped. Returns null when nothing is outside. */
+  revealAll(doc: DocumentLike): Command | null;
+  setDocumentDpi(doc: DocumentLike, dpi: number): Command;
 }
 
 /**
@@ -173,7 +225,72 @@ export interface CompositorLike {
   readImageData(rect?: Rect): ImageData;
   /** Flat render of one node alone at document size (for thumbnails, eyedropper on a layer, rasterize). */
   renderNode(doc: DocumentLike, id: NodeId): ImageData;
+  /** Live preview for transform gestures: the node (or group, or 'root') is drawn through the matrix or warp instead of in place. null clears. Nothing in the document changes. Must look the same as the committed result for affine matrices within resampling tolerance. */
+  setPreview(preview: null | { nodeId: NodeId; matrix?: Mat3; warp?: WarpGrid; interpolation?: Interpolation }): void;
   dispose(): void;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Selection building and mask painting (0.2.0)
+// ---------------------------------------------------------------------------------------------
+
+export interface QuickSelectLike {
+  /** Grows the selection from a brush dab at p (document space) with the given radius. Call for every pointer sample. */
+  stroke(p: Point, radius: number): void;
+  /** Mask accumulated so far (document sized). Same object across calls. */
+  readonly mask: Mask;
+}
+
+export interface MagneticLassoLike {
+  /** First anchor. */
+  start(p: Point): void;
+  /** Edge-following path from the last anchor to p, for live display. Does not commit. */
+  trace(p: Point): Point[];
+  /** Commits the traced path up to p as fixed points (also called automatically every `frequency` pixels). */
+  anchor(p: Point): void;
+  /** Removes the last anchor (Backspace). */
+  undoAnchor(): void;
+  /** All committed points so far. */
+  readonly points: readonly Point[];
+  /** Closes the path back to the start along edges and returns the full polygon. */
+  close(): Point[];
+}
+
+/** Painting into a layer mask. Mirrors RasterEditSession: mark, write, flush, commit one undoable command. */
+export interface MaskEditSession {
+  readonly nodeId: NodeId;
+  readonly mask: Mask;
+  /** Call before writing into mask.data inside the rect so the before-state is captured. */
+  markRect(rect: Rect): Rect;
+  flush(rect?: Rect): void;
+  commit(label: string): Command;
+  cancel(): void;
+}
+
+export interface WandOptions { tolerance: number; contiguous: boolean; antialias: boolean; sampleAllLayers: boolean; nodeId?: NodeId }
+
+export interface ColorRangeOptions {
+  /** 'sampled' uses `samples`; the others are fixed ranges. */
+  range: 'sampled' | 'reds' | 'yellows' | 'greens' | 'cyans' | 'blues' | 'magentas' | 'highlights' | 'midtones' | 'shadows';
+  samples: RGBA[];
+  /** 0..200, how far from the samples a colour may be and still be partly selected. */
+  fuzziness: number;
+  invert: boolean;
+  /** Restrict to this selection when given. */
+  within: Mask | null;
+}
+
+export interface RefineOptions {
+  /** Edge detection band in pixels (0 = off): inside the band, coverage is recomputed from colour so hair and soft edges are kept. */
+  radius: number;
+  /** 0..100 */
+  smooth: number;
+  /** px, 0..250 */
+  feather: number;
+  /** 0..100 percent */
+  contrast: number;
+  /** -100..100 percent */
+  shiftEdge: number;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -341,19 +458,72 @@ export interface EngineApi {
   // utility
   colorToCss(c: RGBA): string;
   cssToColor(css: string): RGBA | null;
+
+  // matrices
+  mat3Identity(): Mat3;
+  /** a after b: result maps p -> a(b(p)). */
+  mat3Multiply(a: Mat3, b: Mat3): Mat3;
+  mat3Translate(tx: number, ty: number): Mat3;
+  mat3Scale(sx: number, sy: number, cx?: number, cy?: number): Mat3;
+  mat3Rotate(degrees: number, cx?: number, cy?: number): Mat3;
+  mat3Skew(degX: number, degY: number, cx?: number, cy?: number): Mat3;
+  /** Projective matrix taking the rect's corners to the four destination points (clockwise from top-left). */
+  mat3FromQuad(rect: Rect, to: [Point, Point, Point, Point]): Mat3;
+  mat3Invert(m: Mat3): Mat3 | null;
+  mat3Apply(m: Mat3, p: Point): Point;
+  mat3IsAffine(m: Mat3): boolean;
+  // selection building
+  polygonMask(w: number, h: number, points: Point[], antialias: boolean): Mask;
+  magicWand(compositor: CompositorLike, doc: DocumentLike, at: Point, opts: WandOptions): Mask;
+  createQuickSelect(compositor: CompositorLike, doc: DocumentLike, opts: { sampleAllLayers: boolean; nodeId?: NodeId; tolerance: number }): QuickSelectLike;
+  createMagneticLasso(compositor: CompositorLike, doc: DocumentLike, opts: { width: number; contrast: number; frequency: number }): MagneticLassoLike;
+  colorRange(compositor: CompositorLike, doc: DocumentLike, opts: ColorRangeOptions): Mask;
+  // selection modification (all return a new mask; soft coverage is preserved, never thresholded unless stated)
+  /** True Gaussian, any radius up to 250. */
+  featherMask(m: Mask, radius: number): Mask;
+  /** Round structuring element. */
+  expandMask(m: Mask, px: number): Mask;
+  /** Image edges do not count as unselected. */
+  contractMask(m: Mask, px: number): Mask;
+  smoothMask(m: Mask, radius: number): Mask;
+  /** Straddles the edge, width px in total. */
+  borderMask(m: Mask, width: number): Mask;
+  /** Contiguous, until stable. */
+  growSelection(compositor: CompositorLike, doc: DocumentLike, m: Mask, tolerance: number): Mask;
+  /** Whole document, against the set of selected colours. */
+  similarSelection(compositor: CompositorLike, doc: DocumentLike, m: Mask, tolerance: number): Mask;
+  refineMask(compositor: CompositorLike, doc: DocumentLike, m: Mask, opts: RefineOptions): Mask;
+  transformMask(m: Mask, mat: Mat3, interpolation: Interpolation): Mask;
+  // masks as paint targets
+  beginMaskEdit(doc: DocumentLike, nodeId: NodeId): MaskEditSession;
+  /** Brush or eraser into a mask: value 255 reveals, 0 hides, greys in between; honours size, hardness, opacity, flow, spacing, pressure and the selection. */
+  createMaskStroke(session: MaskEditSession, params: BrushParams, value: number, selection: Selection | null): BrushStrokeLike;
+  /** Bucket into a mask (at = null fills the selection or the whole mask). */
+  fillMask(session: MaskEditSession, doc: DocumentLike, at: Point | null, value: number, tolerance: number, contiguous: boolean): Rect | null;
+  // pixels
+  /** Selection-clipped pixels of one node, or of the composite when nodeId is null (Copy merged). null when nothing is there. */
+  copyPixels(compositor: CompositorLike, doc: DocumentLike, nodeId: NodeId | null): { image: ImageData; x: number; y: number } | null;
+  // warp
+  /** bend -100..100 */
+  warpGridFor(bounds: Rect, preset: WarpPreset, bend: number): WarpGrid;
 }
 
 /** Framework-neutral serialized form. Blobs are PNG-encoded per raster node (lossless) plus masks. */
 export interface SerializedDocument {
   json: SerializedDocumentJson;
-  /** Keyed as in json: 'layer/<nodeId>' (RGBA PNG of the node's tile bounds), 'mask/<nodeId>' (grey PNG, document size), 'selection' (grey PNG). */
+  /** Keyed as in json: 'layer/<nodeId>' (RGBA PNG of the node's tile bounds), 'mask/<nodeId>' (grey PNG, document size), 'selection' (grey PNG), 'saved/<savedSelectionId>' (grey PNG, document size; format 2). */
   blobs: Record<string, Blob>;
 }
 
+/**
+ * Format 1: 0.1.0 files and autosaves (no dpi, guides, saved selections or node matrices).
+ * Format 2: 0.2.0 and later. Readers accept both and default what format 1 lacks
+ * (dpi 72, no guides, no saved selections, identity matrices); anything higher is rejected.
+ */
 export interface SerializedDocumentJson {
   app: string;          // APP_NAME
   version: string;      // APP_VERSION that wrote the file
-  format: 1;            // file format revision
+  format: 1 | 2;        // file format revision
   id: DocId;
   name: string;
   width: number;
@@ -363,8 +533,15 @@ export interface SerializedDocumentJson {
   activeId: NodeId | null;
   root: SerializedNode;
   selectionBounds: Rect | null;
+  /** Format 2. Missing on read means 72. */
+  dpi?: number;
+  /** Format 2. Missing on read means none. */
+  guides?: Guide[];
+  /** Format 2. Mask bytes live in blobs under 'saved/<id>'. Missing on read means none. */
+  savedSelections?: Array<{ id: string; name: string }>;
 }
 
+/** Text and shape nodes carry `matrix` (format 2); format 1 files lack it and readers default it to identity. */
 export type SerializedNode =
   | (Omit<RasterNode, 'tiles' | 'mask'> & { mask: boolean; bounds: Rect | null })
   | (Omit<TextNode, 'mask'> & { mask: boolean })
@@ -390,10 +567,17 @@ export interface IoApi {
   downloadBlob(blob: Blob, filename: string): void;
   /** File System Access API when present (showSaveFilePicker), else downloadBlob. Resolves to the handle or null. */
   saveAs(blob: Blob, filename: string, description: string, accept: Record<string, string[]>): Promise<FileSystemFileHandle | null>;
+  /** The selection as a greyscale PNG at document size. */
+  exportSelection(doc: DocumentLike): Promise<Blob>;
+  /** Any image as a selection mask (luminance times alpha), scaled to the document when sizes differ. */
+  importSelection(file: File | Blob, doc: DocumentLike): Promise<Mask>;
+  /** Writes an image to the system clipboard as PNG. false when the browser refuses. */
+  copyImageToClipboard(image: ImageData): Promise<boolean>;
 }
 
 // Re-export the types the UI needs most, so '@/engine' is the only import.
 export type {
-  AnyNode, BlendMode, ChangeEvent, DocId, DocumentMeta, GroupNode, Mask, NodeId, Point, RGBA,
-  RasterNode, Rect, Selection, ShapeNode, TextNode, TileStore,
+  AnyNode, BlendMode, ChangeEvent, DocId, DocumentMeta, GroupNode, Guide, Interpolation, Mask, Mat3,
+  NodeId, Point, RGBA, RasterNode, Rect, SavedSelection, Selection, ShapeNode, TextNode, TileStore,
+  WarpGrid, WarpPreset,
 };

@@ -4,7 +4,7 @@
 //   settings  : key = string        -> any structured-cloneable value
 import type { DocumentLike, SerializedDocumentJson, StoreLike } from './contract';
 import type { DocId, DocumentMeta } from './types';
-import { deserializeParts, serializeParts, type SerializeSkip } from './serialize';
+import { deserializeParts, serializePartsAsync, type SerializeSkip } from './serialize';
 import { pngBlob } from './png';
 import { thumbnailDataUrl } from './thumb';
 
@@ -64,13 +64,19 @@ export interface SaveOptions {
   buildThumbnail?: boolean;
 }
 
-/** Serialises synchronously before the first await, so the saved state is one consistent instant. */
+/**
+ * Saves one consistent instant of the document: raster tiles are copied in slices (layers that
+ * change meanwhile are copied again in the final synchronous step), PNG encoding runs in a worker
+ * and the thumbnail is composited in slices, so the main thread stays responsive.
+ */
 export async function saveDocumentWith(doc: DocumentLike, opts: SaveOptions = {}): Promise<DocumentMeta> {
-  const parts = serializeParts(doc, opts.skip);
+  const partsJob = serializePartsAsync(doc, opts.skip);
+  const thumbJob = opts.buildThumbnail === false ? Promise.resolve(opts.thumbnail) : thumbnailDataUrl(doc);
+  const [parts, thumb] = await Promise.all([partsJob, thumbJob]);
   const keep = new Set(parts.keys);
-  const thumbnail = opts.buildThumbnail === false ? opts.thumbnail : (await thumbnailDataUrl(doc)) ?? opts.thumbnail;
+  const thumbnail = thumb ?? opts.thumbnail;
   const meta: DocumentMeta = {
-    id: doc.id, name: doc.name, width: doc.width, height: doc.height,
+    id: doc.id, name: parts.json.name, width: parts.json.width, height: parts.json.height,
     createdAt: doc.createdAt, updatedAt: parts.json.updatedAt, thumbnail,
   };
   const db = await openDb();

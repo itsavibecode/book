@@ -12,6 +12,17 @@ export type RGBA = [number, number, number, number];
 
 export const TILE = 256;
 
+/** Row-major 3x3 matrix mapping source space to document space. Affine when m[6] === 0 && m[7] === 0 && m[8] === 1. */
+export type Mat3 = [number, number, number, number, number, number, number, number, number];
+export type Interpolation = 'nearest' | 'bilinear' | 'bicubic';
+
+/** A ruler guide in document pixels. axis 'h' is a horizontal line at y = pos; 'v' a vertical line at x = pos. */
+export interface Guide { id: string; axis: 'h' | 'v'; pos: number }
+
+/** 4 x 4 bicubic Bezier patch, row-major (16 points), in document space. The undistorted grid spans the node's bounds. */
+export interface WarpGrid { points: Point[] }
+export type WarpPreset = 'none' | 'arc' | 'arch' | 'bulge' | 'flag' | 'wave' | 'fisheye' | 'squeeze';
+
 /** The full Photoshop set. Only BLEND_MODES_IMPLEMENTED render in 0.1.0; others fall back to normal. */
 export type BlendMode =
   | 'normal' | 'dissolve'
@@ -46,6 +57,9 @@ export interface Mask {
   h: number;
   data: Uint8Array;
 }
+
+/** A selection stored inside the document (survives save, reload and .photochop round trips). */
+export interface SavedSelection { id: string; name: string; mask: Mask }
 
 /** Selection = mask + cached bounds of its non-zero area (null bounds when empty). */
 export interface Selection {
@@ -100,6 +114,8 @@ export interface TextNode extends NodeBase {
   letterSpacing: number;
   /** Box width for wrapping; null = point text (no wrap). */
   width: number | null;
+  /** Linear part of the node's transform in canvas order [a, b, c, d]: docX = a*nx + c*ny + x, docY = b*nx + d*ny + y. Identity is [1, 0, 0, 1]. */
+  matrix: [number, number, number, number];
 }
 
 export type ShapeKind = 'rect' | 'ellipse';
@@ -115,6 +131,8 @@ export interface ShapeNode extends NodeBase {
   fill: RGBA | null;
   stroke: RGBA | null;
   strokeWidth: number;
+  /** Linear part of the node's transform in canvas order [a, b, c, d]: docX = a*nx + c*ny + x, docY = b*nx + d*ny + y. Identity is [1, 0, 0, 1]. */
+  matrix: [number, number, number, number];
 }
 
 export interface GroupNode extends NodeBase {
@@ -185,5 +203,6 @@ export type ChangeEvent =
   | { kind: 'node'; nodeId: NodeId }                        // props or mask of one node
   | { kind: 'tree' }                                        // add / remove / move / reparent
   | { kind: 'selection' }
-  | { kind: 'document' }                                    // name, size
-  | { kind: 'active' };                                     // active or selected layer ids
+  | { kind: 'document' }                                    // name, size, dpi, saved selections
+  | { kind: 'active' }                                      // active or selected layer ids
+  | { kind: 'guides' };                                     // ruler guides added, moved or removed

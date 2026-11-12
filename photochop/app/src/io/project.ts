@@ -1,9 +1,10 @@
 // .photochop project file: a ZIP (fflate) holding
-//   document.json, layers/<id>.png, masks/<id>.png, selection.png, thumbnail.png
+//   document.json, layers/<id>.png, masks/<id>.png, selection.png, saved/<id>.png (saved
+//   selections, format 2), thumbnail.png
 // PNGs are stored without recompression; the JSON is deflated.
 import { strFromU8, strToU8, unzipSync, zipSync, type Zippable } from 'fflate';
 import type { CompositorLike, DocumentLike, SerializedDocumentJson } from '@/engine/contract';
-import { deserializeParts, serializeParts } from '@/engine/serialize';
+import { deserializeParts, serializePartsAsync } from '@/engine/serialize';
 import { newId } from '@/engine/document';
 import { thumbnailBlob } from '@/engine/thumb';
 
@@ -11,6 +12,7 @@ function toZipPath(key: string): string {
   if (key === 'selection') return 'selection.png';
   if (key.startsWith('layer/')) return `layers/${key.slice(6)}.png`;
   if (key.startsWith('mask/')) return `masks/${key.slice(5)}.png`;
+  if (key.startsWith('saved/')) return `saved/${key.slice(6)}.png`;
   return `${key}.png`;
 }
 
@@ -20,11 +22,13 @@ function fromZipPath(path: string): string | null {
   if (m) return `layer/${m[1]}`;
   m = /^masks\/(.+)\.png$/.exec(path);
   if (m) return `mask/${m[1]}`;
+  m = /^saved\/(.+)\.png$/.exec(path);
+  if (m) return `saved/${m[1]}`;
   return null;
 }
 
 export async function saveProject(doc: DocumentLike, compositor: CompositorLike): Promise<Blob> {
-  const parts = serializeParts(doc);
+  const parts = await serializePartsAsync(doc);
   const files: Zippable = { 'document.json': [strToU8(JSON.stringify(parts.json)), { level: 6 }] };
   for (const [k, bytes] of Object.entries(parts.files)) files[toZipPath(k)] = [bytes, { level: 0 }];
   try {
