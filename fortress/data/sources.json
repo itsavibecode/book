@@ -1499,5 +1499,71 @@
     "trust": 1,
     "trustReason": "Clickbait aggregator pushing end-of-the-world date headlines.",
     "url": "https://todaypress.tv/"
+  },
+  {
+    "id": "boatos",
+    "name": "Boatos.org",
+    "domain": "boatos.org",
+    "type": "fact-checker",
+    "trust": 3,
+    "trustReason": "Long-running Brazilian hoax-debunking site with an English section; not an IFCN signatory.",
+    "url": "https://www.boatos.org/"
+  },
+  {
+    "id": "euro-weekly-news",
+    "name": "Euro Weekly News",
+    "domain": "euroweeklynews.com",
+    "type": "tabloid",
+    "trust": 2,
+    "trustReason": "Free expat paper in Spain; useful for local rumor context, light on sourcing.",
+    "url": "https://euroweeklynews.com/"
+  },
+  {
+    "id": "biobiochile",
+    "name": "BioBioChile",
+    "domain": "biobiochile.cl",
+    "type": "national-paper",
+    "trust": 3,
+    "trustReason": "Major Chilean news site that checked the Nov 17 blackout rumor.",
+    "url": "https://www.biobiochile.cl/"
+  },
+  {
+    "id": "bm-magazine",
+    "name": "Business Matters",
+    "domain": "bmmagazine.co.uk",
+    "type": "magazine",
+    "trust": 3,
+    "trustReason": "UK business magazine relaying retail research data.",
+    "url": "https://bmmagazine.co.uk/"
+  },
+  {
+    "id": "cnbc-news",
+    "name": "CNBC",
+    "domain": "cnbc.com",
+    "type": "broadcast",
+    "trust": 4,
+    "trustReason": "Major US business broadcaster; its fridge-hack story carries Reuters reporting.",
+    "url": "https://www.cnbc.com/"
+  },
+  {
+    "id": "abc30",
+    "name": "ABC30 (Fresno)",
+    "domain": "abc30.com",
+    "type": "local-tv",
+    "trust": 3,
+    "trustReason": "ABC-owned station running network copy on the Iran talks.",
+    "url": "https://abc30.com/"
+  },
+  {
+    "id": "meaww",
+    "name": "MEAWW",
+    "domain": "news.meaww.com",
+    "type": "blog",
+    "trust": 2,
+    "trustReason": "Entertainment and viral news aggregator whose fact-check posts mostly summarize other outlets' work.",
+    "url": "https://news.meaww.com/",
+    "altDomains": [
+      "meaww.com"
+    ]
   }
 ]
