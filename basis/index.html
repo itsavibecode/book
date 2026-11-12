@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="app-version" content="0.2.1">
+<meta name="description" content="Track the average cost of an options position across every buy and trim, and see how many contracts at today's price would bring your average down to a target.">
+<title>Basis v0.2.1 - options cost averager | BookHockeys</title>
+<link rel="canonical" href="https://bookhockeys.com/basis/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20width=%2264%22%20height=%2264%22%20rx=%2212%22%20fill=%22%23b45309%22/%3E%3Crect%20x=%2214%22%20y=%2216%22%20width=%2236%22%20height=%2232%22%20rx=%223%22%20fill=%22%23f5f1ea%22/%3E%3Crect%20x=%2220%22%20y=%2222%22%20width=%2216%22%20height=%225%22%20rx=%221%22%20fill=%22%231f1a14%22/%3E%3Cpath%20d=%22M18%2034h28%22%20stroke=%22%23b45309%22%20stroke-width=%222.5%22%20stroke-dasharray=%223.5%203%22/%3E%3Crect%20x=%2220%22%20y=%2239%22%20width=%2224%22%20height=%223%22%20rx=%221%22%20fill=%22%235a5248%22/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f1ea">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#15120e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Basis">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BookHockeys">
+<meta property="og:title" content="Basis: what did your options really cost?">
+<meta property="og:description" content="Track the average cost of an options position across every buy and trim, and see how many contracts at today's price would bring your average down to a target.">
+<meta property="og:url" content="https://bookhockeys.com/basis/">
+<meta property="og:image" content="https://bookhockeys.com/basis/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Basis: an options cost-basis averager drawn as a trade ticket">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Basis: what did your options really cost?">
+<meta name="twitter:description" content="Average cost across every fill, and how many contracts it takes to bring it down.">
+<meta name="twitter:image" content="https://bookhockeys.com/basis/og.png">
+<!-- Analytics: per-device opt-out first (?ga=off / ?ga=on, remembered in
+     localStorage), then Google Consent Mode v2 defaults, then GA4. The
+     consent decision shares the site-wide `greenline-consent` key, so a
+     choice made on any bookhockeys.com page applies here too. -->
+<script>
+(function () {
+  var GA_ID = 'G-DYME377V2S';
+  var OPT_KEY = 'basis_ga_optout';
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.get('ga') === 'off') localStorage.setItem(OPT_KEY, '1');
+    if (p.get('ga') === 'on') localStorage.removeItem(OPT_KEY);
+  } catch (e) {}
+  var optedOut = false;
+  try { optedOut = localStorage.getItem(OPT_KEY) === '1'; } catch (e) {}
+  window['ga-disable-' + GA_ID] = optedOut;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  if (optedOut) return;
+
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  // EU/EEA/UK/CH by browser timezone: no IP lookup, errs toward asking.
+  var tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  var euExtras = ['Atlantic/Azores', 'Atlantic/Madeira', 'Atlantic/Canary',
+    'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta'];
+  var likelyEU = tz.indexOf('Europe/') === 0 || euExtras.indexOf(tz) !== -1;
+  var saved = null;
+  try { saved = localStorage.getItem('greenline-consent'); } catch (e) {}
+  if (saved === 'granted' || (saved !== 'denied' && !likelyEU)) {
+    gtag('consent', 'update', { 'analytics_storage': 'granted' });
+  } else if (saved !== 'denied') {
+    window.__needsConsent = true;
+  }
+
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  document.head.appendChild(s);
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+})();
+</script>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f5f1ea; --card:#ffffff; --ink:#1f1a14; --muted:#5a5248; --line:#ddd5c8;
+  --field:#8a7f72; --accent:#b45309; --on-accent:#ffffff;
+  --gain:#166534; --loss:#b91c1c; --on-loss:#ffffff;
+  --shadow:0 6px 18px rgba(31,26,20,.10);
+  --hdr-h:72px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#15120e; --card:#201b15; --ink:#f3ede4; --muted:#b5aa9a; --line:#3a332b;
+    --field:#7d7264; --accent:#f5a623; --on-accent:#15120e;
+    --gain:#4ade80; --loss:#f87171; --on-loss:#15120e;
+    --shadow:0 6px 18px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#15120e; --card:#201b15; --ink:#f3ede4; --muted:#b5aa9a; --line:#3a332b;
+  --field:#7d7264; --accent:#f5a623; --on-accent:#15120e;
+  --gain:#4ade80; --loss:#f87171; --on-loss:#15120e;
+  --shadow:0 6px 18px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow-x:hidden}
+.num,input,table{font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;line-height:1.25}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.gain{color:var(--gain)}
+.loss{color:var(--loss)}
+[hidden]{display:none !important}
+
+/* Safe-area insets keep content clear of the notch, rounded corners and home bar when launched from the home screen. */
+.hdr{background:var(--bg);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top);z-index:20}
+.hdr-in{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;
+  padding:12px max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left))}
+.brand{display:flex;align-items:baseline;gap:8px;margin-right:auto}
+.wordmark{font-size:24px;font-weight:700;letter-spacing:-.3px}
+.ver{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px;background:var(--card)}
+.pos-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-width:0}
+.pos-ctl select{width:16rem;max-width:100%}
+@media (min-width:640px){.hdr{position:sticky;top:0}}
+@media (max-width:639.98px){
+  body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:var(--bg);z-index:30}
+  .hdr-in{display:grid;grid-template-columns:minmax(0,1fr) auto}
+  .pos-ctl{grid-column:1 / -1;order:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .pos-ctl select{grid-column:1 / -1;width:100%}
+}
+
+.wrap{max-width:1200px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;min-width:0}
+.card>h2{font-size:17px;margin-bottom:12px}
+.stack>*+*{margin-top:16px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:6px 14px;
+  border:1px solid var(--field);border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer;
+  transition:background-color 120ms,border-color 120ms,color 120ms;white-space:normal;text-align:center;line-height:1.2}
+.btn:hover{border-color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
+.btn.primary:hover{border-color:var(--ink)}
+.btn.danger{background:var(--loss);border-color:var(--loss);color:var(--on-loss);font-weight:600}
+.btn.danger:hover{border-color:var(--ink)}
+.btn.icon{min-width:38px;padding:4px;font-size:20px;line-height:1}
+
+input,select{min-height:38px;padding:6px 10px;border:1px solid var(--field);border-radius:6px;background:var(--card);width:100%;min-width:0;
+  transition:border-color 120ms}
+input:hover,select:hover{border-color:var(--ink)}
+input:focus-visible,select:focus-visible{border-color:var(--accent)}
+input::placeholder{color:var(--muted);opacity:1}
+input[aria-invalid="true"]{border-color:var(--loss)}
+.money{position:relative;min-width:0}
+.money>span{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.money>input{padding-left:22px}
+
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.lab{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);min-height:24px}
+.lab label{color:var(--muted)}
+.hint{position:relative;width:20px;height:20px;padding:0;border:1px solid var(--field);border-radius:50%;background:var(--card);
+  color:var(--muted);font-size:12px;font-weight:700;line-height:1;cursor:help;flex:none;transition:border-color 120ms,color 120ms}
+.hint:hover,.hint[aria-expanded="true"]{border-color:var(--ink);color:var(--ink)}
+.hint::after{content:"";position:absolute;inset:-12px}
+.tipline{font-size:13px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-top:10px}
+
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--field);border-radius:6px;overflow:hidden;min-height:38px}
+.seg label{position:relative;display:flex;cursor:pointer}
+.seg input{position:absolute;opacity:0;width:1px;height:1px;min-height:0;margin:0}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center;padding:4px 12px;transition:background-color 120ms,color 120ms}
+.seg label+label span{border-left:1px solid var(--field)}
+.seg input:checked+span{background:var(--ink);color:var(--card);font-weight:600}
+.seg:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
+.seg input:focus-visible+span{text-decoration:underline;text-underline-offset:3px}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}
+.main-col{min-width:0}
+.side{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0;order:-1}
+@media (min-width:640px) and (max-width:959.98px){
+  .side{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
+  .side .ticket{grid-row:span 3}
+}
+@media (min-width:960px){
+  .layout{grid-template-columns:minmax(0,1fr) 360px}
+  .side{order:0;position:sticky;top:calc(var(--hdr-h) + 16px);max-height:calc(100vh - var(--hdr-h) - 32px);
+    overflow-y:auto;overflow-x:hidden;padding:4px 10px 16px;margin:-4px -10px 0}
+}
+
+.ticket{box-shadow:var(--shadow);padding:20px 22px}
+.tk-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.tk-head h2{font-size:16px;overflow-wrap:anywhere}
+.big{font-size:clamp(2rem,1.6rem + 1.2vw,2.5rem);font-weight:700;letter-spacing:-.5px;line-height:1.1;margin-top:14px}
+.big.empty{font-size:22px;letter-spacing:0}
+.dash{border:0;border-top:1px dashed var(--field);margin:16px 0}
+.rows{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;margin:0}
+.rows dt{color:var(--muted);display:flex;align-items:center;gap:6px}
+.rows dd{margin:0;text-align:right;font-weight:600}
+.tk-price{margin-top:16px}
+.tk-price .money{max-width:10rem}
+.statement{margin-top:12px;font-size:14px}
+.warn{margin-top:12px;font-size:14px;color:var(--loss)}
+.rule-short{width:72px;border-top:1px dashed var(--field);margin:4px 0 0 2px}
+
+.wi-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.wi-out{margin-top:14px;font-size:15px;font-weight:600;min-height:1.5em}
+.wi-note{margin-top:4px;font-size:13px;color:var(--muted)}
+
+.fills{container-type:inline-size}
+.fill-form{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;align-items:end}
+.f-date,.f-side{grid-column:span 3}
+.f-qty,.f-price,.f-fee{grid-column:span 2}
+.f-add{grid-column:1 / -1}
+@container (min-width:540px){
+  .fill-form>*{grid-column:span 2}
+}
+@container (min-width:720px){
+  .fill-form{grid-template-columns:minmax(10rem,1.4fr) minmax(8rem,1fr) minmax(5rem,.8fr) minmax(6rem,1fr) minmax(6rem,1fr) auto}
+  .fill-form>*{grid-column:auto}
+}
+.f-date input{min-width:10rem}
+.form-msg{margin-top:10px;font-size:14px;color:var(--loss)}
+
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:13px}
+th.r,td.r{text-align:right}
+td.r{white-space:nowrap}
+.sort{background:none;border:0;padding:4px 2px;margin:-4px -2px;color:inherit;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:4px;border-radius:4px;text-align:inherit}
+.sort:hover{color:var(--ink)}
+.caret{font-size:10px;color:var(--muted)}
+.caret.on{color:var(--accent)}
+td .sub{display:block;font-size:12px;color:var(--muted)}
+tr.err td{color:var(--muted)}
+tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
+.empty-row td{text-align:center;color:var(--muted);padding:22px 8px}
+@media (max-width:639.98px){
+  /* rows become cards so the table never scrolls sideways */
+  thead{display:none}
+  table,tbody{display:block}
+  tbody tr{display:block;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;padding:6px 12px}
+  td{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:none;padding:5px 0;white-space:normal;text-align:right}
+  td.r{white-space:normal}
+  td::before{content:attr(data-label);color:var(--muted);font-weight:400;font-size:12px;text-align:left;flex:none}
+  td.act{justify-content:flex-end}
+  td.act::before{display:none}
+  tr.err td.errcell{min-width:0}
+  .empty-row{border-style:dashed}
+  .empty-row td{display:block}
+  .empty-row td::before{display:none}
+}
+
+.empty-state{max-width:560px;margin:40px auto;text-align:left}
+.empty-state h1{font-size:24px;margin-bottom:10px}
+.empty-state p{margin-bottom:18px;color:var(--muted)}
+.banner{border:1px solid var(--loss);background:var(--card);color:var(--ink);border-radius:10px;padding:12px 16px;margin-bottom:16px}
+.banner b{color:var(--loss)}
+.tip-card{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:16px}
+.tip-card p{flex:1 1 14rem}
+.data{margin-top:20px}
+.data .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 12px);transform:translateX(-50%);z-index:60;
+  max-width:calc(100vw - 32px);background:var(--ink);color:var(--card);border-radius:6px;padding:10px 16px;font-size:14px;
+  box-shadow:var(--shadow);transition:opacity 120ms}
+.toast.bad{background:var(--loss);color:var(--on-loss)}
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(15,12,9,.55);display:grid;place-items:center;
+  padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.modal{width:100%;max-width:440px;max-height:100%;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.m-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.m-head h2{font-size:18px}
+.m-body>*+*{margin-top:12px}
+.m-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:20px}
+
+@media (max-width:959.98px), (pointer:coarse){
+  .btn,input,select,.seg{min-height:44px}
+  .btn.icon{min-width:44px}
+  .sort{min-height:44px}
+}
+@media (max-width:639.98px){
+  .wi-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .wi-grid .field:first-child{grid-column:1 / -1}
+  .m-actions .btn{flex:1 1 8rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div id="page">
+<header class="hdr" id="hdr">
+  <div class="hdr-in">
+    <div class="brand"><span class="wordmark">Basis</span><span class="ver num">v<span id="ver">0.2.1</span></span></div>
+    <div class="pos-ctl" id="posCtl">
+      <label class="sr-only" for="posSelect">Position</label>
+      <select id="posSelect" title="Switch between the positions you are tracking."></select>
+      <button type="button" class="btn" id="btnNew">New position</button>
+      <button type="button" class="btn" id="btnRename">Rename</button>
+      <button type="button" class="btn" id="btnDelete">Delete position</button>
+    </div>
+    <button type="button" class="btn" id="btnTheme">Dark theme</button>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="banner" id="storageBanner" role="alert" hidden><b>Storage problem.</b> Basis could not read its saved data in this browser. Your fills will not be kept between visits.</div>
+
+  <div class="card tip-card" id="a2hs" hidden>
+    <p id="a2hsText"></p>
+    <button type="button" class="btn" id="a2hsClose">Dismiss</button>
+  </div>
+
+  <section class="card empty-state" id="emptyState" hidden>
+    <h1>Basis</h1>
+    <p>Basis keeps a running average cost for one options position as you buy and trim it. It also shows what your average becomes if you add more, and how many contracts at today's price it takes to reach a target average.</p>
+    <button type="button" class="btn primary" id="btnFirst">Create your first position</button>
+  </section>
+
+  <div class="layout" id="app" hidden>
+    <div class="main-col">
+      <section class="card fills" aria-labelledby="fillsH" data-tipzone>
+        <h2 id="fillsH">Fills</h2>
+        <form class="fill-form" id="fillForm" novalidate>
+          <div class="field f-date">
+            <div class="lab"><label for="fDate">Date</label><button type="button" class="hint" aria-label="About the date" data-tip="The trade date. Fills are averaged in date order, so a sell only counts against what you held on that day.">?</button></div>
+            <input type="date" id="fDate" required>
+          </div>
+          <div class="field f-side">
+            <div class="lab"><span id="sideLab">Side</span><button type="button" class="hint" aria-label="About buy and sell" data-tip="Buy adds contracts to your average. Sell trims them and books a realized gain or loss without changing the average of what is left.">?</button></div>
+            <div class="seg" role="radiogroup" aria-labelledby="sideLab">
+              <label><input type="radio" name="side" value="buy" checked><span>Buy</span></label>
+              <label><input type="radio" name="side" value="sell"><span>Sell</span></label>
+            </div>
+          </div>
+          <div class="field f-qty">
+            <div class="lab"><label for="fQty">Contracts</label></div>
+            <input id="fQty" inputmode="numeric" autocomplete="off" placeholder="1" title="How many contracts this fill was for. Whole numbers only.">
+          </div>
+          <div class="field f-price">
+            <div class="lab"><label for="fPrice">Price</label><button type="button" class="hint" aria-label="About the price" data-tip="Premium per share as your broker shows it. 1.25 means $125.00 per contract at the standard 100 multiplier.">?</button></div>
+            <div class="money"><span aria-hidden="true">$</span><input id="fPrice" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+          </div>
+          <div class="field f-fee">
+            <div class="lab"><label for="fFee">Fee</label><button type="button" class="hint" aria-label="About the fee" data-tip="Commission and exchange fees for this fill. Added to your cost basis so your break-even is honest.">?</button></div>
+            <div class="money"><span aria-hidden="true">$</span><input id="fFee" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+          </div>
+          <div class="f-add"><button type="submit" class="btn primary" style="width:100%">Add fill</button></div>
+        </form>
+        <p class="form-msg" id="fillMsg" aria-live="polite" hidden></p>
+        <p class="tipline" aria-live="polite" hidden></p>
+        <table id="fillsTable">
+          <thead><tr>
+            <th scope="col" data-key="date"><button type="button" class="sort" data-key="date">Date<span class="caret" aria-hidden="true"></span></button></th>
+            <th scope="col" data-key="side"><button type="button" class="sort" data-key="side">Side<span class="caret" aria-hidden="true"></span></button></th>
+            <th scope="col" class="r" data-key="qty"><button type="button" class="sort" data-key="qty">Contracts<span class="caret" aria-hidden="true"></span></button></th>
+            <th scope="col" class="r" data-key="price"><button type="button" class="sort" data-key="price">Price<span class="caret" aria-hidden="true"></span></button></th>
+            <th scope="col" class="r" data-key="cost"><button type="button" class="sort" data-key="cost" title="Buys: what you paid including the fee. Sells: what you received after the fee.">Cost<span class="caret" aria-hidden="true"></span></button></th>
+            <th scope="col" class="r" data-key="avg"><button type="button" class="sort" data-key="avg" title="Average premium per share after this fill. Basis uses the average-cost method: a sell removes contracts at your average cost, so it does not move the average.">Running avg<span class="caret" aria-hidden="true"></span></button></th>
+            <th scope="col"><span class="sr-only">Remove</span></th>
+          </tr></thead>
+          <tbody id="fillsBody"></tbody>
+        </table>
+      </section>
+    </div>
+
+    <aside class="side" aria-label="Summary and what-if calculators">
+      <section class="card ticket" aria-labelledby="tkName" data-tipzone>
+        <div class="tk-head"><h2 id="tkName"></h2><span class="muted small num" id="tkMult"></span></div>
+        <div class="big num" id="tkAvg"></div>
+        <div class="muted small" id="tkAvgSub"></div>
+        <hr class="dash">
+        <dl class="rows num">
+          <dt>Avg per contract</dt><dd id="tkPer"></dd>
+          <dt>Open contracts</dt><dd id="tkQty"></dd>
+          <dt>Cost basis <button type="button" class="hint" aria-label="About cost basis" data-tip="What your open contracts cost you, including fees.">?</button></dt><dd id="tkCost"></dd>
+          <dt id="tkRealL" hidden>Realized P/L <button type="button" class="hint" aria-label="About realized P/L" data-tip="Gain or loss locked in by your sells, after fees. Basis uses the average-cost method: each sold contract is measured against your average cost at the time.">?</button></dt><dd id="tkReal" hidden></dd>
+        </dl>
+        <div class="field tk-price">
+          <div class="lab"><label for="curPrice">Current price</label><button type="button" class="hint" aria-label="About current price" data-tip="Today's premium per share. Basis uses it to show what the position is worth and to prefill the what-if prices.">?</button></div>
+          <div class="money"><span aria-hidden="true">$</span><input id="curPrice" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+        </div>
+        <dl class="rows num" id="tkMarket" style="margin-top:14px" hidden>
+          <dt>Market value</dt><dd id="tkMV"></dd>
+          <dt>Unrealized P/L</dt><dd id="tkUnr"></dd>
+        </dl>
+        <p class="statement" id="tkDist" hidden></p>
+        <p class="warn" id="tkWarn" hidden></p>
+        <p class="tipline" aria-live="polite" hidden></p>
+      </section>
+      <div class="rule-short" aria-hidden="true"></div>
+      <section class="card" aria-labelledby="wi1H" data-tipzone>
+        <h2 id="wi1H">If I add more</h2>
+        <div class="wi-grid">
+          <div class="field"><div class="lab"><label for="w1Qty">Contracts</label></div><input id="w1Qty" inputmode="numeric" autocomplete="off" placeholder="1"></div>
+          <div class="field"><div class="lab"><label for="w1Price">Price</label></div><div class="money"><span aria-hidden="true">$</span><input id="w1Price" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00" title="Prefilled with the current price. Change it to try a different fill."></div></div>
+          <div class="field"><div class="lab"><label for="w1Fee">Fee</label><button type="button" class="hint" aria-label="About the what-if fee" data-tip="Order fee for this hypothetical buy. It is included in the new average so the number is honest.">?</button></div><div class="money"><span aria-hidden="true">$</span><input id="w1Fee" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div></div>
+        </div>
+        <p class="wi-out num" id="w1Out" aria-live="polite"></p>
+        <p class="wi-note num" id="w1Note"></p>
+        <p class="tipline" aria-live="polite" hidden></p>
+      </section>
+      <section class="card" aria-labelledby="wi2H" data-tipzone>
+        <h2 id="wi2H">To reach an average of</h2>
+        <div class="wi-grid">
+          <div class="field"><div class="lab"><label for="w2Target">Target avg</label><button type="button" class="hint" aria-label="About the target average" data-tip="The average premium per share you want to get down to. It has to sit between the price you would pay and your current average.">?</button></div><div class="money"><span aria-hidden="true">$</span><input id="w2Target" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div></div>
+          <div class="field"><div class="lab"><label for="w2Price">Price</label></div><div class="money"><span aria-hidden="true">$</span><input id="w2Price" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00" title="Prefilled with the current price. Change it to try a different fill."></div></div>
+          <div class="field"><div class="lab"><label for="w2Fee">Fee</label><button type="button" class="hint" aria-label="About the order fee" data-tip="A flat fee for the one order. The contract count ignores it, the resulting average includes it.">?</button></div><div class="money"><span aria-hidden="true">$</span><input id="w2Fee" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div></div>
+        </div>
+        <p class="wi-out num" id="w2Out" aria-live="polite"></p>
+        <p class="wi-note num" id="w2Note"></p>
+        <p class="tipline" aria-live="polite" hidden></p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="card data" aria-labelledby="dataH">
+    <h2 id="dataH">Your data</h2>
+    <p class="muted">Basis saves fills in this browser only. Download a copy to back them up or move them to another device.</p>
+    <div class="row">
+      <button type="button" class="btn" id="btnExport">Download JSON</button>
+      <button type="button" class="btn" id="btnImport">Import JSON</button>
+      <input type="file" id="fileIn" accept="application/json,.json" hidden>
+    </div>
+  </section>
+</main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<div class="overlay" id="overlay" hidden>
+  <form class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle" novalidate>
+    <div class="m-head"><h2 id="mTitle"></h2><button type="button" class="btn icon" id="mClose" aria-label="Close">&times;</button></div>
+    <div class="m-body" id="mBody"></div>
+    <div class="m-actions"><button type="button" class="btn" id="mCancel">Cancel</button><button type="submit" class="btn primary" id="mOk"></button></div>
+  </form>
+</div>
+
+<script>
+const APP_VERSION = "0.2.1";
+(function () {
+  "use strict";
+  document.title = "Basis v" + APP_VERSION + " - options cost averager | BookHockeys";
+  const $ = (id) => document.getElementById(id);
+  $("ver").textContent = APP_VERSION;
+
+  const KEY = "basis_v1", UI_KEY = "basis_ui", OLD_KEY = "blend_v1", OLD_UI_KEY = "blend_ui";
+  const REASON_PRICE = "You cannot average down to a target at or below the price you would pay.";
+  const REASON_TARGET = "Your average is already at or below that target.";
+  const REASON_EMPTY = "There is no average to bring down yet. Add a buy first.";
+  const SELL_ERROR = "This sell is for more contracts than you held on that date";
+
+  /* ---------- pure math ---------- */
+  function sortedLots(p) {
+    return (p.lots || []).map((l, i) => ({ l, i }))
+      .sort((a, b) => (a.l.date < b.l.date ? -1 : a.l.date > b.l.date ? 1 : a.i - b.i))
+      .map((x) => x.l);
+  }
+
+  function compute(position) {
+    const m = Number(position.multiplier) || 100;
+    let openQty = 0, openCost = 0, realized = 0, sells = 0;
+    const errors = [], steps = [];
+    for (const lot of sortedLots(position)) {
+      const qty = Number(lot.qty), price = Number(lot.price), fee = Number(lot.fee) || 0;
+      if (lot.side === "buy") {
+        openCost += qty * price * m + fee;
+        openQty += qty;
+      } else {
+        if (qty > openQty) {
+          errors.push({ id: lot.id, message: SELL_ERROR });
+          steps.push({ id: lot.id, excluded: true, openQty, avgPremium: openQty ? openCost / (openQty * m) : null });
+          continue;
+        }
+        // Average-cost method: sold contracts leave at the current average cost, so the
+        // average of what remains is unchanged and the difference is booked as realized P/L.
+        const avgC = openCost / openQty;
+        const proceeds = qty * price * m - fee;
+        realized += proceeds - qty * avgC;
+        openCost -= qty * avgC;
+        openQty -= qty;
+        sells++;
+        if (openQty === 0) openCost = 0; // drop float residue once the position is flat
+      }
+      steps.push({ id: lot.id, excluded: false, openQty, avgPremium: openQty ? openCost / (openQty * m) : null });
+    }
+    const cp = position.currentPrice;
+    const hasPrice = typeof cp === "number" && isFinite(cp);
+    const marketValue = hasPrice ? openQty * cp * m : null;
+    const unrealized = hasPrice ? marketValue - openCost : null;
+    const unrealizedPct = hasPrice && openCost > 0 ? (unrealized / openCost) * 100 : null;
+    return {
+      openQty, openCost,
+      avgPremium: openQty ? openCost / (openQty * m) : null,
+      avgPerContract: openQty ? openCost / openQty : null,
+      realized, errors, marketValue, unrealized, unrealizedPct,
+      sells, steps
+    };
+  }
+
+  function whatIfAdd(position, qty, price, fee) {
+    const m = Number(position.multiplier) || 100;
+    const c = compute(position);
+    qty = Number(qty); price = Number(price); fee = Number(fee) || 0;
+    if (!Number.isInteger(qty) || qty < 1 || !isFinite(price) || price < 0 || fee < 0) return null;
+    const openQty = c.openQty + qty;
+    const openCost = c.openCost + qty * price * m + fee;
+    const avgPremium = openCost / (openQty * m);
+    return { avgPremium, openQty, openCost, change: c.avgPremium == null ? null : avgPremium - c.avgPremium };
+  }
+
+  function contractsToReach(position, targetAvg, price, feePerContractOrderFee) {
+    const m = Number(position.multiplier) || 100;
+    const c = compute(position);
+    const t = Number(targetAvg), p = Number(price), fee = Number(feePerContractOrderFee) || 0;
+    if (!c.openQty) return { reason: REASON_EMPTY };
+    if (!isFinite(t) || !isFinite(p) || t <= 0 || p < 0) return { reason: "Enter a target average and a price." };
+    if (t >= c.avgPremium) return { reason: REASON_TARGET };
+    if (p >= t) return { reason: REASON_PRICE };
+    // Smallest whole number of contracts that gets the average to the target or below.
+    // The tiny epsilon stops float noise (2.0000000001) from rounding an exact answer up by one.
+    const raw = (c.openQty * (c.avgPremium - t)) / (t - p);
+    const n = Math.max(1, Math.ceil(raw - 1e-9));
+    const cost = n * p * m + fee;
+    const openQty = c.openQty + n, openCost = c.openCost + cost;
+    return { n, cost, newAvg: openCost / (openQty * m), openQty, openCost, feeIncluded: fee > 0 };
+  }
+
+  window.Basis = { compute, whatIfAdd, contractsToReach, version: APP_VERSION };
+
+  /* ---------- formatting ---------- */
+  const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const money = (v) => (v == null || !isFinite(v) ? "n/a" : usd.format(Math.abs(v) < 0.005 ? 0 : v));
+  const signedMoney = (v) => (Math.abs(v) < 0.005 ? usd.format(0) : (v > 0 ? "+" : "-") + usd.format(Math.abs(v)));
+  const plural = (n, w) => n + " " + w + (n === 1 ? "" : "s");
+  function parseNum(s) {
+    s = String(s == null ? "" : s).replace(/[$,\s]/g, "");
+    if (s === "") return null;
+    const n = Number(s);
+    return isFinite(n) ? n : NaN;
+  }
+  function todayISO() {
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+  /* ---------- storage ---------- */
+  let state = { v: 1, positions: [], activeId: null };
+  let storageOk = true;
+  const ui = { theme: null, sort: null, a2hsDismissed: false };
+
+  function cleanLot(l) {
+    if (!l || typeof l !== "object") return null;
+    const qty = Number(l.qty), price = Number(l.price), fee = l.fee == null ? 0 : Number(l.fee);
+    if (typeof l.id !== "string" || !l.id) return null;
+    if (typeof l.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(l.date)) return null;
+    if (l.side !== "buy" && l.side !== "sell") return null;
+    if (!Number.isInteger(qty) || qty < 1 || !isFinite(price) || price < 0 || !isFinite(fee) || fee < 0) return null;
+    return { id: l.id, date: l.date, side: l.side, qty, price, fee };
+  }
+  function cleanPosition(p) {
+    if (!p || typeof p !== "object" || typeof p.id !== "string" || !p.id) return null;
+    if (typeof p.name !== "string" || !p.name.trim()) return null;
+    const mult = p.multiplier == null ? 100 : Number(p.multiplier);
+    if (!Number.isInteger(mult) || mult < 1) return null;
+    const cp = p.currentPrice == null ? null : Number(p.currentPrice);
+    if (cp !== null && (!isFinite(cp) || cp < 0)) return null;
+    if (!Array.isArray(p.lots)) return null;
+    const lots = p.lots.map(cleanLot);
+    if (lots.some((l) => !l)) return null;
+    return { id: p.id, name: p.name.trim(), multiplier: mult, currentPrice: cp, lots, createdAt: p.createdAt || new Date().toISOString() };
+  }
+  function cleanPositions(arr) {
+    if (!Array.isArray(arr)) return null;
+    const out = arr.map(cleanPosition);
+    return out.some((p) => !p) ? null : out;
+  }
+
+  function storageFail() {
+    storageOk = false;
+    $("storageBanner").hidden = false;
+  }
+  function load() {
+    let raw = null;
+    let migrated = false, uiRaw = null;
+    try {
+      raw = localStorage.getItem(KEY);
+      uiRaw = localStorage.getItem(UI_KEY);
+      // The app was renamed: when the new keys are missing, read the old-name keys and copy them forward, leaving the old keys in place.
+      if (raw === null) { raw = localStorage.getItem(OLD_KEY); migrated = raw !== null; }
+      if (uiRaw === null) { uiRaw = localStorage.getItem(OLD_UI_KEY); if (uiRaw !== null) localStorage.setItem(UI_KEY, uiRaw); }
+    } catch (e) { storageFail(); return; }
+    if (raw) {
+      try {
+        const d = JSON.parse(raw);
+        const positions = d && d.v === 1 ? cleanPositions(d.positions) : null;
+        if (!positions) throw new Error("bad shape");
+        state = { v: 1, positions, activeId: positions.some((p) => p.id === d.activeId) ? d.activeId : (positions[0] ? positions[0].id : null) };
+        if (migrated) save();
+      } catch (e) { storageFail(); }
+    }
+    try {
+      const u = JSON.parse(uiRaw || "null");
+      if (u && typeof u === "object") {
+        if (u.theme === "light" || u.theme === "dark") ui.theme = u.theme;
+        if (u.sort && typeof u.sort.key === "string" && (u.sort.dir === "asc" || u.sort.dir === "desc")) ui.sort = u.sort;
+        ui.a2hsDismissed = !!u.a2hsDismissed;
+      }
+    } catch (e) { /* UI prefs are optional */ }
+  }
+  function save() {
+    if (!storageOk) return; // never overwrite data we could not read
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { storageFail(); }
+  }
+  function saveUi() {
+    try { localStorage.setItem(UI_KEY, JSON.stringify(ui)); } catch (e) { /* prefs only */ }
+  }
+
+  const active = () => state.positions.find((p) => p.id === state.activeId) || null;
+
+  /* ---------- toast ---------- */
+  let toastTimer = null;
+  function toast(msg, bad) {
+    const t = $("toast");
+    t.textContent = msg;
+    t.className = "toast" + (bad ? " bad" : "");
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.hidden = true; }, bad ? 4500 : 2500);
+  }
+
+  /* ---------- modal ---------- */
+  let modalCfg = null, modalOpener = null;
+  const FOCUSABLE = "button:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex='-1'])";
+  function openModal(cfg) {
+    modalCfg = cfg;
+    modalOpener = document.activeElement;
+    $("mTitle").textContent = cfg.title;
+    const body = $("mBody");
+    body.textContent = "";
+    body.appendChild(cfg.body);
+    const ok = $("mOk");
+    ok.textContent = cfg.confirmText;
+    ok.className = "btn " + (cfg.danger ? "danger" : "primary");
+    $("overlay").hidden = false;
+    $("page").inert = true;
+    const first = cfg.focus ? body.querySelector(cfg.focus) : $("mCancel");
+    (first || $("mCancel")).focus();
+  }
+  function closeModal() {
+    $("overlay").hidden = true;
+    $("page").inert = false;
+    modalCfg = null;
+    if (modalOpener && document.contains(modalOpener) && !modalOpener.disabled) modalOpener.focus();
+    else $("posSelect").focus();
+    modalOpener = null;
+  }
+  $("modal").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!modalCfg) return;
+    const cfg = modalCfg;
+    if (cfg.onConfirm() !== false) closeModal();
+  });
+  $("mCancel").addEventListener("click", closeModal);
+  $("mClose").addEventListener("click", closeModal);
+  $("overlay").addEventListener("mousedown", (e) => { if (e.target === $("overlay")) e.preventDefault(); });
+  document.addEventListener("keydown", (e) => {
+    if (!modalCfg) return;
+    if (e.key === "Escape") { e.preventDefault(); closeModal(); return; }
+    if (e.key !== "Tab") return;
+    const f = Array.from($("modal").querySelectorAll(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (!$("modal").contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  function fieldEl(labelText, input, tip) {
+    const wrap = document.createElement("div");
+    wrap.className = "field";
+    const lab = document.createElement("div");
+    lab.className = "lab";
+    const l = document.createElement("label");
+    l.htmlFor = input.id;
+    l.textContent = labelText;
+    lab.appendChild(l);
+    if (tip) input.title = tip;
+    wrap.appendChild(lab);
+    wrap.appendChild(input);
+    if (tip) {
+      const p = document.createElement("p");
+      p.className = "small muted";
+      p.textContent = tip;
+      wrap.appendChild(p);
+    }
+    return wrap;
+  }
+  function positionForm(p) {
+    const frag = document.createElement("div");
+    const name = document.createElement("input");
+    name.id = "mName"; name.autocomplete = "off"; name.maxLength = 80;
+    name.placeholder = "e.g. AAPL 200C Jan 2027";
+    name.value = p ? p.name : "";
+    const mult = document.createElement("input");
+    mult.id = "mMult"; mult.inputMode = "numeric"; mult.autocomplete = "off";
+    mult.value = p ? String(p.multiplier) : "100";
+    mult.style.maxWidth = "8rem";
+    const err = document.createElement("p");
+    err.className = "form-msg"; err.id = "mErr"; err.hidden = true; err.setAttribute("aria-live", "polite");
+    frag.appendChild(fieldEl("Name", name, "Ticker, strike, type and expiry, so you can tell positions apart."));
+    frag.appendChild(fieldEl("Multiplier", mult, "Standard equity options control 100 shares per contract. Change this only for mini or index products with a different multiplier."));
+    frag.appendChild(err);
+    return frag;
+  }
+  function readPositionForm() {
+    const name = $("mName").value.trim(), multRaw = $("mMult").value.trim();
+    const mult = Number(multRaw);
+    const err = $("mErr");
+    $("mName").removeAttribute("aria-invalid"); $("mMult").removeAttribute("aria-invalid");
+    if (!name) { err.textContent = "Give the position a name."; err.hidden = false; $("mName").setAttribute("aria-invalid", "true"); $("mName").focus(); return null; }
+    if (!Number.isInteger(mult) || mult < 1) { err.textContent = "Multiplier must be a whole number, usually 100."; err.hidden = false; $("mMult").setAttribute("aria-invalid", "true"); $("mMult").focus(); return null; }
+    return { name, mult };
+  }
+
+  function newPosition() {
+    openModal({
+      title: "New position", confirmText: "Create position", body: positionForm(null), focus: "#mName",
+      onConfirm() {
+        const v = readPositionForm();
+        if (!v) return false;
+        const p = { id: uid(), name: v.name, multiplier: v.mult, currentPrice: null, lots: [], createdAt: new Date().toISOString() };
+        state.positions.push(p);
+        state.activeId = p.id;
+        save();
+        resetWhatIfs();
+        renderAll();
+        toast("Position created");
+        modalOpener = $("fDate");
+      }
+    });
+  }
+  function renamePosition() {
+    const p = active();
+    if (!p) return;
+    openModal({
+      title: "Rename position", confirmText: "Save", body: positionForm(p), focus: "#mName",
+      onConfirm() {
+        const v = readPositionForm();
+        if (!v) return false;
+        const multChanged = v.mult !== p.multiplier;
+        p.name = v.name; p.multiplier = v.mult;
+        save();
+        renderAll();
+        toast(multChanged ? "Position updated" : "Position renamed");
+      }
+    });
+  }
+  function deletePosition() {
+    const p = active();
+    if (!p) return;
+    const body = document.createElement("div");
+    const a = document.createElement("p");
+    a.textContent = "“" + p.name + "” and its " + plural(p.lots.length, "fill") + " will be removed from this browser. This cannot be undone.";
+    const b = document.createElement("p");
+    b.className = "muted small";
+    b.textContent = "Download JSON first if you want a copy.";
+    body.appendChild(a); body.appendChild(b);
+    openModal({
+      title: "Delete position", confirmText: "Delete position", danger: true, body,
+      onConfirm() {
+        state.positions = state.positions.filter((x) => x.id !== p.id);
+        state.activeId = state.positions[0] ? state.positions[0].id : null;
+        save();
+        resetWhatIfs();
+        renderAll();
+        toast("Position deleted");
+        modalOpener = state.positions.length ? $("posSelect") : $("btnFirst");
+      }
+    });
+  }
+  function removeFill(id) {
+    const p = active();
+    const lot = p && p.lots.find((l) => l.id === id);
+    if (!lot) return;
+    const body = document.createElement("p");
+    body.className = "num";
+    body.textContent = (lot.side === "buy" ? "Buy " : "Sell ") + plural(lot.qty, "contract") + " at " + money(lot.price) + " on " + lot.date + ". The average will be recalculated without it.";
+    openModal({
+      title: "Remove this fill?", confirmText: "Remove fill", danger: true, body,
+      onConfirm() {
+        p.lots = p.lots.filter((l) => l.id !== id);
+        save();
+        renderAll();
+        toast("Fill removed");
+        modalOpener = $("fDate");
+      }
+    });
+  }
+
+  /* ---------- theme ---------- */
+  const mqDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const effectiveTheme = () => ui.theme || (mqDark.matches ? "dark" : "light");
+  function applyTheme() {
+    if (ui.theme) document.documentElement.setAttribute("data-theme", ui.theme);
+    else document.documentElement.removeAttribute("data-theme");
+    const eff = effectiveTheme();
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
+      if (ui.theme) m.setAttribute("content", ui.theme === "dark" ? "#15120e" : "#f5f1ea");
+      else m.setAttribute("content", /dark/.test(m.media) ? "#15120e" : "#f5f1ea");
+    });
+    const btn = $("btnTheme");
+    btn.textContent = eff === "dark" ? "Light theme" : "Dark theme";
+    btn.title = "Switch to the " + (eff === "dark" ? "light" : "dark") + " theme. Your choice is remembered on this device.";
+  }
+  $("btnTheme").addEventListener("click", () => {
+    ui.theme = effectiveTheme() === "dark" ? "light" : "dark";
+    saveUi();
+    applyTheme();
+  });
+  mqDark.addEventListener("change", applyTheme);
+
+  /* ---------- rendering ---------- */
+  function renderSwitcher() {
+    const sel = $("posSelect");
+    sel.textContent = "";
+    state.positions.forEach((p) => sel.appendChild(new Option(p.name, p.id, false, p.id === state.activeId)));
+    const has = state.positions.length > 0;
+    sel.hidden = !has;
+    $("btnRename").hidden = !has;
+    $("btnDelete").hidden = !has;
+    $("btnNew").hidden = !has;
+    $("btnExport").disabled = !has;
+  }
+
+  function sortValue(row, key) {
+    switch (key) {
+      case "date": return row.l.date;
+      case "side": return row.l.side;
+      case "qty": return row.l.qty;
+      case "price": return row.l.price;
+      case "cost": return row.cost;
+      case "avg": return row.s && !row.s.excluded && row.s.avgPremium != null ? row.s.avgPremium : -Infinity;
+    }
+    return 0;
+  }
+
+  function cell(tr, label, cls) {
+    const td = document.createElement("td");
+    td.setAttribute("data-label", label);
+    if (cls) td.className = cls;
+    tr.appendChild(td);
+    return td;
+  }
+
+  function renderFills(p, c) {
+    const m = p.multiplier;
+    const body = $("fillsBody");
+    body.textContent = "";
+    const stepMap = new Map(c.steps.map((s) => [s.id, s]));
+    let rows = sortedLots(p).map((l, idx) => ({
+      l, idx, s: stepMap.get(l.id),
+      cost: l.side === "buy" ? l.qty * l.price * m + l.fee : l.qty * l.price * m - l.fee
+    }));
+    if (ui.sort) {
+      const { key, dir } = ui.sort;
+      rows.sort((a, b) => {
+        const va = sortValue(a, key), vb = sortValue(b, key);
+        let r = va < vb ? -1 : va > vb ? 1 : 0;
+        if (dir === "desc") r = -r;
+        return r || a.idx - b.idx;
+      });
+    }
+    document.querySelectorAll("#fillsTable th[data-key]").forEach((th) => {
+      const on = ui.sort && ui.sort.key === th.dataset.key;
+      th.setAttribute("aria-sort", on ? (ui.sort.dir === "asc" ? "ascending" : "descending") : "none");
+      const caret = th.querySelector(".caret");
+      caret.textContent = on ? (ui.sort.dir === "asc" ? "▲" : "▼") : "↕";
+      caret.classList.toggle("on", !!on);
+    });
+    if (!rows.length) {
+      const tr = document.createElement("tr");
+      tr.className = "empty-row";
+      const td = document.createElement("td");
+      td.colSpan = 7;
+      td.textContent = "No fills yet. Add your first buy above and Basis will keep a running average.";
+      tr.appendChild(td);
+      body.appendChild(tr);
+      return;
+    }
+    rows.forEach((r) => {
+      const tr = document.createElement("tr");
+      const excluded = r.s && r.s.excluded;
+      if (excluded) tr.className = "err";
+      cell(tr, "Date").textContent = r.l.date;
+      cell(tr, "Side").textContent = r.l.side === "buy" ? "Buy" : "Sell";
+      cell(tr, "Contracts", "r").textContent = r.l.qty;
+      cell(tr, "Price", "r").textContent = money(r.l.price);
+      const costTd = cell(tr, r.l.side === "buy" ? "Cost" : "Proceeds", "r");
+      const costVal = document.createElement("span");
+      costVal.textContent = money(r.cost);
+      costTd.appendChild(costVal);
+      const subText = r.l.side === "sell" ? (r.l.fee > 0 ? "proceeds after " + money(r.l.fee) + " fee" : "proceeds") : (r.l.fee > 0 ? "incl. " + money(r.l.fee) + " fee" : "");
+      if (subText) { const s = document.createElement("span"); s.className = "sub"; s.textContent = subText; costVal.appendChild(s); }
+      const avgTd = cell(tr, "Running avg", excluded ? "r errcell" : "r");
+      if (excluded) avgTd.textContent = "Excluded. " + SELL_ERROR + ".";
+      else avgTd.textContent = r.s.avgPremium == null ? "None open" : money(r.s.avgPremium);
+      const act = cell(tr, "", "act");
+      const btn = document.createElement("button");
+      btn.type = "button"; btn.className = "btn"; btn.textContent = "Remove";
+      btn.setAttribute("aria-label", "Remove fill: " + (r.l.side === "buy" ? "buy " : "sell ") + r.l.qty + " on " + r.l.date);
+      btn.dataset.remove = r.l.id;
+      act.appendChild(btn);
+      body.appendChild(tr);
+    });
+  }
+
+  function renderTicket(p, c) {
+    $("tkName").textContent = p.name;
+    $("tkMult").textContent = p.multiplier === 100 ? "" : "x" + p.multiplier + " multiplier";
+    const big = $("tkAvg"), sub = $("tkAvgSub");
+    if (c.avgPremium != null) {
+      big.textContent = money(c.avgPremium);
+      big.classList.remove("empty");
+      big.title = "Exact: $" + c.avgPremium.toFixed(4) + " per share";
+      sub.textContent = "avg per share";
+    } else {
+      big.classList.add("empty");
+      big.removeAttribute("title");
+      if (!p.lots.length) { big.textContent = "No fills yet"; sub.textContent = "Add a buy to see your average."; }
+      else { big.textContent = "No open contracts"; sub.textContent = "Everything you bought has been sold."; }
+    }
+    $("tkPer").textContent = c.avgPerContract == null ? "n/a" : money(c.avgPerContract);
+    $("tkQty").textContent = c.openQty;
+    $("tkCost").textContent = money(c.openCost);
+    const showReal = c.sells > 0;
+    $("tkRealL").hidden = !showReal; $("tkReal").hidden = !showReal;
+    if (showReal) setPL($("tkReal"), c.realized, null);
+    const hasPrice = p.currentPrice != null && c.openQty > 0;
+    $("tkMarket").hidden = !hasPrice;
+    $("tkDist").hidden = !hasPrice;
+    if (hasPrice) {
+      $("tkMV").textContent = money(c.marketValue);
+      setPL($("tkUnr"), c.unrealized, c.unrealizedPct);
+      const diff = p.currentPrice - c.avgPremium;
+      if (Math.abs(diff) < 0.005) $("tkDist").textContent = "Current price matches your average.";
+      else $("tkDist").textContent = "Current price is " + money(Math.abs(diff)) + " (" + Math.round(Math.abs(diff) / c.avgPremium * 100) + "%) " + (diff < 0 ? "below" : "above") + " your average.";
+    }
+    const w = $("tkWarn");
+    w.hidden = !c.errors.length;
+    if (c.errors.length) w.textContent = plural(c.errors.length, "fill") + " left out: a sell is larger than what you held on that date. Check the flagged " + (c.errors.length === 1 ? "row" : "rows") + ".";
+  }
+  function setPL(el, v, pct) {
+    const word = Math.abs(v) < 0.005 ? "even" : v > 0 ? "gain" : "loss";
+    let txt = signedMoney(v);
+    if (pct != null) txt += " (" + (pct > 0.05 ? "+" : pct < -0.05 ? "-" : "") + Math.abs(pct).toFixed(1) + "%)";
+    el.textContent = txt + " " + word;
+    el.className = word === "gain" ? "gain" : word === "loss" ? "loss" : "";
+  }
+
+  /* ---------- what-ifs ---------- */
+  const dirty = { w1Price: false, w2Price: false };
+  function resetWhatIfs() {
+    ["w1Qty", "w1Fee", "w2Target", "w2Fee"].forEach((id) => { $(id).value = ""; });
+    dirty.w1Price = dirty.w2Price = false;
+    syncWhatIfPrices();
+  }
+  function syncWhatIfPrices() {
+    const p = active();
+    const cp = p && p.currentPrice != null ? p.currentPrice.toFixed(2) : "";
+    if (!dirty.w1Price) $("w1Price").value = cp;
+    if (!dirty.w2Price) $("w2Price").value = cp;
+  }
+  function renderWhatIfs(p, c) {
+    const q = parseNum($("w1Qty").value), pr = parseNum($("w1Price").value), fe = parseNum($("w1Fee").value);
+    const o1 = $("w1Out"), n1 = $("w1Note");
+    if (q == null || pr == null) { o1.textContent = "Enter contracts and a price to see the new average."; o1.style.fontWeight = "400"; n1.textContent = ""; }
+    else {
+      const r = whatIfAdd(p, q, pr, fe == null ? 0 : fe);
+      if (!r || (fe != null && (isNaN(fe) || fe < 0))) { o1.textContent = "Contracts must be a whole number and prices cannot be negative."; o1.style.fontWeight = "400"; n1.textContent = ""; }
+      else {
+        o1.style.fontWeight = "";
+        let t = "New average " + money(r.avgPremium);
+        if (r.change != null) t += Math.abs(r.change) < 0.005 ? " (no change)" : " (" + (r.change < 0 ? "down " : "up ") + money(Math.abs(r.change)) + ")";
+        o1.textContent = t;
+        n1.textContent = "You would hold " + plural(r.openQty, "contract") + " with a cost basis of " + money(r.openCost) + ", or " + money(r.openCost / r.openQty) + " per contract.";
+      }
+    }
+    const t = parseNum($("w2Target").value), p2 = parseNum($("w2Price").value), f2 = parseNum($("w2Fee").value);
+    const o2 = $("w2Out"), n2 = $("w2Note");
+    n2.textContent = "";
+    if (!c.openQty) { o2.textContent = REASON_EMPTY; o2.style.fontWeight = "400"; }
+    else if (t == null || p2 == null) { o2.textContent = "Enter a target average and a price."; o2.style.fontWeight = "400"; }
+    else if (isNaN(t) || isNaN(p2) || (f2 != null && (isNaN(f2) || f2 < 0))) { o2.textContent = "Prices and fees need to be plain numbers."; o2.style.fontWeight = "400"; }
+    else {
+      const r = contractsToReach(p, t, p2, f2 == null ? 0 : f2);
+      if (r.reason) { o2.textContent = r.reason; o2.style.fontWeight = "400"; }
+      else {
+        o2.style.fontWeight = "";
+        o2.textContent = "Buy " + plural(r.n, "contract") + " (about " + money(r.cost) + ") and your average becomes " + money(r.newAvg) + ".";
+        n2.textContent = r.feeIncluded
+          ? "The new average includes the " + money(f2) + " order fee. The contract count is worked out before fees."
+          : "Rounded up to whole contracts, so the new average lands at or just under your target.";
+      }
+    }
+  }
+
+  function renderAll() {
+    renderSwitcher();
+    const p = active();
+    $("emptyState").hidden = !!p;
+    $("app").hidden = !p;
+    if (!p) return;
+    const c = compute(p);
+    renderFills(p, c);
+    renderTicket(p, c);
+    renderWhatIfs(p, c);
+  }
+  function renderLive() {
+    const p = active();
+    if (!p) return;
+    const c = compute(p);
+    renderTicket(p, c);
+    renderWhatIfs(p, c);
+  }
+  function loadPositionInputs() {
+    const p = active();
+    $("curPrice").value = p && p.currentPrice != null ? p.currentPrice.toFixed(2) : "";
+    syncWhatIfPrices();
+  }
+
+  /* ---------- events ---------- */
+  $("btnFirst").addEventListener("click", newPosition);
+  $("btnNew").addEventListener("click", newPosition);
+  $("btnRename").addEventListener("click", renamePosition);
+  $("btnDelete").addEventListener("click", deletePosition);
+  $("posSelect").addEventListener("change", (e) => {
+    state.activeId = e.target.value;
+    save();
+    resetWhatIfs();
+    loadPositionInputs();
+    renderAll();
+  });
+
+  document.addEventListener("blur", (e) => {
+    const t = e.target;
+    if (t && t.classList && t.classList.contains("money-in")) {
+      const v = parseNum(t.value);
+      if (v != null && !isNaN(v) && v >= 0) t.value = v.toFixed(2);
+    }
+  }, true);
+
+  document.addEventListener("click", (e) => {
+    const h = e.target.closest(".hint");
+    if (!h) return;
+    const zone = h.closest("[data-tipzone]");
+    const line = zone && zone.querySelector(":scope > .tipline");
+    if (!line) return;
+    const same = !line.hidden && line.dataset.from === h.getAttribute("aria-label");
+    zone.querySelectorAll(".hint").forEach((x) => x.setAttribute("aria-expanded", "false"));
+    if (same) { line.hidden = true; return; }
+    line.textContent = h.dataset.tip;
+    line.dataset.from = h.getAttribute("aria-label");
+    line.hidden = false;
+    h.setAttribute("aria-expanded", "true");
+  });
+  document.querySelectorAll(".hint").forEach((h) => { h.title = h.dataset.tip; h.setAttribute("aria-expanded", "false"); });
+
+  const form = $("fillForm");
+  form.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && e.target.tagName === "INPUT") { e.preventDefault(); form.requestSubmit(); }
+  });
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const p = active();
+    if (!p) return;
+    const msg = $("fillMsg");
+    const date = $("fDate").value;
+    const side = form.querySelector("input[name=side]:checked").value;
+    const qty = parseNum($("fQty").value), price = parseNum($("fPrice").value), feeRaw = parseNum($("fFee").value);
+    const fee = feeRaw == null ? 0 : feeRaw;
+    ["fDate", "fQty", "fPrice", "fFee"].forEach((id) => $(id).removeAttribute("aria-invalid"));
+    let bad = null, text = "";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { bad = "fDate"; text = "Pick the date of the fill."; }
+    else if (qty == null || !Number.isInteger(qty) || qty < 1) { bad = "fQty"; text = "Contracts must be a whole number of 1 or more."; }
+    else if (price == null || isNaN(price) || price < 0) { bad = "fPrice"; text = "Enter the premium per share, for example 1.25."; }
+    else if (isNaN(fee) || fee < 0) { bad = "fFee"; text = "Fee must be zero or more."; }
+    if (bad) {
+      msg.textContent = text; msg.hidden = false;
+      $(bad).setAttribute("aria-invalid", "true");
+      $(bad).focus();
+      return;
+    }
+    msg.hidden = true;
+    p.lots.push({ id: uid(), date, side, qty, price, fee });
+    save();
+    renderAll();
+    $("fQty").value = ""; $("fPrice").value = "";
+    $("fQty").focus();
+    const c = compute(p);
+    toast(c.errors.some((er) => er.id === p.lots[p.lots.length - 1].id) ? "Fill added, but it is flagged" : "Fill added");
+  });
+
+  $("fillsBody").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-remove]");
+    if (b) removeFill(b.dataset.remove);
+  });
+  document.querySelectorAll("#fillsTable .sort").forEach((b) => b.addEventListener("click", () => {
+    const key = b.dataset.key;
+    if (!ui.sort || ui.sort.key !== key) ui.sort = { key, dir: "asc" };
+    else if (ui.sort.dir === "asc") ui.sort.dir = "desc";
+    else ui.sort = null;
+    saveUi();
+    const p = active();
+    if (p) renderFills(p, compute(p));
+  }));
+
+  $("curPrice").addEventListener("input", () => {
+    const p = active();
+    if (!p) return;
+    const v = parseNum($("curPrice").value);
+    p.currentPrice = v == null || isNaN(v) || v < 0 ? null : v;
+    save();
+    syncWhatIfPrices();
+    renderLive();
+  });
+  ["w1Qty", "w1Price", "w1Fee", "w2Target", "w2Price", "w2Fee"].forEach((id) => $(id).addEventListener("input", () => {
+    if (id in dirty) dirty[id] = $(id).value.trim() !== "";
+    renderLive();
+  }));
+
+  /* ---------- export / import ---------- */
+  $("btnExport").addEventListener("click", () => {
+    const data = { v: 1, app: "Basis", version: APP_VERSION, exportedAt: new Date().toISOString(), positions: state.positions };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "basis-positions-" + todayISO() + ".json";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    toast("Download started");
+  });
+  $("btnImport").addEventListener("click", () => $("fileIn").click());
+  $("fileIn").addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onerror = () => toast("That file could not be read. Nothing was imported.", true);
+    reader.onload = () => {
+      let positions = null;
+      try {
+        const d = JSON.parse(String(reader.result));
+        if (d && d.v === 1) positions = cleanPositions(d.positions);
+      } catch (err) { positions = null; }
+      if (!positions) { toast("That file is not a Basis export. Nothing was imported.", true); return; }
+      positions.forEach((np) => {
+        const i = state.positions.findIndex((x) => x.id === np.id);
+        if (i >= 0) state.positions[i] = np; else state.positions.push(np);
+      });
+      if (!active()) state.activeId = positions[0] ? positions[0].id : (state.positions[0] ? state.positions[0].id : null);
+      save();
+      resetWhatIfs();
+      loadPositionInputs();
+      renderAll();
+      toast("Imported " + plural(positions.length, "position"));
+    };
+    reader.readAsText(file);
+  });
+
+  /* ---------- add to home screen tip ---------- */
+  function setupA2HS() {
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+    const touch = window.matchMedia("(pointer: coarse)").matches && window.matchMedia("(max-width: 1024px)").matches;
+    if (!touch || standalone || ui.a2hsDismissed) return;
+    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    $("a2hsText").textContent = ios
+      ? "Add Basis to your home screen: tap Share, then Add to Home Screen. It opens full screen and your fills stay on this device."
+      : "Add Basis to your home screen: open the browser menu and choose Add to Home screen or Install app. Your fills stay on this device.";
+    $("a2hs").hidden = false;
+  }
+  $("a2hsClose").addEventListener("click", () => {
+    $("a2hs").hidden = true;
+    ui.a2hsDismissed = true;
+    saveUi();
+  });
+
+  /* ---------- header height for the sticky summary ---------- */
+  const hdr = $("hdr");
+  const setHdr = () => document.documentElement.style.setProperty("--hdr-h", hdr.offsetHeight + "px");
+  if (window.ResizeObserver) new ResizeObserver(setHdr).observe(hdr); else window.addEventListener("resize", setHdr);
+
+  /* ---------- boot ---------- */
+  load();
+  applyTheme();
+  $("fDate").value = todayISO();
+  loadPositionInputs();
+  renderAll();
+  setupA2HS();
+  setHdr();
+})();
+</script>
+</body>
+</html>

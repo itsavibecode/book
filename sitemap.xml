@@ -146,6 +146,16 @@
     </image:image>
   </url>
   <url>
+    <loc>https://bookhockeys.com/basis/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://bookhockeys.com/basis/og.png</image:loc>
+      <image:title>Basis - options cost averager</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://bookhockeys.com/kick/mastuhsplinter/</loc>
     <lastmod>2026-10-11</lastmod>
     <changefreq>daily</changefreq>
