@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="0.3.0">
+<meta name="app-version" content="0.4.0">
 <meta name="description" content="Track the average cost of an options position across every buy and trim, and see how many contracts at today's price would bring your average down to a target.">
-<title>Basis v0.3.0 - options cost averager | BookHockeys</title>
+<title>Basis v0.4.0 - options cost averager | BookHockeys</title>
 <link rel="canonical" href="https://bookhockeys.com/basis/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20x=%222%22%20y=%222%22%20width=%2260%22%20height=%2260%22%20fill=%22%23ffffff%22%20stroke=%22%23111111%22%20stroke-width=%224%22/%3E%3Ctext%20x=%2232%22%20y=%2244%22%20text-anchor=%22middle%22%20font-family=%22Segoe%20UI,Arial,Helvetica,sans-serif%22%20font-size=%2238%22%20font-weight=%22800%22%20fill=%22%23111111%22%3EB%3C/text%3E%3Crect%20x=%2218%22%20y=%2249%22%20width=%2228%22%20height=%226%22%20fill=%22%23e11d48%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -201,7 +201,8 @@ input[aria-invalid="true"]{border-color:var(--loss);outline:1px solid var(--loss
 .rows dt{color:var(--muted);display:flex;align-items:center;gap:6px}
 .rows dd{margin:0;text-align:right;font-weight:600}
 .tk-price{margin-top:16px}
-.tk-price .money{max-width:10rem}
+.tk-price-row{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.tk-price .money{max-width:10rem;flex:1 1 7rem}
 .statement{margin-top:12px;font-size:14px}
 .warn{margin-top:12px;font-size:14px;color:var(--loss)}
 .rule-short{display:none}
@@ -240,6 +241,27 @@ td .sub{display:block;font-size:12px;font-weight:400;color:var(--muted)}
 tr.err td{color:var(--muted)}
 tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
 .empty-row td{text-align:center;color:var(--muted);padding:22px 8px}
+/* What-if rows: pinned under the real fills, faded so they read as not yet real. */
+tr.pending td:not(.act){opacity:.55}
+tr.pending .tag{display:block;font-size:12px;font-weight:700;color:var(--ink);text-align:left}
+
+/* Price history chart */
+.ch-msg{font-size:14px}
+.ch-actions{margin-top:12px}
+.ch-box svg{display:block;width:100%;max-width:100%;height:auto;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.ch-axis{stroke:var(--line);stroke-width:1}
+.ch-tick{fill:var(--muted);font-size:11px}
+.ch-line{fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:round;stroke-linecap:square}
+.ch-avg{stroke:var(--accent);stroke-width:2}
+.ch-avg-l{fill:var(--accent);font-size:11px;font-weight:700}
+.ch-buy{fill:var(--accent)}
+.ch-sell{fill:var(--card);stroke:var(--ink);stroke-width:2}
+.ch-x{stroke:var(--ink);stroke-width:1}
+.ch-lab rect{fill:var(--ink)}
+.ch-lab text{fill:var(--card);font-size:11px;font-weight:700}
+.ch-asof{margin-top:8px;font-size:13px}
+.ch-note{margin-top:2px;font-size:13px;color:var(--muted)}
+.m-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:12px;align-items:start}
 @media (max-width:639.98px){
   /* rows become cards so the table never scrolls sideways */
   thead{display:none}
@@ -295,7 +317,7 @@ tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
 <div id="page">
 <header class="hdr" id="hdr">
   <div class="hdr-in">
-    <div class="brand"><span class="wordmark">Basis</span><span class="ver num">v<span id="ver">0.3.0</span></span></div>
+    <div class="brand"><span class="wordmark">Basis</span><span class="ver num">v<span id="ver">0.4.0</span></span></div>
     <div class="pos-ctl" id="posCtl">
       <label class="sr-only" for="posSelect">Position</label>
       <select id="posSelect" title="Switch between the positions you are tracking."></select>
@@ -368,7 +390,7 @@ tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
       </section>
     </div>
 
-    <aside class="side" aria-label="Summary and what-if calculators">
+    <aside class="side" aria-label="Summary, price chart and what-if calculators">
       <section class="card ticket" aria-labelledby="tkName" data-tipzone>
         <div class="tk-head"><h2 id="tkName"></h2><span class="muted small num" id="tkMult"></span></div>
         <div class="big num" id="tkAvg"></div>
@@ -382,7 +404,10 @@ tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
         </dl>
         <div class="field tk-price">
           <div class="lab"><label for="curPrice">Current price</label><button type="button" class="hint" aria-label="About current price" data-tip="Today's premium per share. Basis uses it to show what the position is worth and to prefill the what-if prices.">?</button></div>
-          <div class="money"><span aria-hidden="true">$</span><input id="curPrice" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+          <div class="tk-price-row">
+            <div class="money"><span aria-hidden="true">$</span><input id="curPrice" class="money-in" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+            <button type="button" class="btn" id="btnLatest" title="Copies the most recent daily close from the chart, so you do not have to look the price up yourself." hidden>Use latest close</button>
+          </div>
         </div>
         <dl class="rows num" id="tkMarket" style="margin-top:14px" hidden>
           <dt>Market value</dt><dd id="tkMV"></dd>
@@ -391,6 +416,10 @@ tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
         <p class="statement" id="tkDist" hidden></p>
         <p class="warn" id="tkWarn" hidden></p>
         <p class="tipline" aria-live="polite" hidden></p>
+      </section>
+      <section class="card" aria-labelledby="chH" data-tipzone>
+        <h2 id="chH" tabindex="-1">Since your first fill</h2>
+        <div class="ch-box" id="chBody" aria-live="polite"></div>
       </section>
       <div class="rule-short" aria-hidden="true"></div>
       <section class="card" aria-labelledby="wi1H" data-tipzone>
@@ -441,7 +470,7 @@ tr.err td.errcell{color:var(--loss);white-space:normal;min-width:9rem}
 </div>
 
 <script>
-const APP_VERSION = "0.3.0";
+const APP_VERSION = "0.4.0";
 (function () {
   "use strict";
   document.title = "Basis v" + APP_VERSION + " - options cost averager | BookHockeys";
@@ -530,7 +559,56 @@ const APP_VERSION = "0.3.0";
     return { n, cost, newAvg: openCost / (openQty * m), openQty, openCost, feeIncluded: fee > 0 };
   }
 
-  window.Basis = { compute, whatIfAdd, contractsToReach, version: APP_VERSION };
+  // OCC option symbol: ticker, expiry as YYMMDD, C or P, strike x 1000 padded to 8 digits.
+  function occSymbol(p) {
+    if (!p || !p.ticker || !p.kind || p.strike == null || !p.expiry) return null;
+    if (!/^[A-Z]{1,6}$/.test(p.ticker) || !/^\d{4}-\d{2}-\d{2}$/.test(p.expiry)) return null;
+    const k = Math.round(Number(p.strike) * 1000);
+    if (!isFinite(k) || k <= 0 || k > 99999999) return null;
+    return p.ticker + p.expiry.slice(2, 4) + p.expiry.slice(5, 7) + p.expiry.slice(8, 10) + (p.kind === "put" ? "P" : "C") + String(k).padStart(8, "0");
+  }
+
+  // The rows the two what-if calculators would add, for showing under the real fills.
+  // They are never saved: adding one is a separate, explicit step.
+  function pendingRows(position, w1, w2) {
+    const m = Number(position.multiplier) || 100;
+    const num = (v) => (typeof v === "number" ? v : parseNum(v));
+    const feeOk = (f) => f == null || (!isNaN(f) && f >= 0);
+    const out = [], date = todayISO();
+    if (w1) {
+      const q = num(w1.qty), pr = num(w1.price), fe = num(w1.fee);
+      if (q != null && pr != null && feeOk(fe)) {
+        const r = whatIfAdd(position, q, pr, fe || 0);
+        if (r) out.push({ which: 1, label: "What-if", date, side: "buy", qty: q, price: pr, fee: fe || 0, cost: q * pr * m + (fe || 0), avgPremium: r.avgPremium });
+      }
+    }
+    if (w2) {
+      const t = num(w2.target), pr = num(w2.price), fe = num(w2.fee);
+      if (t != null && pr != null && !isNaN(t) && !isNaN(pr) && feeOk(fe)) {
+        const r = contractsToReach(position, t, pr, fe || 0);
+        if (!r.reason) out.push({ which: 2, label: "What-if", date, side: "buy", qty: r.n, price: pr, fee: fe || 0, cost: r.cost, avgPremium: r.newAvg });
+      }
+    }
+    return out;
+  }
+
+  function dayNum(iso) {
+    return Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10))) / 86400000;
+  }
+  function isoFromDay(n) { return new Date(n * 86400000).toISOString().slice(0, 10); }
+
+  // SVG path for daily closes. points: [{t:"YYYY-MM-DD", close}]. box: {left, top, width, height,
+  // t0, t1 (ISO dates at the left and right edges), min, max (dollar values at the bottom and top)}.
+  function chartPath(points, box) {
+    const d0 = dayNum(box.t0), span = dayNum(box.t1) - d0, range = box.max - box.min;
+    return points.map((pt, i) => {
+      const x = box.left + (span > 0 ? (dayNum(pt.t) - d0) / span : 0.5) * box.width;
+      const y = box.top + (range > 0 ? (box.max - pt.close) / range : 0.5) * box.height;
+      return (i ? "L" : "M") + x.toFixed(2) + " " + y.toFixed(2);
+    }).join(" ");
+  }
+
+  window.Basis = { compute, whatIfAdd, contractsToReach, occSymbol, pendingRows, chartPath, version: APP_VERSION };
 
   /* ---------- formatting ---------- */
   const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -550,7 +628,7 @@ const APP_VERSION = "0.3.0";
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
   /* ---------- storage ---------- */
-  let state = { v: 1, positions: [], activeId: null };
+  let state = { v: 2, positions: [], activeId: null };
   let storageOk = true;
   const ui = { theme: null, sort: null, a2hsDismissed: false };
 
@@ -563,9 +641,28 @@ const APP_VERSION = "0.3.0";
     if (!Number.isInteger(qty) || qty < 1 || !isFinite(price) || price < 0 || !isFinite(fee) || fee < 0) return null;
     return { id: l.id, date: l.date, side: l.side, qty, price, fee };
   }
+  function validISODate(s) {
+    return typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s) && isoFromDay(dayNum(s)) === s;
+  }
+  // Data v2 adds the contract (ticker, kind, strike, expiry). Missing fields are null, so v1 data reads as-is.
+  function cleanContract(p) {
+    const ticker = p.ticker == null || p.ticker === "" ? null : String(p.ticker).trim().toUpperCase();
+    if (ticker !== null && !/^[A-Z]{1,6}$/.test(ticker)) return null;
+    const kind = p.kind == null || p.kind === "" ? null : p.kind;
+    if (kind !== null && kind !== "call" && kind !== "put") return null;
+    let strike = p.strike == null || p.strike === "" ? null : Number(p.strike);
+    if (strike !== null) { if (!isFinite(strike) || strike <= 0) return null; strike = Math.round(strike * 100) / 100; }
+    const expiry = p.expiry == null || p.expiry === "" ? null : p.expiry;
+    if (expiry !== null && !validISODate(expiry)) return null;
+    return { ticker, kind, strike, expiry };
+  }
   function cleanPosition(p) {
     if (!p || typeof p !== "object" || typeof p.id !== "string" || !p.id) return null;
-    if (typeof p.name !== "string" || !p.name.trim()) return null;
+    if (p.name != null && typeof p.name !== "string") return null;
+    const con = cleanContract(p);
+    if (!con) return null;
+    const name = (p.name || "").trim();
+    if (!name && !con.ticker) return null;
     const mult = p.multiplier == null ? 100 : Number(p.multiplier);
     if (!Number.isInteger(mult) || mult < 1) return null;
     const cp = p.currentPrice == null ? null : Number(p.currentPrice);
@@ -573,7 +670,20 @@ const APP_VERSION = "0.3.0";
     if (!Array.isArray(p.lots)) return null;
     const lots = p.lots.map(cleanLot);
     if (lots.some((l) => !l)) return null;
-    return { id: p.id, name: p.name.trim(), multiplier: mult, currentPrice: cp, lots, createdAt: p.createdAt || new Date().toISOString() };
+    return { id: p.id, name, ticker: con.ticker, kind: con.kind, strike: con.strike, expiry: con.expiry, multiplier: mult, currentPrice: cp, lots, createdAt: p.createdAt || new Date().toISOString() };
+  }
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function shortDate(iso, withYear) {
+    return MON[Number(iso.slice(5, 7)) - 1] + " " + Number(iso.slice(8, 10)) + (withYear ? " " + iso.slice(0, 4) : "");
+  }
+  // The name the user typed, or one built from the contract: "AAPL $250.00 call, Dec 18 2026".
+  function displayName(p) {
+    if (p.name) return p.name;
+    let s = p.ticker || "";
+    if (p.strike != null) s += " " + usd.format(p.strike);
+    if (p.kind) s += " " + p.kind;
+    if (p.expiry) s += ", " + shortDate(p.expiry, true);
+    return s.trim() || "Untitled position";
   }
   function cleanPositions(arr) {
     if (!Array.isArray(arr)) return null;
@@ -598,10 +708,11 @@ const APP_VERSION = "0.3.0";
     if (raw) {
       try {
         const d = JSON.parse(raw);
-        const positions = d && d.v === 1 ? cleanPositions(d.positions) : null;
+        const positions = d && (d.v === 1 || d.v === 2) ? cleanPositions(d.positions) : null;
         if (!positions) throw new Error("bad shape");
-        state = { v: 1, positions, activeId: positions.some((p) => p.id === d.activeId) ? d.activeId : (positions[0] ? positions[0].id : null) };
-        if (migrated) save();
+        state = { v: 2, positions, activeId: positions.some((p) => p.id === d.activeId) ? d.activeId : (positions[0] ? positions[0].id : null) };
+        // v1 data is upgraded in place on first load (contract fields start out empty).
+        if (migrated || d.v === 1) save();
       } catch (e) { storageFail(); }
     }
     try {
@@ -681,7 +792,7 @@ const APP_VERSION = "0.3.0";
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
 
-  function fieldEl(labelText, input, tip) {
+  function fieldEl(labelText, input, tip, control) {
     const wrap = document.createElement("div");
     wrap.className = "field";
     const lab = document.createElement("div");
@@ -692,7 +803,7 @@ const APP_VERSION = "0.3.0";
     lab.appendChild(l);
     if (tip) input.title = tip;
     wrap.appendChild(lab);
-    wrap.appendChild(input);
+    wrap.appendChild(control || input);
     if (tip) {
       const p = document.createElement("p");
       p.className = "small muted";
@@ -703,9 +814,60 @@ const APP_VERSION = "0.3.0";
   }
   function positionForm(p) {
     const frag = document.createElement("div");
+    frag.style.display = "grid"; frag.style.gap = "12px";
+    const grid = document.createElement("div");
+    grid.className = "m-grid";
+
+    const ticker = document.createElement("input");
+    ticker.id = "mTicker"; ticker.autocomplete = "off"; ticker.maxLength = 6; ticker.placeholder = "AAPL";
+    ticker.setAttribute("autocapitalize", "characters"); ticker.spellcheck = false;
+    ticker.value = p && p.ticker ? p.ticker : "";
+    ticker.addEventListener("input", () => {
+      const up = ticker.value.toUpperCase();
+      if (up !== ticker.value) ticker.value = up;
+    });
+    grid.appendChild(fieldEl("Ticker", ticker, "The underlying stock. With the strike and expiry it lets Basis look up the contract's price."));
+
+    const kindWrap = document.createElement("div");
+    kindWrap.className = "field";
+    const kindLab = document.createElement("div");
+    kindLab.className = "lab"; kindLab.id = "mKindLab"; kindLab.textContent = "Type";
+    const seg = document.createElement("div");
+    seg.className = "seg"; seg.setAttribute("role", "radiogroup"); seg.setAttribute("aria-labelledby", "mKindLab");
+    seg.title = "Call or put. Part of the contract symbol, so the chart shows the right option.";
+    ["call", "put"].forEach((k) => {
+      const l = document.createElement("label");
+      const r = document.createElement("input");
+      r.type = "radio"; r.name = "mKind"; r.value = k; r.checked = !!(p && p.kind === k);
+      const s = document.createElement("span");
+      s.textContent = k === "call" ? "Call" : "Put";
+      l.appendChild(r); l.appendChild(s); seg.appendChild(l);
+    });
+    const kindTip = document.createElement("p");
+    kindTip.className = "small muted";
+    kindTip.textContent = "Call or put. Part of the contract symbol, so the chart shows the right option.";
+    kindWrap.appendChild(kindLab); kindWrap.appendChild(seg); kindWrap.appendChild(kindTip);
+    grid.appendChild(kindWrap);
+
+    const strike = document.createElement("input");
+    strike.id = "mStrike"; strike.className = "money-in"; strike.inputMode = "decimal"; strike.autocomplete = "off"; strike.placeholder = "0.00";
+    strike.value = p && p.strike != null ? p.strike.toFixed(2) : "";
+    const strikeMoney = document.createElement("div");
+    strikeMoney.className = "money";
+    const dollar = document.createElement("span");
+    dollar.setAttribute("aria-hidden", "true"); dollar.textContent = "$";
+    strikeMoney.appendChild(dollar); strikeMoney.appendChild(strike);
+    grid.appendChild(fieldEl("Strike", strike, "The contract's strike price. Needed to find the exact option for the chart.", strikeMoney));
+
+    const expiry = document.createElement("input");
+    expiry.id = "mExpiry"; expiry.type = "date";
+    expiry.value = p && p.expiry ? p.expiry : "";
+    grid.appendChild(fieldEl("Expiry", expiry, "The expiration date. Options with the same strike but a different expiry are different contracts."));
+    frag.appendChild(grid);
+
     const name = document.createElement("input");
     name.id = "mName"; name.autocomplete = "off"; name.maxLength = 80;
-    name.placeholder = "e.g. AAPL 200C Jan 2027";
+    name.placeholder = "Leave blank to use the contract";
     name.value = p ? p.name : "";
     const mult = document.createElement("input");
     mult.id = "mMult"; mult.inputMode = "numeric"; mult.autocomplete = "off";
@@ -713,7 +875,8 @@ const APP_VERSION = "0.3.0";
     mult.style.maxWidth = "8rem";
     const err = document.createElement("p");
     err.className = "form-msg"; err.id = "mErr"; err.hidden = true; err.setAttribute("aria-live", "polite");
-    frag.appendChild(fieldEl("Name", name, "Ticker, strike, type and expiry, so you can tell positions apart."));
+    const nameField = fieldEl("Name (optional)", name, "Leave blank to use the contract, like AAPL $250.00 call, Dec 18 2026. Type a name if you want a label of your own.");
+    frag.appendChild(nameField);
     frag.appendChild(fieldEl("Multiplier", mult, "Standard equity options control 100 shares per contract. Change this only for mini or index products with a different multiplier."));
     frag.appendChild(err);
     return frag;
@@ -722,23 +885,39 @@ const APP_VERSION = "0.3.0";
     const name = $("mName").value.trim(), multRaw = $("mMult").value.trim();
     const mult = Number(multRaw);
     const err = $("mErr");
-    $("mName").removeAttribute("aria-invalid"); $("mMult").removeAttribute("aria-invalid");
-    if (!name) { err.textContent = "Give the position a name."; err.hidden = false; $("mName").setAttribute("aria-invalid", "true"); $("mName").focus(); return null; }
-    if (!Number.isInteger(mult) || mult < 1) { err.textContent = "Multiplier must be a whole number, usually 100."; err.hidden = false; $("mMult").setAttribute("aria-invalid", "true"); $("mMult").focus(); return null; }
-    return { name, mult };
+    ["mTicker", "mStrike", "mExpiry", "mName", "mMult"].forEach((id) => $(id).removeAttribute("aria-invalid"));
+    const fail = (id, text) => { err.textContent = text; err.hidden = false; $(id).setAttribute("aria-invalid", "true"); $(id).focus(); return null; };
+    const ticker = $("mTicker").value.trim().toUpperCase() || null;
+    const kindEl = $("modal").querySelector("input[name=mKind]:checked");
+    const kind = kindEl ? kindEl.value : null;
+    const strikeRaw = parseNum($("mStrike").value);
+    const expiry = $("mExpiry").value || null;
+    if (ticker && !/^[A-Z]{1,6}$/.test(ticker)) return fail("mTicker", "Ticker must be 1 to 6 letters, like AAPL.");
+    if (strikeRaw != null && (isNaN(strikeRaw) || strikeRaw <= 0)) return fail("mStrike", "Strike must be a price above zero, like 250.00.");
+    if (expiry && !validISODate(expiry)) return fail("mExpiry", "Pick the expiration date.");
+    if (!name && !ticker) return fail("mName", "Give the position a name, or fill in the ticker so Basis can name it for you.");
+    if (!Number.isInteger(mult) || mult < 1) return fail("mMult", "Multiplier must be a whole number, usually 100.");
+    const strike = strikeRaw == null ? null : Math.round(strikeRaw * 100) / 100;
+    return { name, mult, ticker, kind, strike, expiry };
+  }
+  function applyPositionForm(p, v) {
+    p.name = v.name; p.multiplier = v.mult;
+    p.ticker = v.ticker; p.kind = v.kind; p.strike = v.strike; p.expiry = v.expiry;
   }
 
   function newPosition() {
     openModal({
-      title: "New position", confirmText: "Create position", body: positionForm(null), focus: "#mName",
+      title: "New position", confirmText: "Create position", body: positionForm(null), focus: "#mTicker",
       onConfirm() {
         const v = readPositionForm();
         if (!v) return false;
-        const p = { id: uid(), name: v.name, multiplier: v.mult, currentPrice: null, lots: [], createdAt: new Date().toISOString() };
+        const p = { id: uid(), name: "", ticker: null, kind: null, strike: null, expiry: null, multiplier: 100, currentPrice: null, lots: [], createdAt: new Date().toISOString() };
+        applyPositionForm(p, v);
         state.positions.push(p);
         state.activeId = p.id;
         save();
         resetWhatIfs();
+        loadPositionInputs();
         renderAll();
         toast("Position created");
         modalOpener = $("fDate");
@@ -749,15 +928,15 @@ const APP_VERSION = "0.3.0";
     const p = active();
     if (!p) return;
     openModal({
-      title: "Rename position", confirmText: "Save", body: positionForm(p), focus: "#mName",
+      title: "Rename position", confirmText: "Save", body: positionForm(p), focus: occSymbol(p) ? "#mName" : "#mTicker",
       onConfirm() {
         const v = readPositionForm();
         if (!v) return false;
-        const multChanged = v.mult !== p.multiplier;
-        p.name = v.name; p.multiplier = v.mult;
+        const onlyName = v.mult === p.multiplier && v.ticker === p.ticker && v.kind === p.kind && v.strike === p.strike && v.expiry === p.expiry;
+        applyPositionForm(p, v);
         save();
         renderAll();
-        toast(multChanged ? "Position updated" : "Position renamed");
+        toast(onlyName ? "Position renamed" : "Position updated");
       }
     });
   }
@@ -766,7 +945,7 @@ const APP_VERSION = "0.3.0";
     if (!p) return;
     const body = document.createElement("div");
     const a = document.createElement("p");
-    a.textContent = "“" + p.name + "” and its " + plural(p.lots.length, "fill") + " will be removed from this browser. This cannot be undone.";
+    a.textContent = "“" + displayName(p) + "” and its " + plural(p.lots.length, "fill") + " will be removed from this browser. This cannot be undone.";
     const b = document.createElement("p");
     b.className = "muted small";
     b.textContent = "Download JSON first if you want a copy.";
@@ -778,6 +957,7 @@ const APP_VERSION = "0.3.0";
         state.activeId = state.positions[0] ? state.positions[0].id : null;
         save();
         resetWhatIfs();
+        loadPositionInputs();
         renderAll();
         toast("Position deleted");
         modalOpener = state.positions.length ? $("posSelect") : $("btnFirst");
@@ -829,7 +1009,7 @@ const APP_VERSION = "0.3.0";
   function renderSwitcher() {
     const sel = $("posSelect");
     sel.textContent = "";
-    state.positions.forEach((p) => sel.appendChild(new Option(p.name, p.id, false, p.id === state.activeId)));
+    state.positions.forEach((p) => sel.appendChild(new Option(displayName(p), p.id, false, p.id === state.activeId)));
     const has = state.positions.length > 0;
     sel.hidden = !has;
     $("btnRename").hidden = !has;
@@ -891,7 +1071,6 @@ const APP_VERSION = "0.3.0";
       td.textContent = "No fills yet. Add your first buy above and Basis will keep a running average.";
       tr.appendChild(td);
       body.appendChild(tr);
-      return;
     }
     rows.forEach((r) => {
       const tr = document.createElement("tr");
@@ -918,10 +1097,38 @@ const APP_VERSION = "0.3.0";
       act.appendChild(btn);
       body.appendChild(tr);
     });
+    // What-if rows stay pinned at the bottom whatever the sort, and are never saved.
+    pendingRows(p, readW1(), readW2()).forEach((r) => {
+      const tr = document.createElement("tr");
+      tr.className = "pending";
+      cell(tr, "Date").textContent = "today";
+      const side = document.createElement("span");
+      side.textContent = "Buy";
+      const tag = document.createElement("span");
+      tag.className = "tag"; tag.textContent = r.label;
+      side.appendChild(tag);
+      cell(tr, "Side").appendChild(side);
+      cell(tr, "Contracts", "r").textContent = r.qty;
+      cell(tr, "Price", "r").textContent = money(r.price);
+      const costVal = document.createElement("span");
+      costVal.textContent = money(r.cost);
+      if (r.fee > 0) { const s = document.createElement("span"); s.className = "sub"; s.textContent = "incl. " + money(r.fee) + " fee"; costVal.appendChild(s); }
+      cell(tr, "Cost", "r").appendChild(costVal);
+      cell(tr, "Running avg", "r").textContent = money(r.avgPremium);
+      const btn = document.createElement("button");
+      btn.type = "button"; btn.className = "btn"; btn.textContent = "Add as fill";
+      btn.title = "Turns this what-if into a real buy dated today, so you do not have to type it again.";
+      btn.setAttribute("aria-label", "Add as fill: buy " + plural(r.qty, "contract") + " at " + money(r.price) + " today");
+      btn.dataset.pending = String(r.which);
+      cell(tr, "", "act").appendChild(btn);
+      body.appendChild(tr);
+    });
   }
+  function readW1() { return { qty: $("w1Qty").value, price: $("w1Price").value, fee: $("w1Fee").value }; }
+  function readW2() { return { target: $("w2Target").value, price: $("w2Price").value, fee: $("w2Fee").value }; }
 
   function renderTicket(p, c) {
-    $("tkName").textContent = p.name;
+    $("tkName").textContent = displayName(p);
     $("tkMult").textContent = p.multiplier === 100 ? "" : "x" + p.multiplier + " multiplier";
     const big = $("tkAvg"), sub = $("tkAvgSub");
     if (c.avgPremium != null) {
@@ -1020,13 +1227,269 @@ const APP_VERSION = "0.3.0";
     renderFills(p, c);
     renderTicket(p, c);
     renderWhatIfs(p, c);
+    renderChart();
   }
   function renderLive() {
     const p = active();
     if (!p) return;
     const c = compute(p);
+    renderFills(p, c);
     renderTicket(p, c);
     renderWhatIfs(p, c);
+  }
+
+  /* ---------- price history chart ---------- */
+  const CHART_API = "https://basis-worker.sevendwarfs.workers.dev";
+  const API = (function () {
+    try {
+      const a = new URLSearchParams(location.search).get("api");
+      if (a) {
+        const u = new URL(a);
+        // Only a worker on this machine may stand in, so a shared link cannot point the page elsewhere.
+        if ((u.protocol === "http:" || u.protocol === "https:") && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(u.hostname)) return u.origin;
+      }
+    } catch (e) { /* fall through to the live worker */ }
+    return CHART_API;
+  })();
+  const CHART_TTL = 15 * 60 * 1000;
+  const CH_NODATA = "Yahoo has no data for this contract. Expired contracts are not available.";
+  const CH_NET = "Could not reach the price service.";
+  const CH_RANGE = "The first fill is dated in the future, so there is nothing to chart yet.";
+  const chart = { key: null, status: "idle", points: null, at: 0, asOf: 0, error: "", token: 0 };
+  const SVG_NS = "http://www.w3.org/2000/svg";
+
+  // The worker serves up to three years back, so an older first fill charts from that limit.
+  function chartFrom(p) {
+    const ls = sortedLots(p);
+    if (!ls.length) return null;
+    const floor = isoFromDay(dayNum(todayISO()) - 3 * 365 + 1);
+    return ls[0].date < floor ? floor : ls[0].date;
+  }
+  function cleanPoints(arr) {
+    if (!Array.isArray(arr)) return null;
+    const out = arr.filter((pt) => pt && validISODate(pt.t) && typeof pt.close === "number" && isFinite(pt.close) && pt.close >= 0)
+      .map((pt) => ({ t: pt.t, close: pt.close }))
+      .sort((a, b) => (a.t < b.t ? -1 : a.t > b.t ? 1 : 0));
+    return out.length ? out : null;
+  }
+  function readChartCache(sym, from) {
+    try {
+      const c = JSON.parse(localStorage.getItem("basis_chart_" + sym) || "null");
+      if (!c || c.from !== from || typeof c.at !== "number") return null;
+      const age = Date.now() - c.at;
+      if (age < 0 || age > CHART_TTL) return null;
+      const points = cleanPoints(c.data && c.data.points);
+      return points ? { points, at: c.at, asOf: typeof c.asOf === "number" ? c.asOf : c.at } : null;
+    } catch (e) { return null; }
+  }
+  function writeChartCache(sym, from, data) {
+    try { localStorage.setItem("basis_chart_" + sym, JSON.stringify({ from, at: chart.at, asOf: chart.asOf, data })); } catch (e) { /* cache only */ }
+  }
+  function ensureChart(sym, from, force) {
+    const key = sym + "|" + from;
+    if (!force && chart.key === key) {
+      if (chart.status === "loading" || chart.status === "error") return;
+      if (chart.status === "ok" && Date.now() - chart.at < CHART_TTL) return;
+    }
+    chart.key = key;
+    const tok = ++chart.token;
+    if (!force) {
+      const hit = readChartCache(sym, from);
+      if (hit) { Object.assign(chart, { status: "ok", points: hit.points, at: hit.at, asOf: hit.asOf }); return; }
+    }
+    chart.status = "loading"; chart.points = null;
+    fetch(API + "/chart?symbol=" + encodeURIComponent(sym) + "&from=" + encodeURIComponent(from), { cache: "no-store" })
+      .then((r) => r.json().catch(() => null).then((d) => ({ r, d })))
+      .then(({ r, d }) => {
+        if (tok !== chart.token) return;
+        const points = r.ok && d && d.ok ? cleanPoints(d.points) : null;
+        if (points) {
+          const asOf = Date.parse(d.fetchedAt);
+          Object.assign(chart, { status: "ok", points, at: Date.now(), asOf: isFinite(asOf) ? asOf : Date.now() });
+          writeChartCache(sym, from, d);
+        } else {
+          chart.status = "error";
+          chart.error = r.status === 404 || (d && d.cause === "nodata") ? CH_NODATA : (d && d.cause === "from") ? CH_RANGE : CH_NET;
+        }
+        renderChart();
+      })
+      .catch(() => {
+        if (tok !== chart.token) return;
+        chart.status = "error"; chart.error = CH_NET;
+        renderChart();
+      });
+  }
+
+  function renderChart() {
+    const p = active();
+    const body = $("chBody");
+    body.textContent = "";
+    $("btnLatest").hidden = true;
+    if (!p) return;
+    const msg = (text) => { const el = document.createElement("p"); el.className = "ch-msg"; el.textContent = text; body.appendChild(el); };
+    const action = (text, fn) => {
+      const d = document.createElement("div"); d.className = "ch-actions";
+      const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = text;
+      b.addEventListener("click", fn);
+      d.appendChild(b); body.appendChild(d);
+    };
+    const sym = occSymbol(p), from = chartFrom(p);
+    if (!sym || !from) {
+      chart.token++; chart.key = null; chart.status = "idle";
+      if (!sym) {
+        msg("Add the ticker, strike and expiry to this position and Basis will chart the contract's daily close since your first fill.");
+        action("Add contract details", renamePosition);
+      } else {
+        msg("Add your first fill and Basis will chart the contract's daily close from that day.");
+      }
+      return;
+    }
+    ensureChart(sym, from, false);
+    if (chart.status === "loading") { msg("Loading daily closes..."); return; }
+    if (chart.status === "error") {
+      msg(chart.error);
+      action("Try again", () => { ensureChart(sym, from, true); renderChart(); $("chH").focus(); });
+      return;
+    }
+    drawChart(p, sym, from, body);
+    $("btnLatest").hidden = false;
+  }
+
+  function sv(tag, attrs, parent) {
+    const el = document.createElementNS(SVG_NS, tag);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(el);
+    return el;
+  }
+  function drawChart(p, sym, from, body) {
+    const c = compute(p);
+    const pts = chart.points.filter((pt) => pt.t >= from);
+    const lots = sortedLots(p).filter((l) => l.date >= from);
+    const today = todayISO();
+    const lastPt = pts.length ? pts[pts.length - 1] : chart.points[chart.points.length - 1];
+    const t0 = from, t1 = lastPt.t > today ? lastPt.t : today;
+    const vals = pts.map((pt) => pt.close).concat(lots.map((l) => l.price));
+    if (c.avgPremium != null) vals.push(c.avgPremium);
+    let lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    const pad = (hi - lo) * 0.08 || Math.max(hi * 0.05, 0.05);
+    lo = Math.max(0, lo - pad); hi += pad;
+    const W = 300, H = 190;
+    const box = { left: 52, top: 14, width: W - 52 - 10, height: H - 14 - 28, t0, t1, min: lo, max: hi };
+    const d0 = dayNum(t0), span = dayNum(t1) - d0;
+    const xAt = (iso) => box.left + (span > 0 ? (dayNum(iso) - d0) / span : 0.5) * box.width;
+    const yAt = (v) => box.top + (hi > lo ? (hi - v) / (hi - lo) : 0.5) * box.height;
+    const bottom = box.top + box.height, right = box.left + box.width;
+
+    const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, role: "img", tabindex: "0", preserveAspectRatio: "xMidYMid meet" });
+    svg.setAttribute("aria-label", "Daily close of " + sym + " from " + shortDate(t0, true) + " to " + shortDate(lastPt.t, true) +
+      ". Latest close " + money(lastPt.close) + "." + (c.avgPremium != null ? " Your average is " + money(c.avgPremium) + "." : "") +
+      " Use the left and right arrow keys to read each day.");
+
+    // y axis: four evenly spaced dollar values
+    for (let i = 0; i < 4; i++) {
+      const v = lo + (hi - lo) * i / 3, y = yAt(v);
+      sv("line", { class: "ch-axis", x1: box.left - 4, x2: box.left, y1: y, y2: y }, svg);
+      const t = sv("text", { class: "ch-tick", x: box.left - 7, y: y + 4, "text-anchor": "end" }, svg);
+      t.textContent = money(v);
+    }
+    // x axis: 3 or 4 dates, with the year when the range crosses one
+    const multiYear = t0.slice(0, 4) !== t1.slice(0, 4);
+    const n = span < 1 ? 1 : span < 3 ? span + 1 : multiYear ? 3 : 4;
+    const seen = new Set();
+    for (let i = 0; i < n; i++) {
+      const day = n === 1 ? d0 : Math.round(d0 + span * i / (n - 1));
+      if (seen.has(day)) continue;
+      seen.add(day);
+      const iso = isoFromDay(day), x = xAt(iso);
+      sv("line", { class: "ch-axis", x1: x, x2: x, y1: bottom, y2: bottom + 4 }, svg);
+      const anchor = n === 1 ? "middle" : i === 0 ? "start" : i === n - 1 ? "end" : "middle";
+      const t = sv("text", { class: "ch-tick", x, y: bottom + 17, "text-anchor": anchor }, svg);
+      t.textContent = multiYear ? MON[Number(iso.slice(5, 7)) - 1] + " " + Number(iso.slice(8, 10)) + " '" + iso.slice(2, 4) : shortDate(iso, false);
+    }
+    sv("line", { class: "ch-axis", x1: box.left, x2: box.left, y1: box.top, y2: bottom }, svg);
+    sv("line", { class: "ch-axis", x1: box.left, x2: right, y1: bottom, y2: bottom }, svg);
+
+    if (c.avgPremium != null) {
+      const y = yAt(c.avgPremium);
+      sv("line", { class: "ch-avg", x1: box.left, x2: right, y1: y, y2: y }, svg);
+      const lab = sv("text", { class: "ch-avg-l", x: right - 2, y: y < box.top + 14 ? y + 13 : y - 5, "text-anchor": "end" }, svg);
+      lab.textContent = "avg";
+    }
+    if (pts.length) sv("path", { class: "ch-line", d: chartPath(pts, box) }, svg);
+    lots.forEach((l) => {
+      const x = xAt(l.date), y = yAt(l.price);
+      const r = l.side === "buy"
+        ? sv("rect", { class: "ch-buy", x: x - 4, y: y - 4, width: 8, height: 8 }, svg)
+        : sv("rect", { class: "ch-sell", x: x - 3, y: y - 3, width: 6, height: 6 }, svg);
+      r.setAttribute("data-side", l.side);
+      const tt = sv("title", {}, r);
+      tt.textContent = (l.side === "buy" ? "Buy " : "Sell ") + plural(l.qty, "contract") + " at " + money(l.price) + " on " + shortDate(l.date, true);
+    });
+
+    // crosshair with a small date and close label
+    const cross = sv("g", { visibility: "hidden" }, svg);
+    const vline = sv("line", { class: "ch-x", y1: box.top, y2: bottom }, cross);
+    const labG = sv("g", { class: "ch-lab" }, cross);
+    const labR = sv("rect", { height: 18 }, labG);
+    const labT = sv("text", {}, labG);
+    const xs = pts.map((pt) => xAt(pt.t));
+    let cur = -1;
+    function show(i) {
+      if (!pts.length) return;
+      cur = Math.max(0, Math.min(pts.length - 1, i));
+      const x = xs[cur];
+      vline.setAttribute("x1", x); vline.setAttribute("x2", x);
+      labT.textContent = shortDate(pts[cur].t, true) + ": " + money(pts[cur].close);
+      let w = 0;
+      try { w = labT.getComputedTextLength(); } catch (e) { w = 0; }
+      if (!w) w = labT.textContent.length * 6.2;
+      const bw = w + 12;
+      const bx = Math.max(box.left, Math.min(W - bw, x - bw / 2));
+      labR.setAttribute("x", bx); labR.setAttribute("y", 0); labR.setAttribute("width", bw);
+      labT.setAttribute("x", bx + 6); labT.setAttribute("y", 13);
+      cross.setAttribute("visibility", "visible");
+    }
+    const hide = () => { cross.setAttribute("visibility", "hidden"); };
+    function nearest(e) {
+      const rect = svg.getBoundingClientRect();
+      if (!rect.width) return -1;
+      const vx = (e.clientX - rect.left) * W / rect.width;
+      let best = 0;
+      for (let i = 1; i < xs.length; i++) if (Math.abs(xs[i] - vx) < Math.abs(xs[best] - vx)) best = i;
+      return best;
+    }
+    svg.addEventListener("pointermove", (e) => { const i = nearest(e); if (i >= 0) show(i); });
+    svg.addEventListener("pointerdown", (e) => { const i = nearest(e); if (i >= 0) show(i); });
+    svg.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") hide(); });
+    svg.addEventListener("keydown", (e) => {
+      if (!pts.length) return;
+      let i = cur < 0 ? pts.length - 1 : cur;
+      if (e.key === "ArrowLeft") i--;
+      else if (e.key === "ArrowRight") i++;
+      else if (e.key === "Home") i = 0;
+      else if (e.key === "End") i = pts.length - 1;
+      else if (e.key === "Escape") { hide(); return; }
+      else return;
+      e.preventDefault();
+      show(i);
+    });
+    svg.addEventListener("blur", hide);
+    body.appendChild(svg);
+
+    const asof = document.createElement("p");
+    asof.className = "ch-asof num";
+    const when = new Date(chart.asOf);
+    const time = when.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    const sameDay = when.toDateString() === new Date().toDateString();
+    asof.textContent = "Last close " + money(lastPt.close) + " on " + shortDate(lastPt.t, true) + ", as of " + (sameDay ? time : shortDate(todayISOOf(when), true) + " " + time) + ".";
+    body.appendChild(asof);
+    const note = document.createElement("p");
+    note.className = "ch-note";
+    note.textContent = "Daily closes from Yahoo Finance, delayed. Not advice.";
+    body.appendChild(note);
+  }
+  function todayISOOf(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
   }
   function loadPositionInputs() {
     const p = active();
@@ -1109,6 +1572,29 @@ const APP_VERSION = "0.3.0";
   $("fillsBody").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-remove]");
     if (b) removeFill(b.dataset.remove);
+    const pb = e.target.closest("button[data-pending]");
+    if (pb) addPending(pb.dataset.pending);
+  });
+  function addPending(which) {
+    const p = active();
+    if (!p) return;
+    const r = pendingRows(p, readW1(), readW2()).find((x) => String(x.which) === String(which));
+    if (!r) return;
+    p.lots.push({ id: uid(), date: todayISO(), side: "buy", qty: r.qty, price: r.price, fee: r.fee });
+    save();
+    if (r.which === 1) { $("w1Qty").value = ""; $("w1Fee").value = ""; dirty.w1Price = false; }
+    else { $("w2Target").value = ""; $("w2Fee").value = ""; dirty.w2Price = false; }
+    syncWhatIfPrices();
+    renderAll();
+    toast("Fill added from what-if");
+    $(r.which === 1 ? "w1Qty" : "w2Target").focus();
+  }
+  $("btnLatest").addEventListener("click", () => {
+    const pts = chart.points;
+    if (chart.status !== "ok" || !pts || !pts.length) return;
+    $("curPrice").value = pts[pts.length - 1].close.toFixed(2);
+    $("curPrice").dispatchEvent(new Event("input", { bubbles: true }));
+    toast("Current price set to the latest close");
   });
   document.querySelectorAll("#fillsTable .sort").forEach((b) => b.addEventListener("click", () => {
     const key = b.dataset.key;
@@ -1136,7 +1622,7 @@ const APP_VERSION = "0.3.0";
 
   /* ---------- export / import ---------- */
   $("btnExport").addEventListener("click", () => {
-    const data = { v: 1, app: "Basis", version: APP_VERSION, exportedAt: new Date().toISOString(), positions: state.positions };
+    const data = { v: 2, app: "Basis", version: APP_VERSION, exportedAt: new Date().toISOString(), positions: state.positions };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -1157,7 +1643,7 @@ const APP_VERSION = "0.3.0";
       let positions = null;
       try {
         const d = JSON.parse(String(reader.result));
-        if (d && d.v === 1) positions = cleanPositions(d.positions);
+        if (d && (d.v === 1 || d.v === 2)) positions = cleanPositions(d.positions);
       } catch (err) { positions = null; }
       if (!positions) { toast("That file is not a Basis export. Nothing was imported.", true); return; }
       positions.forEach((np) => {

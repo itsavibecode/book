@@ -7,16 +7,41 @@ contract. Two calculators answer the questions that come up when a position is
 underwater: what does my average become if I add more at today's price, and how
 many contracts would I need to buy to reach a target average?
 
-It is a single HTML file with no server and no account. The only network
-request is the site's Google Analytics visit count, which `?ga=off` turns off
-for your device. Fills are saved in the browser's local storage, and you can download them as
-JSON to back them up or move them to another device.
+It is a single HTML file with no account. It makes two kinds of network
+request. One is the site's Google Analytics visit count, which `?ga=off` turns
+off for your device. The other is the price chart: when a position has its
+ticker, strike and expiry filled in, Basis asks a small helper worker
+(basis-worker.sevendwarfs.workers.dev) for that contract's daily closes from
+Yahoo Finance. Only the contract symbol and the date of your first fill are
+sent, never your fills. Fills are saved in the browser's local storage, and you
+can download them as JSON to back them up or move them to another device.
 
 Sells use the average-cost method: sold contracts leave at your average cost,
 so the average of what you still hold does not move and the difference is shown
 as realized profit or loss.
 
 ## Changelog
+
+### 0.4.0
+
+A position can now carry its contract: ticker, call or put, strike and expiry.
+Leave the name blank and Basis names it for you, like "AAPL $250.00 call, Dec 18
+2026". Your saved positions carry over untouched; the contract fields just
+start out empty.
+
+The two calculators now show their answer right in the fills table, as a faded
+"What-if" row under your real fills, with the running average that buy would
+give you. If you like it, "Add as fill" turns it into a real buy dated today, so
+you do not have to type it twice. What-if rows are never saved or exported.
+
+With the contract filled in, a new "Since your first fill" chart shows the
+option's daily close from the day you first bought, with each of your fills
+marked at the price you paid and a line at your current average. You can see at
+a glance whether you are buying the dips or chasing. "Use latest close" copies
+the last close into Current price. Browsers are not allowed to ask Yahoo for
+prices directly, so a tiny worker fetches them; it sees only the contract symbol
+and the start date. Expired contracts drop off Yahoo, so their chart is not
+available.
 
 ### 0.3.0
 
