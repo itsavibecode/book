@@ -1,6 +1,6 @@
 # Fortress Watch
 
-Live at https://bookhockeys.com/fortress/ . Version 0.3.0.
+Live at https://bookhockeys.com/fortress/ . Version 0.3.1.
 
 One page that answers "what is actually confirmed about FORTRESS and the 90-day / 30-day
 warnings, and what is just going around". Every claim carries a status label. Every outlet
@@ -138,6 +138,22 @@ the page says the wire is stale. The workflow commits only when a file changed, 
 
 The script never changes a label. A script cannot know if something is true.
 
+**Topic filter.** The word lists sit together at the top of `refresh.py`. A headline passes
+when it holds a strong phrase (`TOPIC_STRONG`: be ready, emergency alert, alert test, IPAWS,
+FORTRESS America), or an anchor word with one of its context words (`TOPIC_ANCHORS`): a bare
+"fortress" or "90 days" needs pentagon, hegseth, bases, military, blackout, grid, off-grid
+or readiness; "30 days" and "stockpile / stock up" need a household word (households, food,
+water, tinned, be ready, emergency kit, preparedness, government urges, supplies), and
+"stockpile" is rejected next to oil, loans, missile or credit; "blackout" needs words like
+72-hour, nationwide, grid or hoax. Words match whole, case-insensitive. After editing the
+lists run `python -I refresh.py --selftest`: it checks fourteen real headlines (seven that
+must be kept out, seven that must get in) and exits 1 on any miss.
+
+**Syndicated copies.** Headlines with the same normalized title (lowercase, punctuation and
+spaces collapsed) become one wire row: the copy from the highest-trust outlet, ties to the
+earliest published, with `alsoIn` (how many other outlets ran it) and `alsoDomains`. The
+page shows "and N other outlets" after the outlet name.
+
 Run it by hand from this folder: `python -I refresh.py`.
 
 ### IndexNow (off for now)
@@ -181,6 +197,18 @@ on one device, `?ga=on` turns it back on.
   (checked with the antislop `contrast-check.py`).
 
 ## Changelog
+
+### v0.3.1 (2026-11-12)
+
+- The wire let in finance and foreign headlines that only shared a word with the story
+  ("Fortress" the fund, loans "90 days behind", a missile "fortress" in Iran, oil
+  stockpiles), and showed the same syndicated headline many times. The filter now needs
+  context: a bare "fortress" or "90 days" needs a military or grid word beside it, and
+  "stockpile" needs a household word and is turned away next to oil, loans, missiles or
+  credit. Copies of one headline collapse to the copy from the most trusted outlet,
+  with "and N other outlets" beside it.
+- This week's editorial update: the status line now covers the November 17 alert test and
+  the 72-hour blackout hoax, and the analysis verdict is updated for 2026-11-12.
 
 ### v0.3.0 (2026-10-30)
 

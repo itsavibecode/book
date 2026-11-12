@@ -6,7 +6,8 @@ GitHub Actions runs it every 6 hours (.github/workflows/fortress-refresh.yml).
 What it does, each step on its own so one failure never aborts the run:
   1. Pulls Google News RSS for each query in QUERIES (last 2 days).
   2. Keeps headlines published in the last 48 hours that mention the topic,
-     (see TOPIC_WORDS), dedupes them by link and by title, merges them with the headlines already
+     (see TOPIC_STRONG and TOPIC_ANCHORS), dedupes them by link, collapses
+     syndicated copies of one headline into a row with alsoIn, merges them with the headlines already
      in data/feed.json, and maps each outlet's domain to data/sources.json for
      its trust rating. A query that fails is skipped; if every query fails,
      feed.json is left exactly as it was.
@@ -52,18 +53,49 @@ QUERIES = [
 RSS = 'https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en'
 KEEP_HOURS = 48
 MAX_ENTRIES = 150
-# The wire keeps only headlines whose title contains at least one of these
-# (case-insensitive), so off-topic Pentagon or base stories stay out.
-# This is the one place the list lives.
-TOPIC_WORDS = ['fortress', '90 day', '90-day', 'off-grid', 'stockpile', 'stock up',
-               'be ready', '30 days', 'emergency alert', 'blackout', 'prepared']
+# Wire topic filter. All the word lists live here and nowhere else.
+# A title passes when it holds a STRONG phrase, or an anchor word together with
+# one of that anchor's context words. A bare "fortress" or "90 days" shares a
+# word with half the news (finance funds, loan arrears, foreign bases), so it
+# needs a military or grid word next to it; "stockpile" needs a household word
+# and is rejected next to oil, loans, missiles or credit. Matching is on whole
+# words, case-insensitive. Run `python -I refresh.py --selftest` after edits.
+TOPIC_STRONG = ['be ready', 'emergency alert', 'alert test', 'ipaws', 'fortress america']
+CONTEXT_MILITARY = ['pentagon', 'hegseth', 'bases', 'military', 'blackout', 'grid', 'off-grid', 'readiness']
+CONTEXT_HOUSEHOLD = ['households', 'household', 'food', 'water', 'tinned', 'be ready', 'emergency kit',
+                     'preparedness', 'government urges', 'supplies']
+STOCKPILE_REJECT = ['oil', 'loans', 'loan', 'missile', 'missiles', 'credit']
+TOPIC_ANCHORS = [
+    # (anchor phrases, context phrases needed, phrases that reject it)
+    (['fortress', '90 day', '90-day', '90 days'], CONTEXT_MILITARY, []),
+    (['30 days', '30-day', '30 day'], CONTEXT_HOUSEHOLD, []),
+    (['stockpile', 'stockpiles', 'stockpiling', 'stock up', 'stock-up'], CONTEXT_HOUSEHOLD, STOCKPILE_REJECT),
+    (['blackout'], ['72-hour', '72 hour', 'nationwide', 'worldwide', 'grid', 'fema', 'hoax', 'november 17',
+                    '90-day', '90 day', 'military'], []),
+]
+TOPIC_SELFTEST = [
+    ('Goldman Sachs, HSBC, and Fortress are backing a $150 million Saudi private credit deal', False),
+    ('De la Espriella failed to make Colombia secure in 90 days', False),
+    ('15,000 CBA home loans fall 90 days behind', False),
+    ('Iranian Underground Missile Fortress Complex Unveiled in New Footage', False),
+    ("The US gives the green light to establish a 'Trump fortress' base in Poland", False),
+    ('Emergency Stockpile Oil Coming Soon to Iran-Wracked Markets, IEA Says', False),
+    ('Stock Up on These 21 Items Now and Save When Prices Climb', False),
+    ("Is a 90-day blackout coming? What the U.S. military's new readiness initiative actually means", True),
+    ("Sales of tinned food and bottled water jump after 'Be Ready' campaign launch", True),
+    ("What Is IPAWS? America's Emergency Alert System To Be Tested Next Week", True),
+    ('Fact Check: Are videos showing Trump announcing 90-day blackout real?', True),
+    ("Britons rush to stockpile tinned food and bottled water after Labour accused of sparking 'panic'", True),
+    ('Former FBI deputy director warns Americans to have 30 days worth of food and water', True),
+    ("Pentagon's FORTRESS plan for global war: Every major US base would run 90 days on its own power", True),
+]
 # Second-level suffixes where the registrable domain has three labels (bbc.co.uk).
 SECOND_LEVEL = {'co.uk', 'org.uk', 'ac.uk', 'gov.uk', 'com.au', 'net.au', 'org.au', 'gov.au',
                 'co.nz', 'govt.nz', 'co.in', 'co.jp', 'or.jp', 'go.jp', 'com.br', 'co.za', 'go.kr', 'co.kr'}
-UA = 'FortressWatch/0.3 (+https://bookhockeys.com/fortress/)'
+UA = 'FortressWatch/0.3.1 (+https://bookhockeys.com/fortress/)'
 
 DEFAULT_META = {
-    'version': '0.3.0',
+    'version': '0.3.1',
     'statusConfirmed': 'the Pentagon has ordered its bases to stop depending on the civilian grid.',
     'statusNotTrue': 'the UK told people to stock 30 days. The official figure is 3 days.',
 }
@@ -115,9 +147,26 @@ def host_of(url):
         return ''
 
 
+def _has(text, phrases):
+    return any(re.search(r'(?<![a-z0-9])' + re.escape(p) + r'(?![a-z0-9])', text) for p in phrases)
+
+
 def on_topic(title):
-    t = (title or '').lower()
-    return any(w in t for w in TOPIC_WORDS)
+    t = ' '.join(re.sub(r"[\u2018\u2019']", "'", (title or '').lower()).split())
+    if _has(t, TOPIC_STRONG):
+        return True
+    for anchors, context, reject in TOPIC_ANCHORS:
+        if _has(t, anchors) and _has(t, context) and not _has(t, reject):
+            return True
+    return False
+
+
+def selftest():
+    bad = [(h, want) for h, want in TOPIC_SELFTEST if on_topic(h) != want]
+    for h, want in bad:
+        print('FAIL  expected %s: %s' % ('pass' if want else 'reject', h))
+    print('selftest: %d of %d headlines as expected' % (len(TOPIC_SELFTEST) - len(bad), len(TOPIC_SELFTEST)))
+    return 1 if bad else 0
 
 
 def registrable(host):
@@ -222,7 +271,7 @@ def step_feed(sources):
         notice('every feed query failed; feed.json kept as it was', 'warning')
         return 'failed', False, len(old)
 
-    merged, seen_links, seen_titles = [], set(), set()
+    merged, seen_links = [], set()
     # Older entries first so a headline keeps its first "fetched" time; trust is
     # re-read from sources.json every run so a re-rating shows up on the wire.
     for e in old + fresh:
@@ -230,15 +279,15 @@ def step_feed(sources):
             continue
         if not on_topic(e.get('title', '')):
             continue
-        lk, tk = link_key(e['url']), norm_title(e.get('title', '')) + '|' + (e.get('domain') or '')
-        if lk in seen_links or tk in seen_titles:
+        lk = link_key(e['url'])
+        if lk in seen_links:
             continue
         seen_links.add(lk)
-        seen_titles.add(tk)
         src = source_for(e.get('domain') or '', sources)
         e['sourceId'] = src['id'] if src else None
         e['trust'] = src['trust'] if src else None
         merged.append(e)
+    merged = collapse_syndicated(merged)
     merged.sort(key=lambda e: e['published'], reverse=True)
     merged = merged[:MAX_ENTRIES]
     changed = write_json(FEED, merged)
@@ -246,6 +295,31 @@ def step_feed(sources):
     if failed:
         notice('%d of %d queries failed (%s); kept the rest' % (len(failed), len(QUERIES), ', '.join(failed)))
     return status, changed, len(merged)
+
+
+def collapse_syndicated(entries):
+    """Syndicated copies (same normalized title) become one row: the copy from the
+    highest-trust outlet, ties to the earliest published. alsoIn counts the other
+    outlets; alsoDomains remembers them so the count survives the next run."""
+    groups = {}
+    for e in entries:
+        groups.setdefault(norm_title(e.get('title', '')), []).append(e)
+    out = []
+    for group in groups.values():
+        group.sort(key=lambda e: (-(e.get('trust') or 0), e.get('published') or ''))
+        keep = group[0]
+        others = set(keep.get('alsoDomains') or [])
+        for e in group[1:]:
+            others.update(e.get('alsoDomains') or [])
+            others.add(e.get('domain') or e.get('outlet') or e.get('url'))
+        others.discard(keep.get('domain'))
+        keep['alsoDomains'] = sorted(d for d in others if d)
+        keep['alsoIn'] = len(keep['alsoDomains'])
+        if not keep['alsoIn']:
+            keep.pop('alsoDomains', None)
+            keep.pop('alsoIn', None)
+        out.append(keep)
+    return out
 
 
 def board_hash():
@@ -304,6 +378,8 @@ def step_seo():
 
 
 def main():
+    if '--selftest' in sys.argv[1:]:
+        return selftest()
     sources = read_json(SOURCES, [])
     if not isinstance(sources, list):
         sources = []

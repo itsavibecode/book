@@ -1,4 +1,4 @@
-/* Fortress Watch v0.3.0, blackout starter kit. Vanilla JS, no build step.
+/* Fortress Watch v0.3.1, blackout starter kit. Vanilla JS, no build step.
    Renders the kit hero count and the item list from data/kit.json on the
    board (index.html) and on the standalone kit page (kit.html). On the kit
    page it also runs the theme toggle, the toast and the consent banner,

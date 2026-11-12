@@ -1,11 +1,11 @@
 {
- "version": "0.3.0",
+ "version": "0.3.1",
  "statusConfirmed": "the Pentagon has ordered major bases to plan to run on their own power, off the civilian grid. The 90-day figure is still unconfirmed on the record.",
- "statusNotTrue": "the UK told people to stock 30 days. The official figure is 3 days, and November 17 is a routine radio and TV alert test, not a blackout.",
- "lastUpdated": "2026-11-06T21:25:18Z",
- "lastFeedRun": "2026-11-12T15:07:47Z",
- "lastFeedAttempt": "2026-11-12T15:07:47Z",
+ "statusNotTrue": "the UK told people to stock 30 days. The official figure is 3 days. November 17 is a routine radio and TV alert test, and the worldwide 72-hour blackout claim is a hoax.",
+ "lastUpdated": "2026-11-12T18:24:58Z",
+ "lastFeedRun": "2026-11-12T18:24:58Z",
+ "lastFeedAttempt": "2026-11-12T18:24:58Z",
  "feedStatus": "ok",
- "feedCount": 20,
- "boardHash": "acc8db612a6d8e03"
+ "feedCount": 8,
+ "boardHash": "3fda80aaa01a50e0"
 }

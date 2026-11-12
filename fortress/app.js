@@ -1,4 +1,4 @@
-/* Fortress Watch v0.3.0. Vanilla JS, no build step.
+/* Fortress Watch v0.3.1. Vanilla JS, no build step.
    Fetches data/*.json and renders every section. Each section loads on its
    own, so one missing file shows that section's error and leaves the rest. */
 (function () {
@@ -884,7 +884,8 @@
       var src = el('div', 'w-src');
       var known = (e.sourceId && D.srcById[e.sourceId]) || sourceForHost(e.domain);
       var trust = known ? known.trust : e.trust;
-      src.appendChild(el('span', null, (known ? known.name : (e.outlet || e.domain || 'Unknown outlet'))));
+      var also = e.alsoIn > 0 ? ' and ' + plural(e.alsoIn, 'other outlet') : '';
+      src.appendChild(el('span', null, (known ? known.name : (e.outlet || e.domain || 'Unknown outlet')) + also));
       if (trust) {
         src.appendChild(meter(trust));
         src.appendChild(el('span', 'trust-text', 'Trust ' + trust + ' of 5'));

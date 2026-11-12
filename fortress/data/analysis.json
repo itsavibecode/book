@@ -1,8 +1,8 @@
 {
- "updated": "2026-11-06",
- "author": "Analysis by Claude (Fable 5.1), updated 2026-11-06. Reasoning, not a prediction.",
+ "updated": "2026-11-12",
+ "author": "Analysis by Claude (Fable 5.2), updated 2026-11-12. Reasoning, not a prediction.",
  "intro": "Governments do not usually tell people to fill a cupboard with water unless something changed. The question is what. Below, each theory people are sharing is held to the same four questions: what would have to happen for it to be the reason, what we would expect to see first, which of those signs are actually on the board today, and what the boring explanation is. Links go to the claims with their labels, so this section is only as strong as the evidence it points at.",
- "verdict": "Updated after the week of the midterms. The resilience reading still fits most of the board: the FORTRESS office has an interim director and no deadline for the base work, and Canada, Japan, Ireland and the EU all landed on the same three-day or 72-hour household figure. Two things changed. The Iran theory now has a real sign behind it: US forces struck Iranian sites near Hormuz on the eve of the vote, after the pledge of no strikes before the election, so renewed fighting is no longer only a guess about timing. And the midterm-reveal theory had its date come and go: Democrats won both chambers and nothing was revealed, with no grid or cyber incident on election day. The freezer failures at base commissaries are now a confirmed Pentagon cyber investigation, cause still unknown, and they date from August, before the memo. November 17 remains a scheduled radio and TV test. The most likely reading is still governments hardening for a long conflict and a year of attacks on utilities, with Iran as the live risk to watch. If the board shows strikes widening, a date attached to civilian guidance, or an official linking the warnings to a named threat, this verdict gets rewritten and the change is logged.",
+ "verdict": "Updated five days before the November 17 alert test. Nothing this week changed the main reading: governments are hardening for a long conflict and a year of attacks on utilities, and households are being asked for the same three days or 72 hours everywhere. The EU published its 72-hour guidelines, UK bottled water sales rose 67 percent in the ten days after Be Ready launched, and FORTRESS showed up as a procurement story, with money committed for tungsten and a shortage of critical minerals. Those are signs of a slow program, not a countdown. Iran remains the live risk: tanker blasts and reported mines near Hormuz, a US blockade task force and stalled talks, but no attack on the US homeland and no new homeland advisory. The cyber thread widened: supermarket refrigeration systems were hacked in four European countries on November 2, which makes the August commissary failures look less like a one-off, though nothing links the two and the Pentagon probe has no finding. The loudest claim of the week, a worldwide 72-hour blackout on November 17, is a hoax that fact-checkers rated false. On that day radio and TV will carry a test message, and phones are not part of it. What would change this verdict: an attack on US infrastructure tied to Iran, an attribution in the freezer probe, a date attached to civilian guidance, or an official confirming the 90-day figure.",
  "theories": [
   {
    "theory": "resilience-policy",
@@ -24,7 +24,10 @@
     "japan-agency-launch-request",
     "canada-72-hours-unchanged",
     "ireland-emergency-booklet",
-    "fortress-interim-director"
+    "fortress-interim-director",
+    "eu-72h-guidelines-published",
+    "be-ready-sales-jump",
+    "fortress-minerals-stockpile"
    ],
    "boringExplanation": "This is the boring explanation. Every item above is a plan, a campaign or a standing goal. None names a date or a specific threat."
   },
@@ -43,7 +46,8 @@
     "ncsc-cyber-incidents",
     "streeting-alert-not-alarmed",
     "ncsc-annual-review-warning",
-    "freezer-suspected-cyberattack"
+    "freezer-suspected-cyberattack",
+    "europe-fridge-attacks-second-wave"
    ],
    "boringExplanation": "The PHP flaws are real and are being exploited, and the UK minister did cite cyberattacks. But the flaws affect web servers, not grid control systems, and no official has connected them to the preparedness advice. Patch orders with three-day deadlines are routine for critical flaws."
   },
@@ -60,7 +64,8 @@
     "trump-iran-midterms-pledge",
     "theory-iran-war",
     "us-strikes-iran-eve-of-midterms",
-    "trump-no-rush-iran"
+    "trump-no-rush-iran",
+    "iran-talks-stall-hormuz-incidents"
    ],
    "boringExplanation": "Strikes near Hormuz on the eve of the vote are a real escalation sign and the one theory on this board with new evidence. What is still missing: any official linking the base plan or the household advice to Iran, and any completion date for FORTRESS that would fit a short timeline."
   },
@@ -142,17 +147,19 @@
     "viral-blackout-chain-post",
     "simpsons-nov17-claim",
     "nov17-bank-cyberattack-rumor",
-    "nov13-doomsday-date-rumor"
+    "nov13-doomsday-date-rumor",
+    "nov17-global-blackout-72h-hoax"
    ],
    "boringExplanation": "Every item pointing at this is a social post with no source beyond itself. The Simpsons episode people cite aired in 2023 and shows no date. The same November 17 claim circulated in 2025 and nothing happened."
   }
  ],
  "nov17": {
   "title": "What November 17 actually is",
-  "text": "FEMA and the FCC scheduled a nationwide test of the Emergency Alert System for Tuesday, November 17, 2026, between 2:20 and 2:50 pm Eastern, with December 3 as the backup date. It goes to radio, TV, cable and satellite. Phones are not part of this one. Federal law requires a national test at least every three years, and earlier ones ran in 2011, 2017, 2018 and 2023. FEMA calls it routine and no official source links it to FORTRESS.",
+  "text": "FEMA and the FCC scheduled a nationwide test of the Emergency Alert System for Tuesday, November 17, 2026, between 2:20 and 2:50 pm Eastern, with December 3 as the backup date. It goes to radio, TV, cable and satellite. Phones are not part of this one. Federal law requires a national test at least every three years, and earlier ones ran in 2011, 2017, 2018 and 2023. FEMA calls it routine and no official source links it to FORTRESS. A claim that a worldwide 72-hour blackout will happen that day is a hoax that fact-checkers rated false.",
   "itemIds": [
    "fema-eas-test-nov17",
-   "fema-test-routine"
+   "fema-test-routine",
+   "nov17-global-blackout-72h-hoax"
   ]
  }
 }
