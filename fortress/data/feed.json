@@ -1,5 +1,15 @@
 [
  {
+  "fetched": "2026-11-22T06:41:12Z",
+  "published": "2026-11-22T02:27:06Z",
+  "title": "Shoppers stockpile emergency food as Be Ready warning boosts retail sales | The Independent - newspaper",
+  "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPNzBpN05sMWg3aUxzTFZrTjJ5WDRsOU1kcWY2TE5YemJRUGJxR3F0ZGN6RElHN05CVTFuSVhPSUFhYUV0ZnE5VHphQ0ZhTjdOOWVyV2hKT2V4QWtEcWFCYmQzMDY3d01YUzNGTG0yVHdvT1RxX2dsRnJWaFVsSVl2RlJKQ2NQNmh1RloyOVFReGEteEZaSm53d3gxcUVtWUJKYzhQS0FUak8wNUZRTnNwX1A4THhGS083aGJqaGMwdFZtU09RWFJldExpQQ?oc=5",
+  "domain": "magzter.com",
+  "outlet": "Magzter",
+  "sourceId": null,
+  "trust": null
+ },
+ {
   "fetched": "2026-11-21T19:10:46Z",
   "published": "2026-11-21T18:57:33Z",
   "title": "Costco makes major Thanksgiving closure decision as Americans rush to stock up on generators, canned food",
@@ -7,7 +17,21 @@
   "domain": "m.economictimes.com",
   "outlet": "The Economic Times",
   "sourceId": "economic-times",
-  "trust": 3
+  "trust": 3,
+  "alsoDomains": [
+   "economictimes.indiatimes.com"
+  ],
+  "alsoIn": 1
+ },
+ {
+  "fetched": "2026-11-22T06:41:12Z",
+  "published": "2026-11-21T13:51:00Z",
+  "title": "Cabinet Office working with food banks to ensure stockpiling drive doesn't impact crisis supplies",
+  "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPMzgzVVNHT3dLb0hDZHZ2bnkyak9ZbjBSbVFFMHlsVHo5VG9IY25CYXFScnNCV0RzUTMzWGVpRW80T1VvTGQyOEcwLWdfN1NOck85aEhtSjhBUUNuWFFhZEd1M0Z3azlGX1RTU1oyQm1ILTBJWjJJY2dxRDgxVlJrNS1FTGZoZG9SWEZ1MGhpT3dPUdIBlwFBVV95cUxNZy1aT2I2eGEteUs4U1hvaHpsVG1CSjBHYTJIVEVJZEQ4TEJJSmZtNV9NYUhPbDNpUTlUemI2WEhZUFhDdVpNZk9rUW03bWVyR2dXdGVKa1ItTTdvYy10ZkpSVFVmS0M4RnVaemRrQlBvck5QX09QYURrcWItQklsVmcyemFUUHZZT2JpbW85NkRrRndyZkJF?oc=5",
+  "domain": "mirror.co.uk",
+  "outlet": "The Mirror",
+  "sourceId": "mirror",
+  "trust": 2
  },
  {
   "fetched": "2026-11-21T19:10:46Z",
@@ -118,35 +142,5 @@
   "outlet": "Daily Mail",
   "sourceId": "daily-mail",
   "trust": 2
- },
- {
-  "fetched": "2026-11-20T07:08:35Z",
-  "published": "2026-11-20T06:02:00Z",
-  "title": "I lived in a city where stockpiling is normal – this is what I kept in my emergency kit",
-  "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNS2g0UFZOdEdFSnhJdWtrLVhPSjFVNTlURlNhYnlCYmlxaVF0dnRETTZITVlOOVo2SzAwaFFXYlBoY2F6WFBpVllheGhhbWo2Xzc4TTNoNG52TV82eGdGcU53ekI5SlV1ZV9DWThFVFNqeDNLanRURUtRVFZWZ2lPSVVGTnZoMnlCS1BUYTln0gGTAUFVX3lxTFBKay1ydW9WbkhiWWF3MGI3MkFfcVlHbHg5OGZsUEExcmU1eHZTMHlJM3RBM2trelRKUi1kYUFJU2NmZU1GajlNRkVKNnFkdFVOVllCUW9RYTlRMUZZbWUzYmFSMGQzd3hnRVpEUjBYUE9xYmVOeFVYVWlheUp2dnJXWlktdzBMdHVQVFlFdDRxTnpabw?oc=5",
-  "domain": "mirror.co.uk",
-  "outlet": "Mirror",
-  "sourceId": "mirror",
-  "trust": 2
- },
- {
-  "fetched": "2026-11-20T07:08:35Z",
-  "published": "2026-11-20T01:51:00Z",
-  "title": "Did Trump tell Americans to stockpile food and water? No, he told them to 'relax' about the outages",
-  "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxNS1FDY2tuU3MxR0l6RlJHZU9hV0dObVRsazVaRVFWTmRxVVhKdHJtdGw1dWtOZnY4RGlqVnFUdUdFN1daVTR4OG0taE5oVE9oT2FUQzRpcDhENFB1eEJhcG5RSXFFOXhJVmUyWDE4QzgzUXRRSWhlLTdSVDUyTzR3aXowRWgxVXVteHNNNHRSU3ZCWjJ0Nkw5U1VNYjZiQQ?oc=5",
-  "domain": "nacionale.com",
-  "outlet": "Nacionale",
-  "sourceId": null,
-  "trust": null
- },
- {
-  "fetched": "2026-11-19T20:30:25Z",
-  "published": "2026-11-19T19:56:55Z",
-  "title": "Debunking social media posts that claim a 90-day blackout will start Nov. 17",
-  "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPcmFNTmJiTzY2SFNiZlM5dE14ekFoc0ZrZFQ3T043M3BCOURXOXFza2g0ZVZwZFZxaHF3NDJNR2VIb1BXUHc0TGZtbDl5SlpUeDJPLUtJMEZuaHpFTGJsd1JLQW1NaV9TOHlqcktNTHoxVmhEQmh0R2NsMjVJbFV0RnVzcnMzSzNZWUx5SVloS2xkSFBmOXhUcXdnQmZuTU5rM3MyUjVwMWZGanB3bGQ5Sw?oc=5",
-  "domain": "pbs.org",
-  "outlet": "PBS",
-  "sourceId": "pbs",
-  "trust": 5
  }
 ]
